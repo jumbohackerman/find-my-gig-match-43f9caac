@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Heart, Briefcase, RotateCcw } from "lucide-react";
+import { X, Heart, Briefcase, RotateCcw, Users } from "lucide-react";
 import SwipeCard from "@/components/SwipeCard";
 import AppliedList from "@/components/AppliedList";
 import JobFilters, { filterJobs, type JobFiltersState } from "@/components/JobFilters";
@@ -58,17 +59,26 @@ const Index = () => {
           <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
         </div>
 
-        <button
-          onClick={() => setShowApplied(!showApplied)}
-          className="relative px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
-        >
-          Applied
-          {appliedJobs.length > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full btn-gradient text-primary-foreground text-xs flex items-center justify-center font-bold">
-              {appliedJobs.length}
-            </span>
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/profiles"
+            className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+          >
+            <Users className="w-4 h-4" />
+            Talent
+          </Link>
+          <button
+            onClick={() => setShowApplied(!showApplied)}
+            className="relative px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
+          >
+            Applied
+            {appliedJobs.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full btn-gradient text-primary-foreground text-xs flex items-center justify-center font-bold">
+                {appliedJobs.length}
+              </span>
+            )}
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 max-w-md mx-auto w-full">
