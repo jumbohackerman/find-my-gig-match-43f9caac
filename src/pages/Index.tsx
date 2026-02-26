@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Heart, Briefcase, RotateCcw, Users } from "lucide-react";
+import { X, Heart, Briefcase, RotateCcw, Users, Building2 } from "lucide-react";
 import SwipeCard from "@/components/SwipeCard";
 import AppliedList from "@/components/AppliedList";
 import JobFilters, { filterJobs, type JobFiltersState } from "@/components/JobFilters";
@@ -60,6 +60,13 @@ const Index = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            to="/employer"
+            className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+          >
+            <Building2 className="w-4 h-4" />
+            Employer
+          </Link>
           <Link
             to="/profiles"
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
