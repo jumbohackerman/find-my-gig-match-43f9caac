@@ -23,7 +23,7 @@ const Auth = () => {
 
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -33,7 +33,12 @@ const Auth = () => {
         });
         if (error) throw error;
 
-        toast.success("Check your email to confirm your account!");
+        // If session exists, user is auto-confirmed — navigate directly
+        if (data.session) {
+          navigate("/");
+        } else {
+          toast.success("Check your email to confirm your account!");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
