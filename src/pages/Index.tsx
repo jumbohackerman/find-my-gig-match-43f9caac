@@ -1,13 +1,15 @@
 import { useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Heart, Briefcase, RotateCcw, Users, Building2 } from "lucide-react";
+import { X, Heart, Briefcase, RotateCcw, Users, Building2, LogOut } from "lucide-react";
 import SwipeCard from "@/components/SwipeCard";
 import AppliedList from "@/components/AppliedList";
 import JobFilters, { filterJobs, type JobFiltersState } from "@/components/JobFilters";
 import { jobs, type Job } from "@/data/jobs";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { signOut, profile } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
   const [skippedJobs, setSkippedJobs] = useState<Job[]>([]);
@@ -84,6 +86,13 @@ const Index = () => {
                 {appliedJobs.length}
               </span>
             )}
+          </button>
+          <button
+            onClick={signOut}
+            className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors"
+            title="Sign out"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </header>
