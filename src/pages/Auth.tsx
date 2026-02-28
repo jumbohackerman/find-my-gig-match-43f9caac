@@ -23,27 +23,15 @@ const Auth = () => {
 
     try {
       if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { role, full_name: fullName },
+          },
         });
         if (error) throw error;
-
-        if (data.user) {
-          // Create profile
-          const { error: profileError } = await supabase
-            .from("profiles")
-            .insert({ user_id: data.user.id, role, full_name: fullName });
-          if (profileError) throw profileError;
-
-          // Create candidate record if candidate
-          if (role === "candidate") {
-            await supabase
-              .from("candidates")
-              .insert({ user_id: data.user.id, title: "", location: "", bio: "" });
-          }
-        }
 
         toast.success("Check your email to confirm your account!");
       } else {
