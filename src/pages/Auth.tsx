@@ -202,6 +202,13 @@ const Auth = () => {
             )}
           </p>
         </div>
+
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 w-full py-2.5 rounded-xl border border-dashed border-border text-muted-foreground text-sm font-medium hover:bg-secondary transition-colors"
+        >
+          🚀 Demo — skip login
+        </button>
       </motion.div>
     </div>
   );
