@@ -30,7 +30,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
 
   return (
     <motion.div
-      className="absolute w-full cursor-grab active:cursor-grabbing"
+      className="absolute w-full cursor-grab active:cursor-grabbing top-0 left-0"
       style={{ x, rotate, zIndex: isTop ? 10 : 0 }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
@@ -44,7 +44,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
         transition: { duration: 0.3 },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border max-h-[420px] overflow-y-auto">
+      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border">
         {/* Swipe indicators */}
         {isTop && (
           <>
@@ -64,7 +64,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
         )}
 
         {/* Company header */}
-        <div className="p-6 pb-4">
+        <div className="p-5 pb-3">
           <div className="flex items-center gap-4 mb-3">
             <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center text-3xl">
               {job.logo}
@@ -83,23 +83,23 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
             </div>
           </div>
 
-          <h2 className="font-display text-2xl font-bold text-foreground mb-1">{job.title}</h2>
+          <h2 className="font-display text-xl font-bold text-foreground mb-1">{job.title}</h2>
 
           {/* Salary - prominent */}
-          <div className="mb-3">
+          <div className="mb-2">
             {hasSalary ? (
-              <span className="text-lg font-bold text-accent">{job.salary}</span>
+              <span className="text-base font-bold text-accent">{job.salary}</span>
             ) : (
               <span className="text-sm text-muted-foreground italic">Salary not disclosed</span>
             )}
           </div>
 
-          <p className="text-muted-foreground text-sm leading-relaxed mb-4">{job.description}</p>
+          <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">{job.description}</p>
 
           {/* Match explainability */}
           {matchResult && (
-            <div className="mb-4 p-3 rounded-xl bg-secondary/50 border border-border">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+            <div className="mb-3 p-2.5 rounded-xl bg-secondary/50 border border-border">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
                 Why this matches you
               </p>
               <MatchBadge result={matchResult} />
@@ -107,17 +107,17 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
           )}
 
           {/* Details */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="w-4 h-4 text-primary" />
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="w-3.5 h-3.5 text-primary" />
               {job.location}
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Briefcase className="w-4 h-4 text-primary" />
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Briefcase className="w-3.5 h-3.5 text-primary" />
               {job.type}
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4 text-accent" />
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="w-3.5 h-3.5 text-accent" />
               {job.posted}
             </div>
           </div>

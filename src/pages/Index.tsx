@@ -172,7 +172,7 @@ const Index = () => {
         ))}
       </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 max-w-md mx-auto w-full">
+      <main className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full">
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
@@ -216,7 +216,7 @@ const Index = () => {
             ) : (
               <>
                 {/* Card stack */}
-                <div className="relative w-full h-[430px] mb-6">
+                <div className="relative w-full mb-4" style={{ minHeight: '360px' }}>
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
