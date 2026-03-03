@@ -30,7 +30,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
 
   return (
     <motion.div
-      className="absolute w-full cursor-grab active:cursor-grabbing top-0 left-0"
+      className="absolute inset-x-0 top-0 cursor-grab active:cursor-grabbing"
       style={{ x, rotate, zIndex: isTop ? 10 : 0 }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}

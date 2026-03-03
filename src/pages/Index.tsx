@@ -172,7 +172,7 @@ const Index = () => {
         ))}
       </div>
 
-      <main className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full">
+      <main className="flex-1 flex flex-col items-center justify-between px-4 py-4 max-w-md mx-auto w-full overflow-hidden">
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
@@ -214,9 +214,9 @@ const Index = () => {
                 <p className="text-muted-foreground text-sm">No jobs match your filters.</p>
               </div>
             ) : (
-              <>
+              <div className="flex flex-col flex-1 w-full items-center">
                 {/* Card stack */}
-                <div className="relative w-full h-[380px] mb-4">
+                <div className="relative w-full flex-1 min-h-0">
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
@@ -232,7 +232,7 @@ const Index = () => {
                 </div>
 
                 {/* Action buttons: Skip / Save / Apply */}
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-5 py-3 shrink-0">
                   <button
                     onClick={() => handleSwipe("left")}
                     className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
@@ -259,10 +259,10 @@ const Index = () => {
                 </div>
 
                 {/* Counter */}
-                <p className="text-muted-foreground text-xs mt-4">
+                <p className="text-muted-foreground text-xs pb-2 shrink-0">
                   {currentIndex + 1} / {filteredJobs.length}
                 </p>
-              </>
+              </div>
             )}
           </>
         )}
