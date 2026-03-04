@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 import { Briefcase, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import SeekerCard from "@/components/SeekerCard";
+import CandidateProfileModal from "@/components/CandidateProfileModal";
+import type { ExtendedSeeker } from "@/components/CandidateProfileModal";
 import { seekers } from "@/data/seekers";
 
 const Profiles = () => {
   const [search, setSearch] = useState("");
+  const [selectedSeeker, setSelectedSeeker] = useState<ExtendedSeeker | null>(null);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return seekers;
@@ -43,7 +46,7 @@ const Profiles = () => {
             Talent Pool
           </h2>
           <p className="text-muted-foreground text-sm mb-5">
-            Browse job seekers by skills, role, or location.
+            Browse job seekers by skills, role, or location. Click to see full profile.
           </p>
 
           <div className="relative mb-6">
@@ -64,11 +67,21 @@ const Profiles = () => {
         ) : (
           <div className="flex flex-col gap-4">
             {filtered.map((seeker, i) => (
-              <SeekerCard key={seeker.id} seeker={seeker} index={i} />
+              <SeekerCard
+                key={seeker.id}
+                seeker={seeker}
+                index={i}
+                onClick={() => setSelectedSeeker(seeker as ExtendedSeeker)}
+              />
             ))}
           </div>
         )}
       </main>
+
+      <CandidateProfileModal
+        seeker={selectedSeeker}
+        onClose={() => setSelectedSeeker(null)}
+      />
     </div>
   );
 };

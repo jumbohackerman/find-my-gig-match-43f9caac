@@ -8,6 +8,10 @@ import {
 import { jobs as initialJobs, type Job } from "@/data/jobs";
 import { seekers, type Seeker } from "@/data/seekers";
 import MatchBadge from "@/components/MatchBadge";
+import MatchScoreBreakdown, { computeBreakdown } from "@/components/MatchScoreBreakdown";
+import CandidateProfileModal from "@/components/CandidateProfileModal";
+import type { ExtendedSeeker } from "@/components/CandidateProfileModal";
+import { getActivityLabel } from "@/components/CandidateProfileModal";
 import { calculateMatch, type CandidateProfile, type MatchResult } from "@/lib/matchScoring";
 
 // Convert seeker to CandidateProfile for scoring
@@ -55,6 +59,7 @@ const Employer = () => {
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<{ seeker: ExtendedSeeker; match: MatchResult } | null>(null);
 
   const [form, setForm] = useState({
     title: "", company: "", logo: "🏢", location: "", salary: "",
@@ -282,20 +287,32 @@ const Employer = () => {
                             <p className="text-xs text-muted-foreground">No applicants yet.</p>
                           ) : (
                             <div className="space-y-2">
-                              {jobApplicants.map((seeker) => (
-                                <div key={seeker.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-                                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm">{seeker.avatar}</div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-foreground">{seeker.name}</p>
-                                    <p className="text-xs text-muted-foreground">{seeker.title} · {seeker.experience}</p>
+                              {jobApplicants.map((seeker) => {
+                                const activity = getActivityLabel(undefined);
+                                return (
+                                  <div
+                                    key={seeker.id}
+                                    className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 cursor-pointer hover:bg-secondary/80 transition-colors"
+                                    onClick={() => {
+                                      const job = postedJobs.find((j) => j.id === expandedJob)!;
+                                      const m = calculateMatch(seekerToProfile(seeker), job);
+                                      setSelectedCandidate({ seeker: seeker as ExtendedSeeker, match: m });
+                                    }}
+                                  >
+                                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm">{seeker.avatar}</div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-foreground">{seeker.name}</p>
+                                      <p className="text-xs text-muted-foreground">{seeker.title} · {seeker.experience}</p>
+                                      <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
+                                    </div>
+                                    <div className="flex gap-1 flex-wrap justify-end">
+                                      {seeker.skills.slice(0, 2).map((skill) => (
+                                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
+                                      ))}
+                                    </div>
                                   </div>
-                                  <div className="flex gap-1 flex-wrap justify-end">
-                                    {seeker.skills.slice(0, 2).map((skill) => (
-                                      <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -315,9 +332,19 @@ const Employer = () => {
                             <p className="text-xs text-muted-foreground">No applicants to analyze.</p>
                           ) : (
                             <div className="space-y-3">
-                              {rankedApplicants.map(({ seeker, match }, idx) => (
-                                <ApplicantAnalysisCard key={seeker.id} seeker={seeker} match={match} rank={idx + 1} />
-                              ))}
+                              {rankedApplicants.map(({ seeker, match }, idx) => {
+                                const job = postedJobs.find((j) => j.id === analyzedJob)!;
+                                return (
+                                  <ApplicantAnalysisCard
+                                    key={seeker.id}
+                                    seeker={seeker}
+                                    match={match}
+                                    rank={idx + 1}
+                                    job={job}
+                                    onViewProfile={() => setSelectedCandidate({ seeker: seeker as ExtendedSeeker, match })}
+                                  />
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -330,13 +357,22 @@ const Employer = () => {
           </AnimatePresence>
         </div>
       </main>
+
+      <CandidateProfileModal
+        seeker={selectedCandidate?.seeker || null}
+        match={selectedCandidate?.match}
+        onClose={() => setSelectedCandidate(null)}
+      />
     </div>
   );
 };
 
 // Sub-component for analyzed applicant card
-function ApplicantAnalysisCard({ seeker, match, rank }: { seeker: Seeker; match: MatchResult; rank: number }) {
+function ApplicantAnalysisCard({ seeker, match, rank, job, onViewProfile }: { seeker: Seeker; match: MatchResult; rank: number; job: Job; onViewProfile: () => void }) {
   const [expanded, setExpanded] = useState(false);
+  const activity = getActivityLabel(undefined); // demo data - no real last_active
+  const profile = seekerToProfile(seeker);
+  const breakdown = computeBreakdown(profile, job);
 
   return (
     <div className="rounded-lg bg-secondary/50 border border-border overflow-hidden">
@@ -346,6 +382,7 @@ function ApplicantAnalysisCard({ seeker, match, rank }: { seeker: Seeker; match:
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">{seeker.name}</p>
           <p className="text-xs text-muted-foreground">{seeker.title} · {seeker.experience}</p>
+          <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
         </div>
         <MatchBadge result={match} compact />
         {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -354,8 +391,15 @@ function ApplicantAnalysisCard({ seeker, match, rank }: { seeker: Seeker; match:
         {expanded && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
             <div className="px-3 pb-3 pt-0 border-t border-border">
-              <div className="pt-3">
+              <div className="pt-3 space-y-3">
+                <MatchScoreBreakdown breakdown={breakdown} totalScore={match.score} />
                 <MatchBadge result={match} />
+                <button
+                  onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  View full profile →
+                </button>
               </div>
             </div>
           </motion.div>

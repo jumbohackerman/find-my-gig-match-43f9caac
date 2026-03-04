@@ -48,37 +48,67 @@ export type Database = {
           availability: string
           bio: string
           created_at: string
+          cv_url: string | null
+          employment_type: string
           experience: string
+          experience_entries: Json
           id: string
+          last_active: string
+          links: Json
           location: string
+          salary_max: number
+          salary_min: number
+          seniority: string
           skills: string[]
+          summary: string
           title: string
           updated_at: string
           user_id: string
+          work_mode: string
         }
         Insert: {
           availability?: string
           bio?: string
           created_at?: string
+          cv_url?: string | null
+          employment_type?: string
           experience?: string
+          experience_entries?: Json
           id?: string
+          last_active?: string
+          links?: Json
           location?: string
+          salary_max?: number
+          salary_min?: number
+          seniority?: string
           skills?: string[]
+          summary?: string
           title?: string
           updated_at?: string
           user_id: string
+          work_mode?: string
         }
         Update: {
           availability?: string
           bio?: string
           created_at?: string
+          cv_url?: string | null
+          employment_type?: string
           experience?: string
+          experience_entries?: Json
           id?: string
+          last_active?: string
+          links?: Json
           location?: string
+          salary_max?: number
+          salary_min?: number
+          seniority?: string
           skills?: string[]
+          summary?: string
           title?: string
           updated_at?: string
           user_id?: string
+          work_mode?: string
         }
         Relationships: []
       }
