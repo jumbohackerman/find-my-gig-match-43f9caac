@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Clock, Briefcase, DollarSign } from "lucide-react";
+import { MapPin, Clock, Briefcase, DollarSign, Wifi } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
 import type { Job } from "@/data/jobs";
 import type { MatchResult } from "@/lib/matchScoring";
@@ -27,6 +27,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
   };
 
   const hasSalary = job.salary && job.salary.trim().length > 0;
+  const workMode = job.type === "Remote" || job.location.toLowerCase().includes("remote") ? "Remote" : job.type === "Contract" ? "Hybrid" : "Onsite";
 
   return (
     <motion.div
@@ -107,7 +108,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
           )}
 
           {/* Details */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="w-3.5 h-3.5 text-primary" />
               {job.location}
@@ -117,7 +118,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
               {job.type}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Clock className="w-3.5 h-3.5 text-accent" />
+              <Wifi className="w-3.5 h-3.5 text-accent" />
+              {workMode}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="w-3.5 h-3.5 text-muted-foreground" />
               {job.posted}
             </div>
           </div>

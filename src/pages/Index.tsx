@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, Briefcase, RotateCcw, Users, Building2, LogOut } from "lucide-react";
+import { X, Check, Star, Briefcase, RotateCcw, Users, Building2, LogOut, User } from "lucide-react";
 import SwipeCard from "@/components/SwipeCard";
 import AppliedList from "@/components/AppliedList";
 import SavedList from "@/components/SavedList";
@@ -122,6 +122,13 @@ const Index = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            to="/my-profile"
+            className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+          >
+            <User className="w-4 h-4" />
+            My Profile
+          </Link>
           <Link
             to="/employer"
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"

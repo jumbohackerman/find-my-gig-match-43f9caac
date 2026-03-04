@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Profiles from "./pages/Profiles";
 import Employer from "./pages/Employer";
+import MyProfile from "./pages/MyProfile";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/my-profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
             <Route path="/profiles" element={<ProtectedRoute><Profiles /></ProtectedRoute>} />
             <Route path="/employer" element={<ProtectedRoute><Employer /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
