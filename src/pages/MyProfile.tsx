@@ -60,7 +60,7 @@ function computeCompleteness(data: {
 }
 
 const MyProfile = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -98,7 +98,11 @@ const MyProfile = () => {
   const [activeSection, setActiveSection] = useState<string>("basic");
 
   useEffect(() => {
-    if (!user) return;
+    if (authLoading) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     const load = async () => {
       const { data } = await supabase
         .from("candidates")
@@ -109,27 +113,27 @@ const MyProfile = () => {
       if (data) {
         setTitle(data.title || "");
         setLocation(data.location || "");
-        setSummary((data as any).summary || "");
+        setSummary(data.summary || "");
         setSkills(data.skills || []);
-        setSeniority((data as any).seniority || "Mid");
-        setWorkMode((data as any).work_mode || "Remote");
-        setEmploymentType((data as any).employment_type || "Full-time");
-        setSalaryMin((data as any).salary_min || 0);
-        setSalaryMax((data as any).salary_max || 0);
+        setSeniority(data.seniority || "Mid");
+        setWorkMode(data.work_mode || "Remote");
+        setEmploymentType(data.employment_type || "Full-time");
+        setSalaryMin(data.salary_min || 0);
+        setSalaryMax(data.salary_max || 0);
         setAvailability(data.availability || "Open to work");
-        setExperienceEntries((data as any).experience_entries || []);
-        setLinks((data as any).links || {});
-        setCvUrl((data as any).cv_url || null);
+        setExperienceEntries((data.experience_entries as any) || []);
+        setLinks((data.links as any) || {});
+        setCvUrl(data.cv_url || null);
 
         const expMatch = data.experience?.match(/(\d+)/);
         setExperienceYears(expMatch ? parseInt(expMatch[1]) : 0);
       }
 
-      setFullName(profile?.full_name || "");
+      setFullName(profile?.full_name || user.user_metadata?.full_name || "");
       setLoading(false);
     };
     load();
-  }, [user, profile]);
+  }, [user, profile, authLoading]);
 
   const handleSave = async () => {
     if (!user) return;
