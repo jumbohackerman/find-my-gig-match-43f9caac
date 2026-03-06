@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, TrendingUp, Zap,
+  BarChart3, TrendingUp, Zap, Layers, MessageSquare,
 } from "lucide-react";
 import { jobs as initialJobs, type Job } from "@/data/jobs";
 import { seekers, type Seeker } from "@/data/seekers";
@@ -13,8 +13,17 @@ import CandidateProfileModal from "@/components/CandidateProfileModal";
 import type { ExtendedSeeker } from "@/components/CandidateProfileModal";
 import { getActivityLabel } from "@/components/CandidateProfileModal";
 import { calculateMatch, type CandidateProfile, type MatchResult } from "@/lib/matchScoring";
+import StatusBadge from "@/components/employer/StatusBadge";
+import SourceLabel from "@/components/employer/SourceLabel";
+import StatusPipeline from "@/components/employer/StatusPipeline";
+import EmptyState from "@/components/employer/EmptyState";
+import ChatPanel from "@/components/employer/ChatPanel";
+import EmployerCandidateSwipe from "@/components/employer/EmployerCandidateSwipe";
+import type { ApplicationStatus, ApplicationSource, DemoApplication, DemoMessage } from "@/types/application";
 
-// Convert seeker to CandidateProfile for scoring
+const MAX_SHORTLIST = 5;
+const MAX_PICKS = 5;
+
 function seekerToProfile(seeker: Seeker): CandidateProfile {
   const expMatch = seeker.experience.match(/(\d+)/);
   return {
@@ -29,7 +38,7 @@ function seekerToProfile(seeker: Seeker): CandidateProfile {
   };
 }
 
-// Simulate some applicants per job
+// Generate demo applicants
 const generateApplicants = () => {
   const map: Record<string, typeof seekers> = {};
   initialJobs.forEach((job) => {
@@ -40,7 +49,6 @@ const generateApplicants = () => {
   return map;
 };
 
-// Simulate metrics
 const generateMetrics = () => {
   const map: Record<string, { views: number; swipesRight: number; applications: number }> = {};
   initialJobs.forEach((job) => {
@@ -52,34 +60,161 @@ const generateMetrics = () => {
   return map;
 };
 
+// Generate initial demo applications from applicants
+function generateDemoApps(applicants: Record<string, Seeker[]>): DemoApplication[] {
+  const apps: DemoApplication[] = [];
+  Object.entries(applicants).forEach(([jobId, jobSeekers]) => {
+    jobSeekers.forEach((s) => {
+      apps.push({
+        id: `${jobId}-${s.id}`,
+        candidateId: s.id,
+        jobId,
+        status: "applied",
+        source: "candidate",
+        appliedAt: new Date().toISOString(),
+      });
+    });
+  });
+  return apps;
+}
+
+type EmployerTab = "listings" | "swipe";
+
 const Employer = () => {
   const [postedJobs, setPostedJobs] = useState<Job[]>(initialJobs);
   const [applicants] = useState(generateApplicants);
   const [metrics] = useState(generateMetrics);
+  const [applications, setApplications] = useState<DemoApplication[]>(() => generateDemoApps(applicants));
+  const [messages, setMessages] = useState<DemoMessage[]>([]);
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
+  const [swipeJob, setSwipeJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ seeker: ExtendedSeeker; match: MatchResult } | null>(null);
+  const [chatOpen, setChatOpen] = useState<string | null>(null); // application id
+  const [swipeIndexes, setSwipeIndexes] = useState<Record<string, number>>({});
+  const [picksUsed, setPicksUsed] = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab] = useState<EmployerTab>("listings");
 
   const [form, setForm] = useState({
     title: "", company: "", logo: "🏢", location: "", salary: "",
     type: "Full-time" as Job["type"], description: "", tags: "",
   });
 
-  // Pre-compute match scores for analyzed job
+  // Helpers
+  const getApp = (jobId: string, candidateId: string) =>
+    applications.find((a) => a.jobId === jobId && a.candidateId === candidateId);
+
+  const getJobApps = (jobId: string) =>
+    applications.filter((a) => a.jobId === jobId);
+
+  const getShortlisted = (jobId: string) =>
+    applications.filter((a) => a.jobId === jobId && a.status === "shortlisted");
+
+  const updateAppStatus = useCallback((appId: string, status: ApplicationStatus) => {
+    setApplications((prev) => prev.map((a) => a.id === appId ? { ...a, status } : a));
+  }, []);
+
+  // Mark as viewed when opening profile
+  const handleViewCandidate = useCallback((seeker: Seeker, match: MatchResult, jobId: string) => {
+    const app = getApp(jobId, seeker.id);
+    if (app && app.status === "applied") {
+      updateAppStatus(app.id, "viewed");
+    }
+    setSelectedCandidate({ seeker: seeker as ExtendedSeeker, match });
+  }, [applications]);
+
+  // AI shortlist generation
+  const handleGenerateShortlist = useCallback((jobId: string) => {
+    const job = postedJobs.find((j) => j.id === jobId);
+    if (!job) return;
+    const jobApplicants = applicants[jobId] || [];
+    const existing = getShortlisted(jobId).length;
+    const slotsAvailable = MAX_SHORTLIST - existing;
+    if (slotsAvailable <= 0) return;
+
+    const ranked = jobApplicants
+      .map((s) => ({ seeker: s, match: calculateMatch(seekerToProfile(s), job) }))
+      .sort((a, b) => b.match.score - a.match.score);
+
+    const toShortlist = ranked
+      .filter(({ seeker }) => {
+        const app = getApp(jobId, seeker.id);
+        return app && app.status !== "shortlisted";
+      })
+      .slice(0, slotsAvailable);
+
+    setApplications((prev) =>
+      prev.map((a) => {
+        const found = toShortlist.find((t) => a.jobId === jobId && a.candidateId === t.seeker.id);
+        return found ? { ...a, status: "shortlisted" as ApplicationStatus, source: "ai" as ApplicationSource } : a;
+      })
+    );
+  }, [postedJobs, applicants, applications]);
+
+  // Employer swipe pick
+  const handleSwipePick = useCallback((jobId: string, seekerId: string) => {
+    const shortlisted = getShortlisted(jobId);
+    if (shortlisted.length >= MAX_SHORTLIST) return; // full
+
+    setApplications((prev) =>
+      prev.map((a) =>
+        a.jobId === jobId && a.candidateId === seekerId
+          ? { ...a, status: "shortlisted" as ApplicationStatus, source: "employer" as ApplicationSource }
+          : a
+      )
+    );
+    setPicksUsed((prev) => ({ ...prev, [jobId]: (prev[jobId] || 0) + 1 }));
+    setSwipeIndexes((prev) => ({ ...prev, [jobId]: (prev[jobId] || 0) + 1 }));
+  }, [applications]);
+
+  const handleSwipeSkip = useCallback((jobId: string) => {
+    setSwipeIndexes((prev) => ({ ...prev, [jobId]: (prev[jobId] || 0) + 1 }));
+  }, []);
+
+  // Chat
+  const handleSendMessage = useCallback((applicationId: string, content: string) => {
+    const msg: DemoMessage = {
+      id: String(Date.now()),
+      applicationId,
+      senderId: "employer",
+      senderName: "You",
+      content,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, msg]);
+  }, []);
+
+  const handleUnlockChat = useCallback((applicationId: string) => {
+    setChatOpen(applicationId);
+  }, []);
+
+  // Status advancement
+  const handleAdvanceStatus = useCallback((appId: string, newStatus: ApplicationStatus) => {
+    updateAppStatus(appId, newStatus);
+  }, [updateAppStatus]);
+
+  // Ranked applicants for analysis
   const rankedApplicants = useMemo(() => {
     if (!analyzedJob) return [];
     const job = postedJobs.find((j) => j.id === analyzedJob);
     const jobApplicants = applicants[analyzedJob] || [];
     if (!job) return [];
-
     return jobApplicants
-      .map((seeker) => ({
-        seeker,
-        match: calculateMatch(seekerToProfile(seeker), job),
-      }))
+      .map((seeker) => ({ seeker, match: calculateMatch(seekerToProfile(seeker), job) }))
       .sort((a, b) => b.match.score - a.match.score);
   }, [analyzedJob, postedJobs, applicants]);
+
+  // Swipe candidates for a job
+  const swipeCandidates = useMemo(() => {
+    if (!swipeJob) return [];
+    const job = postedJobs.find((j) => j.id === swipeJob);
+    const jobApplicants = applicants[swipeJob] || [];
+    if (!job) return [];
+    return jobApplicants
+      .map((seeker) => ({ seeker, match: calculateMatch(seekerToProfile(seeker), job) }))
+      .sort((a, b) => b.match.score - a.match.score);
+  }, [swipeJob, postedJobs, applicants]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,6 +233,7 @@ const Employer = () => {
 
   const handleDelete = (id: string) => {
     setPostedJobs((prev) => prev.filter((j) => j.id !== id));
+    setApplications((prev) => prev.filter((a) => a.jobId !== id));
   };
 
   const getAvgMatchScore = (jobId: string) => {
@@ -105,8 +241,7 @@ const Employer = () => {
     const jobApplicants = applicants[jobId] || [];
     if (!job || jobApplicants.length === 0) return 0;
     const total = jobApplicants.reduce(
-      (sum, s) => sum + calculateMatch(seekerToProfile(s), job).score,
-      0
+      (sum, s) => sum + calculateMatch(seekerToProfile(s), job).score, 0
     );
     return Math.round(total / jobApplicants.length);
   };
@@ -132,10 +267,10 @@ const Employer = () => {
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="font-display text-2xl font-bold text-foreground">Employer Dashboard</h2>
-              <p className="text-muted-foreground text-sm mt-1">Manage your listings and analyze applicants.</p>
+              <p className="text-muted-foreground text-sm mt-1">Manage listings, shortlists, and candidates.</p>
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
@@ -215,8 +350,11 @@ const Employer = () => {
           <AnimatePresence>
             {postedJobs.map((job, i) => {
               const jobApplicants = applicants[job.id] || [];
+              const jobApps = getJobApps(job.id);
+              const shortlisted = getShortlisted(job.id);
               const isExpanded = expandedJob === job.id;
               const isAnalyzed = analyzedJob === job.id;
+              const isSwipe = swipeJob === job.id;
               const m = metrics[job.id] || { views: 0, swipesRight: 0, applications: 0 };
               const avgScore = getAvgMatchScore(job.id);
 
@@ -230,10 +368,11 @@ const Employer = () => {
                   className="card-gradient rounded-xl border border-border overflow-hidden"
                 >
                   {/* Metrics bar */}
-                  <div className="px-4 pt-3 flex gap-4 text-[11px] text-muted-foreground">
+                  <div className="px-4 pt-3 flex gap-4 text-[11px] text-muted-foreground flex-wrap">
                     <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {m.views} views</span>
                     <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {m.swipesRight} swipes</span>
-                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {m.applications} applied</span>
+                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApplicants.length} applied</span>
+                    <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlisted</span>
                     <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% avg match</span>
                   </div>
 
@@ -245,27 +384,50 @@ const Employer = () => {
                       <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
                       <p className="text-xs text-muted-foreground">{job.company} · {job.location} · {job.posted}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                      {/* Generate Shortlist */}
+                      <button
+                        onClick={() => handleGenerateShortlist(job.id)}
+                        disabled={shortlisted.length >= MAX_SHORTLIST}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        title="AI generates shortlist"
+                      >
+                        <Zap className="w-3.5 h-3.5" /> Generate Shortlist
+                      </button>
+                      {/* Swipe picks */}
+                      <button
+                        onClick={() => {
+                          setSwipeJob(isSwipe ? null : job.id);
+                          setExpandedJob(null);
+                          setAnalyzedJob(null);
+                        }}
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          isSwipe ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <Users className="w-3.5 h-3.5" /> Swipe ({MAX_PICKS - (picksUsed[job.id] || 0)})
+                      </button>
+                      {/* Analyze */}
                       <button
                         onClick={() => {
                           setAnalyzedJob(isAnalyzed ? null : job.id);
                           setExpandedJob(null);
+                          setSwipeJob(null);
                         }}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                          isAnalyzed
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-accent/15 text-accent hover:bg-accent/25"
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          isAnalyzed ? "bg-primary text-primary-foreground" : "bg-accent/15 text-accent hover:bg-accent/25"
                         }`}
                       >
-                        <Zap className="w-3.5 h-3.5" />
-                        Analyze
+                        <BarChart3 className="w-3.5 h-3.5" /> Analyze
                       </button>
+                      {/* Applicants */}
                       <button
                         onClick={() => {
                           setExpandedJob(isExpanded ? null : job.id);
                           setAnalyzedJob(null);
+                          setSwipeJob(null);
                         }}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         {jobApplicants.length}
@@ -277,39 +439,131 @@ const Employer = () => {
                     </div>
                   </div>
 
+                  {/* Employer Swipe Picks */}
+                  <AnimatePresence>
+                    {isSwipe && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="px-4 pb-4 border-t border-border pt-3">
+                          <h5 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5" /> Swipe Picks — Add to Shortlist
+                          </h5>
+                          <EmployerCandidateSwipe
+                            candidates={swipeCandidates}
+                            picksRemaining={MAX_PICKS - (picksUsed[job.id] || 0)}
+                            maxPicks={MAX_PICKS}
+                            onSwipeRight={(seekerId) => handleSwipePick(job.id, seekerId)}
+                            onSkip={() => handleSwipeSkip(job.id)}
+                            currentIndex={swipeIndexes[job.id] || 0}
+                            onViewProfile={(seeker, match) => handleViewCandidate(seeker, match, job.id)}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Regular applicant list */}
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="px-4 pb-4 border-t border-border pt-3">
-                          <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Applicants ({jobApplicants.length})</h5>
+                          <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                            Applicants ({jobApplicants.length})
+                          </h5>
                           {jobApplicants.length === 0 ? (
-                            <p className="text-xs text-muted-foreground">No applicants yet.</p>
+                            <EmptyState
+                              title="No applicants yet"
+                              description="No candidates yet. Share this job listing to receive applications."
+                            />
                           ) : (
                             <div className="space-y-2">
                               {jobApplicants.map((seeker) => {
+                                const app = getApp(job.id, seeker.id);
                                 const activity = getActivityLabel(undefined);
+                                const appMessages = messages.filter((m) => m.applicationId === app?.id);
+                                const isChatOpen = chatOpen === app?.id;
+
                                 return (
-                                  <div
-                                    key={seeker.id}
-                                    className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 cursor-pointer hover:bg-secondary/80 transition-colors"
-                                    onClick={() => {
-                                      const job = postedJobs.find((j) => j.id === expandedJob)!;
-                                      const m = calculateMatch(seekerToProfile(seeker), job);
-                                      setSelectedCandidate({ seeker: seeker as ExtendedSeeker, match: m });
-                                    }}
-                                  >
-                                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm">{seeker.avatar}</div>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-foreground">{seeker.name}</p>
-                                      <p className="text-xs text-muted-foreground">{seeker.title} · {seeker.experience}</p>
-                                      <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
+                                  <div key={seeker.id} className="rounded-lg bg-secondary/50 border border-border overflow-hidden">
+                                    <div
+                                      className="flex items-center gap-3 p-3 cursor-pointer hover:bg-secondary/80 transition-colors"
+                                      onClick={() => {
+                                        const matchResult = calculateMatch(seekerToProfile(seeker), job);
+                                        handleViewCandidate(seeker, matchResult, job.id);
+                                      }}
+                                    >
+                                      <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm">{seeker.avatar}</div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-foreground">{seeker.name}</p>
+                                        <p className="text-xs text-muted-foreground">{seeker.title} · {seeker.experience}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                          <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
+                                          {app && <StatusBadge status={app.status} />}
+                                          {app && app.source !== "candidate" && <SourceLabel source={app.source} />}
+                                        </div>
+                                      </div>
+                                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                        <div className="flex gap-1 flex-wrap justify-end">
+                                          {seeker.skills.slice(0, 2).map((skill) => (
+                                            <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
+                                          ))}
+                                        </div>
+                                        {/* Status actions */}
+                                        {app && (
+                                          <div className="flex gap-1">
+                                            {app.status === "applied" && (
+                                              <button
+                                                onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "shortlisted"); }}
+                                                className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25"
+                                              >
+                                                Shortlist
+                                              </button>
+                                            )}
+                                            {(app.status === "shortlisted" || app.status === "viewed") && (
+                                              <button
+                                                onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "interview"); }}
+                                                className="text-[10px] px-2 py-0.5 rounded bg-yellow-400/15 text-yellow-500 hover:bg-yellow-400/25"
+                                              >
+                                                Interview
+                                              </button>
+                                            )}
+                                            {app.status === "interview" && (
+                                              <>
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "hired"); }}
+                                                  className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25"
+                                                >
+                                                  Hire
+                                                </button>
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "closed"); }}
+                                                  className="text-[10px] px-2 py-0.5 rounded bg-destructive/15 text-destructive hover:bg-destructive/25"
+                                                >
+                                                  Close
+                                                </button>
+                                              </>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
-                                    <div className="flex gap-1 flex-wrap justify-end">
-                                      {seeker.skills.slice(0, 2).map((skill) => (
-                                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
-                                      ))}
-                                    </div>
+
+                                    {/* Status pipeline */}
+                                    {app && (
+                                      <div className="px-3 pb-2">
+                                        <StatusPipeline currentStatus={app.status} />
+                                      </div>
+                                    )}
+
+                                    {/* Chat */}
+                                    {app && (
+                                      <ChatPanel
+                                        messages={appMessages}
+                                        onSend={(content) => handleSendMessage(app.id, content)}
+                                        candidateName={seeker.name}
+                                        isUnlocked={isChatOpen || appMessages.length > 0}
+                                        onUnlock={() => handleUnlockChat(app.id)}
+                                      />
+                                    )}
                                   </div>
                                 );
                               })}
@@ -329,11 +583,14 @@ const Employer = () => {
                             <Zap className="w-3.5 h-3.5" /> AI Match Analysis — Ranked by Score
                           </h5>
                           {rankedApplicants.length === 0 ? (
-                            <p className="text-xs text-muted-foreground">No applicants to analyze.</p>
+                            <EmptyState
+                              title="No applicants to analyze"
+                              description="Share this job listing to receive applications for analysis."
+                            />
                           ) : (
                             <div className="space-y-3">
                               {rankedApplicants.map(({ seeker, match }, idx) => {
-                                const job = postedJobs.find((j) => j.id === analyzedJob)!;
+                                const app = getApp(job.id, seeker.id);
                                 return (
                                   <ApplicantAnalysisCard
                                     key={seeker.id}
@@ -341,7 +598,8 @@ const Employer = () => {
                                     match={match}
                                     rank={idx + 1}
                                     job={job}
-                                    onViewProfile={() => setSelectedCandidate({ seeker: seeker as ExtendedSeeker, match })}
+                                    app={app}
+                                    onViewProfile={() => handleViewCandidate(seeker, match, job.id)}
                                   />
                                 );
                               })}
@@ -368,9 +626,14 @@ const Employer = () => {
 };
 
 // Sub-component for analyzed applicant card
-function ApplicantAnalysisCard({ seeker, match, rank, job, onViewProfile }: { seeker: Seeker; match: MatchResult; rank: number; job: Job; onViewProfile: () => void }) {
+function ApplicantAnalysisCard({
+  seeker, match, rank, job, app, onViewProfile,
+}: {
+  seeker: Seeker; match: MatchResult; rank: number; job: Job;
+  app?: DemoApplication; onViewProfile: () => void;
+}) {
   const [expanded, setExpanded] = useState(false);
-  const activity = getActivityLabel(undefined); // demo data - no real last_active
+  const activity = getActivityLabel(undefined);
   const profile = seekerToProfile(seeker);
   const breakdown = computeBreakdown(profile, job);
 
@@ -382,7 +645,11 @@ function ApplicantAnalysisCard({ seeker, match, rank, job, onViewProfile }: { se
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">{seeker.name}</p>
           <p className="text-xs text-muted-foreground">{seeker.title} · {seeker.experience}</p>
-          <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
+            {app && <StatusBadge status={app.status} />}
+            {app && app.source !== "candidate" && <SourceLabel source={app.source} />}
+          </div>
         </div>
         <MatchBadge result={match} compact />
         {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}

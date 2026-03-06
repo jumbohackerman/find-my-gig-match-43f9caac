@@ -20,18 +20,24 @@ export type Database = {
           candidate_id: string
           id: string
           job_id: string
+          source: string
+          status: string
         }
         Insert: {
           applied_at?: string
           candidate_id: string
           id?: string
           job_id: string
+          source?: string
+          status?: string
         }
         Update: {
           applied_at?: string
           candidate_id?: string
           id?: string
           job_id?: string
+          source?: string
+          status?: string
         }
         Relationships: [
           {
@@ -159,6 +165,38 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          application_id: string
+          content: string
+          created_at: string
+          id: string
+          sender_id: string
+        }
+        Insert: {
+          application_id: string
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id: string
+        }
+        Update: {
+          application_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

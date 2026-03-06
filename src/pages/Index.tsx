@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, Briefcase, RotateCcw, Users, Building2, LogOut, User } from "lucide-react";
+import { X, Check, Star, Briefcase, RotateCcw, Users, Building2, LogOut, User, Bell } from "lucide-react";
 import SwipeCard from "@/components/SwipeCard";
 import AppliedList from "@/components/AppliedList";
 import SavedList from "@/components/SavedList";
@@ -14,6 +14,13 @@ import { calculateMatch, DEMO_CANDIDATE, type CandidateProfile, type MatchResult
 
 type Tab = "swipe" | "applied" | "saved";
 
+interface Notification {
+  id: string;
+  message: string;
+  jobTitle: string;
+  read: boolean;
+}
+
 const Index = () => {
   const { signOut, user, profile } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,14 +31,32 @@ const Index = () => {
   const [filters, setFilters] = useState<JobFiltersState>({ ...defaultFilters });
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [candidateProfile, setCandidateProfile] = useState<CandidateProfile>(DEMO_CANDIDATE);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
-  // Check if onboarding needed (first login as candidate)
   useEffect(() => {
     if (user && profile?.role === "candidate") {
       const onboarded = localStorage.getItem(`onboarded_${user.id}`);
       if (!onboarded) setShowOnboarding(true);
     }
   }, [user, profile]);
+
+  // Demo: simulate shortlist notifications after some applications
+  useEffect(() => {
+    if (appliedJobs.length >= 2 && notifications.length === 0) {
+      const timer = setTimeout(() => {
+        setNotifications([
+          {
+            id: "n1",
+            message: "You were shortlisted for this role.",
+            jobTitle: appliedJobs[0].title,
+            read: false,
+          },
+        ]);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [appliedJobs.length]);
 
   const handleOnboardingComplete = (data: {
     title: string;
@@ -102,6 +127,12 @@ const Index = () => {
     setCurrentIndex(0);
   };
 
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: "swipe", label: "Browse" },
     { key: "applied", label: "My Applications", count: appliedJobs.length },
@@ -122,6 +153,51 @@ const Index = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Notifications bell */}
+          <div className="relative">
+            <button
+              onClick={() => { setShowNotifications(!showNotifications); markAllRead(); }}
+              className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors relative"
+            >
+              <Bell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-accent-foreground text-[9px] font-bold flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notification dropdown */}
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="absolute right-0 top-12 w-72 card-gradient rounded-xl border border-border shadow-lg z-50 overflow-hidden"
+                >
+                  <div className="p-3 border-b border-border">
+                    <p className="text-xs font-semibold text-foreground">Notifications</p>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-muted-foreground">
+                      No notifications yet
+                    </div>
+                  ) : (
+                    <div className="max-h-60 overflow-y-auto">
+                      {notifications.map((n) => (
+                        <div key={n.id} className={`p-3 border-b border-border last:border-0 ${n.read ? "" : "bg-accent/5"}`}>
+                          <p className="text-xs font-medium text-foreground">{n.message}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{n.jobTitle}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <Link
             to="/my-profile"
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
@@ -238,7 +314,7 @@ const Index = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Action buttons: Skip / Save / Apply */}
+                {/* Action buttons */}
                 <div className="flex items-center gap-5 mt-4">
                   <button
                     onClick={() => handleSwipe("left")}
@@ -247,7 +323,6 @@ const Index = () => {
                   >
                     <X className="w-6 h-6" />
                   </button>
-
                   <button
                     onClick={() => handleSwipe("save")}
                     className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors"
@@ -255,7 +330,6 @@ const Index = () => {
                   >
                     <Star className="w-5 h-5" />
                   </button>
-
                   <button
                     onClick={() => handleSwipe("right")}
                     className="w-16 h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform"
@@ -265,7 +339,6 @@ const Index = () => {
                   </button>
                 </div>
 
-                {/* Counter */}
                 <p className="text-muted-foreground text-xs mt-3">
                   {currentIndex + 1} / {filteredJobs.length}
                 </p>
