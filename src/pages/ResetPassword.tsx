@@ -13,7 +13,6 @@ const ResetPassword = () => {
   const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
-    // Listen for PASSWORD_RECOVERY event from the auth link
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event) => {
         if (event === "PASSWORD_RECOVERY") {
@@ -21,7 +20,6 @@ const ResetPassword = () => {
         }
       }
     );
-    // Also check hash for type=recovery
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) {
       setIsRecovery(true);
@@ -32,21 +30,21 @@ const ResetPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords don't match");
+      toast.error("Hasła nie pasują do siebie");
       return;
     }
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      toast.error("Hasło musi mieć co najmniej 6 znaków");
       return;
     }
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      toast.success("Password updated successfully!");
+      toast.success("Hasło zostało zaktualizowane!");
       navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Failed to update password");
+      toast.error(err.message || "Nie udało się zaktualizować hasła");
     } finally {
       setLoading(false);
     }
@@ -68,13 +66,13 @@ const ResetPassword = () => {
           </div>
           <div className="card-gradient rounded-2xl border border-border p-6">
             <p className="text-muted-foreground text-sm">
-              Invalid or expired reset link.
+              Nieprawidłowy lub wygasły link resetowania.
             </p>
             <button
               onClick={() => navigate("/auth")}
               className="mt-4 text-primary font-medium hover:underline text-sm"
             >
-              Back to sign in
+              Wróć do logowania
             </button>
           </div>
         </motion.div>
@@ -98,15 +96,15 @@ const ResetPassword = () => {
 
         <div className="card-gradient rounded-2xl border border-border p-6">
           <h2 className="font-display text-lg font-bold text-foreground mb-1">
-            Set new password
+            Ustaw nowe hasło
           </h2>
           <p className="text-muted-foreground text-sm mb-5">
-            Enter your new password below.
+            Wprowadź poniżej nowe hasło.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground font-medium">New Password</label>
+              <label className="text-xs text-muted-foreground font-medium">Nowe hasło</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -122,7 +120,7 @@ const ResetPassword = () => {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground font-medium">Confirm Password</label>
+              <label className="text-xs text-muted-foreground font-medium">Potwierdź hasło</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -142,7 +140,7 @@ const ResetPassword = () => {
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform disabled:opacity-50"
             >
-              {loading ? "Updating…" : "Update Password"}
+              {loading ? "Aktualizuję…" : "Zaktualizuj hasło"}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

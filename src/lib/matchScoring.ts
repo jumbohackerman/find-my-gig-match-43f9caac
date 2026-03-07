@@ -6,9 +6,9 @@
 export interface CandidateProfile {
   skills: string[];
   seniority: string; // Junior | Mid | Senior | Lead
-  preferredSalaryMin: number; // in k
+  preferredSalaryMin: number; // in thousands PLN
   preferredSalaryMax: number;
-  remotePreference: string; // Remote | Hybrid | On-site | Any
+  remotePreference: string; // Zdalnie | Hybrydowo | Stacjonarnie | Dowolnie | Any
   location: string;
   experienceYears: number;
   title: string;
@@ -34,15 +34,24 @@ export interface MatchResult {
 export const DEMO_CANDIDATE: CandidateProfile = {
   skills: ["React", "TypeScript", "Node.js", "GraphQL", "Tailwind CSS", "Next.js"],
   seniority: "Senior",
-  preferredSalaryMin: 120,
-  preferredSalaryMax: 180,
+  preferredSalaryMin: 18,
+  preferredSalaryMax: 28,
   remotePreference: "Any",
-  location: "San Francisco, CA",
+  location: "Warszawa",
   experienceYears: 5,
   title: "Frontend Developer",
 };
 
 function parseSalaryRange(salary: string): { min: number; max: number } | null {
+  // Match PLN format: "18 000 zł - 25 000 zł"
+  const plnMatch = salary.match(/(\d[\d\s]*)\s*zł\s*-\s*(\d[\d\s]*)\s*zł/i);
+  if (plnMatch) {
+    return {
+      min: parseInt(plnMatch[1].replace(/\s/g, "")) / 1000,
+      max: parseInt(plnMatch[2].replace(/\s/g, "")) / 1000,
+    };
+  }
+  // Fallback: $XXk format
   const matches = salary.match(/\$(\d+)k\s*-\s*\$(\d+)k/i);
   if (matches) return { min: parseInt(matches[1]), max: parseInt(matches[2]) };
   const single = salary.match(/\$(\d+)k/i);
@@ -69,10 +78,10 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
   const skillScore = jobSkills.length > 0 ? (matchedSkills.length / jobSkills.length) * 100 : 50;
 
   if (matchedSkills.length > 0) {
-    reasons.push(`${matchedSkills.length}/${job.tags.length} required skills match`);
+    reasons.push(`${matchedSkills.length}/${job.tags.length} wymaganych umiejętności pasuje`);
   }
   if (missingSkills.length > 0) {
-    reasons.push(`Missing: ${missingSkills.join(", ")}`);
+    reasons.push(`Brakuje: ${missingSkills.join(", ")}`);
   }
 
   // 2. Seniority match (20%)
@@ -84,9 +93,9 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
   const seniorityScore = seniorityDiff === 0 ? 100 : seniorityDiff === 1 ? 70 : 30;
 
   if (seniorityDiff === 0) {
-    reasons.push(`Seniority level aligns (${candidate.seniority})`);
+    reasons.push(`Poziom doświadczenia pasuje (${candidate.seniority})`);
   } else {
-    reasons.push(`Seniority gap: you're ${candidate.seniority}, role is ${jobSeniority}`);
+    reasons.push(`Różnica poziomu: Ty — ${candidate.seniority}, rola — ${jobSeniority}`);
   }
 
   // 3. Salary alignment (10%)
@@ -99,9 +108,9 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
     const range = salaryRange.max - salaryRange.min || 1;
     salaryScore = overlap >= 0 ? Math.min(100, (overlap / range) * 100 + 30) : 10;
     if (overlap >= 0) {
-      reasons.push("Salary range aligns with your preference");
+      reasons.push("Wynagrodzenie zgodne z Twoimi oczekiwaniami");
     } else {
-      reasons.push("Salary may not meet your expectations");
+      reasons.push("Wynagrodzenie może nie spełniać Twoich oczekiwań");
     }
   }
 
@@ -111,17 +120,19 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
   const candLoc = candidate.location.toLowerCase();
   if (
     candidate.remotePreference === "Any" ||
+    candidate.remotePreference === "Dowolnie" ||
+    jobLoc.includes("zdaln") ||
     jobLoc.includes("remote") ||
     job.type === "Remote"
   ) {
     locationScore = 100;
-    if (jobLoc.includes("remote") || job.type === "Remote") reasons.push("Remote-friendly role");
+    if (jobLoc.includes("zdaln") || jobLoc.includes("remote") || job.type === "Remote") reasons.push("Praca zdalna");
   } else if (jobLoc.includes(candLoc) || candLoc.includes(jobLoc.split(",")[0])) {
     locationScore = 100;
-    reasons.push("Location matches your preference");
+    reasons.push("Lokalizacja pasuje do Twoich preferencji");
   } else {
     locationScore = 30;
-    reasons.push(`Location differs: ${job.location}`);
+    reasons.push(`Inna lokalizacja: ${job.location}`);
   }
 
   // 5. Experience (10%)

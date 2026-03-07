@@ -27,7 +27,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
   };
 
   const hasSalary = job.salary && job.salary.trim().length > 0;
-  const workMode = job.type === "Remote" || job.location.toLowerCase().includes("remote") ? "Remote" : job.type === "Contract" ? "Hybrid" : "Onsite";
+  const workMode = job.type === "Remote" || job.location.toLowerCase().includes("zdaln") ? "Zdalnie" : job.type === "Contract" ? "Hybrydowo" : "Stacjonarnie";
 
   return (
     <motion.div
@@ -53,13 +53,13 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
               className="absolute top-6 right-6 z-20 swipe-indicator-right rotate-[-15deg]"
               style={{ opacity: rightOpacity }}
             >
-              APPLY ✓
+              APLIKUJ ✓
             </motion.div>
             <motion.div
               className="absolute top-6 left-6 z-20 swipe-indicator-left rotate-[15deg]"
               style={{ opacity: leftOpacity }}
             >
-              SKIP ✗
+              POMIŃ ✗
             </motion.div>
           </>
         )}
@@ -77,7 +77,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
             <div className="flex items-center gap-2">
               {isSaved && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-400/15 text-yellow-400 font-medium border border-yellow-400/30">
-                  ⭐ Saved
+                  ⭐ Zapisano
                 </span>
               )}
               {matchResult && <MatchBadge result={matchResult} compact />}
@@ -91,7 +91,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
             {hasSalary ? (
               <span className="text-base font-bold text-accent">{job.salary}</span>
             ) : (
-              <span className="text-sm text-muted-foreground italic">Salary not disclosed</span>
+              <span className="text-sm text-muted-foreground italic">Wynagrodzenie nie podane</span>
             )}
           </div>
 
@@ -101,7 +101,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps
           {matchResult && (
             <div className="mb-3 p-2.5 rounded-xl bg-secondary/50 border border-border">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                Why this matches you
+                Dlaczego to pasuje
               </p>
               <MatchBadge result={matchResult} />
             </div>

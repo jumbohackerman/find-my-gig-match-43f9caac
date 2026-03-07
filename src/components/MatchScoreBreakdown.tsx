@@ -9,13 +9,11 @@ interface ScoreBreakdown {
 }
 
 export function computeBreakdown(candidate: CandidateProfile, job: JobForScoring): ScoreBreakdown {
-  // Skills
   const jobSkills = job.tags.map((t) => t.toLowerCase());
   const candidateSkills = candidate.skills.map((s) => s.toLowerCase());
   const matchedCount = job.tags.filter((t) => candidateSkills.includes(t.toLowerCase())).length;
   const skillScore = jobSkills.length > 0 ? Math.round((matchedCount / jobSkills.length) * 100) : 50;
 
-  // Experience / Seniority
   const inferSeniority = (title: string) => {
     const t = title.toLowerCase();
     if (t.includes("lead") || t.includes("principal")) return "Lead";
@@ -27,20 +25,18 @@ export function computeBreakdown(candidate: CandidateProfile, job: JobForScoring
   const diff = Math.abs(levels.indexOf(inferSeniority(job.title)) - levels.indexOf(candidate.seniority));
   const experienceScore = diff === 0 ? 100 : diff === 1 ? 70 : 30;
 
-  // Salary
-  const salaryMatch = job.salary.match(/\$(\d+)k\s*-\s*\$(\d+)k/i);
+  const salaryMatch = job.salary.match(/(\d[\d\s]*)\s*zł\s*-\s*(\d[\d\s]*)\s*zł/i);
   let salaryScore = 50;
   if (salaryMatch) {
-    const jMin = parseInt(salaryMatch[1]);
-    const jMax = parseInt(salaryMatch[2]);
+    const jMin = parseInt(salaryMatch[1].replace(/\s/g, "")) / 1000;
+    const jMax = parseInt(salaryMatch[2].replace(/\s/g, "")) / 1000;
     const overlap = Math.min(jMax, candidate.preferredSalaryMax) - Math.max(jMin, candidate.preferredSalaryMin);
     salaryScore = overlap >= 0 ? Math.min(100, Math.round((overlap / (jMax - jMin || 1)) * 100 + 30)) : 10;
   }
 
-  // Location
   const jobLoc = job.location.toLowerCase();
   let locationScore = 50;
-  if (candidate.remotePreference === "Any" || jobLoc.includes("remote") || job.type === "Remote") {
+  if (candidate.remotePreference === "Any" || jobLoc.includes("zdaln") || job.type === "Remote") {
     locationScore = 100;
   } else if (jobLoc.includes(candidate.location.toLowerCase().split(",")[0])) {
     locationScore = 100;
@@ -64,22 +60,22 @@ function barColor(score: number) {
 
 const MatchScoreBreakdown = ({ breakdown, totalScore }: Props) => {
   const items = [
-    { label: "Skills", value: breakdown.skills },
-    { label: "Experience", value: breakdown.experience },
-    { label: "Salary", value: breakdown.salary },
-    { label: "Location", value: breakdown.location },
+    { label: "Umiejętności", value: breakdown.skills },
+    { label: "Doświadczenie", value: breakdown.experience },
+    { label: "Wynagrodzenie", value: breakdown.salary },
+    { label: "Lokalizacja", value: breakdown.location },
   ];
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 mb-1">
         <span className={`text-sm font-bold ${totalScore >= 75 ? "text-accent" : totalScore >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
-          Match score: {totalScore}%
+          Dopasowanie: {totalScore}%
         </span>
       </div>
       {items.map((item) => (
         <div key={item.label} className="flex items-center gap-2">
-          <span className="text-[11px] text-muted-foreground w-20">{item.label}</span>
+          <span className="text-[11px] text-muted-foreground w-24">{item.label}</span>
           <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
             <div
               className={`h-full rounded-full ${barColor(item.value)} transition-all`}

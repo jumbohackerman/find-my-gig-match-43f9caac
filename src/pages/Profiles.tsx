@@ -36,17 +36,17 @@ const Profiles = () => {
           to="/"
           className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
         >
-          Browse Jobs
+          Przeglądaj oferty
         </Link>
       </header>
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-lg mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
-            Talent Pool
+            Pula talentów
           </h2>
           <p className="text-muted-foreground text-sm mb-5">
-            Browse job seekers by skills, role, or location. Click to see full profile.
+            Przeglądaj kandydatów wg umiejętności, roli lub lokalizacji. Kliknij, aby zobaczyć pełny profil.
           </p>
 
           <div className="relative mb-6">
@@ -54,7 +54,7 @@ const Profiles = () => {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, skill, or role…"
+              placeholder="Szukaj po imieniu, umiejętności lub roli…"
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -62,7 +62,7 @@ const Profiles = () => {
 
         {filtered.length === 0 ? (
           <p className="text-center text-muted-foreground text-sm py-12">
-            No profiles match your search.
+            Brak profili pasujących do wyszukiwania.
           </p>
         ) : (
           <div className="flex flex-col gap-4">

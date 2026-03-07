@@ -22,12 +22,12 @@ export interface DemoMessage {
 export const STATUS_ORDER: ApplicationStatus[] = ["applied", "shortlisted", "viewed", "interview", "hired"];
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  applied: "Applied",
-  shortlisted: "Shortlisted",
-  viewed: "Viewed",
-  interview: "Interview",
-  hired: "Hired",
-  closed: "Position Closed",
+  applied: "Aplikowano",
+  shortlisted: "Shortlista",
+  viewed: "Wyświetlono",
+  interview: "Rozmowa",
+  hired: "Zatrudniony",
+  closed: "Stanowisko zamknięte",
 };
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {

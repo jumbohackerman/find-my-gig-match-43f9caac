@@ -34,8 +34,8 @@ const EmployerCandidateSwipe = ({
     return (
       <EmptyState
         icon={<Users className="w-5 h-5 text-muted-foreground" />}
-        title="No candidates available"
-        description="No candidates yet. Share this job listing to receive applications."
+        title="Brak kandydatów"
+        description="Brak kandydatów. Udostępnij ogłoszenie, aby otrzymać aplikacje."
       />
     );
   }
@@ -45,8 +45,8 @@ const EmployerCandidateSwipe = ({
       <div className="text-center py-6">
         <p className="text-sm text-muted-foreground">
           {picksRemaining <= 0
-            ? "All swipe picks used for this job."
-            : "You've reviewed all candidates."}
+            ? "Wszystkie swipe picki wykorzystane dla tej oferty."
+            : "Przejrzano wszystkich kandydatów."}
         </p>
       </div>
     );
@@ -58,7 +58,7 @@ const EmployerCandidateSwipe = ({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          Swipe picks remaining: <span className="font-bold text-foreground">{picksRemaining}</span> / {maxPicks}
+          Pozostałe picki: <span className="font-bold text-foreground">{picksRemaining}</span> / {maxPicks}
         </p>
         <p className="text-xs text-muted-foreground">
           {currentIndex + 1} / {candidates.length}
@@ -116,7 +116,7 @@ const EmployerCandidateSwipe = ({
               }}
               className="px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
             >
-              View Profile
+              Zobacz profil
             </button>
             <button
               onClick={() => onSwipeRight(current.seeker.id)}

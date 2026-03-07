@@ -27,7 +27,7 @@ const Auth = () => {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        toast.success("Check your email for a password reset link!");
+        toast.success("Sprawdź email — wysłaliśmy link do resetowania hasła!");
         setMode("login");
       } else if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -43,7 +43,7 @@ const Auth = () => {
         if (data.session) {
           navigate("/");
         } else {
-          toast.success("Check your email to confirm your account!");
+          toast.success("Sprawdź email, aby potwierdzić konto!");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -51,7 +51,7 @@ const Auth = () => {
         navigate("/");
       }
     } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+      toast.error(err.message || "Coś poszło nie tak");
     } finally {
       setLoading(false);
     }
@@ -73,14 +73,14 @@ const Auth = () => {
 
         <div className="card-gradient rounded-2xl border border-border p-6">
           <h2 className="font-display text-lg font-bold text-foreground mb-1">
-            {mode === "login" ? "Welcome back" : mode === "signup" ? "Create account" : "Reset password"}
+            {mode === "login" ? "Witaj ponownie" : mode === "signup" ? "Utwórz konto" : "Resetuj hasło"}
           </h2>
           <p className="text-muted-foreground text-sm mb-5">
             {mode === "login"
-              ? "Sign in to continue swiping."
+              ? "Zaloguj się, aby kontynuować przeglądanie."
               : mode === "signup"
-              ? "Join as a candidate or employer."
-              : "Enter your email to receive a reset link."}
+              ? "Dołącz jako kandydat lub pracodawca."
+              : "Podaj email, aby otrzymać link do resetowania."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,20 +99,20 @@ const Auth = () => {
                           : "bg-secondary text-secondary-foreground hover:bg-muted"
                       }`}
                     >
-                      {r === "candidate" ? "🧑‍💻 Candidate" : "🏢 Employer"}
+                      {r === "candidate" ? "🧑‍💻 Kandydat" : "🏢 Pracodawca"}
                     </button>
                   ))}
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground font-medium">Full Name</label>
+                  <label className="text-xs text-muted-foreground font-medium">Imię i nazwisko</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Your name"
+                      placeholder="Twoje imię i nazwisko"
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
@@ -129,7 +129,7 @@ const Auth = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  placeholder="ty@przyklad.pl"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
@@ -137,7 +137,7 @@ const Auth = () => {
 
             {mode !== "forgot" && (
               <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground font-medium">Password</label>
+                <label className="text-xs text-muted-foreground font-medium">Hasło</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
@@ -160,7 +160,7 @@ const Auth = () => {
                   onClick={() => setMode("forgot")}
                   className="text-xs text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Forgot password?
+                  Zapomniałeś hasła?
                 </button>
               </div>
             )}
@@ -171,12 +171,12 @@ const Auth = () => {
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform disabled:opacity-50"
             >
               {loading
-                ? "Loading…"
+                ? "Ładowanie…"
                 : mode === "login"
-                ? "Sign In"
+                ? "Zaloguj się"
                 : mode === "signup"
-                ? "Create Account"
-                : "Send Reset Link"}
+                ? "Utwórz konto"
+                : "Wyślij link resetowania"}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -187,16 +187,16 @@ const Auth = () => {
                 onClick={() => setMode("login")}
                 className="text-primary font-medium hover:underline inline-flex items-center gap-1"
               >
-                <ArrowLeft className="w-3 h-3" /> Back to sign in
+                <ArrowLeft className="w-3 h-3" /> Wróć do logowania
               </button>
             ) : (
               <>
-                {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
+                {mode === "login" ? "Nie masz konta?" : "Masz już konto?"}{" "}
                 <button
                   onClick={() => setMode(mode === "login" ? "signup" : "login")}
                   className="text-primary font-medium hover:underline"
                 >
-                  {mode === "login" ? "Sign up" : "Sign in"}
+                  {mode === "login" ? "Zarejestruj się" : "Zaloguj się"}
                 </button>
               </>
             )}
@@ -207,7 +207,7 @@ const Auth = () => {
           onClick={() => navigate("/")}
           className="mt-4 w-full py-2.5 rounded-xl border border-dashed border-border text-muted-foreground text-sm font-medium hover:bg-secondary transition-colors"
         >
-          🚀 Demo — skip login
+          🚀 Demo — pomiń logowanie
         </button>
       </motion.div>
     </div>

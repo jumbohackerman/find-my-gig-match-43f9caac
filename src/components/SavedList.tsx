@@ -11,8 +11,8 @@ const SavedList = ({ jobs, onApply }: Props) => {
   if (jobs.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground text-sm">No saved jobs yet.</p>
-        <p className="text-muted-foreground text-xs mt-1">Use the ⭐ button to save jobs for later!</p>
+        <p className="text-muted-foreground text-sm">Brak zapisanych ofert.</p>
+        <p className="text-muted-foreground text-xs mt-1">Użyj przycisku ⭐ aby zapisać oferty na później!</p>
       </div>
     );
   }
@@ -39,7 +39,7 @@ const SavedList = ({ jobs, onApply }: Props) => {
               onClick={() => onApply(job)}
               className="px-3 py-1.5 rounded-lg btn-gradient text-primary-foreground text-xs font-medium hover:scale-105 transition-transform"
             >
-              Apply
+              Aplikuj
             </button>
             <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 shrink-0" />
           </motion.div>

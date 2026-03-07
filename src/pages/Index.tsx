@@ -48,7 +48,7 @@ const Index = () => {
         setNotifications([
           {
             id: "n1",
-            message: "You were shortlisted for this role.",
+            message: "Zostałeś dodany do shortlisty na tę rolę.",
             jobTitle: appliedJobs[0].title,
             read: false,
           },
@@ -134,9 +134,9 @@ const Index = () => {
   };
 
   const tabs: { key: Tab; label: string; count?: number }[] = [
-    { key: "swipe", label: "Browse" },
-    { key: "applied", label: "My Applications", count: appliedJobs.length },
-    { key: "saved", label: "Saved Jobs", count: savedJobs.length },
+    { key: "swipe", label: "Przeglądaj" },
+    { key: "applied", label: "Moje aplikacje", count: appliedJobs.length },
+    { key: "saved", label: "Zapisane", count: savedJobs.length },
   ];
 
   return (
@@ -177,11 +177,11 @@ const Index = () => {
                   className="absolute right-0 top-12 w-72 card-gradient rounded-xl border border-border shadow-lg z-50 overflow-hidden"
                 >
                   <div className="p-3 border-b border-border">
-                    <p className="text-xs font-semibold text-foreground">Notifications</p>
+                    <p className="text-xs font-semibold text-foreground">Powiadomienia</p>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="p-4 text-center text-xs text-muted-foreground">
-                      No notifications yet
+                      Brak powiadomień
                     </div>
                   ) : (
                     <div className="max-h-60 overflow-y-auto">
@@ -203,27 +203,27 @@ const Index = () => {
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
           >
             <User className="w-4 h-4" />
-            My Profile
+            Mój profil
           </Link>
           <Link
             to="/employer"
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
           >
             <Building2 className="w-4 h-4" />
-            For Companies
+            Dla firm
           </Link>
           <Link
             to="/profiles"
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
           >
             <Users className="w-4 h-4" />
-            Find Talent
+            Znajdź talent
           </Link>
           {user && (
             <button
               onClick={signOut}
               className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors"
-              title="Sign out"
+              title="Wyloguj się"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -259,14 +259,14 @@ const Index = () => {
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
-              My Applications ({appliedJobs.length})
+              Moje aplikacje ({appliedJobs.length})
             </h2>
             <AppliedList jobs={appliedJobs} />
           </motion.div>
         ) : activeTab === "saved" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
-              Saved Jobs ({savedJobs.length})
+              Zapisane oferty ({savedJobs.length})
             </h2>
             <SavedList jobs={savedJobs} onApply={handleSavedApply} />
           </motion.div>
@@ -275,16 +275,16 @@ const Index = () => {
             <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-4xl">
               🎉
             </div>
-            <h2 className="font-display text-2xl font-bold text-foreground mb-2">All caught up!</h2>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-2">Wszystko przejrzane!</h2>
             <p className="text-muted-foreground text-sm mb-2">
-              You applied to {appliedJobs.length} job{appliedJobs.length !== 1 ? "s" : ""}, saved {savedJobs.length}, and skipped {skippedJobs.length}.
+              Zaaplikowałeś na {appliedJobs.length} ofert{appliedJobs.length !== 1 ? "" : "ę"}, zapisałeś {savedJobs.length} i pominąłeś {skippedJobs.length}.
             </p>
             <div className="flex gap-3 mt-6 justify-center">
               <button
                 onClick={handleReset}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
               >
-                <RotateCcw className="w-4 h-4" /> Start Over
+                <RotateCcw className="w-4 h-4" /> Zacznij od nowa
               </button>
             </div>
           </motion.div>
@@ -294,7 +294,7 @@ const Index = () => {
 
             {filteredJobs.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground text-sm">No jobs match your filters.</p>
+                <p className="text-muted-foreground text-sm">Brak ofert pasujących do filtrów.</p>
               </div>
             ) : (
               <>
@@ -319,21 +319,21 @@ const Index = () => {
                   <button
                     onClick={() => handleSwipe("left")}
                     className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
-                    title="Skip"
+                    title="Pomiń"
                   >
                     <X className="w-6 h-6" />
                   </button>
                   <button
                     onClick={() => handleSwipe("save")}
                     className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors"
-                    title="Save for later"
+                    title="Zapisz na później"
                   >
                     <Star className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleSwipe("right")}
                     className="w-16 h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform"
-                    title="Apply"
+                    title="Aplikuj"
                   >
                     <Check className="w-7 h-7" />
                   </button>

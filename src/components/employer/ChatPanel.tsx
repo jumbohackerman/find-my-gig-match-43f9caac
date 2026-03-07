@@ -28,10 +28,10 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock }: Pr
           onClick={onUnlock}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform"
         >
-          <MessageSquare className="w-4 h-4" /> Message {candidateName}
+          <MessageSquare className="w-4 h-4" /> Napisz do {candidateName}
         </button>
         <p className="text-[10px] text-muted-foreground text-center mt-1.5">
-          Send the first message to unlock chat
+          Wyślij pierwszą wiadomość aby odblokować czat
         </p>
       </div>
     );
@@ -43,8 +43,8 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock }: Pr
         {messages.length === 0 ? (
           <EmptyState
             icon={<MessageSquare className="w-5 h-5 text-muted-foreground" />}
-            title="No messages yet"
-            description="Start the conversation with the candidate."
+            title="Brak wiadomości"
+            description="Rozpocznij rozmowę z kandydatem."
           />
         ) : (
           <AnimatePresence>
@@ -75,7 +75,7 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock }: Pr
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Type a message…"
+          placeholder="Napisz wiadomość…"
           className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <button

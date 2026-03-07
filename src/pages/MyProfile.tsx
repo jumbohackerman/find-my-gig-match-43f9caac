@@ -26,9 +26,9 @@ interface Links {
 }
 
 const SENIORITY_OPTIONS = ["Junior", "Mid", "Senior", "Lead"];
-const WORK_MODE_OPTIONS = ["Remote", "Hybrid", "Onsite"];
+const WORK_MODE_OPTIONS = ["Zdalnie", "Hybrydowo", "Stacjonarnie"];
 const EMPLOYMENT_OPTIONS = ["Full-time", "Contract", "Part-time"];
-const AVAILABILITY_OPTIONS = ["Open to work", "Passive", "Not looking"];
+const AVAILABILITY_OPTIONS = ["Otwarty na oferty", "Pasywny", "Nie szukam"];
 
 const SKILL_SUGGESTIONS = [
   "React", "TypeScript", "JavaScript", "Node.js", "Python", "Go",
@@ -64,7 +64,6 @@ const MyProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Basic info
   const [fullName, setFullName] = useState("");
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -72,29 +71,23 @@ const MyProfile = () => {
   const [seniority, setSeniority] = useState("Mid");
   const [summary, setSummary] = useState("");
 
-  // Work preferences
-  const [workMode, setWorkMode] = useState("Remote");
+  const [workMode, setWorkMode] = useState("Zdalnie");
   const [employmentType, setEmploymentType] = useState("Full-time");
   const [salaryMin, setSalaryMin] = useState(0);
   const [salaryMax, setSalaryMax] = useState(0);
-  const [availability, setAvailability] = useState("Open to work");
+  const [availability, setAvailability] = useState("Otwarty na oferty");
 
-  // Skills
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
 
-  // Experience
   const [experienceEntries, setExperienceEntries] = useState<ExperienceEntry[]>([]);
   const [expandedExp, setExpandedExp] = useState<number | null>(null);
 
-  // Links
   const [links, setLinks] = useState<Links>({});
 
-  // CV
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Section visibility
   const [activeSection, setActiveSection] = useState<string>("basic");
 
   useEffect(() => {
@@ -116,11 +109,11 @@ const MyProfile = () => {
         setSummary(data.summary || "");
         setSkills(data.skills || []);
         setSeniority(data.seniority || "Mid");
-        setWorkMode(data.work_mode || "Remote");
+        setWorkMode(data.work_mode || "Zdalnie");
         setEmploymentType(data.employment_type || "Full-time");
         setSalaryMin(data.salary_min || 0);
         setSalaryMax(data.salary_max || 0);
-        setAvailability(data.availability || "Open to work");
+        setAvailability(data.availability || "Otwarty na oferty");
         setExperienceEntries((data.experience_entries as any) || []);
         setLinks((data.links as any) || {});
         setCvUrl(data.cv_url || null);
@@ -139,13 +132,11 @@ const MyProfile = () => {
     if (!user) return;
     setSaving(true);
 
-    // Update profile name
     await supabase
       .from("profiles")
       .update({ full_name: fullName })
       .eq("user_id", user.id);
 
-    // Update candidate data
     const { error } = await supabase
       .from("candidates")
       .update({
@@ -161,7 +152,7 @@ const MyProfile = () => {
         availability,
         experience_entries: experienceEntries as any,
         links: links as any,
-        experience: `${experienceYears} years`,
+        experience: `${experienceYears} lat`,
         cv_url: cvUrl,
         last_active: new Date().toISOString(),
       } as any)
@@ -169,9 +160,9 @@ const MyProfile = () => {
 
     setSaving(false);
     if (error) {
-      toast.error("Failed to save profile");
+      toast.error("Nie udało się zapisać profilu");
     } else {
-      toast.success("Profile saved");
+      toast.success("Profil zapisany");
     }
   };
 
@@ -216,17 +207,17 @@ const MyProfile = () => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     if (file.type !== "application/pdf") {
-      toast.error("Only PDF files are allowed");
+      toast.error("Dozwolone tylko pliki PDF");
       return;
     }
     setUploading(true);
     const path = `${user.id}/cv-${Date.now()}.pdf`;
     const { error } = await supabase.storage.from("cvs").upload(path, file);
     if (error) {
-      toast.error("Upload failed");
+      toast.error("Przesyłanie nie powiodło się");
     } else {
       setCvUrl(path);
-      toast.success("CV uploaded");
+      toast.success("CV przesłane");
     }
     setUploading(false);
   };
@@ -240,24 +231,23 @@ const MyProfile = () => {
   const additionalSkills = skills.slice(5);
 
   const sections = [
-    { id: "basic", label: "Basic Info" },
-    { id: "prefs", label: "Work Preferences" },
-    { id: "skills", label: "Skills" },
-    { id: "experience", label: "Experience" },
-    { id: "links", label: "Links & CV" },
+    { id: "basic", label: "Dane podstawowe" },
+    { id: "prefs", label: "Preferencje" },
+    { id: "skills", label: "Umiejętności" },
+    { id: "experience", label: "Doświadczenie" },
+    { id: "links", label: "Linki i CV" },
   ];
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">Loading...</p>
+        <p className="text-muted-foreground text-sm">Ładowanie...</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="px-6 py-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
@@ -270,7 +260,7 @@ const MyProfile = () => {
             to="/"
             className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
           >
-            Browse Jobs
+            Przeglądaj oferty
           </Link>
           <button
             onClick={handleSave}
@@ -278,20 +268,20 @@ const MyProfile = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save Profile"}
+            {saving ? "Zapisuję..." : "Zapisz profil"}
           </button>
         </div>
       </header>
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-lg mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="font-display text-2xl font-bold text-foreground mb-1">My Profile</h2>
-          <p className="text-muted-foreground text-sm mb-4">Keep it concise — recruiters scan in under 30 seconds.</p>
+          <h2 className="font-display text-2xl font-bold text-foreground mb-1">Mój profil</h2>
+          <p className="text-muted-foreground text-sm mb-4">Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund.</p>
 
           {/* Completeness */}
           <div className="mb-6 p-3 rounded-xl bg-secondary/50 border border-border">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground">Profile completeness</span>
+              <span className="text-xs font-medium text-muted-foreground">Kompletność profilu</span>
               <span className={`text-sm font-bold ${completeness >= 80 ? "text-accent" : completeness >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
                 {completeness}%
               </span>
@@ -319,11 +309,11 @@ const MyProfile = () => {
           {/* BASIC INFO */}
           {activeSection === "basic" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <Field label="Full Name" value={fullName} onChange={setFullName} placeholder="Jane Doe" />
-              <Field label="Professional Headline" value={title} onChange={setTitle} placeholder="Frontend Engineer" />
-              <Field label="Location" value={location} onChange={setLocation} placeholder="San Francisco, CA" />
+              <Field label="Imię i nazwisko" value={fullName} onChange={setFullName} placeholder="Jan Kowalski" />
+              <Field label="Tytuł zawodowy" value={title} onChange={setTitle} placeholder="Frontend Engineer" />
+              <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Warszawa" />
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Years of Experience</label>
+                <label className="text-xs font-medium text-muted-foreground">Lata doświadczenia</label>
                 <input
                   type="number"
                   min={0}
@@ -334,7 +324,7 @@ const MyProfile = () => {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Seniority Level</label>
+                <label className="text-xs font-medium text-muted-foreground">Poziom doświadczenia</label>
                 <div className="grid grid-cols-4 gap-2">
                   {SENIORITY_OPTIONS.map((s) => (
                     <button
@@ -351,12 +341,12 @@ const MyProfile = () => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">
-                  Professional Summary ({summary.length}/300)
+                  Podsumowanie zawodowe ({summary.length}/300)
                 </label>
                 <textarea
                   value={summary}
                   onChange={(e) => setSummary(e.target.value.slice(0, 300))}
-                  placeholder="Frontend engineer specializing in React and scalable UI systems."
+                  placeholder="Frontend engineer specjalizujący się w React i skalowalnych systemach UI."
                   rows={3}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                 />
@@ -368,7 +358,7 @@ const MyProfile = () => {
           {activeSection === "prefs" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Work Mode</label>
+                <label className="text-xs font-medium text-muted-foreground">Tryb pracy</label>
                 <div className="grid grid-cols-3 gap-2">
                   {WORK_MODE_OPTIONS.map((w) => (
                     <button
@@ -384,7 +374,7 @@ const MyProfile = () => {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Employment Type</label>
+                <label className="text-xs font-medium text-muted-foreground">Typ zatrudnienia</label>
                 <div className="grid grid-cols-3 gap-2">
                   {EMPLOYMENT_OPTIONS.map((e) => (
                     <button
@@ -401,13 +391,13 @@ const MyProfile = () => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">
-                  Salary Expectation: {salaryMin > 0 || salaryMax > 0 ? `$${salaryMin}k – $${salaryMax}k` : "Not set"}
+                  Oczekiwania finansowe: {salaryMin > 0 || salaryMax > 0 ? `${salaryMin} 000 zł – ${salaryMax} 000 zł brutto` : "Nie ustawiono"}
                 </label>
                 <div className="flex gap-3 items-center">
                   <input
                     type="number"
                     min={0}
-                    max={500}
+                    max={100}
                     value={salaryMin || ""}
                     onChange={(e) => setSalaryMin(parseInt(e.target.value) || 0)}
                     placeholder="Min"
@@ -417,17 +407,17 @@ const MyProfile = () => {
                   <input
                     type="number"
                     min={0}
-                    max={500}
+                    max={100}
                     value={salaryMax || ""}
                     onChange={(e) => setSalaryMax(parseInt(e.target.value) || 0)}
                     placeholder="Max"
                     className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   />
-                  <span className="text-xs text-muted-foreground">k/year</span>
+                  <span className="text-xs text-muted-foreground">tys. zł brutto</span>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Availability</label>
+                <label className="text-xs font-medium text-muted-foreground">Dostępność</label>
                 <div className="grid grid-cols-3 gap-2">
                   {AVAILABILITY_OPTIONS.map((a) => (
                     <button
@@ -453,7 +443,7 @@ const MyProfile = () => {
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))}
-                  placeholder="Add a skill..."
+                  placeholder="Dodaj umiejętność..."
                   className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <button
@@ -464,7 +454,6 @@ const MyProfile = () => {
                 </button>
               </div>
 
-              {/* Quick add */}
               <div className="flex flex-wrap gap-1.5">
                 {SKILL_SUGGESTIONS.filter((s) => !skills.includes(s))
                   .slice(0, 12)
@@ -479,11 +468,10 @@ const MyProfile = () => {
                   ))}
               </div>
 
-              {/* Core skills */}
               {coreSkills.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Core Skills ({coreSkills.length})
+                    Kluczowe umiejętności ({coreSkills.length})
                   </p>
                   <div className="space-y-1">
                     {coreSkills.map((skill, i) => (
@@ -503,7 +491,7 @@ const MyProfile = () => {
               {additionalSkills.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Additional Skills ({additionalSkills.length})
+                    Dodatkowe umiejętności ({additionalSkills.length})
                   </p>
                   <div className="space-y-1">
                     {additionalSkills.map((skill, i) => (
@@ -533,10 +521,10 @@ const MyProfile = () => {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
-                        {entry.title || "New Position"}{entry.company ? ` — ${entry.company}` : ""}
+                        {entry.title || "Nowe stanowisko"}{entry.company ? ` — ${entry.company}` : ""}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {entry.startDate || "Start"} – {entry.endDate || "End"}
+                        {entry.startDate || "Początek"} – {entry.endDate || "Koniec"}
                       </p>
                     </div>
                     <button
@@ -551,17 +539,17 @@ const MyProfile = () => {
                   {expandedExp === idx && (
                     <div className="px-3 pb-3 space-y-3 border-t border-border pt-3">
                       <div className="grid grid-cols-2 gap-3">
-                        <Field label="Job Title" value={entry.title} onChange={(v) => updateExperience(idx, "title", v)} placeholder="Senior Frontend Engineer" />
-                        <Field label="Company" value={entry.company} onChange={(v) => updateExperience(idx, "company", v)} placeholder="Stripe" />
+                        <Field label="Stanowisko" value={entry.title} onChange={(v) => updateExperience(idx, "title", v)} placeholder="Senior Frontend Engineer" />
+                        <Field label="Firma" value={entry.company} onChange={(v) => updateExperience(idx, "company", v)} placeholder="Allegro" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <Field label="Start Date" value={entry.startDate} onChange={(v) => updateExperience(idx, "startDate", v)} placeholder="2022" />
-                        <Field label="End Date" value={entry.endDate} onChange={(v) => updateExperience(idx, "endDate", v)} placeholder="2024 or Present" />
+                        <Field label="Data rozpoczęcia" value={entry.startDate} onChange={(v) => updateExperience(idx, "startDate", v)} placeholder="2022" />
+                        <Field label="Data zakończenia" value={entry.endDate} onChange={(v) => updateExperience(idx, "endDate", v)} placeholder="2024 lub Obecnie" />
                       </div>
                       {entry.bullets.map((bullet, bi) => (
                         <div key={bi} className="space-y-1.5">
                           <label className="text-xs font-medium text-muted-foreground">
-                            Bullet {bi + 1} ({bullet.length}/200)
+                            Punkt {bi + 1} ({bullet.length}/200)
                           </label>
                           <input
                             value={bullet}
@@ -570,7 +558,7 @@ const MyProfile = () => {
                               bullets[bi] = e.target.value.slice(0, 200);
                               updateExperience(idx, "bullets", bullets);
                             }}
-                            placeholder="Built React dashboard used by 50k merchants"
+                            placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników"
                             className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                           />
                         </div>
@@ -580,7 +568,7 @@ const MyProfile = () => {
                           onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])}
                           className="text-xs text-primary hover:underline flex items-center gap-1"
                         >
-                          <Plus className="w-3 h-3" /> Add bullet point
+                          <Plus className="w-3 h-3" /> Dodaj punkt
                         </button>
                       )}
                     </div>
@@ -593,7 +581,7 @@ const MyProfile = () => {
                   onClick={addExperience}
                   className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2"
                 >
-                  <Plus className="w-4 h-4" /> Add Experience ({experienceEntries.length}/3)
+                  <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/3)
                 </button>
               )}
             </motion.div>
@@ -607,7 +595,7 @@ const MyProfile = () => {
                 label="Portfolio"
                 value={links.portfolio || ""}
                 onChange={(v) => setLinks({ ...links, portfolio: v })}
-                placeholder="https://myportfolio.com"
+                placeholder="https://mojeportfolio.pl"
               />
               <LinkField
                 icon={<Github className="w-4 h-4 text-primary" />}
@@ -625,20 +613,20 @@ const MyProfile = () => {
               />
               <LinkField
                 icon={<ExternalLink className="w-4 h-4 text-primary" />}
-                label="Personal Website"
+                label="Strona osobista"
                 value={links.website || ""}
                 onChange={(v) => setLinks({ ...links, website: v })}
-                placeholder="https://mysite.com"
+                placeholder="https://mojastrona.pl"
               />
 
               <div className="pt-2 border-t border-border">
                 <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                  CV Upload (optional, PDF only)
+                  Prześlij CV (opcjonalne, tylko PDF)
                 </label>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
                     <Upload className="w-4 h-4" />
-                    {uploading ? "Uploading..." : "Upload CV"}
+                    {uploading ? "Przesyłanie..." : "Prześlij CV"}
                     <input
                       type="file"
                       accept="application/pdf"
@@ -649,7 +637,7 @@ const MyProfile = () => {
                   </label>
                   {cvUrl && (
                     <span className="flex items-center gap-1.5 text-xs text-accent">
-                      <FileText className="w-3.5 h-3.5" /> CV uploaded
+                      <FileText className="w-3.5 h-3.5" /> CV przesłane
                     </span>
                   )}
                 </div>
@@ -662,7 +650,6 @@ const MyProfile = () => {
   );
 };
 
-// Reusable field component
 function Field({
   label, value, onChange, placeholder,
 }: {

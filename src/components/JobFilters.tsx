@@ -25,10 +25,10 @@ interface JobFiltersProps {
   onChange: (filters: JobFiltersState) => void;
 }
 
-const locations = ["All", "San Francisco, CA", "New York, NY", "Austin, TX", "Seattle, WA", "Chicago, IL", "Remote"];
-const jobTypes = ["All", "Full-time", "Part-time", "Contract", "Remote"];
-const remoteOptions = ["All", "Remote", "Hybrid", "On-site"];
-const seniorityOptions = ["All", "Junior", "Mid", "Senior", "Lead"];
+const locations = ["Wszystkie", "Warszawa", "Kraków", "Wrocław", "Gdańsk", "Poznań", "Zdalnie"];
+const jobTypes = ["Wszystkie", "Full-time", "Part-time", "Contract", "Remote"];
+const remoteOptions = ["Wszystkie", "Zdalnie", "Hybrydowo", "Stacjonarnie"];
+const seniorityOptions = ["Wszystkie", "Junior", "Mid", "Senior", "Lead"];
 const skillOptions = [
   "React", "TypeScript", "JavaScript", "Node.js", "Python", "Go",
   "GraphQL", "PostgreSQL", "AWS", "Docker", "Figma", "UI/UX",
@@ -36,11 +36,11 @@ const skillOptions = [
 ];
 
 export const defaultFilters: JobFiltersState = {
-  location: "All",
-  type: "All",
+  location: "Wszystkie",
+  type: "Wszystkie",
   salaryMin: 0,
-  remote: "All",
-  seniority: "All",
+  remote: "Wszystkie",
+  seniority: "Wszystkie",
   requiredSkills: [],
 };
 
@@ -48,11 +48,11 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
   const [open, setOpen] = useState(false);
 
   const hasActiveFilters =
-    filters.location !== "All" ||
-    filters.type !== "All" ||
+    filters.location !== "Wszystkie" ||
+    filters.type !== "Wszystkie" ||
     filters.salaryMin > 0 ||
-    filters.remote !== "All" ||
-    filters.seniority !== "All" ||
+    filters.remote !== "Wszystkie" ||
+    filters.seniority !== "Wszystkie" ||
     filters.requiredSkills.length > 0;
 
   const clearFilters = () => onChange({ ...defaultFilters });
@@ -71,7 +71,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
       >
         <Filter className="w-4 h-4" />
-        Filters
+        Filtry
         {hasActiveFilters && (
           <span className="w-2 h-2 rounded-full bg-primary" />
         )}
@@ -89,7 +89,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
               <div className="grid grid-cols-2 gap-3">
                 {/* Location */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Location</label>
+                  <label className="text-xs font-medium text-muted-foreground">Lokalizacja</label>
                   <Select value={filters.location} onValueChange={(v) => onChange({ ...filters, location: v })}>
                     <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -100,7 +100,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
 
                 {/* Job Type */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Job Type</label>
+                  <label className="text-xs font-medium text-muted-foreground">Typ pracy</label>
                   <Select value={filters.type} onValueChange={(v) => onChange({ ...filters, type: v })}>
                     <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -111,7 +111,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
 
                 {/* Remote / Hybrid / On-site */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Work Mode</label>
+                  <label className="text-xs font-medium text-muted-foreground">Tryb pracy</label>
                   <Select value={filters.remote} onValueChange={(v) => onChange({ ...filters, remote: v })}>
                     <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -122,7 +122,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
 
                 {/* Seniority */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Seniority</label>
+                  <label className="text-xs font-medium text-muted-foreground">Poziom</label>
                   <Select value={filters.seniority} onValueChange={(v) => onChange({ ...filters, seniority: v })}>
                     <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -135,19 +135,19 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
               {/* Salary */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">
-                  Min Salary: {filters.salaryMin > 0 ? `$${filters.salaryMin}k+` : "Any"}
+                  Min. wynagrodzenie: {filters.salaryMin > 0 ? `${filters.salaryMin} 000 zł+` : "Dowolne"}
                 </label>
                 <Slider
                   value={[filters.salaryMin]}
                   onValueChange={([v]) => onChange({ ...filters, salaryMin: v })}
-                  max={200}
-                  step={10}
+                  max={35}
+                  step={1}
                 />
               </div>
 
               {/* Skills multi-select */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Required Skills</label>
+                <label className="text-xs font-medium text-muted-foreground">Wymagane umiejętności</label>
                 <div className="flex flex-wrap gap-1.5">
                   {skillOptions.map((s) => (
                     <button
@@ -170,7 +170,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
                   onClick={clearFilters}
                   className="flex items-center gap-1.5 text-xs text-primary hover:underline"
                 >
-                  <X className="w-3 h-3" /> Clear filters
+                  <X className="w-3 h-3" /> Wyczyść filtry
                 </button>
               )}
             </div>
@@ -185,20 +185,20 @@ export default JobFilters;
 
 export function filterJobs(jobs: Job[], filters: JobFiltersState): Job[] {
   return jobs.filter((job) => {
-    if (filters.location !== "All" && job.location !== filters.location) return false;
-    if (filters.type !== "All" && job.type !== filters.type) return false;
+    if (filters.location !== "Wszystkie" && job.location !== filters.location) return false;
+    if (filters.type !== "Wszystkie" && job.type !== filters.type) return false;
     if (filters.salaryMin > 0) {
-      const match = job.salary.match(/\$(\d+)k/);
-      const min = match ? parseInt(match[1]) : 0;
+      const match = job.salary.match(/(\d[\d\s]*)\s*zł/);
+      const min = match ? parseInt(match[1].replace(/\s/g, "")) / 1000 : 0;
       if (min < filters.salaryMin) return false;
     }
-    if (filters.remote !== "All") {
+    if (filters.remote !== "Wszystkie") {
       const loc = job.location.toLowerCase();
       const type = job.type.toLowerCase();
-      if (filters.remote === "Remote" && !loc.includes("remote") && type !== "remote") return false;
-      if (filters.remote === "On-site" && (loc.includes("remote") || type === "remote")) return false;
+      if (filters.remote === "Zdalnie" && !loc.includes("zdaln") && type !== "remote") return false;
+      if (filters.remote === "Stacjonarnie" && (loc.includes("zdaln") || type === "remote")) return false;
     }
-    if (filters.seniority !== "All") {
+    if (filters.seniority !== "Wszystkie") {
       const title = job.title.toLowerCase();
       const sen = filters.seniority.toLowerCase();
       if (sen === "senior" && !title.includes("senior") && !title.includes("sr")) return false;

@@ -10,7 +10,7 @@ const SKILL_OPTIONS = [
 ];
 
 const SENIORITY_OPTIONS = ["Junior", "Mid", "Senior", "Lead"];
-const REMOTE_OPTIONS = ["Remote", "Hybrid", "On-site", "Any"];
+const REMOTE_OPTIONS = ["Zdalnie", "Hybrydowo", "Stacjonarnie", "Dowolnie"];
 
 interface OnboardingData {
   title: string;
@@ -31,9 +31,9 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
   const [step, setStep] = useState(0);
   const [title, setTitle] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
-  const [salaryMin, setSalaryMin] = useState(80);
-  const [salaryMax, setSalaryMax] = useState(160);
-  const [remote, setRemote] = useState("Any");
+  const [salaryMin, setSalaryMin] = useState(8);
+  const [salaryMax, setSalaryMax] = useState(25);
+  const [remote, setRemote] = useState("Dowolnie");
   const [seniority, setSeniority] = useState("Mid");
 
   const toggleSkill = (s: string) => {
@@ -45,17 +45,17 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
   const steps = [
     // Step 0: Role
     <div key="role" className="space-y-3">
-      <h3 className="font-display text-lg font-bold text-foreground">What's your primary role?</h3>
+      <h3 className="font-display text-lg font-bold text-foreground">Jaka jest Twoja główna rola?</h3>
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="e.g. Frontend Developer"
+        placeholder="np. Frontend Developer"
         className="w-full px-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       />
     </div>,
     // Step 1: Skills
     <div key="skills" className="space-y-3">
-      <h3 className="font-display text-lg font-bold text-foreground">Your top skills (up to 8)</h3>
+      <h3 className="font-display text-lg font-bold text-foreground">Twoje kluczowe umiejętności (max 8)</h3>
       <div className="flex flex-wrap gap-2">
         {SKILL_OPTIONS.map((s) => (
           <button
@@ -71,30 +71,30 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
           </button>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">{skills.length}/8 selected</p>
+      <p className="text-xs text-muted-foreground">{skills.length}/8 wybranych</p>
     </div>,
     // Step 2: Salary + Seniority
     <div key="salary" className="space-y-4">
-      <h3 className="font-display text-lg font-bold text-foreground">Salary & Seniority</h3>
+      <h3 className="font-display text-lg font-bold text-foreground">Wynagrodzenie i poziom</h3>
       <div className="space-y-2">
         <label className="text-xs text-muted-foreground font-medium">
-          Preferred salary: ${salaryMin}k – ${salaryMax}k
+          Oczekiwane wynagrodzenie: {salaryMin} 000 zł – {salaryMax} 000 zł brutto
         </label>
         <div className="flex gap-3">
           <input
-            type="range" min={30} max={250} step={10} value={salaryMin}
-            onChange={(e) => setSalaryMin(Math.min(Number(e.target.value), salaryMax - 10))}
+            type="range" min={5} max={40} step={1} value={salaryMin}
+            onChange={(e) => setSalaryMin(Math.min(Number(e.target.value), salaryMax - 1))}
             className="flex-1"
           />
           <input
-            type="range" min={30} max={250} step={10} value={salaryMax}
-            onChange={(e) => setSalaryMax(Math.max(Number(e.target.value), salaryMin + 10))}
+            type="range" min={5} max={40} step={1} value={salaryMax}
+            onChange={(e) => setSalaryMax(Math.max(Number(e.target.value), salaryMin + 1))}
             className="flex-1"
           />
         </div>
       </div>
       <div className="space-y-2">
-        <label className="text-xs text-muted-foreground font-medium">Seniority level</label>
+        <label className="text-xs text-muted-foreground font-medium">Poziom doświadczenia</label>
         <div className="grid grid-cols-4 gap-2">
           {SENIORITY_OPTIONS.map((s) => (
             <button
@@ -114,7 +114,7 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
     </div>,
     // Step 3: Remote preference
     <div key="remote" className="space-y-3">
-      <h3 className="font-display text-lg font-bold text-foreground">Work preference</h3>
+      <h3 className="font-display text-lg font-bold text-foreground">Preferowany tryb pracy</h3>
       <div className="grid grid-cols-2 gap-2">
         {REMOTE_OPTIONS.map((r) => (
           <button
@@ -176,7 +176,7 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
             disabled={step === 0}
             className="flex items-center gap-1 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors disabled:opacity-30"
           >
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className="w-4 h-4" /> Wstecz
           </button>
           {step < steps.length - 1 ? (
             <button
@@ -184,7 +184,7 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
               disabled={!canNext}
               className="flex items-center gap-2 px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50"
             >
-              Next <ArrowRight className="w-4 h-4" />
+              Dalej <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
@@ -200,7 +200,7 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
               }
               className="flex items-center gap-2 px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform"
             >
-              Finish ✓
+              Gotowe ✓
             </button>
           )}
         </div>

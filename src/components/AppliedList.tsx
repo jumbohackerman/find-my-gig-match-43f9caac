@@ -10,8 +10,8 @@ const AppliedList = ({ jobs }: AppliedListProps) => {
   if (jobs.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground text-sm">No applications yet.</p>
-        <p className="text-muted-foreground text-xs mt-1">Swipe right on jobs you like!</p>
+        <p className="text-muted-foreground text-sm">Brak aplikacji.</p>
+        <p className="text-muted-foreground text-xs mt-1">Przesuń w prawo na oferty, które Ci się podobają!</p>
       </div>
     );
   }

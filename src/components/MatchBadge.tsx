@@ -30,7 +30,7 @@ const MatchBadge = ({ result, compact }: Props) => {
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <span className={`text-lg font-bold ${scoreColor(result.score)}`}>
-          {result.score}% match
+          {result.score}% dopasowania
         </span>
       </div>
       <div className="space-y-1">

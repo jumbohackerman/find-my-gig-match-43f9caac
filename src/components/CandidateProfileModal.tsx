@@ -41,13 +41,13 @@ interface Props {
 }
 
 function getActivityLabel(lastActive?: string): { label: string; color: string } {
-  if (!lastActive) return { label: "Unknown", color: "text-muted-foreground" };
+  if (!lastActive) return { label: "Nieznane", color: "text-muted-foreground" };
   const diff = Date.now() - new Date(lastActive).getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return { label: "Active today", color: "text-accent" };
-  if (days <= 3) return { label: `Active ${days}d ago`, color: "text-yellow-400" };
-  if (days <= 7) return { label: "Active 1 week ago", color: "text-muted-foreground" };
-  return { label: `Active ${days}d ago`, color: "text-muted-foreground" };
+  if (days === 0) return { label: "Aktywny dziś", color: "text-accent" };
+  if (days <= 3) return { label: `Aktywny ${days} dni temu`, color: "text-yellow-400" };
+  if (days <= 7) return { label: "Aktywny tydzień temu", color: "text-muted-foreground" };
+  return { label: `Aktywny ${days} dni temu`, color: "text-muted-foreground" };
 }
 
 const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
@@ -122,7 +122,7 @@ const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
           {/* Summary */}
           {seeker.summary && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Summary</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Podsumowanie</h4>
               <p className="text-sm text-foreground leading-relaxed">{seeker.summary}</p>
             </div>
           )}
@@ -130,7 +130,7 @@ const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
           {/* Skills */}
           <div className="mb-4">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Skills
+              Umiejętności
             </h4>
             {coreSkills.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-1.5">
@@ -165,7 +165,7 @@ const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
           {/* Experience */}
           {seeker.experience_entries && seeker.experience_entries.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Experience</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doświadczenie</h4>
               <div className="space-y-3">
                 {seeker.experience_entries.map((entry, idx) => (
                   <div key={idx} className="pl-3 border-l-2 border-border">
@@ -190,10 +190,10 @@ const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
           {seeker.salary_min && seeker.salary_min > 0 && (
             <div className="mb-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                Salary Expectation
+                Oczekiwania finansowe
               </h4>
               <p className="text-sm text-foreground">
-                ${seeker.salary_min}k – ${seeker.salary_max || seeker.salary_min}k / year
+                {seeker.salary_min} 000 zł – {seeker.salary_max || seeker.salary_min} 000 zł brutto / mies.
               </p>
             </div>
           )}
@@ -201,7 +201,7 @@ const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
           {/* Links */}
           {hasLinks && (
             <div className="mb-2">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Links</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Linki</h4>
               <div className="flex gap-2">
                 {links.portfolio && (
                   <a href={links.portfolio} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
@@ -231,7 +231,7 @@ const CandidateProfileModal = ({ seeker, match, onClose }: Props) => {
           {seeker.cv_url && (
             <div className="pt-2 border-t border-border">
               <span className="flex items-center gap-1.5 text-xs text-accent">
-                <FileText className="w-3.5 h-3.5" /> CV available
+                <FileText className="w-3.5 h-3.5" /> CV dostępne
               </span>
             </div>
           )}

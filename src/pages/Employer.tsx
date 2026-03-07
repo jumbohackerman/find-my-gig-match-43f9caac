@@ -29,16 +29,15 @@ function seekerToProfile(seeker: Seeker): CandidateProfile {
   return {
     skills: seeker.skills,
     seniority: parseInt(expMatch?.[1] || "3") >= 6 ? "Senior" : parseInt(expMatch?.[1] || "3") >= 3 ? "Mid" : "Junior",
-    preferredSalaryMin: 80,
-    preferredSalaryMax: 180,
-    remotePreference: seeker.location.toLowerCase().includes("remote") ? "Remote" : "Any",
+    preferredSalaryMin: seeker.salary_min || 12,
+    preferredSalaryMax: seeker.salary_max || 25,
+    remotePreference: seeker.work_mode?.toLowerCase().includes("zdaln") ? "Zdalnie" : "Any",
     location: seeker.location,
     experienceYears: parseInt(expMatch?.[1] || "3"),
     title: seeker.title,
   };
 }
 
-// Generate demo applicants
 const generateApplicants = () => {
   const map: Record<string, typeof seekers> = {};
   initialJobs.forEach((job) => {
@@ -60,7 +59,6 @@ const generateMetrics = () => {
   return map;
 };
 
-// Generate initial demo applications from applicants
 function generateDemoApps(applicants: Record<string, Seeker[]>): DemoApplication[] {
   const apps: DemoApplication[] = [];
   Object.entries(applicants).forEach(([jobId, jobSeekers]) => {
@@ -91,7 +89,7 @@ const Employer = () => {
   const [swipeJob, setSwipeJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ seeker: ExtendedSeeker; match: MatchResult } | null>(null);
-  const [chatOpen, setChatOpen] = useState<string | null>(null); // application id
+  const [chatOpen, setChatOpen] = useState<string | null>(null);
   const [swipeIndexes, setSwipeIndexes] = useState<Record<string, number>>({});
   const [picksUsed, setPicksUsed] = useState<Record<string, number>>({});
   const [activeTab, setActiveTab] = useState<EmployerTab>("listings");
@@ -101,7 +99,6 @@ const Employer = () => {
     type: "Full-time" as Job["type"], description: "", tags: "",
   });
 
-  // Helpers
   const getApp = (jobId: string, candidateId: string) =>
     applications.find((a) => a.jobId === jobId && a.candidateId === candidateId);
 
@@ -115,7 +112,6 @@ const Employer = () => {
     setApplications((prev) => prev.map((a) => a.id === appId ? { ...a, status } : a));
   }, []);
 
-  // Mark as viewed when opening profile
   const handleViewCandidate = useCallback((seeker: Seeker, match: MatchResult, jobId: string) => {
     const app = getApp(jobId, seeker.id);
     if (app && app.status === "applied") {
@@ -124,7 +120,6 @@ const Employer = () => {
     setSelectedCandidate({ seeker: seeker as ExtendedSeeker, match });
   }, [applications]);
 
-  // AI shortlist generation
   const handleGenerateShortlist = useCallback((jobId: string) => {
     const job = postedJobs.find((j) => j.id === jobId);
     if (!job) return;
@@ -152,10 +147,9 @@ const Employer = () => {
     );
   }, [postedJobs, applicants, applications]);
 
-  // Employer swipe pick
   const handleSwipePick = useCallback((jobId: string, seekerId: string) => {
     const shortlisted = getShortlisted(jobId);
-    if (shortlisted.length >= MAX_SHORTLIST) return; // full
+    if (shortlisted.length >= MAX_SHORTLIST) return;
 
     setApplications((prev) =>
       prev.map((a) =>
@@ -172,13 +166,12 @@ const Employer = () => {
     setSwipeIndexes((prev) => ({ ...prev, [jobId]: (prev[jobId] || 0) + 1 }));
   }, []);
 
-  // Chat
   const handleSendMessage = useCallback((applicationId: string, content: string) => {
     const msg: DemoMessage = {
       id: String(Date.now()),
       applicationId,
       senderId: "employer",
-      senderName: "You",
+      senderName: "Ty",
       content,
       createdAt: new Date().toISOString(),
     };
@@ -189,12 +182,10 @@ const Employer = () => {
     setChatOpen(applicationId);
   }, []);
 
-  // Status advancement
   const handleAdvanceStatus = useCallback((appId: string, newStatus: ApplicationStatus) => {
     updateAppStatus(appId, newStatus);
   }, [updateAppStatus]);
 
-  // Ranked applicants for analysis
   const rankedApplicants = useMemo(() => {
     if (!analyzedJob) return [];
     const job = postedJobs.find((j) => j.id === analyzedJob);
@@ -205,7 +196,6 @@ const Employer = () => {
       .sort((a, b) => b.match.score - a.match.score);
   }, [analyzedJob, postedJobs, applicants]);
 
-  // Swipe candidates for a job
   const swipeCandidates = useMemo(() => {
     if (!swipeJob) return [];
     const job = postedJobs.find((j) => j.id === swipeJob);
@@ -224,7 +214,7 @@ const Employer = () => {
       location: form.location, salary: form.salary, type: form.type,
       description: form.description,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      posted: "Just now",
+      posted: "Właśnie dodano",
     };
     setPostedJobs((prev) => [newJob, ...prev]);
     setForm({ title: "", company: "", logo: "🏢", location: "", salary: "", type: "Full-time", description: "", tags: "" });
@@ -257,10 +247,10 @@ const Employer = () => {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/" className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
-            Browse Jobs
+            Przeglądaj oferty
           </Link>
           <Link to="/profiles" className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5">
-            <Users className="w-4 h-4" /> Find Talent
+            <Users className="w-4 h-4" /> Znajdź talent
           </Link>
         </div>
       </header>
@@ -269,14 +259,14 @@ const Employer = () => {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="font-display text-2xl font-bold text-foreground">Employer Dashboard</h2>
-              <p className="text-muted-foreground text-sm mt-1">Manage listings, shortlists, and candidates.</p>
+              <h2 className="font-display text-2xl font-bold text-foreground">Panel pracodawcy</h2>
+              <p className="text-muted-foreground text-sm mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform"
             >
-              <Plus className="w-4 h-4" /> Post Job
+              <Plus className="w-4 h-4" /> Dodaj ogłoszenie
             </button>
           </div>
         </motion.div>
@@ -292,28 +282,28 @@ const Employer = () => {
               onSubmit={handleSubmit}
             >
               <div className="card-gradient rounded-2xl border border-border p-5 mb-6 space-y-4">
-                <h3 className="font-display text-lg font-semibold text-foreground">New Job Listing</h3>
+                <h3 className="font-display text-lg font-semibold text-foreground">Nowe ogłoszenie</h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Job Title *</label>
-                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. Frontend Developer" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <label className="text-xs text-muted-foreground font-medium">Stanowisko *</label>
+                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="np. Frontend Developer" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Company *</label>
-                    <input required value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="e.g. Acme Corp" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <label className="text-xs text-muted-foreground font-medium">Firma *</label>
+                    <input required value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="np. TechNova" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Location *</label>
-                    <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Remote" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <label className="text-xs text-muted-foreground font-medium">Lokalizacja *</label>
+                    <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="np. Zdalnie" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Salary</label>
-                    <input value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} placeholder="e.g. $120k - $150k" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <label className="text-xs text-muted-foreground font-medium">Wynagrodzenie</label>
+                    <input value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} placeholder="np. 18 000 zł - 25 000 zł" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Type</label>
+                    <label className="text-xs text-muted-foreground font-medium">Typ</label>
                     <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as Job["type"] })} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                       <option value="Full-time">Full-time</option>
                       <option value="Part-time">Part-time</option>
@@ -324,21 +314,21 @@ const Employer = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Emoji Logo</label>
+                    <label className="text-xs text-muted-foreground font-medium">Logo (emoji)</label>
                     <input value={form.logo} onChange={(e) => setForm({ ...form, logo: e.target.value })} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Tags (comma-separated)</label>
+                    <label className="text-xs text-muted-foreground font-medium">Tagi (po przecinku)</label>
                     <input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="React, TypeScript" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground font-medium">Description *</label>
-                  <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Describe the role…" rows={3} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+                  <label className="text-xs text-muted-foreground font-medium">Opis *</label>
+                  <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Opisz rolę…" rows={3} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
                 </div>
                 <div className="flex gap-3 justify-end">
-                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">Cancel</button>
-                  <button type="submit" className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform">Publish Listing</button>
+                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">Anuluj</button>
+                  <button type="submit" className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform">Opublikuj</button>
                 </div>
               </div>
             </motion.form>
@@ -369,11 +359,11 @@ const Employer = () => {
                 >
                   {/* Metrics bar */}
                   <div className="px-4 pt-3 flex gap-4 text-[11px] text-muted-foreground flex-wrap">
-                    <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {m.views} views</span>
-                    <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {m.swipesRight} swipes</span>
-                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApplicants.length} applied</span>
-                    <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlisted</span>
-                    <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% avg match</span>
+                    <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {m.views} wyśw.</span>
+                    <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {m.swipesRight} swipe'ów</span>
+                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApplicants.length} aplikacji</span>
+                    <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlista</span>
+                    <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr. dopasowanie</span>
                   </div>
 
                   <div className="p-4 pt-2 flex items-center gap-3">
@@ -385,16 +375,14 @@ const Employer = () => {
                       <p className="text-xs text-muted-foreground">{job.company} · {job.location} · {job.posted}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                      {/* Generate Shortlist */}
                       <button
                         onClick={() => handleGenerateShortlist(job.id)}
                         disabled={shortlisted.length >= MAX_SHORTLIST}
                         className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        title="AI generates shortlist"
+                        title="AI generuje shortlistę"
                       >
-                        <Zap className="w-3.5 h-3.5" /> Generate Shortlist
+                        <Zap className="w-3.5 h-3.5" /> Generuj shortlistę
                       </button>
-                      {/* Swipe picks */}
                       <button
                         onClick={() => {
                           setSwipeJob(isSwipe ? null : job.id);
@@ -405,9 +393,8 @@ const Employer = () => {
                           isSwipe ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
                         }`}
                       >
-                        <Users className="w-3.5 h-3.5" /> Swipe ({MAX_PICKS - (picksUsed[job.id] || 0)})
+                        <Users className="w-3.5 h-3.5" /> Picki ({MAX_PICKS - (picksUsed[job.id] || 0)})
                       </button>
-                      {/* Analyze */}
                       <button
                         onClick={() => {
                           setAnalyzedJob(isAnalyzed ? null : job.id);
@@ -418,9 +405,8 @@ const Employer = () => {
                           isAnalyzed ? "bg-primary text-primary-foreground" : "bg-accent/15 text-accent hover:bg-accent/25"
                         }`}
                       >
-                        <BarChart3 className="w-3.5 h-3.5" /> Analyze
+                        <BarChart3 className="w-3.5 h-3.5" /> Analiza
                       </button>
-                      {/* Applicants */}
                       <button
                         onClick={() => {
                           setExpandedJob(isExpanded ? null : job.id);
@@ -445,7 +431,7 @@ const Employer = () => {
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="px-4 pb-4 border-t border-border pt-3">
                           <h5 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                            <Users className="w-3.5 h-3.5" /> Swipe Picks — Add to Shortlist
+                            <Users className="w-3.5 h-3.5" /> Swipe picki — dodaj do shortlisty
                           </h5>
                           <EmployerCandidateSwipe
                             candidates={swipeCandidates}
@@ -467,12 +453,12 @@ const Employer = () => {
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="px-4 pb-4 border-t border-border pt-3">
                           <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                            Applicants ({jobApplicants.length})
+                            Kandydaci ({jobApplicants.length})
                           </h5>
                           {jobApplicants.length === 0 ? (
                             <EmptyState
-                              title="No applicants yet"
-                              description="No candidates yet. Share this job listing to receive applications."
+                              title="Brak kandydatów"
+                              description="Brak kandydatów. Udostępnij ogłoszenie, aby otrzymać aplikacje."
                             />
                           ) : (
                             <div className="space-y-2">
@@ -507,7 +493,6 @@ const Employer = () => {
                                             <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
                                           ))}
                                         </div>
-                                        {/* Status actions */}
                                         {app && (
                                           <div className="flex gap-1">
                                             {app.status === "applied" && (
@@ -515,7 +500,7 @@ const Employer = () => {
                                                 onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "shortlisted"); }}
                                                 className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25"
                                               >
-                                                Shortlist
+                                                Shortlista
                                               </button>
                                             )}
                                             {(app.status === "shortlisted" || app.status === "viewed") && (
@@ -523,7 +508,7 @@ const Employer = () => {
                                                 onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "interview"); }}
                                                 className="text-[10px] px-2 py-0.5 rounded bg-yellow-400/15 text-yellow-500 hover:bg-yellow-400/25"
                                               >
-                                                Interview
+                                                Rozmowa
                                               </button>
                                             )}
                                             {app.status === "interview" && (
@@ -532,13 +517,13 @@ const Employer = () => {
                                                   onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "hired"); }}
                                                   className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25"
                                                 >
-                                                  Hire
+                                                  Zatrudnij
                                                 </button>
                                                 <button
                                                   onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "closed"); }}
                                                   className="text-[10px] px-2 py-0.5 rounded bg-destructive/15 text-destructive hover:bg-destructive/25"
                                                 >
-                                                  Close
+                                                  Zamknij
                                                 </button>
                                               </>
                                             )}
@@ -547,14 +532,12 @@ const Employer = () => {
                                       </div>
                                     </div>
 
-                                    {/* Status pipeline */}
                                     {app && (
                                       <div className="px-3 pb-2">
                                         <StatusPipeline currentStatus={app.status} />
                                       </div>
                                     )}
 
-                                    {/* Chat */}
                                     {app && (
                                       <ChatPanel
                                         messages={appMessages}
@@ -580,12 +563,12 @@ const Employer = () => {
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="px-4 pb-4 border-t border-border pt-3">
                           <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                            <Zap className="w-3.5 h-3.5" /> AI Match Analysis — Ranked by Score
+                            <Zap className="w-3.5 h-3.5" /> Analiza AI — ranking wg dopasowania
                           </h5>
                           {rankedApplicants.length === 0 ? (
                             <EmptyState
-                              title="No applicants to analyze"
-                              description="Share this job listing to receive applications for analysis."
+                              title="Brak kandydatów do analizy"
+                              description="Udostępnij ogłoszenie, aby otrzymać aplikacje do analizy."
                             />
                           ) : (
                             <div className="space-y-3">
@@ -625,7 +608,6 @@ const Employer = () => {
   );
 };
 
-// Sub-component for analyzed applicant card
 function ApplicantAnalysisCard({
   seeker, match, rank, job, app, onViewProfile,
 }: {
@@ -665,7 +647,7 @@ function ApplicantAnalysisCard({
                   onClick={(e) => { e.stopPropagation(); onViewProfile(); }}
                   className="text-xs text-primary hover:underline"
                 >
-                  View full profile →
+                  Zobacz pełny profil →
                 </button>
               </div>
             </div>

@@ -36,7 +36,7 @@ const StatusPipeline = ({ currentStatus }: Props) => {
         <>
           <div className="w-2 h-px bg-border" />
           <div className="px-2 py-0.5 rounded text-[9px] font-semibold bg-destructive/15 text-destructive">
-            Closed
+            Zamknięte
           </div>
         </>
       )}
