@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { logConsent } from "@/lib/consent";
 
 const STORAGE_KEY = "jobswipe_cookie_consent";
 
@@ -15,6 +16,7 @@ const CookieBanner = () => {
 
   const accept = (value: "all" | "essential") => {
     localStorage.setItem(STORAGE_KEY, value);
+    logConsent({ type: "cookies", level: value });
     setVisible(false);
   };
 
