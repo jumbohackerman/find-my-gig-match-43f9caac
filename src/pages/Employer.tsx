@@ -209,7 +209,7 @@ const Employer = () => {
                 </div>
                 <div className="flex gap-3 justify-end">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">Anuluj</button>
-                  <button type="submit" disabled={submitting} className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50">{submitting ? "Publikuję…" : "Opublikuj"}</button>
+                  <button type="submit" disabled={submitting} data-testid="employer-submit-job" className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50">{submitting ? "Publikuję…" : "Opublikuj"}</button>
                 </div>
               </div>
             </motion.form>
