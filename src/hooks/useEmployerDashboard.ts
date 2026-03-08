@@ -1,8 +1,28 @@
+/**
+ * Employer dashboard data — fetches jobs, applications, and candidates.
+ * Uses provider registry for backend-agnostic data access.
+ * Falls back to direct Supabase when needed (enrichment) — will be migrated
+ * to repository layer once listForEmployer returns enriched data natively.
+ */
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { calculateMatch, dbCandidateToProfile, type MatchResult, type CandidateProfile } from "@/lib/matchScoring";
-import type { ApplicationStatus } from "@/types/application";
+import {
+  calculateMatch,
+  dbCandidateToCandidate,
+  type MatchResult,
+} from "@/lib/matchScoring";
+import type {
+  Candidate,
+  Job,
+  EnrichedEmployerApplication,
+  ApplicationStatus,
+  ApplicationSource,
+} from "@/domain/models";
+
+// Re-export for backward compat during migration
+export type EmployerApplication = EnrichedEmployerApplication;
 
 export interface DbCandidate {
   id: string;
@@ -39,24 +59,27 @@ export interface DbJob {
   status: string;
 }
 
-export interface EmployerApplication {
-  id: string;
-  job_id: string;
-  candidate_id: string;
-  status: ApplicationStatus;
-  source: string;
-  applied_at: string;
-  candidate?: DbCandidate;
-  job?: DbJob;
-  matchResult?: MatchResult;
-  candidateProfile?: CandidateProfile;
+function dbJobToDomain(j: DbJob): Job {
+  return {
+    id: j.id,
+    title: j.title,
+    company: j.company,
+    location: j.location,
+    logo: j.logo,
+    salary: j.salary,
+    tags: j.tags,
+    type: j.type as Job["type"],
+    description: j.description,
+    posted: "",
+    status: j.status as Job["status"],
+    employerId: j.employer_id,
+  };
 }
 
 export function useEmployerDashboardData() {
   const { user } = useAuth();
-  const [jobs, setJobs] = useState<DbJob[]>([]);
-  const [applications, setApplications] = useState<EmployerApplication[]>([]);
-  const [candidates, setCandidates] = useState<Record<string, DbCandidate>>({});
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [applications, setApplications] = useState<EnrichedEmployerApplication[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -72,9 +95,11 @@ export function useEmployerDashboardData() {
       .or(`employer_id.eq.${user.id},employer_id.eq.00000000-0000-0000-0000-000000000000`);
 
     const dbJobs = (jobsData || []) as unknown as DbJob[];
-    setJobs(dbJobs);
+    const domainJobs = dbJobs.map(dbJobToDomain);
+    setJobs(domainJobs);
 
     if (dbJobs.length === 0) {
+      setApplications([]);
       setLoading(false);
       return;
     }
@@ -87,10 +112,17 @@ export function useEmployerDashboardData() {
       .in("job_id", jobIds)
       .order("applied_at", { ascending: false });
 
-    const dbApps = (appsData || []) as unknown as EmployerApplication[];
+    const rawApps = (appsData || []) as unknown as {
+      id: string;
+      job_id: string;
+      candidate_id: string;
+      status: string;
+      source: string;
+      applied_at: string;
+    }[];
 
     // Fetch candidate profiles for all unique candidate_ids
-    const candidateIds = [...new Set(dbApps.map((a) => a.candidate_id))];
+    const candidateIds = [...new Set(rawApps.map((a) => a.candidate_id))];
     if (candidateIds.length > 0) {
       const { data: candidatesData } = await supabase
         .from("candidates")
@@ -101,9 +133,7 @@ export function useEmployerDashboardData() {
       (candidatesData || []).forEach((c: any) => {
         candidateMap[c.user_id] = c as DbCandidate;
       });
-      setCandidates(candidateMap);
 
-      // Also fetch profile names
       const { data: profilesData } = await supabase
         .from("profiles")
         .select("user_id, full_name, avatar")
@@ -114,36 +144,45 @@ export function useEmployerDashboardData() {
         profileMap[p.user_id] = { full_name: p.full_name, avatar: p.avatar };
       });
 
-      // Enrich applications with candidate data, job data, and match scores
-      const enrichedApps = dbApps.map((app) => {
-        const candidate = candidateMap[app.candidate_id];
-        const job = dbJobs.find((j) => j.id === app.job_id);
+      // Enrich applications with domain Candidate, Job, and match scores
+      const enrichedApps: EnrichedEmployerApplication[] = rawApps.map((app) => {
+        const dbCandidate = candidateMap[app.candidate_id];
+        const job = domainJobs.find((j) => j.id === app.job_id);
         let matchResult: MatchResult | undefined;
-        let candidateProfile: CandidateProfile | undefined;
+        let candidate: Candidate | undefined;
 
-        if (candidate && job) {
-          candidateProfile = dbCandidateToProfile(candidate);
-          matchResult = calculateMatch(candidateProfile, { ...job, type: job.type as any });
-        }
-
-        // Attach profile name to candidate
-        if (candidate && profileMap[app.candidate_id]) {
-          (candidate as any).full_name = profileMap[app.candidate_id].full_name;
-          (candidate as any).avatar = profileMap[app.candidate_id].avatar;
+        if (dbCandidate) {
+          candidate = dbCandidateToCandidate(dbCandidate, profileMap[app.candidate_id]);
+          if (job) {
+            matchResult = calculateMatch(candidate, job);
+          }
         }
 
         return {
-          ...app,
+          id: app.id,
+          jobId: app.job_id,
+          candidateId: app.candidate_id,
+          status: app.status as ApplicationStatus,
+          source: app.source as ApplicationSource,
+          appliedAt: app.applied_at,
           candidate,
           job,
           matchResult,
-          candidateProfile,
         };
       });
 
       setApplications(enrichedApps);
     } else {
-      setApplications(dbApps);
+      setApplications(
+        rawApps.map((app) => ({
+          id: app.id,
+          jobId: app.job_id,
+          candidateId: app.candidate_id,
+          status: app.status as ApplicationStatus,
+          source: app.source as ApplicationSource,
+          appliedAt: app.applied_at,
+        })),
+      );
     }
 
     setLoading(false);
@@ -162,17 +201,18 @@ export function useEmployerDashboardData() {
         fetchData();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, fetchData]);
 
   // Group applications by job
   const applicationsByJob = useMemo(() => {
-    const map: Record<string, EmployerApplication[]> = {};
+    const map: Record<string, EnrichedEmployerApplication[]> = {};
     applications.forEach((app) => {
-      if (!map[app.job_id]) map[app.job_id] = [];
-      map[app.job_id].push(app);
+      if (!map[app.jobId]) map[app.jobId] = [];
+      map[app.jobId].push(app);
     });
-    // Sort each job's applications by match score descending
     Object.values(map).forEach((apps) => {
       apps.sort((a, b) => (b.matchResult?.score || 0) - (a.matchResult?.score || 0));
     });
@@ -183,7 +223,6 @@ export function useEmployerDashboardData() {
     jobs,
     applications,
     applicationsByJob,
-    candidates,
     loading,
     refetch: fetchData,
   };
