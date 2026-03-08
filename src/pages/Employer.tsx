@@ -245,8 +245,8 @@ const Employer = () => {
                         <Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlista
                       </span>
                       <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> {aiCount} AI</span>
-                      <span className="flex items-center gap-1"><UserCheck className="w-3 h-3" /> {employerPickCount} picki</span>
-                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr.</span>
+                      <span className="flex items-center gap-1"><UserCheck className="w-3 h-3" /> {employerPickCount} wybrane</span>
+                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% średnia</span>
                     </div>
 
                     <div className="p-4 pt-2">
@@ -413,10 +413,10 @@ const Employer = () => {
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                           <div className="px-4 pb-4 border-t border-border pt-3">
                             <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                              <Zap className="w-3.5 h-3.5" /> Analiza AI — ranking wg dopasowania
+                              <Zap className="w-3.5 h-3.5" /> Analiza AI — ranking kandydatów
                             </h5>
                             {jobApps.length === 0 ? (
-                              <EmptyState title="Brak kandydatów do analizy" description="Udostępnij ogłoszenie, aby otrzymać aplikacje do analizy." />
+                              <EmptyState title="Brak kandydatów" description="Poczekaj na pierwsze aplikacje, aby uruchomić analizę." />
                             ) : (
                               <div className="space-y-3">
                                 {jobApps.map((app, idx) => (

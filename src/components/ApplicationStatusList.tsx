@@ -23,8 +23,8 @@ const ApplicationStatusList = ({ applications, loading, onJobClick }: Props) => 
   if (applications.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground text-sm">Brak aplikacji.</p>
-        <p className="text-muted-foreground text-xs mt-1">Przesuń w prawo na oferty, które Ci się podobają!</p>
+        <p className="text-muted-foreground text-sm">Nie masz jeszcze żadnych aplikacji.</p>
+        <p className="text-muted-foreground text-xs mt-1">Przeglądaj oferty i aplikuj jednym gestem!</p>
       </div>
     );
   }

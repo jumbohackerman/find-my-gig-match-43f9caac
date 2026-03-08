@@ -56,7 +56,7 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, curr
           <MessageSquare className="w-4 h-4" /> Napisz do {candidateName}
         </button>
         <p className="text-[10px] text-muted-foreground text-center mt-1.5">
-          Wyślij pierwszą wiadomość aby odblokować czat
+          Wyślij wiadomość, aby rozpocząć rozmowę
         </p>
       </div>
     );

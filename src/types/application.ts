@@ -15,12 +15,12 @@ export const STATUS_ORDER: ApplicationStatus[] = [
 export const OUTCOME_STATUSES: ApplicationStatus[] = ["hired", "not_selected", "position_closed"];
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
-  applied: "Aplikowano",
-  shortlisted: "Shortlista",
-  viewed: "Wyświetlono",
+  applied: "Wysłano",
+  shortlisted: "Na shortliście",
+  viewed: "Przejrzano",
   interview: "Rozmowa",
-  hired: "Zatrudniony",
-  not_selected: "Nie wybrano",
+  hired: "Zatrudniony/a",
+  not_selected: "Odmowa",
   position_closed: "Stanowisko zamknięte",
 };
 

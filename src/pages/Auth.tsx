@@ -192,7 +192,7 @@ const Auth = () => {
                   onClick={() => setMode("forgot")}
                   className="text-xs text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Zapomniałeś hasła?
+                  Nie pamiętasz hasła?
                 </button>
               </div>
             )}
@@ -203,7 +203,7 @@ const Auth = () => {
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform disabled:opacity-50"
             >
               {loading
-                ? "Ładowanie…"
+                ? "Proszę czekać…"
                 : mode === "login"
                 ? "Zaloguj się"
                 : mode === "signup"

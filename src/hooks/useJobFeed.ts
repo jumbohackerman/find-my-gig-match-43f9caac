@@ -141,7 +141,7 @@ export function useJobFeed() {
       } else {
         // direction === "left" (skip)
         lastUndoableRef.current = { direction: "left", job, previousIndex: currentIndex };
-        toast("Pominięto", {
+        toast("Oferta pominięta", {
           action: { label: "Cofnij", onClick: () => undoLast() },
           duration: 5000,
         });
