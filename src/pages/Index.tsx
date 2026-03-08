@@ -169,8 +169,8 @@ const Index = () => {
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center min-h-0 w-full">
-                {/* Card stack — fills available space, overflow-hidden prevents card bleeding into buttons */}
-                <div className="relative w-full flex-1 min-h-0 overflow-hidden">
+                {/* Card stack — overflow-visible allows exit animation to fly beyond container */}
+                <div className="relative w-full flex-1 min-h-0 overflow-visible">
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard

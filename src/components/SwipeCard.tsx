@@ -28,7 +28,7 @@ interface SwipeCardProps {
 
 const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 300], [-12, 12]);
+  const rotate = useTransform(x, [-300, 300], [-10, 10]);
   const rightOpacity = useTransform(x, [0, 80], [0, 1]);
   const leftOpacity = useTransform(x, [-80, 0], [1, 0]);
 
@@ -81,13 +81,13 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
       initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 8 }}
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 8 }}
       exit={{
-        x: resolvedExit === "right" ? 800 : -800,
-        rotate: resolvedExit === "right" ? 20 : -20,
+        x: resolvedExit === "right" ? 1200 : -1200,
+        rotate: resolvedExit === "right" ? 18 : -18,
         opacity: 0,
         transition: {
-          x: { type: "spring", stiffness: 300, damping: 30, mass: 0.8 },
-          rotate: { type: "spring", stiffness: 300, damping: 30, mass: 0.8 },
-          opacity: { duration: 0.25, delay: 0.05 },
+          x: { type: "spring", stiffness: 120, damping: 22, mass: 1 },
+          rotate: { type: "spring", stiffness: 120, damping: 22, mass: 1 },
+          opacity: { duration: 0.4, delay: 0.15 },
         },
       }}
     >
