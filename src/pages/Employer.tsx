@@ -186,7 +186,7 @@ const Employer = () => {
   }, []);
 
   const handleSendMessage = useCallback((applicationId: string, content: string) => {
-    const msg: DemoMessage = {
+    const msg: ChatMessage = {
       id: String(Date.now()),
       applicationId,
       senderId: "employer",
