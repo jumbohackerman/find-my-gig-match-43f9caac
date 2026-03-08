@@ -145,7 +145,7 @@ const Index = () => {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => changeTab(tab.key)}
             role="tab"
             aria-selected={activeTab === tab.key}
             aria-controls={`panel-${tab.key}`}
@@ -179,7 +179,7 @@ const Index = () => {
               onJobClick={(dbJob) => {
                 if (!dbJob) return;
                 const fullJob = allJobs.find(j => j.title === dbJob.title && j.company === dbJob.company);
-                setSelectedJob(fullJob || dbJob as any);
+                openJobModal(fullJob || dbJob as any);
               }}
             />
           </motion.div>
@@ -188,7 +188,7 @@ const Index = () => {
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
               Zapisane oferty ({savedJobs.length})
             </h2>
-            <SavedList jobs={savedJobs} onApply={handleSavedApply} onJobClick={setSelectedJob} />
+            <SavedList jobs={savedJobs} onApply={handleSavedApply} onJobClick={openJobModal} />
           </motion.div>
         ) : isFinished ? (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
@@ -231,7 +231,7 @@ const Index = () => {
                         isTop={i === 0}
                         matchResult={matchResults[job.id]}
                         isSaved={savedJobIds.has(job.id)}
-                        onTap={() => setSelectedJob(job)}
+                        onTap={() => openJobModal(job)}
                         forcedExitDirection={i === 0 ? buttonExitDir : null}
                       />
                     ))}
@@ -284,7 +284,7 @@ const Index = () => {
       <JobDetailModal
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
-        onClose={() => setSelectedJob(null)}
+        onClose={closeJobModal}
         onApply={(job) => {
           applyToJob(job);
           refetchApps();
