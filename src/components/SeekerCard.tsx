@@ -1,6 +1,6 @@
 import { MapPin, Clock, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Seeker } from "@/data/seekers";
+import type { Seeker } from "@/data/seekers"; // Legacy type — kept for backward compat
 import { getActivityLabel } from "@/components/CandidateProfileModal";
 
 interface SeekerCardProps {

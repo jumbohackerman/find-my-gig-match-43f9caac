@@ -3,7 +3,7 @@ import {
   X, MapPin, Clock, Globe, Github, Linkedin, ExternalLink,
   FileText, Briefcase,
 } from "lucide-react";
-import type { Seeker } from "@/data/seekers";
+import type { Seeker } from "@/data/seekers"; // Legacy type — kept for backward compat with ExtendedSeeker
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 

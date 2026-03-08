@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
-import type { Job } from "@/data/jobs";
+import type { Job } from "@/domain/models";
 
 interface Props {
   jobs: Job[];

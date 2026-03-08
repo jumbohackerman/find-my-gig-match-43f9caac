@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { MapPin, Clock, Briefcase, DollarSign, Wifi } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
-import type { Job } from "@/data/jobs";
+import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 
 interface SwipeCardProps {

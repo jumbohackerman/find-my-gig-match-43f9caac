@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import type { Job } from "@/data/jobs";
+import type { Job } from "@/domain/models";
 
 export interface JobFiltersState {
   location: string;

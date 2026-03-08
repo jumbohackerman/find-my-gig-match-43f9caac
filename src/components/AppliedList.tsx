@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import type { Job } from "@/data/jobs";
+import type { Job } from "@/domain/models";
 import StatusPipeline from "@/components/employer/StatusPipeline";
 import { STATUS_LABELS, type ApplicationStatus } from "@/types/application";
 

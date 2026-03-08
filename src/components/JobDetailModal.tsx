@@ -3,7 +3,7 @@ import {
   X, MapPin, Briefcase, Clock, DollarSign, Users, Building2,
   CheckCircle2, ListChecks, Gift, ExternalLink, Wifi,
 } from "lucide-react";
-import type { Job } from "@/data/jobs";
+import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 
