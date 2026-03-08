@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, MessageSquare } from "lucide-react";
+import { Send, MessageSquare, Loader2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmptyState from "./EmptyState";
 
@@ -14,7 +14,7 @@ export interface ChatMessage {
 
 interface Props {
   messages: ChatMessage[];
-  onSend: (content: string) => void;
+  onSend: (content: string) => Promise<void> | void;
   candidateName: string;
   isUnlocked: boolean;
   onUnlock: () => void;
@@ -23,11 +23,25 @@ interface Props {
 
 const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, currentUserId }: Props) => {
   const [text, setText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [lastFailedText, setLastFailedText] = useState<string | null>(null);
 
-  const handleSend = () => {
-    if (!text.trim()) return;
-    onSend(text.trim());
-    setText("");
+  const handleSend = async (content?: string) => {
+    const msg = (content ?? text).trim();
+    if (!msg || sending) return;
+    setSending(true);
+    setSendError(null);
+    setLastFailedText(null);
+    try {
+      await onSend(msg);
+      setText("");
+    } catch {
+      setSendError("Nie udało się wysłać wiadomości");
+      setLastFailedText(msg);
+    } finally {
+      setSending(false);
+    }
   };
 
   if (!isUnlocked) {
@@ -79,20 +93,38 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, curr
           </AnimatePresence>
         )}
       </div>
+
+      {/* Error with retry */}
+      {sendError && (
+        <div className="px-3 py-1.5 flex items-center gap-2 text-xs text-destructive">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          <span className="flex-1">{sendError}</span>
+          {lastFailedText && (
+            <button
+              onClick={() => handleSend(lastFailedText)}
+              className="text-primary text-[10px] font-semibold hover:underline"
+            >
+              Ponów
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="p-2 flex gap-2">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Napisz wiadomość…"
-          className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          disabled={sending}
+          className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
         />
         <button
-          onClick={handleSend}
-          disabled={!text.trim()}
-          className="p-2 rounded-xl btn-gradient text-primary-foreground disabled:opacity-40"
+          onClick={() => handleSend()}
+          disabled={!text.trim() || sending}
+          className="p-2 rounded-xl btn-gradient text-primary-foreground disabled:opacity-40 flex items-center justify-center"
         >
-          <Send className="w-3.5 h-3.5" />
+          {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
         </button>
       </div>
     </div>

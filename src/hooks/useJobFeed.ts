@@ -25,6 +25,7 @@ export function useJobFeed() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [swipedJobIds, setSwipedJobIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<JobFiltersState>({ ...defaultFilters });
+  const [actionPending, setActionPending] = useState(false);
 
   const userId = user?.id ?? "anonymous";
 
@@ -59,7 +60,8 @@ export function useJobFeed() {
         toast.success(`Zaaplikowano na: ${job.title}`);
       } catch (err: any) {
         console.error("Apply error:", err);
-        toast.error("Nie udało się zaaplikować");
+        toast.error("Nie udało się zaaplikować. Spróbuj ponownie.");
+        throw err;
       }
     },
     [user],
@@ -68,8 +70,11 @@ export function useJobFeed() {
   // ── Swipe handler ────────────────────────────────────────────────────────
   const handleSwipe = useCallback(
     async (direction: "left" | "right" | "save") => {
+      if (actionPending) return;
       const job = filteredJobs[currentIndex];
       if (!job) return;
+
+      setActionPending(true);
 
       // Record swipe event — non-blocking; don't let failures stop the UX
       try {
@@ -82,20 +87,22 @@ export function useJobFeed() {
       if (direction === "right") {
         try {
           await applyToJob(job);
-        } catch (err) {
-          console.error("[useJobFeed] apply failed:", err);
+        } catch {
+          // toast already shown in applyToJob — advance card anyway
         }
       } else if (direction === "save") {
         try {
           await saveJob(job.id);
-        } catch (err) {
-          console.error("[useJobFeed] save failed:", err);
+          toast.success("Oferta zapisana ⭐");
+        } catch {
+          toast.error("Nie udało się zapisać oferty");
         }
       }
 
       setCurrentIndex((prev) => prev + 1);
+      setActionPending(false);
     },
-    [currentIndex, filteredJobs, userId, applyToJob, saveJob],
+    [currentIndex, filteredJobs, userId, applyToJob, saveJob, actionPending],
   );
 
   // ── Apply from saved list ────────────────────────────────────────────────
@@ -137,6 +144,7 @@ export function useJobFeed() {
     jobsLoading,
     filters,
     matchResults,
+    actionPending,
     handleSwipe,
     applyFromSaved,
     applyToJob,
