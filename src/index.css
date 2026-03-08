@@ -98,6 +98,14 @@
     border-color: hsl(var(--swipe-left));
     color: hsl(var(--swipe-left));
   }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ── Reduced motion ── */

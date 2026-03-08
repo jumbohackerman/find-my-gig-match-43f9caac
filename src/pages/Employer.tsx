@@ -134,14 +134,14 @@ const Employer = () => {
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h2 className="font-display text-2xl font-bold text-foreground">Panel pracodawcy</h2>
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">Panel pracodawcy</h2>
               <p className="text-muted-foreground text-sm mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" /> Dodaj ogłoszenie
             </button>
@@ -160,7 +160,7 @@ const Employer = () => {
             >
               <div className="card-gradient rounded-2xl border border-border p-5 mb-6 space-y-4">
                 <h3 className="font-display text-lg font-semibold text-foreground">Nowe ogłoszenie</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs text-muted-foreground font-medium">Stanowisko *</label>
                     <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="np. Frontend Developer" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -170,7 +170,7 @@ const Employer = () => {
                     <input required value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="np. TechNova" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs text-muted-foreground font-medium">Lokalizacja *</label>
                     <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="np. Zdalnie" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -189,7 +189,7 @@ const Employer = () => {
                     </select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs text-muted-foreground font-medium">Logo (emoji) <span className="text-muted-foreground/60 font-normal">(opcjonalne)</span></label>
                     <input value={form.logo} onChange={(e) => setForm({ ...form, logo: e.target.value })} placeholder="🏢" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -560,35 +560,36 @@ function CandidateCard({
     <div className={`rounded-lg border overflow-hidden ${
       isShortlisted ? "bg-accent/5 border-accent/20" : "bg-secondary/50 border-border"
     }`}>
-      <div
-        className="flex items-center gap-3 p-3 cursor-pointer hover:bg-secondary/80 transition-colors"
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 cursor-pointer hover:bg-secondary/80 transition-colors"
         onClick={onView}
       >
-        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm">{avatar}</div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground">{name}</p>
-          <p className="text-xs text-muted-foreground">
-            {candidate?.title || "–"} · {candidate?.experience || "–"}
-          </p>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
-            <StatusBadge status={app.status as ApplicationStatus} />
-            {app.source !== "candidate" && <SourceLabel source={app.source as any} />}
-            {chatMessages.length > 0 && (
-              <span className="text-[10px] text-muted-foreground/60 flex items-center gap-0.5">
-                💬 {chatMessages.length}
-              </span>
-            )}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm shrink-0">{avatar}</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground">{name}</p>
+            <p className="text-xs text-muted-foreground">
+              {candidate?.title || "–"} · {candidate?.experience || "–"}
+            </p>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
+              <StatusBadge status={app.status as ApplicationStatus} />
+              {app.source !== "candidate" && <SourceLabel source={app.source as any} />}
+              {chatMessages.length > 0 && (
+                <span className="text-[10px] text-muted-foreground/60 flex items-center gap-0.5">
+                  💬 {chatMessages.length}
+                </span>
+              )}
+            </div>
           </div>
+          {matchResult && <MatchBadge result={matchResult} compact />}
         </div>
-        {matchResult && <MatchBadge result={matchResult} compact />}
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <div className="flex gap-1 flex-wrap justify-end">
+        <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1.5 shrink-0 pl-11 sm:pl-0">
+          <div className="flex gap-1 flex-wrap">
             {(candidate?.skills || []).slice(0, 2).map((skill) => (
               <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
             ))}
           </div>
-          <div className="flex gap-1 flex-wrap justify-end">
+          <div className="flex gap-1 flex-wrap">
             {(app.status === "applied" || app.status === "viewed") && (
               <button
                 onClick={(e) => { e.stopPropagation(); onShortlist(); }}
