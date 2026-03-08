@@ -1,6 +1,6 @@
 # Production Readiness Report
 
-**Date:** 2026-03-08 (post-consistency alignment)
+**Date:** 2026-03-08 (post saved_jobs + swipe_events migration)
 **Target Stack:** Lovable → GitHub → Cloudflare Pages + Supabase + Edge Functions + Resend + PostHog/GA4 + Sentry
 
 ---
@@ -17,13 +17,13 @@
 | `profiles` | `supabase/profiles.ts` | `getByUserId`, `update` |
 | `messages` | `supabase/messages.ts` | `listByApplication`, `send`, `subscribe` |
 | `storage` | `supabaseStorage.ts` | `upload`, `getPublicUrl`, `delete` |
+| `savedJobs` | `supabase/savedJobs.ts` | `listIds`, `save`, `remove`, `isSaved` |
+| `swipeEvents` | `supabase/swipeEvents.ts` | `record`, `listSwipedJobIds`, `clear` |
 
 ### 🟡 Mock (DB tables not yet created)
 
 | Provider | Mock File | Needs Table |
 |----------|-----------|-------------|
-| `savedJobs` | `mock/savedJobs.ts` | `saved_jobs` |
-| `swipeEvents` | `mock/swipeEvents.ts` | `swipe_events` |
 | `notifications` | `mock/notifications.ts` | `notifications` |
 | `preferences` | `mock/preferences.ts` | `user_preferences` |
 
@@ -47,8 +47,8 @@ All 9 repository interfaces now fully cover every product flow:
 - **MessageRepository**: listByApplication, send, subscribe (realtime)
 - **CandidateRepository**: list (with filters), getByUserId, upsert
 - **ProfileRepository**: getByUserId, update
-- **SavedJobRepository**: listIds, save, remove, isSaved
-- **SwipeEventRepository**: record, listSwipedJobIds, clear
+- **SavedJobRepository**: listIds, save, remove, isSaved ✅ **(Supabase)**
+- **SwipeEventRepository**: record, listSwipedJobIds, clear ✅ **(Supabase)**
 - **NotificationRepository**: listForUser, markRead, markAllRead, countUnread, subscribe
 - **PreferencesRepository**: get, set, delete
 
@@ -68,7 +68,7 @@ All 9 repository interfaces now fully cover every product flow:
 
 ## Security
 
-- RLS on all 5 existing tables
+- RLS on all 7 existing tables (jobs, applications, candidates, profiles, messages, saved_jobs, swipe_events)
 - Role-aware route guards in App.tsx
 - Navigation guards in Index.tsx
 - Storage bucket `cvs` needs RLS policies (documented in security-prelaunch.md)
@@ -77,7 +77,7 @@ All 9 repository interfaces now fully cover every product flow:
 
 ## Missing Infrastructure
 
-- [ ] DB tables: `saved_jobs`, `swipe_events`, `notifications`, `user_preferences`
+- [ ] DB tables: `notifications`, `user_preferences`
 - [ ] Storage RLS for `cvs` bucket
 - [ ] Cloudflare Pages config
 - [ ] pgvector extension
