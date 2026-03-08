@@ -564,8 +564,14 @@ const Employer = () => {
                                                   Zatrudnij
                                                 </button>
                                                 <button
-                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "position_closed"); }}
+                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "not_selected"); }}
                                                   className="text-[10px] px-2 py-0.5 rounded bg-destructive/15 text-destructive hover:bg-destructive/25"
+                                                >
+                                                  Nie wybrano
+                                                </button>
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "position_closed"); }}
+                                                  className="text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground hover:bg-muted/80"
                                                 >
                                                   Zamknij
                                                 </button>
