@@ -1,148 +1,59 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, Star, Briefcase, RotateCcw, Users, Building2, LogOut, User, Bell } from "lucide-react";
 import SwipeCard from "@/components/SwipeCard";
 import SavedList from "@/components/SavedList";
 import ApplicationStatusList from "@/components/ApplicationStatusList";
-import JobFilters, { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
+import JobFilters from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
-import type { Job, Candidate, Notification } from "@/domain/models";
-import { useJobs } from "@/hooks/useJobs";
+import type { Job } from "@/domain/models";
 import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
-import { useCandidateProfile } from "@/hooks/useCandidateProfile";
 import { useNotifications } from "@/hooks/useNotifications";
-import { usePreferences } from "@/hooks/usePreferences";
-import { supabase } from "@/integrations/supabase/client";
-import { calculateMatch, type MatchResult } from "@/lib/matchScoring";
-
-import { toast } from "sonner";
+import { useJobFeed } from "@/hooks/useJobFeed";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 type Tab = "swipe" | "applied" | "saved";
 
 const Index = () => {
-  const { signOut, user, profile } = useAuth();
+  const { signOut, user } = useAuth();
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
-  const { jobs: allJobs, loading: jobsLoading } = useJobs();
-  const { candidate: candidateProfile, updateProfile } = useCandidateProfile();
   const { notifications, unreadCount, markAllRead } = useNotifications();
-  const { get: getPref, set: setPref } = usePreferences();
+  const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
-  const [savedJobs, setSavedJobs] = useState<Job[]>([]);
-  const [skippedJobs, setSkippedJobs] = useState<Job[]>([]);
+  const {
+    allJobs,
+    filteredJobs,
+    remainingJobs,
+    savedJobs,
+    savedJobIds,
+    currentIndex,
+    isFinished,
+    jobsLoading,
+    filters,
+    matchResults,
+    handleSwipe,
+    applyFromSaved,
+    applyToJob,
+    resetFeed,
+    updateFilters,
+  } = useJobFeed();
+
   const [activeTab, setActiveTab] = useState<Tab>("swipe");
-  const [filters, setFilters] = useState<JobFiltersState>({ ...defaultFilters });
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
-  useEffect(() => {
-    if (user && profile?.role === "candidate") {
-      getPref(`onboarded_${user.id}`).then((val) => {
-        if (!val) setShowOnboarding(true);
-      });
-    }
-  }, [user, profile, getPref]);
-
-  const handleOnboardingComplete = (data: {
-    title: string;
-    skills: string[];
-    salaryMin: number;
-    salaryMax: number;
-    remotePreference: string;
-    seniority: string;
-  }) => {
-    updateProfile({
-      title: data.title,
-      skills: data.skills,
-      salaryMin: data.salaryMin,
-      salaryMax: data.salaryMax,
-      workMode: data.remotePreference as Candidate["workMode"],
-      seniority: data.seniority as Candidate["seniority"],
-    });
-    if (user) {
-      setPref(`onboarded_${user.id}`, "true");
-    }
-    setShowOnboarding(false);
+  // Refetch applications after apply (swipe triggers applyToJob inside useJobFeed)
+  const handleSwipeWithRefetch = async (direction: "left" | "right" | "save") => {
+    await handleSwipe(direction);
+    if (direction === "right") refetchApps();
   };
 
-  const filteredJobs = useMemo(() => filterJobs(allJobs, filters), [allJobs, filters]);
-
-  const matchResults = useMemo(() => {
-    const map: Record<string, MatchResult> = {};
-    filteredJobs.forEach((job) => {
-      map[job.id] = calculateMatch(candidateProfile, job);
-    });
-    return map;
-  }, [filteredJobs, candidateProfile]);
-
-  const remainingJobs = filteredJobs.slice(currentIndex);
-  const isFinished = currentIndex >= filteredJobs.length;
-
-  const applyToJob = useCallback(async (job: Job) => {
-    if (!user) return;
-    try {
-      const { error } = await supabase.rpc("apply_to_job", {
-        _static_job_id: job.id,
-        _job_title: job.title,
-        _job_company: job.company,
-        _job_location: job.location,
-        _job_logo: job.logo,
-        _job_salary: job.salary,
-        _job_tags: job.tags,
-        _job_type: job.type,
-        _job_description: job.description,
-      });
-      if (error) {
-        console.error("Apply error:", error);
-        toast.error("Nie udało się zaaplikować");
-      } else {
-        toast.success(`Zaaplikowano na: ${job.title}`);
-        refetchApps();
-      }
-    } catch (err) {
-      console.error("Apply error:", err);
-    }
-  }, [user, refetchApps]);
-
-  const handleSwipe = useCallback(
-    (direction: "left" | "right" | "save") => {
-      const job = filteredJobs[currentIndex];
-      if (!job) return;
-
-      if (direction === "right") {
-        setAppliedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
-        applyToJob(job);
-      } else if (direction === "save") {
-        setSavedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
-      } else {
-        setSkippedJobs((prev) => [job, ...prev]);
-      }
-      setCurrentIndex((prev) => prev + 1);
-    },
-    [currentIndex, filteredJobs, applyToJob]
-  );
-
-  const handleSavedApply = (job: Job) => {
-    setSavedJobs((prev) => prev.filter((j) => j.id !== job.id));
-    setAppliedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
-    applyToJob(job);
-  };
-
-  const handleReset = () => {
-    setCurrentIndex(0);
-    setAppliedJobs([]);
-    setSavedJobs([]);
-    setSkippedJobs([]);
-  };
-
-  const handleFiltersChange = (newFilters: JobFiltersState) => {
-    setFilters(newFilters);
-    setCurrentIndex(0);
+  const handleSavedApply = async (job: Job) => {
+    await applyFromSaved(job);
+    refetchApps();
   };
 
   const tabs: { key: Tab; label: string; count?: number }[] = [
@@ -303,11 +214,11 @@ const Index = () => {
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground mb-2">Wszystko przejrzane!</h2>
             <p className="text-muted-foreground text-sm mb-2">
-              Zaaplikowałeś na {appliedJobs.length} ofert{appliedJobs.length !== 1 ? "" : "ę"}, zapisałeś {savedJobs.length} i pominąłeś {skippedJobs.length}.
+              Przejrzano {filteredJobs.length} ofert, zapisano {savedJobs.length}.
             </p>
             <div className="flex gap-3 mt-6 justify-center">
               <button
-                onClick={handleReset}
+                onClick={resetFeed}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
               >
                 <RotateCcw className="w-4 h-4" /> Zacznij od nowa
@@ -316,7 +227,7 @@ const Index = () => {
           </motion.div>
         ) : (
           <>
-            <JobFilters filters={filters} onChange={handleFiltersChange} />
+            <JobFilters filters={filters} onChange={updateFilters} />
 
             {filteredJobs.length === 0 ? (
               <div className="text-center py-12">
@@ -331,10 +242,10 @@ const Index = () => {
                       <SwipeCard
                         key={job.id}
                         job={job}
-                        onSwipe={handleSwipe}
+                        onSwipe={handleSwipeWithRefetch}
                         isTop={i === 0}
                         matchResult={matchResults[job.id]}
-                        isSaved={savedJobs.some((j) => j.id === job.id)}
+                        isSaved={savedJobIds.has(job.id)}
                         onTap={() => setSelectedJob(job)}
                       />
                     ))}
@@ -344,21 +255,21 @@ const Index = () => {
                 {/* Action buttons */}
                 <div className="flex items-center gap-5 mt-4">
                   <button
-                    onClick={() => handleSwipe("left")}
+                    onClick={() => handleSwipeWithRefetch("left")}
                     className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
                     title="Pomiń"
                   >
                     <X className="w-6 h-6" />
                   </button>
                   <button
-                    onClick={() => handleSwipe("save")}
+                    onClick={() => handleSwipeWithRefetch("save")}
                     className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors"
                     title="Zapisz na później"
                   >
                     <Star className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleSwipe("right")}
+                    onClick={() => handleSwipeWithRefetch("right")}
                     className="w-16 h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform"
                     title="Aplikuj"
                   >
@@ -377,8 +288,8 @@ const Index = () => {
 
       <OnboardingModal
         open={showOnboarding}
-        onComplete={handleOnboardingComplete}
-        onClose={() => setShowOnboarding(false)}
+        onComplete={completeOnboarding}
+        onClose={dismissOnboarding}
       />
 
       <JobDetailModal
@@ -386,8 +297,8 @@ const Index = () => {
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
         onClose={() => setSelectedJob(null)}
         onApply={(job) => {
-          setAppliedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
           applyToJob(job);
+          refetchApps();
         }}
       />
     </div>
