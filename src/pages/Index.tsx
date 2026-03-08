@@ -190,24 +190,27 @@ const Index = () => {
                 <div className="relative z-10 flex items-center gap-5 shrink-0 py-3">
                   <button
                     onClick={() => handleSwipeWithRefetch("left")}
-                    className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
+                    disabled={actionPending}
+                    className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     title="Pomiń"
                   >
                     <X className="w-6 h-6" />
                   </button>
                   <button
                     onClick={() => handleSwipeWithRefetch("save")}
-                    className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors"
+                    disabled={actionPending}
+                    className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     title="Zapisz na później"
                   >
                     <Star className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleSwipeWithRefetch("right")}
-                    className="w-16 h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform"
+                    disabled={actionPending}
+                    className="w-16 h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform disabled:opacity-50 disabled:hover:scale-100"
                     title="Aplikuj"
                   >
-                    <Check className="w-7 h-7" />
+                    {actionPending ? <Loader2 className="w-7 h-7 animate-spin" /> : <Check className="w-7 h-7" />}
                   </button>
                 </div>
 
