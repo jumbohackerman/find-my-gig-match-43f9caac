@@ -1,73 +1,108 @@
-# Welcome to your Lovable project
+# JobSwipe — Tinder-style Job Matching Platform
 
-## Project info
+A mobile-first job matching app where candidates swipe through offers and employers manage their talent pipeline. Built with React, TypeScript, Tailwind CSS, and Supabase.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Architecture
 
-## How can I edit this code?
+```
+src/
+├── domain/        # Business models, scoring engine — zero framework deps
+├── repositories/  # Data access contracts + mock implementations
+├── providers/     # Runtime registry — swap mock ↔ Supabase ↔ any backend
+├── services/      # External service interfaces (analytics, email, AI, storage)
+├── hooks/         # React hooks consuming the provider layer
+├── pages/         # Route-level page components
+├── components/    # Reusable UI components
+├── config/        # Centralized env-var access + integration config
+└── lib/           # Utility functions, legacy façades
+```
 
-There are several ways of editing your application.
+**Key design principles:**
+- Domain models own the truth — no Supabase types leak into UI
+- Provider registry enables runtime backend swapping
+- Role-aware route guards enforce candidate/employer separation
+- All environment variables accessed via `src/config/index.ts`
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18 + Vite + TypeScript |
+| Styling | Tailwind CSS + shadcn/ui |
+| Animation | Framer Motion |
+| Backend | Supabase (Postgres + Auth + RLS + Storage) |
+| Hosting | Cloudflare Pages (planned) |
+| Edge Functions | Supabase Edge Functions (Deno) |
+| Email | Resend (planned) |
+| Analytics | PostHog or GA4 (planned) |
+| Error Tracking | Sentry (planned) |
+| AI | Lovable AI / pgvector (planned) |
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# 1. Clone the repository
 git clone <YOUR_GIT_URL>
+cd jobswipe
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Copy environment template
+cp .env.example .env
+# Fill in your Supabase project URL and anon key
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Start dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint check |
+| `npm test` | Run Vitest tests |
+| `npm run preview` | Preview production build |
 
-**Use GitHub Codespaces**
+## User Flows
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Candidate
+1. Sign up → email verification → profile setup
+2. Swipe through jobs (skip / save / apply)
+3. Track application statuses in "My Applications" tab
+4. Manage saved jobs
+5. Edit profile with skills, experience, CV upload
 
-## What technologies are used for this project?
+### Employer
+1. Sign up as employer → employer dashboard
+2. Post job listings
+3. View applications with AI match scores
+4. Generate AI shortlists
+5. Advance candidates through status pipeline
+6. In-app messaging with candidates
 
-This project is built with:
+## Environment Variables
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+See [`.env.example`](.env.example) for the full template. Key groups:
 
-## How can I deploy this project?
+- **Supabase** — auto-provisioned by Lovable Cloud
+- **App** — base URL, environment mode
+- **Analytics** — PostHog/GA4 toggle and keys
+- **Error Tracking** — Sentry DSN
+- **AI** — model selection and feature toggle
+- **Storage** — bucket names and upload limits
+- **Email** — Resend configuration
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Documentation
 
-## Can I connect a custom domain to my Lovable project?
+- [`docs/architecture.md`](docs/architecture.md) — System architecture overview
+- [`docs/match-scoring-plan.md`](docs/match-scoring-plan.md) — Match scoring engine design
+- [`docs/provider-integration-plan.md`](docs/provider-integration-plan.md) — Provider abstraction roadmap
+- [`docs/cleanup-notes.md`](docs/cleanup-notes.md) — Technical debt and security notes
+- [`docs/production-readiness-report.md`](docs/production-readiness-report.md) — Deployment readiness audit
 
-Yes, you can!
+## License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Private — all rights reserved.

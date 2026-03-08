@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import RoleGate from "@/components/RoleGate";
 import Index from "./pages/Index";
 import Profiles from "./pages/Profiles";
 import Employer from "./pages/Employer";
@@ -32,9 +33,36 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/my-profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
-            <Route path="/profiles" element={<ProtectedRoute><Profiles /></ProtectedRoute>} />
-            <Route path="/employer" element={<ProtectedRoute><Employer /></ProtectedRoute>} />
+            <Route
+              path="/my-profile"
+              element={
+                <ProtectedRoute>
+                  <RoleGate role="candidate" redirectTo="/employer">
+                    <MyProfile />
+                  </RoleGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profiles"
+              element={
+                <ProtectedRoute>
+                  <RoleGate role="employer" redirectTo="/">
+                    <Profiles />
+                  </RoleGate>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employer"
+              element={
+                <ProtectedRoute>
+                  <RoleGate role="employer" redirectTo="/">
+                    <Employer />
+                  </RoleGate>
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
