@@ -71,6 +71,7 @@ const ReportButton = ({ targetType, targetId, targetLabel }: Props) => {
         onClick={() => setOpen(true)}
         className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1"
         aria-label={`Zgłoś ${targetType === "job" ? "ofertę" : "profil"}`}
+        data-testid="report-open"
       >
         <Flag className="w-3.5 h-3.5" aria-hidden="true" />
         <span className="hidden sm:inline">Zgłoś</span>
@@ -144,6 +145,7 @@ const ReportButton = ({ targetType, targetId, targetLabel }: Props) => {
               <button
                 onClick={handleSubmit}
                 disabled={!reason || sending}
+                data-testid="report-submit"
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Send className="w-4 h-4" aria-hidden="true" />
