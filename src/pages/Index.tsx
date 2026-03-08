@@ -210,10 +210,10 @@ const Index = () => {
                   </button>
                 </div>
 
-                <p className="text-muted-foreground text-xs mt-3">
+                <p className="text-muted-foreground text-xs mt-2 shrink-0">
                   {currentIndex + 1} / {filteredJobs.length}
                 </p>
-              </>
+              </div>
             )}
           </>
         )}
