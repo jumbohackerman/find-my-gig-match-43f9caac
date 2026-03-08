@@ -64,12 +64,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
   return (
     <motion.div
-      className="absolute inset-x-0 top-0"
+      className="absolute inset-0"
       style={{
         x,
         rotate,
         zIndex: isTop ? 2 : 1,
-        // Prevent this element from capturing clicks outside the visible card
         pointerEvents: isTop ? "auto" : "none",
       }}
       drag={isTop ? "x" : false}
@@ -79,15 +78,15 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       onTap={handleTap}
-      initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
-      animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
+      initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 8 }}
+      animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 8 }}
       exit={{
-        x: resolvedExit === "right" ? 500 : -500,
+        x: resolvedExit === "right" ? 600 : -600,
         opacity: 0,
-        transition: { duration: 0.35, ease: "easeInOut" },
+        transition: { duration: 0.3, ease: [0.32, 0.72, 0, 1] },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border cursor-grab active:cursor-grabbing">
+      <div className="card-gradient rounded-2xl shadow-card overflow-y-auto border border-border cursor-grab active:cursor-grabbing h-full">
         {/* Swipe indicators */}
         {isTop && (
           <>

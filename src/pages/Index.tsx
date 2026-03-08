@@ -165,8 +165,8 @@ const Index = () => {
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center min-h-0 w-full">
-                {/* Card stack — flex-1 fills available space, min-h ensures usability */}
-                <div className="relative w-full flex-1 min-h-[280px]">
+                {/* Card stack — fills available space, overflow-hidden prevents card bleeding into buttons */}
+                <div className="relative w-full flex-1 min-h-0">
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
@@ -185,8 +185,8 @@ const Index = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Action buttons — z-10, shrink-0 so they never get pushed off */}
-                <div className="relative z-10 flex items-center gap-5 mt-3 shrink-0 pb-1">
+                {/* Action buttons — dedicated fixed-height row, never overlapped */}
+                <div className="relative z-10 flex items-center gap-5 shrink-0 py-3">
                   <button
                     onClick={() => handleSwipeWithRefetch("left")}
                     className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
@@ -210,7 +210,7 @@ const Index = () => {
                   </button>
                 </div>
 
-                <p className="text-muted-foreground text-xs mt-2 shrink-0">
+                <p className="text-muted-foreground text-xs shrink-0 pb-1">
                   {currentIndex + 1} / {filteredJobs.length}
                 </p>
               </div>
