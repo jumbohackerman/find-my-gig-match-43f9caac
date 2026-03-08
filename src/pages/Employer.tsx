@@ -457,6 +457,7 @@ const Employer = () => {
               })}
             </AnimatePresence>
           </div>
+          </LocalErrorBoundary>
         )}
       </main>
 
