@@ -1,18 +1,18 @@
 # Production Readiness Report
 
-**Date:** 2026-03-08 (all 9 repositories on Supabase)
+**Date:** 2026-03-08 (all providers on Supabase, security hardened)
 **Target Stack:** Lovable → GitHub → Cloudflare Pages + Supabase + Edge Functions + Resend + PostHog/GA4 + Sentry
 
 ---
 
 ## Provider Registry — Current State
 
-### ✅ Supabase (live)
+### ✅ Supabase (live — all 10 data providers)
 
 | Provider | Repo File | Key Methods |
 |----------|-----------|-------------|
 | `jobs` | `supabase/jobs.ts` | `list`, `listForEmployer`, `getById`, `create`, `update`, `archive`, `delete` |
-| `applications` | `supabase/applications.ts` | `listForCandidate`, `listForEmployer`, `apply` (RPC), `updateStatus`, `countByStatus`, `subscribeForCandidate`, `subscribeForEmployer` |
+| `applications` | `supabase/applications.ts` | `listForCandidate`, `listForEmployer`, `apply` (RPC + direct), `updateStatus`, `countByStatus`, `subscribeForCandidate`, `subscribeForEmployer` |
 | `candidates` | `supabase/candidates.ts` | `list`, `getByUserId`, `upsert` |
 | `profiles` | `supabase/profiles.ts` | `getByUserId`, `update` |
 | `messages` | `supabase/messages.ts` | `listByApplication`, `send`, `subscribe` |
@@ -22,11 +22,7 @@
 | `notifications` | `supabase/notifications.ts` | `listForUser`, `markRead`, `markAllRead`, `countUnread`, `subscribe` |
 | `preferences` | `supabase/preferences.ts` | `get`, `set`, `delete` |
 
-### 🟡 Mock (none remaining)
-
-All data repositories are now backed by Supabase.
-
-### 🟡 Noop (pending external integration)
+### 🔇 Noop (pending external integration)
 
 | Provider | Future Service |
 |----------|---------------|
@@ -37,65 +33,65 @@ All data repositories are now backed by Supabase.
 
 ---
 
-## Repository Contract Coverage
-
-All 9 repository interfaces are fully implemented on Supabase:
-
-- **JobRepository**: list, listForEmployer, getById, create, update, archive, delete
-- **ApplicationRepository**: apply (RPC), listForCandidate, listForEmployer, updateStatus (with source), countByStatus, subscribeForCandidate, subscribeForEmployer
-- **MessageRepository**: listByApplication, send, subscribe (realtime)
-- **CandidateRepository**: list (with filters), getByUserId, upsert
-- **ProfileRepository**: getByUserId, update
-- **SavedJobRepository**: listIds, save, remove, isSaved ✅
-- **SwipeEventRepository**: record, listSwipedJobIds, clear ✅
-- **NotificationRepository**: listForUser, markRead, markAllRead, countUnread, subscribe ✅
-- **PreferencesRepository**: get, set, delete ✅
-
----
-
 ## Database Tables (9 total)
 
-| Table | RLS | Realtime |
-|-------|-----|----------|
-| `jobs` | ✅ 4 policies | — |
-| `applications` | ✅ 5 policies | — |
-| `candidates` | ✅ 2 policies | — |
-| `profiles` | ✅ 3 policies | — |
-| `messages` | ✅ 2 policies | TODO |
-| `saved_jobs` | ✅ 3 policies | — |
-| `swipe_events` | ✅ 3 policies | — |
-| `notifications` | ✅ 3 policies | ✅ |
-| `user_preferences` | ✅ 4 policies | — |
+| Table | RLS Policies | Realtime | Storage |
+|-------|-------------|----------|---------|
+| `jobs` | 4 | — | — |
+| `applications` | 5 | — | — |
+| `candidates` | 2 | — | — |
+| `profiles` | 4 (incl. employer cross-read) | — | — |
+| `messages` | 2 | ✅ | — |
+| `saved_jobs` | 3 | — | — |
+| `swipe_events` | 3 | — | — |
+| `notifications` | 3 (INSERT server-only) | ✅ | — |
+| `user_preferences` | 4 | — | — |
+| `cvs` bucket | 5 (candidate CRUD + employer read) | — | ✅ |
+
+**Total: 35 RLS policies across 9 tables + 1 storage bucket**
 
 ---
 
-## Files That Import Supabase Directly (all allowed)
+## Security Status
 
-| File | Reason |
+| Area | Status |
 |------|--------|
-| `src/hooks/useAuth.tsx` | Auth bootstrap |
-| `src/pages/Auth.tsx` | Sign-in/sign-up |
-| `src/pages/ResetPassword.tsx` | Password reset |
-| `src/repositories/supabase/*.ts` | ARE the abstraction boundary |
-| `src/services/supabaseStorage.ts` | IS the storage service |
+| RLS on all tables | ✅ |
+| Storage bucket RLS | ✅ |
+| Profiles least-privilege cross-read | ✅ |
+| Edge function auth validation | ✅ (all 4 functions) |
+| Edge function CORS hardening | ✅ (full Supabase headers) |
+| Role-aware route guards | ✅ |
+| No service role key in client | ✅ |
+| Leaked password protection | ⚠️ Needs auth settings toggle |
+| CORS origin restriction | ⚠️ Still `*` (pre-launch) |
+| Status transition enforcement | ⚠️ Function exists, not wired as trigger |
+| Rate limiting integration | ⚠️ Function exists, not wired into flows |
+
+See `docs/security-prelaunch.md` for full details.
 
 ---
 
-## Security
+## Cutover Status
 
-- RLS on all 9 tables
-- Role-aware route guards in App.tsx
-- Navigation guards in Index.tsx
-- Storage bucket `cvs` needs RLS policies (documented in security-prelaunch.md)
-- Notifications INSERT is server-only (no client INSERT policy)
+All provider switches are complete. See `docs/supabase-cutover-plan.md` for:
+- Migration dependency graph
+- Provider switch order and wave grouping
+- Per-wave test checklists
+- Rollback procedure
+- Final pre-launch checklist
 
 ---
 
 ## Missing Infrastructure
 
-- [ ] Storage RLS for `cvs` bucket
-- [ ] Cloudflare Pages config
-- [ ] pgvector extension
+- [ ] Leaked password protection (auth settings)
+- [ ] Email verification enforcement
+- [ ] CORS origin restriction for edge functions
+- [ ] Status transition DB trigger
+- [ ] Rate limiter integration into apply/message flows
+- [ ] Notification creation triggers (server-side)
 - [ ] Candidate-side messaging UI
-- [ ] Message read receipts (`read_at` column + UPDATE policy)
-- [ ] Notification creation triggers (server-side on status change)
+- [ ] Message read receipts (`read_at` column)
+- [ ] pgvector extension
+- [ ] Cloudflare Pages config
