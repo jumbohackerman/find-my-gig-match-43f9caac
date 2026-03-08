@@ -63,6 +63,7 @@ function computeCompleteness(data: {
 
 const MyProfile = () => {
   const { user, profile, loading: authLoading } = useAuth();
+  const isEmployer = profile?.role === "employer";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -99,32 +100,31 @@ const MyProfile = () => {
       return;
     }
     const load = async () => {
-      const candidate = await getProvider("candidates").getByUserId(user.id);
-
-      if (candidate) {
-        setTitle(candidate.title || "");
-        setLocation(candidate.location || "");
-        setSummary(candidate.summary || "");
-        setSkills(candidate.skills || []);
-        setSeniority(candidate.seniority || "Mid");
-        setWorkMode(candidate.workMode || "Zdalnie");
-        setEmploymentType(candidate.employmentType || "Full-time");
-        setSalaryMin(candidate.salaryMin || 0);
-        setSalaryMax(candidate.salaryMax || 0);
-        setAvailability(candidate.availability || "Otwarty na oferty");
-        setExperienceEntries(candidate.experienceEntries as ExperienceEntry[] || []);
-        setLinks(candidate.links as Links || {});
-        setCvUrl(candidate.cvUrl || null);
-
-        const expMatch = candidate.experience?.match(/(\d+)/);
-        setExperienceYears(expMatch ? parseInt(expMatch[1]) : 0);
+      if (!isEmployer) {
+        const candidate = await getProvider("candidates").getByUserId(user.id);
+        if (candidate) {
+          setTitle(candidate.title || "");
+          setLocation(candidate.location || "");
+          setSummary(candidate.summary || "");
+          setSkills(candidate.skills || []);
+          setSeniority(candidate.seniority || "Mid");
+          setWorkMode(candidate.workMode || "Zdalnie");
+          setEmploymentType(candidate.employmentType || "Full-time");
+          setSalaryMin(candidate.salaryMin || 0);
+          setSalaryMax(candidate.salaryMax || 0);
+          setAvailability(candidate.availability || "Otwarty na oferty");
+          setExperienceEntries(candidate.experienceEntries as ExperienceEntry[] || []);
+          setLinks(candidate.links as Links || {});
+          setCvUrl(candidate.cvUrl || null);
+          const expMatch = candidate.experience?.match(/(\d+)/);
+          setExperienceYears(expMatch ? parseInt(expMatch[1]) : 0);
+        }
       }
-
       setFullName(profile?.full_name || user.user_metadata?.full_name || "");
       setLoading(false);
     };
     load();
-  }, [user, profile, authLoading]);
+  }, [user, profile, authLoading, isEmployer]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -133,22 +133,24 @@ const MyProfile = () => {
     try {
       await getProvider("profiles").update(user.id, { fullName });
 
-      await getProvider("candidates").upsert(user.id, {
-        title,
-        location,
-        summary,
-        skills,
-        seniority: seniority as any,
-        workMode: workMode as any,
-        employmentType: employmentType as any,
-        salaryMin,
-        salaryMax,
-        availability,
-        experienceEntries: experienceEntries as any,
-        links: links as any,
-        experience: `${experienceYears} lat`,
-        cvUrl,
-      });
+      if (!isEmployer) {
+        await getProvider("candidates").upsert(user.id, {
+          title,
+          location,
+          summary,
+          skills,
+          seniority: seniority as any,
+          workMode: workMode as any,
+          employmentType: employmentType as any,
+          salaryMin,
+          salaryMax,
+          availability,
+          experienceEntries: experienceEntries as any,
+          links: links as any,
+          experience: `${experienceYears} lat`,
+          cvUrl,
+        });
+      }
 
       toast.success("Profil zapisany");
     } catch (error) {
@@ -256,22 +258,51 @@ const MyProfile = () => {
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-lg mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="font-display text-2xl font-bold text-foreground mb-1">Mój profil</h2>
-          <p className="text-muted-foreground text-sm mb-4">Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund.</p>
+          <h2 className="font-display text-2xl font-bold text-foreground mb-1">
+            {isEmployer ? "Profil pracodawcy" : "Mój profil"}
+          </h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            {isEmployer
+              ? "Uzupełnij dane firmy, aby kandydaci mogli Cię lepiej poznać."
+              : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
+          </p>
 
-          {/* Completeness */}
-          <div className="mb-6 p-3 rounded-xl bg-secondary/50 border border-border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground">Kompletność profilu</span>
-              <span className={`text-sm font-bold ${completeness >= 80 ? "text-accent" : completeness >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
-                {completeness}%
-              </span>
+          {/* Completeness - only for candidates */}
+          {!isEmployer && (
+            <div className="mb-6 p-3 rounded-xl bg-secondary/50 border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-muted-foreground">Kompletność profilu</span>
+                <span className={`text-sm font-bold ${completeness >= 80 ? "text-accent" : completeness >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
+                  {completeness}%
+                </span>
+              </div>
+              <Progress value={completeness} className="h-2" />
             </div>
-            <Progress value={completeness} className="h-2" />
-          </div>
+          )}
 
           {/* Accordion sections */}
           <div className="space-y-2">
+          {isEmployer ? (
+            /* ═══ EMPLOYER PROFILE ═══ */
+            <AccordionSection
+              id="basic"
+              label="Dane firmy"
+              icon="🏢"
+              isOpen={activeSection === "basic"}
+              onToggle={() => toggleSection("basic")}
+              badge={fullName || undefined}
+            >
+              <div className="space-y-4">
+                <Field label="Imię i nazwisko / osoba kontaktowa" value={fullName} onChange={setFullName} placeholder="Jan Kowalski" />
+                <p className="text-xs text-muted-foreground">
+                  Aby zarządzać ofertami pracy i przeglądać kandydatów, przejdź do{" "}
+                  <Link to="/employer" className="text-primary hover:underline">Panelu pracodawcy</Link>.
+                </p>
+              </div>
+            </AccordionSection>
+          ) : (
+            /* ═══ CANDIDATE PROFILE ═══ */
+            <>
             {/* BASIC INFO */}
             <AccordionSection
               id="basic"
@@ -543,6 +574,8 @@ const MyProfile = () => {
                 </div>
               </div>
             </AccordionSection>
+            </>
+          )}
           </div>
         </motion.div>
       </main>

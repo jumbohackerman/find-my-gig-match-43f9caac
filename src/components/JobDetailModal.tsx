@@ -7,6 +7,16 @@ import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 
+function formatPostedDate(raw: string): string {
+  if (!raw) return "";
+  const date = new Date(raw);
+  if (isNaN(date.getTime())) return raw;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+}
+
 interface Props {
   job: Job | null;
   matchResult?: MatchResult;
@@ -57,7 +67,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
                   <MapPin className="w-3 h-3" /> {job.location}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {job.posted}
+                  <Clock className="w-3 h-3" /> {formatPostedDate(job.posted)}
                 </span>
               </div>
             </div>

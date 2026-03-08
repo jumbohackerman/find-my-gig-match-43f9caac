@@ -155,7 +155,9 @@ const Index = () => {
                       <SwipeCard
                         key={job.id}
                         job={job}
-                        onSwipe={handleSwipeWithRefetch}
+                        onSwipe={(dir) => {
+                          handleSwipeWithRefetch(dir);
+                        }}
                         isTop={i === 0}
                         matchResult={matchResults[job.id]}
                         isSaved={savedJobIds.has(job.id)}

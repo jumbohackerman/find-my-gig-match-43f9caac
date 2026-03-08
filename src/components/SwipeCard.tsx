@@ -1,6 +1,6 @@
+import { useState, useRef } from "react";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { MapPin, Clock, Briefcase, Wifi } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { pl } from "date-fns/locale";
 import MatchBadge from "@/components/MatchBadge";
 import type { Job } from "@/domain/models";
@@ -10,7 +10,10 @@ function formatPosted(raw: string): string {
   if (!raw) return "";
   const date = new Date(raw);
   if (isNaN(date.getTime())) return raw;
-  return formatDistanceToNow(date, { addSuffix: true, locale: pl });
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
 }
 
 interface SwipeCardProps {
@@ -28,22 +31,29 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
   const rightOpacity = useTransform(x, [0, 100], [0, 1]);
   const leftOpacity = useTransform(x, [-100, 0], [1, 0]);
 
-  const dragStartPos = { x: 0, y: 0 };
+  const [exitDirection, setExitDirection] = useState<"left" | "right">("right");
+  const didDrag = useRef(false);
 
-  const handleDragStart = (_: any, info: PanInfo) => {
-    dragStartPos.x = info.point.x;
-    dragStartPos.y = info.point.y;
+  const handleDragStart = () => {
+    didDrag.current = false;
+  };
+
+  const handleDrag = () => {
+    didDrag.current = true;
   };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     const absX = Math.abs(info.offset.x);
     if (absX > 120) {
-      onSwipe(info.offset.x > 0 ? "right" : "left");
+      const dir = info.offset.x > 0 ? "right" : "left";
+      setExitDirection(dir);
+      onSwipe(dir);
     }
   };
 
   const handleTap = () => {
-    if (onTap) onTap();
+    // Only open details if no drag occurred
+    if (!didDrag.current && onTap) onTap();
   };
 
   const hasSalary = job.salary && job.salary.trim().length > 0;
@@ -57,12 +67,13 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
       onDragStart={handleDragStart}
+      onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       onTap={handleTap}
       initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
       exit={{
-        x: 300,
+        x: exitDirection === "right" ? 300 : -300,
         opacity: 0,
         transition: { duration: 0.3 },
       }}
