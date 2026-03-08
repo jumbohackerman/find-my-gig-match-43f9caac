@@ -39,6 +39,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Profil kandydata: ${candidate.name}`}>
+        <LocalErrorBoundary label="Profil kandydata">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -219,6 +220,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
         </motion.div>
+        </LocalErrorBoundary>
       </div>
     </AnimatePresence>
   );
