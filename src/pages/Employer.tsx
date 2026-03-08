@@ -134,7 +134,7 @@ const Employer = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full">
+      <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full" data-testid="employer-dashboard">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
