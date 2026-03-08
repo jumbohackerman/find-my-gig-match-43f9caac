@@ -46,7 +46,7 @@ const ReportButton = ({ targetType, targetId, targetLabel }: Props) => {
   }, [open, handleClose]);
 
   const handleSubmit = async () => {
-    if (!user || !reason) return;
+    if (!user || !reason || sending) return;
     setSending(true);
     const { error } = await supabase.from("reports" as any).insert({
       reporter_id: user.id,
