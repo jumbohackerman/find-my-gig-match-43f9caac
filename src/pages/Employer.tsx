@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { createFallbackCandidate } from "@/data/defaults";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,187 +6,78 @@ import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
   BarChart3, Zap, Layers, UserCheck, ArrowLeftRight,
 } from "lucide-react";
-import { type Job, type Candidate, type MatchResult, getActivityLabel } from "@/domain/models";
-import { dbCandidateToCandidate } from "@/lib/matchScoring";
+import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import MatchScoreBreakdown from "@/components/MatchScoreBreakdown";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
-import { useUpdateApplicationStatus } from "@/hooks/useApplications";
-import { useEmployerDashboardData, type EmployerApplication } from "@/hooks/useEmployerDashboard";
+import { useEmployerDashboardData } from "@/hooks/useEmployerDashboard";
+import { useEmployerJobs, type JobFormData } from "@/hooks/useEmployerJobs";
+import { useEmployerShortlist, MAX_SHORTLIST } from "@/hooks/useEmployerShortlist";
+import { useEmployerApplicationActions, getCandidateDisplayName, getCandidateAvatar } from "@/hooks/useEmployerApplications";
+import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
 import StatusBadge from "@/components/employer/StatusBadge";
 import SourceLabel from "@/components/employer/SourceLabel";
 import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
-import type { ChatMessage } from "@/components/employer/ChatPanel";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-
-const MAX_SHORTLIST = 5;
-
-function getCandidateDisplayName(app: EmployerApplication): string {
-  const c = app.candidate;
-  if (!c) return "Kandydat";
-  return (c as any).full_name || c.title || "Kandydat";
-}
-
-function getCandidateAvatar(app: EmployerApplication): string {
-  const c = app.candidate;
-  if (!c) return "👤";
-  return (c as any).avatar || "👤";
-}
-
-function appToCandidate(app: EmployerApplication): Candidate {
-  const c = app.candidate;
-  if (!c) {
-    return createFallbackCandidate(app.candidate_id);
-  }
-  return dbCandidateToCandidate(c, {
-    full_name: (c as any).full_name,
-    avatar: (c as any).avatar,
-  });
-}
 
 const Employer = () => {
   const { user } = useAuth();
-  const { updateStatus: updateDbStatus } = useUpdateApplicationStatus();
-  const { jobs: dbJobs, applicationsByJob, loading, refetch } = useEmployerDashboardData();
+  const { jobs: domainJobs, applicationsByJob, loading, refetch } = useEmployerDashboardData();
+  const { createJob, deleteJob, submitting, EMPTY_FORM } = useEmployerJobs();
+  const shortlist = useEmployerShortlist(refetch);
+  const appActions = useEmployerApplicationActions(refetch);
+  const messaging = useEmployerMessages(user?.id);
 
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult } | null>(null);
-  const [chatOpen, setChatOpen] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [replacingFor, setReplacingFor] = useState<{ jobId: string; appId: string; source: string } | null>(null);
 
   const [form, setForm] = useState({
     title: "", company: "", logo: "🏢", location: "", salary: "",
     type: "Full-time" as Job["type"], description: "", tags: "",
   });
 
-  // ── Shortlist helpers ───────────────────────────────────────────────────────
+  // ── Actions ─────────────────────────────────────────────────────────────────
 
-  const getShortlisted = (jobId: string) =>
-    (applicationsByJob[jobId] || []).filter((a) => a.status === "shortlisted");
+  const handleAdvanceStatus = async (appId: string, newStatus: ApplicationStatus) => {
+    await appActions.advanceStatus(appId, newStatus);
+  };
 
-  const getEmployerPicks = (jobId: string) =>
-    getShortlisted(jobId).filter((a) => a.source === "employer");
-
-  const getAiShortlisted = (jobId: string) =>
-    getShortlisted(jobId).filter((a) => a.source === "ai");
-
-  // ── Status / shortlist actions ──────────────────────────────────────────────
-
-  const handleAdvanceStatus = useCallback(async (appId: string, newStatus: ApplicationStatus) => {
-    await updateDbStatus(appId, newStatus);
-    refetch();
-  }, [updateDbStatus, refetch]);
-
-  const shortlistCandidate = useCallback(async (appId: string, source: "ai" | "employer", jobId: string) => {
-    const shortlisted = getShortlisted(jobId);
-    if (shortlisted.length >= MAX_SHORTLIST) {
-      // Need to replace — open replace modal
-      setReplacingFor({ jobId, appId, source });
-      return;
+  const handleViewCandidate = (app: EnrichedEmployerApplication) => {
+    const { candidate, shouldAdvance } = appActions.viewCandidate(app);
+    if (shouldAdvance) {
+      appActions.advanceStatus(app.id, "viewed");
     }
-    await supabase
-      .from("applications")
-      .update({ status: "shortlisted", source })
-      .eq("id", appId);
-    toast.success(source === "ai" ? "Dodano do shortlisty (AI)" : "Dodano do shortlisty");
-    refetch();
-  }, [applicationsByJob, refetch]);
-
-  const replaceShortlisted = useCallback(async (removeAppId: string) => {
-    if (!replacingFor) return;
-    // Remove old from shortlist → revert to "applied"
-    await supabase
-      .from("applications")
-      .update({ status: "applied", source: "candidate" })
-      .eq("id", removeAppId);
-    // Add new to shortlist
-    await supabase
-      .from("applications")
-      .update({ status: "shortlisted", source: replacingFor.source })
-      .eq("id", replacingFor.appId);
-    toast.success("Zamieniono kandydata na shortliście");
-    setReplacingFor(null);
-    refetch();
-  }, [replacingFor, refetch]);
-
-  const handleViewCandidate = useCallback((app: EmployerApplication) => {
-    if (app.status === "applied") {
-      handleAdvanceStatus(app.id, "viewed");
-    }
-    const cand = appToCandidate(app);
-    setSelectedCandidate({ candidate: cand, match: app.matchResult! });
-  }, [handleAdvanceStatus]);
-
-  const handleGenerateShortlist = useCallback(async (jobId: string) => {
-    const jobApps = applicationsByJob[jobId] || [];
-    const shortlisted = getShortlisted(jobId);
-    const slotsAvailable = MAX_SHORTLIST - shortlisted.length;
-    if (slotsAvailable <= 0) {
-      toast.error("Shortlista pełna (5/5). Zamień kandydata ręcznie.");
-      return;
-    }
-
-    const toShortlist = jobApps
-      .filter((a) => a.status !== "shortlisted" && a.matchResult)
-      .sort((a, b) => (b.matchResult?.score || 0) - (a.matchResult?.score || 0))
-      .slice(0, slotsAvailable);
-
-    if (toShortlist.length === 0) {
-      toast.info("Brak nowych kandydatów do dodania");
-      return;
-    }
-
-    for (const app of toShortlist) {
-      await supabase
-        .from("applications")
-        .update({ status: "shortlisted", source: "ai" })
-        .eq("id", app.id);
-    }
-    toast.success(`AI dodał ${toShortlist.length} kandydatów do shortlisty`);
-    refetch();
-  }, [applicationsByJob, refetch]);
-
-  const handleSendMessage = useCallback((applicationId: string, content: string) => {
-    const msg: ChatMessage = {
-      id: String(Date.now()),
-      applicationId,
-      senderId: "employer",
-      senderName: "Ty",
-      content,
-      createdAt: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, msg]);
-  }, []);
-
-  const handleUnlockChat = useCallback((applicationId: string) => {
-    setChatOpen(applicationId);
-  }, []);
+    setSelectedCandidate({ candidate, match: app.matchResult! });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    await supabase.from("jobs").insert({
-      title: form.title, company: form.company, logo: form.logo,
-      location: form.location, salary: form.salary, type: form.type,
+    const formData: JobFormData = {
+      title: form.title,
+      company: form.company,
+      logo: form.logo,
+      location: form.location,
+      salary: form.salary,
+      type: form.type,
       description: form.description,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      employer_id: user.id,
-    });
-    setForm({ title: "", company: "", logo: "🏢", location: "", salary: "", type: "Full-time", description: "", tags: "" });
-    setShowForm(false);
-    refetch();
+    };
+    const job = await createJob(formData, user.id);
+    if (job) {
+      setForm({ title: "", company: "", logo: "🏢", location: "", salary: "", type: "Full-time", description: "", tags: "" });
+      setShowForm(false);
+      refetch();
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("jobs").delete().eq("id", id);
+    await deleteJob(id);
     refetch();
   };
 
@@ -299,14 +190,14 @@ const Employer = () => {
                 </div>
                 <div className="flex gap-3 justify-end">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">Anuluj</button>
-                  <button type="submit" className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform">Opublikuj</button>
+                  <button type="submit" disabled={submitting} className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50">Opublikuj</button>
                 </div>
               </div>
             </motion.form>
           )}
         </AnimatePresence>
 
-        {dbJobs.length === 0 ? (
+        {domainJobs.length === 0 ? (
           <EmptyState
             title="Brak ogłoszeń"
             description="Dodaj swoje pierwsze ogłoszenie lub poczekaj na aplikacje."
@@ -314,11 +205,11 @@ const Employer = () => {
         ) : (
           <div className="space-y-3">
             <AnimatePresence>
-              {dbJobs.map((job, i) => {
+              {domainJobs.map((job, i) => {
                 const jobApps = applicationsByJob[job.id] || [];
-                const shortlisted = getShortlisted(job.id);
-                const aiCount = getAiShortlisted(job.id).length;
-                const employerPickCount = getEmployerPicks(job.id).length;
+                const shortlisted = shortlist.getShortlisted(jobApps);
+                const aiCount = shortlisted.filter((a) => a.source === "ai").length;
+                const employerPickCount = shortlisted.filter((a) => a.source === "employer").length;
                 const isExpanded = expandedJob === job.id;
                 const isAnalyzed = analyzedJob === job.id;
                 const avgScore = getAvgMatchScore(job.id);
@@ -353,7 +244,7 @@ const Employer = () => {
                           <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
                           <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
                         </div>
-                        {job.employer_id === user?.id && (
+                        {job.employerId === user?.id && (
                           <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors shrink-0">
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -361,7 +252,7 @@ const Employer = () => {
                       </div>
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <button
-                          onClick={() => handleGenerateShortlist(job.id)}
+                          onClick={() => shortlist.generateShortlist(job.id, jobApps)}
                           disabled={shortlistFull}
                           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
@@ -392,7 +283,7 @@ const Employer = () => {
                       </div>
                     </div>
 
-                    {/* Shortlist section — always visible if there are shortlisted */}
+                    {/* Shortlist section */}
                     {shortlisted.length > 0 && (
                       <div className="px-4 pb-3 border-t border-border pt-3">
                         <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -404,8 +295,8 @@ const Employer = () => {
                               key={app.id}
                               app={app}
                               onRemove={() => handleAdvanceStatus(app.id, "applied")}
-                              isReplaceTarget={replacingFor?.jobId === job.id}
-                              onReplace={() => replaceShortlisted(app.id)}
+                              isReplaceTarget={shortlist.replacingFor?.jobId === job.id}
+                              onReplace={() => shortlist.replaceShortlisted(app.id)}
                             />
                           ))}
                         </div>
@@ -414,7 +305,7 @@ const Employer = () => {
 
                     {/* Replace modal inline */}
                     <AnimatePresence>
-                      {replacingFor?.jobId === job.id && (
+                      {shortlist.replacingFor?.jobId === job.id && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
@@ -432,7 +323,7 @@ const Employer = () => {
                               Kliknij na kandydata w shortliście powyżej, aby go zamienić.
                             </p>
                             <button
-                              onClick={() => setReplacingFor(null)}
+                              onClick={() => shortlist.setReplacingFor(null)}
                               className="text-[10px] px-3 py-1 rounded bg-secondary text-secondary-foreground hover:bg-muted"
                             >
                               Anuluj
@@ -466,12 +357,12 @@ const Employer = () => {
                                     jobId={job.id}
                                     onView={() => handleViewCandidate(app)}
                                     onAdvanceStatus={handleAdvanceStatus}
-                                    onShortlist={() => shortlistCandidate(app.id, "employer", job.id)}
+                                    onShortlist={() => shortlist.shortlistCandidate(app.id, "employer", jobApps, job.id)}
                                     shortlistFull={shortlistFull}
-                                    chatMessages={messages.filter((m) => m.applicationId === app.id)}
-                                    onSendMessage={(content) => handleSendMessage(app.id, content)}
-                                    isChatOpen={chatOpen === app.id}
-                                    onUnlockChat={() => handleUnlockChat(app.id)}
+                                    chatMessages={messaging.getMessages(app.id)}
+                                    onSendMessage={(content) => messaging.sendMessage(app.id, content)}
+                                    isChatOpen={messaging.isChatOpen(app.id)}
+                                    onUnlockChat={() => messaging.unlockChat(app.id)}
                                   />
                                 ))}
                               </div>
@@ -532,7 +423,7 @@ function ShortlistChip({
   isReplaceTarget,
   onReplace,
 }: {
-  app: EmployerApplication;
+  app: EnrichedEmployerApplication;
   onRemove: () => void;
   isReplaceTarget: boolean;
   onReplace: () => void;
@@ -598,7 +489,7 @@ function CandidateCard({
   isChatOpen,
   onUnlockChat,
 }: {
-  app: EmployerApplication;
+  app: EnrichedEmployerApplication;
   jobId: string;
   onView: () => void;
   onAdvanceStatus: (appId: string, status: ApplicationStatus) => void;
@@ -613,7 +504,7 @@ function CandidateCard({
   const avatar = getCandidateAvatar(app);
   const candidate = app.candidate;
   const matchResult = app.matchResult;
-  const activity = getActivityLabel(candidate?.last_active);
+  const activity = getActivityLabel(candidate?.lastActive);
   const isShortlisted = app.status === "shortlisted";
 
   return (
@@ -710,7 +601,7 @@ function AnalysisCard({
   rank,
   onViewProfile,
 }: {
-  app: EmployerApplication;
+  app: EnrichedEmployerApplication;
   rank: number;
   onViewProfile: () => void;
 }) {
@@ -718,7 +609,7 @@ function AnalysisCard({
   const name = getCandidateDisplayName(app);
   const avatar = getCandidateAvatar(app);
   const matchResult = app.matchResult;
-  const activity = getActivityLabel(app.candidate?.last_active);
+  const activity = getActivityLabel(app.candidate?.lastActive);
 
   return (
     <div className="rounded-lg bg-secondary/50 border border-border overflow-hidden">
