@@ -8,6 +8,7 @@ import {
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
 import { Progress } from "@/components/ui/progress";
+import { ProfileSkeleton } from "@/components/StateViews";
 import { toast } from "sonner";
 
 interface ExperienceEntry {
@@ -223,8 +224,16 @@ const MyProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">Ładowanie...</p>
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
+            <Briefcase className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
+        </header>
+        <main className="flex-1 px-4 py-6 max-w-lg mx-auto w-full">
+          <ProfileSkeleton />
+        </main>
       </div>
     );
   }
