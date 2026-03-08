@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, Star, RotateCcw, Loader2 } from "lucide-react";
@@ -10,6 +10,7 @@ import SavedList from "@/components/SavedList";
 import ApplicationStatusList from "@/components/ApplicationStatusList";
 import RecentlyViewedList from "@/components/RecentlyViewedList";
 import JobFilters from "@/components/JobFilters";
+import { defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
 import type { Job } from "@/domain/models";
@@ -21,6 +22,41 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 type Tab = "swipe" | "applied" | "saved" | "recent";
 const VALID_TABS: Tab[] = ["swipe", "applied", "saved", "recent"];
+
+// ── Filter ↔ URL helpers ────────────────────────────────────────────────────
+
+const FILTER_PARAMS = ["loc", "type", "salary", "remote", "seniority", "skills"] as const;
+
+function filtersFromParams(sp: URLSearchParams): Partial<JobFiltersState> {
+  const f: Partial<JobFiltersState> = {};
+  const loc = sp.get("loc");
+  if (loc) f.location = loc;
+  const type = sp.get("type");
+  if (type) f.type = type;
+  const salary = sp.get("salary");
+  if (salary && !isNaN(Number(salary))) f.salaryMin = Number(salary);
+  const remote = sp.get("remote");
+  if (remote) f.remote = remote;
+  const seniority = sp.get("seniority");
+  if (seniority) f.seniority = seniority;
+  const skills = sp.get("skills");
+  if (skills) f.requiredSkills = skills.split(",").filter(Boolean);
+  return f;
+}
+
+function filtersToParams(f: JobFiltersState, sp: URLSearchParams): URLSearchParams {
+  const next = new URLSearchParams(sp);
+  // Remove all filter keys first
+  FILTER_PARAMS.forEach((k) => next.delete(k));
+  // Write only non-default values
+  if (f.location !== defaultFilters.location) next.set("loc", f.location);
+  if (f.type !== defaultFilters.type) next.set("type", f.type);
+  if (f.salaryMin > 0) next.set("salary", String(f.salaryMin));
+  if (f.remote !== defaultFilters.remote) next.set("remote", f.remote);
+  if (f.seniority !== defaultFilters.seniority) next.set("seniority", f.seniority);
+  if (f.requiredSkills.length > 0) next.set("skills", f.requiredSkills.join(","));
+  return next;
+}
 
 const Index = () => {
   useAuth();
