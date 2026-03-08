@@ -1,25 +1,22 @@
-export type ApplicationStatus = "applied" | "shortlisted" | "viewed" | "interview" | "hired" | "closed";
+export type ApplicationStatus =
+  | "applied"
+  | "shortlisted"
+  | "viewed"
+  | "interview"
+  | "hired"
+  | "not_selected"
+  | "position_closed";
+
 export type ApplicationSource = "candidate" | "ai" | "employer";
 
-export interface DemoApplication {
-  id: string;
-  candidateId: string;
-  jobId: string;
-  status: ApplicationStatus;
-  source: ApplicationSource;
-  appliedAt: string;
-}
+export const STATUS_ORDER: ApplicationStatus[] = [
+  "applied",
+  "shortlisted",
+  "viewed",
+  "interview",
+];
 
-export interface DemoMessage {
-  id: string;
-  applicationId: string;
-  senderId: string;
-  senderName: string;
-  content: string;
-  createdAt: string;
-}
-
-export const STATUS_ORDER: ApplicationStatus[] = ["applied", "shortlisted", "viewed", "interview", "hired"];
+export const OUTCOME_STATUSES: ApplicationStatus[] = ["hired", "not_selected", "position_closed"];
 
 export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: "Aplikowano",
@@ -27,7 +24,8 @@ export const STATUS_LABELS: Record<ApplicationStatus, string> = {
   viewed: "Wyświetlono",
   interview: "Rozmowa",
   hired: "Zatrudniony",
-  closed: "Stanowisko zamknięte",
+  not_selected: "Nie wybrano",
+  position_closed: "Stanowisko zamknięte",
 };
 
 export const STATUS_COLORS: Record<ApplicationStatus, string> = {
@@ -36,5 +34,10 @@ export const STATUS_COLORS: Record<ApplicationStatus, string> = {
   viewed: "bg-primary/15 text-primary border border-primary/30",
   interview: "bg-yellow-400/15 text-yellow-500 border border-yellow-400/30",
   hired: "bg-accent/20 text-accent border border-accent/40",
-  closed: "bg-muted text-muted-foreground",
+  not_selected: "bg-destructive/15 text-destructive border border-destructive/30",
+  position_closed: "bg-muted text-muted-foreground border border-border",
 };
+
+export function isOutcome(status: ApplicationStatus): boolean {
+  return OUTCOME_STATUSES.includes(status);
+}

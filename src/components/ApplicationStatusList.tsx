@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import StatusPipeline from "@/components/employer/StatusPipeline";
-import type { ApplicationStatus } from "@/types/application";
-import { STATUS_LABELS } from "@/types/application";
+import { STATUS_LABELS, STATUS_COLORS, type ApplicationStatus } from "@/types/application";
 import type { ApplicationWithJob } from "@/hooks/useApplications";
 
 interface Props {
@@ -60,19 +59,7 @@ const ApplicationStatusList = ({ applications, loading, onJobClick }: Props) => 
                   </p>
                   <div className="mt-1">
                     <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        status === "hired"
-                          ? "bg-accent/20 text-accent border border-accent/40"
-                          : status === "interview"
-                          ? "bg-yellow-400/15 text-yellow-500 border border-yellow-400/30"
-                          : status === "shortlisted"
-                          ? "bg-accent/15 text-accent border border-accent/30"
-                          : status === "viewed"
-                          ? "bg-primary/15 text-primary border border-primary/30"
-                          : status === "closed"
-                          ? "bg-destructive/15 text-destructive border border-destructive/30"
-                          : "bg-secondary text-secondary-foreground"
-                      }`}
+                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${STATUS_COLORS[status] || "bg-secondary text-secondary-foreground"}`}
                     >
                       Status: {STATUS_LABELS[status] || status}
                     </span>

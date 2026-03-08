@@ -52,9 +52,9 @@ const AppliedList = ({ jobs, onJobClick, statuses }: AppliedListProps) => {
                           ? "bg-accent/15 text-accent border border-accent/30"
                           : status === "viewed"
                           ? "bg-primary/15 text-primary border border-primary/30"
-                          : status === "closed"
-                          ? "bg-destructive/15 text-destructive border border-destructive/30"
-                          : "bg-secondary text-secondary-foreground"
+                           : status === "position_closed" || status === "not_selected"
+                           ? "bg-destructive/15 text-destructive border border-destructive/30"
+                           : "bg-secondary text-secondary-foreground"
                       }`}
                     >
                       Status: {STATUS_LABELS[status]}

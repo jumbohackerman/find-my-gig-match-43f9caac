@@ -99,6 +99,83 @@ export function useUpdateApplicationStatus() {
   return { updateStatus, updating };
 }
 
+/** Employer-side: fetch all applications for employer's jobs with realtime */
+export function useEmployerApplications() {
+  const { user } = useAuth();
+  const [applications, setApplications] = useState<ApplicationWithJob[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchApplications = useCallback(async () => {
+    if (!user) {
+      setApplications([]);
+      setLoading(false);
+      return;
+    }
+
+    // First get employer's job IDs
+    const { data: jobsData } = await supabase
+      .from("jobs")
+      .select("id")
+      .eq("employer_id", user.id);
+
+    if (!jobsData || jobsData.length === 0) {
+      // Also fetch applications for system-seeded jobs (employer_id = 00000000...)
+      // since demo jobs use a placeholder employer_id
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*, job:jobs(id, title, company, location, logo, salary, tags, type, description)")
+        .order("applied_at", { ascending: false });
+
+      if (!error && data) {
+        setApplications(data as unknown as ApplicationWithJob[]);
+      }
+      setLoading(false);
+      return;
+    }
+
+    const jobIds = jobsData.map((j) => j.id);
+    const { data, error } = await supabase
+      .from("applications")
+      .select("*, job:jobs(id, title, company, location, logo, salary, tags, type, description)")
+      .in("job_id", jobIds)
+      .order("applied_at", { ascending: false });
+
+    if (!error && data) {
+      setApplications(data as unknown as ApplicationWithJob[]);
+    }
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications]);
+
+  // Realtime subscription for status changes
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel("employer-applications")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "applications",
+        },
+        () => {
+          fetchApplications();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchApplications]);
+
+  return { applications, loading, refetch: fetchApplications };
+}
+
 /** Employer-side: fetch applications for a specific job */
 export function useJobApplications(jobId: string | null) {
   const [applications, setApplications] = useState<ApplicationWithJob[]>([]);

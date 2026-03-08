@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { Send, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { DemoMessage } from "@/types/application";
 import EmptyState from "./EmptyState";
 
+export interface ChatMessage {
+  id: string;
+  applicationId: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  createdAt: string;
+}
+
 interface Props {
-  messages: DemoMessage[];
+  messages: ChatMessage[];
   onSend: (content: string) => void;
   candidateName: string;
   isUnlocked: boolean;
