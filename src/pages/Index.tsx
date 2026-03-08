@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, Star, RotateCcw, Loader2 } from "lucide-react";
 import { SwipeCardSkeleton, EmptyView } from "@/components/StateViews";
@@ -11,15 +12,17 @@ import JobFilters from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
 import type { Job } from "@/domain/models";
-import { useAuth } from "@/hooks/useAuth"; // kept for potential future use
+import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
 type Tab = "swipe" | "applied" | "saved";
+const VALID_TABS: Tab[] = ["swipe", "applied", "saved"];
 
 const Index = () => {
-  useAuth(); // ensure auth context is available
+  useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
 
@@ -42,9 +45,55 @@ const Index = () => {
     actionPending,
   } = useJobFeed();
 
-  const [activeTab, setActiveTab] = useState<Tab>("swipe");
+  // ── Deep-link: tab ────────────────────────────────────────────────────────
+  const tabParam = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabParam && VALID_TABS.includes(tabParam) ? tabParam : "swipe"
+  );
+
+  const changeTab = useCallback((tab: Tab) => {
+    setActiveTab(tab);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (tab === "swipe") next.delete("tab");
+      else next.set("tab", tab);
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  // ── Deep-link: job detail modal ───────────────────────────────────────────
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
+
+  const openJobModal = useCallback((job: Job | null) => {
+    setSelectedJob(job);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (job) next.set("job", job.id);
+      else next.delete("job");
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  const closeJobModal = useCallback(() => openJobModal(null), [openJobModal]);
+
+  // Restore job modal from URL on data load
+  useEffect(() => {
+    if (jobsLoading || allJobs.length === 0) return;
+    const jobId = searchParams.get("job");
+    if (jobId && !selectedJob) {
+      const found = allJobs.find((j) => j.id === jobId);
+      if (found) setSelectedJob(found);
+      else {
+        // Invalid job id — clean up URL
+        setSearchParams((prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete("job");
+          return next;
+        }, { replace: true });
+      }
+    }
+  }, [jobsLoading, allJobs, searchParams, selectedJob, setSearchParams]);
 
   // Refetch applications after apply (swipe triggers applyToJob inside useJobFeed)
   const handleSwipeWithRefetch = async (direction: "left" | "right" | "save") => {
@@ -96,7 +145,7 @@ const Index = () => {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => changeTab(tab.key)}
             role="tab"
             aria-selected={activeTab === tab.key}
             aria-controls={`panel-${tab.key}`}
@@ -130,7 +179,7 @@ const Index = () => {
               onJobClick={(dbJob) => {
                 if (!dbJob) return;
                 const fullJob = allJobs.find(j => j.title === dbJob.title && j.company === dbJob.company);
-                setSelectedJob(fullJob || dbJob as any);
+                openJobModal(fullJob || dbJob as any);
               }}
             />
           </motion.div>
@@ -139,7 +188,7 @@ const Index = () => {
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
               Zapisane oferty ({savedJobs.length})
             </h2>
-            <SavedList jobs={savedJobs} onApply={handleSavedApply} onJobClick={setSelectedJob} />
+            <SavedList jobs={savedJobs} onApply={handleSavedApply} onJobClick={openJobModal} />
           </motion.div>
         ) : isFinished ? (
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
@@ -182,7 +231,7 @@ const Index = () => {
                         isTop={i === 0}
                         matchResult={matchResults[job.id]}
                         isSaved={savedJobIds.has(job.id)}
-                        onTap={() => setSelectedJob(job)}
+                        onTap={() => openJobModal(job)}
                         forcedExitDirection={i === 0 ? buttonExitDir : null}
                       />
                     ))}
@@ -235,7 +284,7 @@ const Index = () => {
       <JobDetailModal
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
-        onClose={() => setSelectedJob(null)}
+        onClose={closeJobModal}
         onApply={(job) => {
           applyToJob(job);
           refetchApps();
