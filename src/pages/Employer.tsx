@@ -1,9 +1,9 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, TrendingUp, Zap, Layers,
+  BarChart3, Zap, Layers, UserCheck, ArrowLeftRight,
 } from "lucide-react";
 import { type Job } from "@/data/jobs";
 import MatchBadge from "@/components/MatchBadge";
@@ -22,6 +22,7 @@ import type { ChatMessage } from "@/components/employer/ChatPanel";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const MAX_SHORTLIST = 5;
 
@@ -92,19 +93,64 @@ const Employer = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<{ seeker: ExtendedSeeker; match: MatchResult } | null>(null);
   const [chatOpen, setChatOpen] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [replacingFor, setReplacingFor] = useState<{ jobId: string; appId: string; source: string } | null>(null);
 
   const [form, setForm] = useState({
     title: "", company: "", logo: "🏢", location: "", salary: "",
     type: "Full-time" as Job["type"], description: "", tags: "",
   });
 
+  // ── Shortlist helpers ───────────────────────────────────────────────────────
+
+  const getShortlisted = (jobId: string) =>
+    (applicationsByJob[jobId] || []).filter((a) => a.status === "shortlisted");
+
+  const getEmployerPicks = (jobId: string) =>
+    getShortlisted(jobId).filter((a) => a.source === "employer");
+
+  const getAiShortlisted = (jobId: string) =>
+    getShortlisted(jobId).filter((a) => a.source === "ai");
+
+  // ── Status / shortlist actions ──────────────────────────────────────────────
+
   const handleAdvanceStatus = useCallback(async (appId: string, newStatus: ApplicationStatus) => {
     await updateDbStatus(appId, newStatus);
     refetch();
   }, [updateDbStatus, refetch]);
 
+  const shortlistCandidate = useCallback(async (appId: string, source: "ai" | "employer", jobId: string) => {
+    const shortlisted = getShortlisted(jobId);
+    if (shortlisted.length >= MAX_SHORTLIST) {
+      // Need to replace — open replace modal
+      setReplacingFor({ jobId, appId, source });
+      return;
+    }
+    await supabase
+      .from("applications")
+      .update({ status: "shortlisted", source })
+      .eq("id", appId);
+    toast.success(source === "ai" ? "Dodano do shortlisty (AI)" : "Dodano do shortlisty");
+    refetch();
+  }, [applicationsByJob, refetch]);
+
+  const replaceShortlisted = useCallback(async (removeAppId: string) => {
+    if (!replacingFor) return;
+    // Remove old from shortlist → revert to "applied"
+    await supabase
+      .from("applications")
+      .update({ status: "applied", source: "candidate" })
+      .eq("id", removeAppId);
+    // Add new to shortlist
+    await supabase
+      .from("applications")
+      .update({ status: "shortlisted", source: replacingFor.source })
+      .eq("id", replacingFor.appId);
+    toast.success("Zamieniono kandydata na shortliście");
+    setReplacingFor(null);
+    refetch();
+  }, [replacingFor, refetch]);
+
   const handleViewCandidate = useCallback((app: EmployerApplication) => {
-    // Mark as viewed if still applied
     if (app.status === "applied") {
       handleAdvanceStatus(app.id, "viewed");
     }
@@ -114,15 +160,22 @@ const Employer = () => {
 
   const handleGenerateShortlist = useCallback(async (jobId: string) => {
     const jobApps = applicationsByJob[jobId] || [];
-    const shortlisted = jobApps.filter((a) => a.status === "shortlisted");
+    const shortlisted = getShortlisted(jobId);
     const slotsAvailable = MAX_SHORTLIST - shortlisted.length;
-    if (slotsAvailable <= 0) return;
+    if (slotsAvailable <= 0) {
+      toast.error("Shortlista pełna (5/5). Zamień kandydata ręcznie.");
+      return;
+    }
 
-    // Pick top-scored non-shortlisted candidates
     const toShortlist = jobApps
       .filter((a) => a.status !== "shortlisted" && a.matchResult)
       .sort((a, b) => (b.matchResult?.score || 0) - (a.matchResult?.score || 0))
       .slice(0, slotsAvailable);
+
+    if (toShortlist.length === 0) {
+      toast.info("Brak nowych kandydatów do dodania");
+      return;
+    }
 
     for (const app of toShortlist) {
       await supabase
@@ -130,6 +183,7 @@ const Employer = () => {
         .update({ status: "shortlisted", source: "ai" })
         .eq("id", app.id);
     }
+    toast.success(`AI dodał ${toShortlist.length} kandydatów do shortlisty`);
     refetch();
   }, [applicationsByJob, refetch]);
 
@@ -153,12 +207,8 @@ const Employer = () => {
     e.preventDefault();
     if (!user) return;
     await supabase.from("jobs").insert({
-      title: form.title,
-      company: form.company,
-      logo: form.logo,
-      location: form.location,
-      salary: form.salary,
-      type: form.type,
+      title: form.title, company: form.company, logo: form.logo,
+      location: form.location, salary: form.salary, type: form.type,
       description: form.description,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       employer_id: user.id,
@@ -299,10 +349,13 @@ const Employer = () => {
             <AnimatePresence>
               {dbJobs.map((job, i) => {
                 const jobApps = applicationsByJob[job.id] || [];
-                const shortlisted = jobApps.filter((a) => a.status === "shortlisted");
+                const shortlisted = getShortlisted(job.id);
+                const aiCount = getAiShortlisted(job.id).length;
+                const employerPickCount = getEmployerPicks(job.id).length;
                 const isExpanded = expandedJob === job.id;
                 const isAnalyzed = analyzedJob === job.id;
                 const avgScore = getAvgMatchScore(job.id);
+                const shortlistFull = shortlisted.length >= MAX_SHORTLIST;
 
                 return (
                   <motion.div
@@ -314,10 +367,14 @@ const Employer = () => {
                     className="card-gradient rounded-xl border border-border overflow-hidden"
                   >
                     {/* Metrics bar */}
-                    <div className="px-4 pt-3 flex gap-4 text-[11px] text-muted-foreground flex-wrap">
+                    <div className="px-4 pt-3 flex gap-3 text-[11px] text-muted-foreground flex-wrap">
                       <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
-                      <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlista</span>
-                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr. dopasowanie</span>
+                      <span className={`flex items-center gap-1 ${shortlistFull ? "text-accent font-semibold" : ""}`}>
+                        <Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlista
+                      </span>
+                      <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> {aiCount} AI</span>
+                      <span className="flex items-center gap-1"><UserCheck className="w-3 h-3" /> {employerPickCount} picki</span>
+                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr.</span>
                     </div>
 
                     <div className="p-4 pt-2">
@@ -338,10 +395,10 @@ const Employer = () => {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <button
                           onClick={() => handleGenerateShortlist(job.id)}
-                          disabled={shortlisted.length >= MAX_SHORTLIST}
+                          disabled={shortlistFull}
                           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                          <Zap className="w-3.5 h-3.5" /> Generuj shortlistę
+                          <Zap className="w-3.5 h-3.5" /> AI Shortlista {shortlistFull && "(pełna)"}
                         </button>
                         <button
                           onClick={() => {
@@ -368,6 +425,56 @@ const Employer = () => {
                       </div>
                     </div>
 
+                    {/* Shortlist section — always visible if there are shortlisted */}
+                    {shortlisted.length > 0 && (
+                      <div className="px-4 pb-3 border-t border-border pt-3">
+                        <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                          <Layers className="w-3.5 h-3.5" /> Shortlista ({shortlisted.length}/{MAX_SHORTLIST})
+                        </h5>
+                        <div className="flex flex-wrap gap-2">
+                          {shortlisted.map((app) => (
+                            <ShortlistChip
+                              key={app.id}
+                              app={app}
+                              onRemove={() => handleAdvanceStatus(app.id, "applied")}
+                              isReplaceTarget={replacingFor?.jobId === job.id}
+                              onReplace={() => replaceShortlisted(app.id)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Replace modal inline */}
+                    <AnimatePresence>
+                      {replacingFor?.jobId === job.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-3 bg-destructive/5 border-t border-destructive/20 pt-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <ArrowLeftRight className="w-4 h-4 text-destructive" />
+                              <p className="text-xs font-semibold text-destructive">
+                                Shortlista pełna — wybierz kandydata do zamiany
+                              </p>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mb-2">
+                              Kliknij na kandydata w shortliście powyżej, aby go zamienić.
+                            </p>
+                            <button
+                              onClick={() => setReplacingFor(null)}
+                              className="text-[10px] px-3 py-1 rounded bg-secondary text-secondary-foreground hover:bg-muted"
+                            >
+                              Anuluj
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
                     {/* Regular applicant list */}
                     <AnimatePresence>
                       {isExpanded && (
@@ -375,13 +482,13 @@ const Employer = () => {
                           <div className="px-4 pb-4 border-t border-border pt-3">
                             <div className="flex items-center justify-between mb-3">
                               <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                Kandydaci ({jobApps.length}) — posortowani wg dopasowania
+                                Kandydaci ({jobApps.length}) — wg dopasowania
                               </h5>
                             </div>
                             {jobApps.length === 0 ? (
                               <EmptyState
                                 title="Brak kandydatów"
-                                description="Brak kandydatów. Udostępnij ogłoszenie, aby otrzymać aplikacje."
+                                description="Udostępnij ogłoszenie, aby otrzymać aplikacje."
                               />
                             ) : (
                               <div className="space-y-2">
@@ -389,8 +496,11 @@ const Employer = () => {
                                   <CandidateCard
                                     key={app.id}
                                     app={app}
+                                    jobId={job.id}
                                     onView={() => handleViewCandidate(app)}
                                     onAdvanceStatus={handleAdvanceStatus}
+                                    onShortlist={() => shortlistCandidate(app.id, "employer", job.id)}
+                                    shortlistFull={shortlistFull}
                                     chatMessages={messages.filter((m) => m.applicationId === app.id)}
                                     onSendMessage={(content) => handleSendMessage(app.id, content)}
                                     isChatOpen={chatOpen === app.id}
@@ -413,10 +523,7 @@ const Employer = () => {
                               <Zap className="w-3.5 h-3.5" /> Analiza AI — ranking wg dopasowania
                             </h5>
                             {jobApps.length === 0 ? (
-                              <EmptyState
-                                title="Brak kandydatów do analizy"
-                                description="Udostępnij ogłoszenie, aby otrzymać aplikacje do analizy."
-                              />
+                              <EmptyState title="Brak kandydatów do analizy" description="Udostępnij ogłoszenie, aby otrzymać aplikacje do analizy." />
                             ) : (
                               <div className="space-y-3">
                                 {jobApps.map((app, idx) => (
@@ -450,20 +557,86 @@ const Employer = () => {
   );
 };
 
-// ── Candidate card with real DB data ──────────────────────────────────────────
+// ── Shortlist chip ────────────────────────────────────────────────────────────
+
+function ShortlistChip({
+  app,
+  onRemove,
+  isReplaceTarget,
+  onReplace,
+}: {
+  app: EmployerApplication;
+  onRemove: () => void;
+  isReplaceTarget: boolean;
+  onReplace: () => void;
+}) {
+  const name = getCandidateDisplayName(app);
+  const avatar = getCandidateAvatar(app);
+  const isAi = app.source === "ai";
+
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs transition-all ${
+        isReplaceTarget
+          ? "border-destructive/40 bg-destructive/5 cursor-pointer hover:bg-destructive/10"
+          : "border-border bg-secondary/50"
+      }`}
+      onClick={isReplaceTarget ? onReplace : undefined}
+    >
+      <span className="text-sm">{avatar}</span>
+      <span className="font-medium text-foreground max-w-[100px] truncate">{name}</span>
+      {app.matchResult && (
+        <span className={`text-[10px] font-bold ${
+          app.matchResult.score >= 75 ? "text-accent" : app.matchResult.score >= 50 ? "text-yellow-400" : "text-muted-foreground"
+        }`}>
+          {app.matchResult.score}%
+        </span>
+      )}
+      {isAi ? (
+        <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-semibold flex items-center gap-0.5">
+          <Zap className="w-2.5 h-2.5" /> AI
+        </span>
+      ) : (
+        <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold flex items-center gap-0.5">
+          <UserCheck className="w-2.5 h-2.5" /> Pick
+        </span>
+      )}
+      {!isReplaceTarget && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          className="text-muted-foreground hover:text-destructive ml-0.5"
+          title="Usuń z shortlisty"
+        >
+          ×
+        </button>
+      )}
+      {isReplaceTarget && (
+        <span className="text-[9px] text-destructive font-medium">← zamień</span>
+      )}
+    </div>
+  );
+}
+
+// ── Candidate card ────────────────────────────────────────────────────────────
 
 function CandidateCard({
   app,
+  jobId,
   onView,
   onAdvanceStatus,
+  onShortlist,
+  shortlistFull,
   chatMessages,
   onSendMessage,
   isChatOpen,
   onUnlockChat,
 }: {
   app: EmployerApplication;
+  jobId: string;
   onView: () => void;
   onAdvanceStatus: (appId: string, status: ApplicationStatus) => void;
+  onShortlist: () => void;
+  shortlistFull: boolean;
   chatMessages: ChatMessage[];
   onSendMessage: (content: string) => void;
   isChatOpen: boolean;
@@ -474,9 +647,12 @@ function CandidateCard({
   const candidate = app.candidate;
   const matchResult = app.matchResult;
   const activity = getActivityLabel(candidate?.last_active);
+  const isShortlisted = app.status === "shortlisted";
 
   return (
-    <div className="rounded-lg bg-secondary/50 border border-border overflow-hidden">
+    <div className={`rounded-lg border overflow-hidden ${
+      isShortlisted ? "bg-accent/5 border-accent/20" : "bg-secondary/50 border-border"
+    }`}>
       <div
         className="flex items-center gap-3 p-3 cursor-pointer hover:bg-secondary/80 transition-colors"
         onClick={onView}
@@ -487,7 +663,7 @@ function CandidateCard({
           <p className="text-xs text-muted-foreground">
             {candidate?.title || "–"} · {candidate?.experience || "–"}
           </p>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
             <StatusBadge status={app.status as ApplicationStatus} />
             {app.source !== "candidate" && <SourceLabel source={app.source as any} />}
@@ -500,13 +676,15 @@ function CandidateCard({
               <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
             ))}
           </div>
-          <div className="flex gap-1">
-            {app.status === "applied" && (
+          <div className="flex gap-1 flex-wrap justify-end">
+            {(app.status === "applied" || app.status === "viewed") && (
               <button
-                onClick={(e) => { e.stopPropagation(); onAdvanceStatus(app.id, "shortlisted"); }}
-                className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25"
+                onClick={(e) => { e.stopPropagation(); onShortlist(); }}
+                className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25 flex items-center gap-0.5"
+                title={shortlistFull ? "Shortlista pełna — wybierz kandydata do zamiany" : "Dodaj do shortlisty"}
               >
-                Shortlista
+                <UserCheck className="w-3 h-3" />
+                {shortlistFull ? "Zamień na shortliście" : "Shortlista"}
               </button>
             )}
             {(app.status === "shortlisted" || app.status === "viewed") && (
