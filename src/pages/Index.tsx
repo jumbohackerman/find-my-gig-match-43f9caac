@@ -278,10 +278,11 @@ const Index = () => {
             <ApplicationStatusList
               applications={dbApplications}
               loading={appsLoading}
-              onJobClick={(job) => {
-                if (job) {
-                  setSelectedJob(job as any);
-                }
+              onJobClick={(dbJob) => {
+                if (!dbJob) return;
+                // Find full job from static data for rich details
+                const fullJob = jobs.find(j => j.title === dbJob.title && j.company === dbJob.company);
+                setSelectedJob(fullJob || dbJob as any);
               }}
             />
           </motion.div>
