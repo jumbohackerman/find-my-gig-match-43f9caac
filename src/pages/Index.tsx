@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, Briefcase, RotateCcw, Users, Building2, LogOut, User, Bell } from "lucide-react";
+import { X, Check, Star, RotateCcw } from "lucide-react";
+import Navbar from "@/components/Navbar";
 import SwipeCard from "@/components/SwipeCard";
 import SavedList from "@/components/SavedList";
 import ApplicationStatusList from "@/components/ApplicationStatusList";
@@ -9,21 +9,16 @@ import JobFilters from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
 import type { Job } from "@/domain/models";
-import { useAuth } from "@/hooks/useAuth";
-import { useRequireRole } from "@/hooks/useRequireRole";
+import { useAuth } from "@/hooks/useAuth"; // kept for potential future use
 import { useCandidateApplications } from "@/hooks/useApplications";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
 type Tab = "swipe" | "applied" | "saved";
 
 const Index = () => {
-  const { signOut, user, profile } = useAuth();
-  const isEmployer = profile?.role === "employer";
-  const isCandidate = profile?.role === "candidate";
+  useAuth(); // ensure auth context is available
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
-  const { notifications, unreadCount, markAllRead } = useNotifications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
 
   const {
@@ -45,7 +40,6 @@ const Index = () => {
   } = useJobFeed();
 
   const [activeTab, setActiveTab] = useState<Tab>("swipe");
-  const [showNotifications, setShowNotifications] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   // Refetch applications after apply (swipe triggers applyToJob inside useJobFeed)
@@ -76,98 +70,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
 
-      {/* Header */}
-      <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
-            <Briefcase className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
-        </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
-          {/* Notifications bell */}
-          <div className="relative">
-            <button
-              onClick={() => { setShowNotifications(!showNotifications); markAllRead(); }}
-              className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors relative"
-            >
-              <Bell className="w-4 h-4" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-accent-foreground text-[9px] font-bold flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            <AnimatePresence>
-              {showNotifications && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="absolute right-0 top-12 w-72 card-gradient rounded-xl border border-border shadow-lg z-50 overflow-hidden"
-                >
-                  <div className="p-3 border-b border-border">
-                    <p className="text-xs font-semibold text-foreground">Powiadomienia</p>
-                  </div>
-                  {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-muted-foreground">
-                      Brak powiadomień
-                    </div>
-                  ) : (
-                    <div className="max-h-60 overflow-y-auto">
-                      {notifications.map((n) => (
-                        <div key={n.id} className={`p-3 border-b border-border last:border-0 ${n.read ? "" : "bg-accent/5"}`}>
-                          <p className="text-xs font-medium text-foreground">{n.title}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{n.body}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {isCandidate && (
-            <Link
-              to="/my-profile"
-              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-            >
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Mój profil</span>
-            </Link>
-          )}
-          {isEmployer && (
-            <Link
-              to="/employer"
-              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-            >
-              <Building2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Panel pracodawcy</span>
-            </Link>
-          )}
-          {isEmployer && (
-            <Link
-              to="/profiles"
-              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-            >
-              <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Znajdź talent</span>
-            </Link>
-          )}
-          {user && (
-            <button
-              onClick={signOut}
-              className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors"
-              title="Wyloguj się"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </header>
+      <Navbar />
 
       {/* Tabs */}
       <div className="px-6 pt-4 flex gap-1">

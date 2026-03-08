@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Briefcase, Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -10,8 +11,10 @@ type Role = "candidate" | "employer";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const defaultRole = (location.state as any)?.defaultRole;
   const [mode, setMode] = useState<Mode>("login");
-  const [role, setRole] = useState<Role>("candidate");
+  const [role, setRole] = useState<Role>(defaultRole === "employer" ? "employer" : "candidate");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -58,7 +61,9 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -204,6 +209,7 @@ const Auth = () => {
         </div>
 
       </motion.div>
+      </div>
     </div>
   );
 };
