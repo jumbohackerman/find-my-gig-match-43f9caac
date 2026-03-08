@@ -352,7 +352,7 @@ const Employer = () => {
                               <div className="space-y-2">
                                 {jobApps.map((app) => (
                                   <CandidateCard
-                                    key={app.id}
+                                     key={app.id}
                                     app={app}
                                     jobId={job.id}
                                     onView={() => handleViewCandidate(app)}
@@ -363,6 +363,7 @@ const Employer = () => {
                                     onSendMessage={(content) => messaging.sendMessage(app.id, content)}
                                     isChatOpen={messaging.isChatOpen(app.id)}
                                     onUnlockChat={() => messaging.unlockChat(app.id)}
+                                    currentUserId={user?.id}
                                   />
                                 ))}
                               </div>
@@ -488,6 +489,7 @@ function CandidateCard({
   onSendMessage,
   isChatOpen,
   onUnlockChat,
+  currentUserId,
 }: {
   app: EnrichedEmployerApplication;
   jobId: string;
@@ -499,6 +501,7 @@ function CandidateCard({
   onSendMessage: (content: string) => void;
   isChatOpen: boolean;
   onUnlockChat: () => void;
+  currentUserId?: string;
 }) {
   const name = getCandidateDisplayName(app);
   const avatar = getCandidateAvatar(app);
@@ -589,6 +592,7 @@ function CandidateCard({
         candidateName={name}
         isUnlocked={isChatOpen || chatMessages.length > 0}
         onUnlock={onUnlockChat}
+        currentUserId={currentUserId}
       />
     </div>
   );
