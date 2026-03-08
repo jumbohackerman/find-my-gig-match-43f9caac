@@ -267,13 +267,9 @@ const Index = () => {
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
-              Moje aplikacje ({user ? dbApplications.length : appliedJobs.length})
+              Moje aplikacje ({dbApplications.length})
             </h2>
-            {user ? (
-              <ApplicationStatusList applications={dbApplications} loading={appsLoading} />
-            ) : (
-              <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} statuses={demoStatuses} />
-            )}
+            <ApplicationStatusList applications={dbApplications} loading={appsLoading} />
           </motion.div>
         ) : activeTab === "saved" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
