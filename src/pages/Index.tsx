@@ -14,6 +14,7 @@ import { jobs, type Job } from "@/data/jobs";
 import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { calculateMatch, DEMO_CANDIDATE, type CandidateProfile, type MatchResult } from "@/lib/matchScoring";
+import type { ApplicationStatus } from "@/types/application";
 
 type Tab = "swipe" | "applied" | "saved";
 
@@ -38,6 +39,7 @@ const Index = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [demoStatuses, setDemoStatuses] = useState<Record<string, ApplicationStatus>>({});
 
   useEffect(() => {
     if (user && profile?.role === "candidate") {
