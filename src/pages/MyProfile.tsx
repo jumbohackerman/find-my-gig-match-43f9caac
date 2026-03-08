@@ -282,6 +282,27 @@ const MyProfile = () => {
 
           {/* Accordion sections */}
           <div className="space-y-2">
+          {isEmployer ? (
+            /* ═══ EMPLOYER PROFILE ═══ */
+            <AccordionSection
+              id="basic"
+              label="Dane firmy"
+              icon="🏢"
+              isOpen={activeSection === "basic"}
+              onToggle={() => toggleSection("basic")}
+              badge={fullName || undefined}
+            >
+              <div className="space-y-4">
+                <Field label="Imię i nazwisko / osoba kontaktowa" value={fullName} onChange={setFullName} placeholder="Jan Kowalski" />
+                <p className="text-xs text-muted-foreground">
+                  Aby zarządzać ofertami pracy i przeglądać kandydatów, przejdź do{" "}
+                  <Link to="/employer" className="text-primary hover:underline">Panelu pracodawcy</Link>.
+                </p>
+              </div>
+            </AccordionSection>
+          ) : (
+            /* ═══ CANDIDATE PROFILE ═══ */
+            <>
             {/* BASIC INFO */}
             <AccordionSection
               id="basic"
@@ -579,7 +600,8 @@ function AccordionSection({
           {badge && !isOpen && (
             <p className="text-[11px] text-muted-foreground truncate mt-0.5">{badge}</p>
           )}
-        </div>
+          )}
+          </div>
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
