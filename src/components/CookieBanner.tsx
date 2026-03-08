@@ -34,7 +34,9 @@ const CookieBanner = () => {
                 <p className="text-sm font-medium text-foreground mb-1">🍪 Pliki cookies</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Używamy plików cookies, aby zapewnić działanie serwisu i poprawić Twoje doświadczenie.
-                  Więcej informacji w naszej{" "}
+                  Szczegóły w{" "}
+                  <Link to="/cookies" className="text-primary hover:underline">Polityce Cookies</Link>
+                  {" "}i{" "}
                   <Link to="/privacy" className="text-primary hover:underline">Polityce Prywatności</Link>.
                 </p>
               </div>
