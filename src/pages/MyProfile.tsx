@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Briefcase, Save, Plus, X, Upload, FileText,
-  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus,
+  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2
 } from "lucide-react";
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
@@ -92,6 +92,7 @@ const MyProfile = () => {
 
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [activeSection, setActiveSection] = useState<string>("basic");
 
@@ -198,20 +199,53 @@ const MyProfile = () => {
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    
     if (file.type !== "application/pdf") {
       toast.error("Dozwolone tylko pliki PDF");
       return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Plik jest za duży. Maksymalny rozmiar to 5MB.");
+      return;
+    }
+
     setUploading(true);
+    setUploadProgress(10);
+    
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => Math.min(prev + 15, 90));
+    }, 100);
+
     const path = `${user.id}/cv-${Date.now()}.pdf`;
     const result = await getProvider("storage").upload("cvs", path, file);
+    
+    clearInterval(progressInterval);
+    setUploadProgress(100);
+
     if (result.error) {
       toast.error("Przesyłanie nie powiodło się");
+      setUploading(false);
+      setUploadProgress(0);
     } else {
-      setCvUrl(path);
-      toast.success("CV przesłane");
+      setTimeout(() => {
+        setCvUrl(path);
+        toast.success("CV przesłane");
+        setUploading(false);
+        setUploadProgress(0);
+      }, 300);
     }
-    setUploading(false);
+  };
+
+  const handleRemoveCv = async () => {
+    if (!cvUrl || !user) return;
+    try {
+      await getProvider("storage").delete("cvs", cvUrl);
+      setCvUrl(null);
+      toast.success("CV zostało usunięte");
+    } catch (e) {
+      toast.error("Nie udało się usunąć CV");
+    }
   };
 
   const completeness = computeCompleteness({
@@ -571,20 +605,54 @@ const MyProfile = () => {
                 <LinkField icon={<Github className="w-4 h-4 text-primary" />} label="GitHub" value={links.github || ""} onChange={(v) => setLinks({ ...links, github: v })} placeholder="https://github.com/username" />
                 <LinkField icon={<Linkedin className="w-4 h-4 text-primary" />} label="LinkedIn" value={links.linkedin || ""} onChange={(v) => setLinks({ ...links, linkedin: v })} placeholder="https://linkedin.com/in/username" />
                 <LinkField icon={<ExternalLink className="w-4 h-4 text-primary" />} label="Strona osobista" value={links.website || ""} onChange={(v) => setLinks({ ...links, website: v })} placeholder="https://mojastrona.pl" />
-                <div className="pt-2 border-t border-border">
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Prześlij CV (opcjonalne, tylko PDF)</label>
-                  <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
-                      <Upload className="w-4 h-4" />
-                      {uploading ? "Przesyłanie..." : "Prześlij CV"}
-                      <input type="file" accept="application/pdf" onChange={handleCvUpload} className="hidden" disabled={uploading} />
-                    </label>
-                    {cvUrl && (
-                      <span className="flex items-center gap-1.5 text-xs text-accent">
-                        <FileText className="w-3.5 h-3.5" /> CV przesłane
-                      </span>
-                    )}
+                <div className="pt-2 border-t border-border mt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
+                    <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5MB</span>
                   </div>
+                  
+                  {cvUrl && !uploading ? (
+                    <div className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Twoje CV</p>
+                          <p className="text-xs text-muted-foreground">Przesłane pomyślnie</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer" title="Zmień plik">
+                          <Upload className="w-4 h-4" />
+                          <input type="file" accept="application/pdf" onChange={handleCvUpload} className="hidden" />
+                        </label>
+                        <button onClick={handleRemoveCv} className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Usuń plik">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-primary/50 hover:bg-secondary/20 transition-all">
+                      <input type="file" accept="application/pdf" onChange={handleCvUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled={uploading} />
+                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        {uploading ? "Przesyłanie..." : "Kliknij aby dodać plik"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        lub przeciągnij i upuść
+                      </p>
+                      
+                      {uploading && (
+                        <div className="w-full max-w-xs mt-4">
+                          <Progress value={uploadProgress} className="h-1.5" />
+                          <p className="text-[10px] text-muted-foreground mt-2 text-right">{uploadProgress}%</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </AccordionSection>
