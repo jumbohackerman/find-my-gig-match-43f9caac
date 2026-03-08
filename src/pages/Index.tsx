@@ -14,6 +14,7 @@ import { jobs, type Job } from "@/data/jobs";
 import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { calculateMatch, DEMO_CANDIDATE, type CandidateProfile, type MatchResult } from "@/lib/matchScoring";
+import type { ApplicationStatus } from "@/types/application";
 
 type Tab = "swipe" | "applied" | "saved";
 
@@ -38,6 +39,7 @@ const Index = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [demoStatuses, setDemoStatuses] = useState<Record<string, ApplicationStatus>>({});
 
   useEffect(() => {
     if (user && profile?.role === "candidate") {
@@ -46,18 +48,21 @@ const Index = () => {
     }
   }, [user, profile]);
 
-  // Demo: simulate shortlist notifications after some applications
+  // Demo: simulate shortlist notifications and status changes after some applications
   useEffect(() => {
     if (appliedJobs.length >= 2 && notifications.length === 0) {
       const timer = setTimeout(() => {
+        const firstJob = appliedJobs[0];
         setNotifications([
           {
             id: "n1",
             message: "Zostałeś dodany do shortlisty na tę rolę.",
-            jobTitle: appliedJobs[0].title,
+            jobTitle: firstJob.title,
             read: false,
           },
         ]);
+        // Simulate status change to shortlisted
+        setDemoStatuses((prev) => ({ ...prev, [firstJob.id]: "shortlisted" }));
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -105,6 +110,7 @@ const Index = () => {
 
       if (direction === "right") {
         setAppliedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
+        setDemoStatuses((prev) => ({ ...prev, [job.id]: "applied" }));
       } else if (direction === "save") {
         setSavedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
       } else {
@@ -268,7 +274,7 @@ const Index = () => {
             {user ? (
               <ApplicationStatusList applications={dbApplications} loading={appsLoading} />
             ) : (
-              <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} />
+              <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} statuses={demoStatuses} />
             )}
           </motion.div>
         ) : activeTab === "saved" ? (
