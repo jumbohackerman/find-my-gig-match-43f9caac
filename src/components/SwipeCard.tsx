@@ -1,8 +1,17 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Clock, Briefcase, DollarSign, Wifi } from "lucide-react";
+import { MapPin, Clock, Briefcase, Wifi } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { pl } from "date-fns/locale";
 import MatchBadge from "@/components/MatchBadge";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
+
+function formatPosted(raw: string): string {
+  if (!raw) return "";
+  const date = new Date(raw);
+  if (isNaN(date.getTime())) return raw;
+  return formatDistanceToNow(date, { addSuffix: true, locale: pl });
+}
 
 interface SwipeCardProps {
   job: Job;
