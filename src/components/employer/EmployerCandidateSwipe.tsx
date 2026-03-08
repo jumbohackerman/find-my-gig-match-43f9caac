@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Users } from "lucide-react";
-import type { Seeker } from "@/data/seekers";
+import type { Seeker } from "@/data/seekers"; // Legacy type — kept for backward compat
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 import EmptyState from "./EmptyState";

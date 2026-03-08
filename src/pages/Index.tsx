@@ -8,7 +8,8 @@ import ApplicationStatusList from "@/components/ApplicationStatusList";
 import JobFilters, { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
-import { jobs, type Job } from "@/data/jobs";
+import type { Job } from "@/domain/models";
+import { useJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ interface Notification {
 const Index = () => {
   const { signOut, user, profile } = useAuth();
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
+  const { jobs: allJobs, loading: jobsLoading } = useJobs();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
@@ -68,7 +70,7 @@ const Index = () => {
     setShowOnboarding(false);
   };
 
-  const filteredJobs = useMemo(() => filterJobs(jobs, filters), [filters]);
+  const filteredJobs = useMemo(() => filterJobs(allJobs, filters), [allJobs, filters]);
 
   const matchResults = useMemo(() => {
     const map: Record<string, MatchResult> = {};
@@ -154,6 +156,14 @@ const Index = () => {
     { key: "applied", label: "Moje aplikacje", count: dbApplications.length },
     { key: "saved", label: "Zapisane", count: savedJobs.length },
   ];
+
+  if (jobsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground text-sm">Ładowanie ofert...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -280,8 +290,7 @@ const Index = () => {
               loading={appsLoading}
               onJobClick={(dbJob) => {
                 if (!dbJob) return;
-                // Find full job from static data for rich details
-                const fullJob = jobs.find(j => j.title === dbJob.title && j.company === dbJob.company);
+                const fullJob = allJobs.find(j => j.title === dbJob.title && j.company === dbJob.company);
                 setSelectedJob(fullJob || dbJob as any);
               }}
             />

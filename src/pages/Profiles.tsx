@@ -5,11 +5,46 @@ import { motion } from "framer-motion";
 import SeekerCard from "@/components/SeekerCard";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import type { ExtendedSeeker } from "@/components/CandidateProfileModal";
-import { seekers } from "@/data/seekers";
+import { useCandidates } from "@/hooks/useCandidates";
+import type { Candidate } from "@/domain/models";
+
+/** Map domain Candidate to the shape SeekerCard/CandidateProfileModal expect */
+function candidateToSeeker(c: Candidate): ExtendedSeeker {
+  return {
+    id: c.id,
+    name: c.title, // fallback — name not in Candidate model yet
+    avatar: "👤",
+    title: c.title,
+    location: c.location,
+    bio: c.bio,
+    experience: c.experience,
+    skills: c.skills,
+    availability: c.availability as any,
+    seniority: c.seniority,
+    summary: c.summary,
+    work_mode: c.workMode,
+    employment_type: c.employmentType,
+    salary_min: c.salaryMin,
+    salary_max: c.salaryMax,
+    experience_entries: c.experienceEntries?.map((e) => ({
+      title: e.title,
+      company: e.company,
+      startDate: e.startDate,
+      endDate: e.endDate,
+      bullets: e.bullets,
+    })),
+    links: c.links,
+    cv_url: c.cvUrl || undefined,
+    last_active: c.lastActive,
+  } as ExtendedSeeker;
+}
 
 const Profiles = () => {
   const [search, setSearch] = useState("");
   const [selectedSeeker, setSelectedSeeker] = useState<ExtendedSeeker | null>(null);
+  const { candidates, loading } = useCandidates();
+
+  const seekers = useMemo(() => candidates.map(candidateToSeeker), [candidates]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return seekers;
@@ -18,10 +53,10 @@ const Profiles = () => {
       (s) =>
         s.name.toLowerCase().includes(q) ||
         s.title.toLowerCase().includes(q) ||
-        s.skills.some((sk) => sk.toLowerCase().includes(q)) ||
+        s.skills.some((sk: string) => sk.toLowerCase().includes(q)) ||
         s.location.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, seekers]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -60,7 +95,11 @@ const Profiles = () => {
           </div>
         </motion.div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-sm">Ładowanie profili...</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground text-sm py-12">
             Brak profili pasujących do wyszukiwania.
           </p>
@@ -71,7 +110,7 @@ const Profiles = () => {
                 key={seeker.id}
                 seeker={seeker}
                 index={i}
-                onClick={() => setSelectedSeeker(seeker as ExtendedSeeker)}
+                onClick={() => setSelectedSeeker(seeker)}
               />
             ))}
           </div>

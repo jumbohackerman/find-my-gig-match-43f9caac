@@ -23,6 +23,50 @@ The app follows a **repository/adapter pattern** to cleanly separate UI from dat
 └──────────────────────────────────┘
 ```
 
+## Wiring status (current)
+
+### ✅ Fully wired through provider registry
+
+| Page / Component | Hook | Provider key | Notes |
+|---|---|---|---|
+| `Index.tsx` (job swipe feed) | `useJobs()` | `jobs` | Was importing `jobs` array directly from `src/data/jobs.ts` |
+| `Profiles.tsx` (talent pool) | `useCandidates()` | `candidates` | Was importing `seekers` array directly from `src/data/seekers.ts` |
+
+### ✅ Type imports migrated to domain models
+
+All components now import `Job` from `@/domain/models` instead of `@/data/jobs`:
+- `SwipeCard`, `JobFilters`, `JobDetailModal`, `AppliedList`, `SavedList`
+
+`Employer.tsx` imports `Job` from `@/domain/models`.
+
+### ⚠️ Legacy type imports (intentional, backward-compat)
+
+`Seeker` type from `@/data/seekers` is still imported by:
+- `SeekerCard`, `CandidateProfileModal`, `EmployerCandidateSwipe`
+
+These components use `Seeker` as their prop type. The `Profiles.tsx` page maps `Candidate` → `ExtendedSeeker` at the boundary. When we refactor these components to accept `Candidate` directly, the `Seeker` type can be removed.
+
+### ⚠️ Not yet behind repository layer
+
+| Feature | Current approach | Future fix |
+|---|---|---|
+| Employer dashboard (jobs + applications) | `useEmployerDashboardData` → direct Supabase queries | Move to `getProvider("applications").listForEmployer()` |
+| Candidate applications | `useCandidateApplications` → direct Supabase queries | Move to `getProvider("applications").listForCandidate()` |
+| Chat messages | Local state in `Employer.tsx` | `getProvider("messages")` |
+| Job posting / deletion | Direct `supabase.from("jobs")` in `Employer.tsx` | `getProvider("jobs").create()` / `.delete()` |
+| Apply to job | Direct `supabase.rpc("apply_to_job")` in `Index.tsx` | `getProvider("applications").apply()` |
+| Onboarding flag | `localStorage` | `getProvider("profiles").update()` or dedicated flag |
+| Saved jobs | Local state array | Future: `getProvider("savedJobs")` or DB table |
+
+### Data flow: `src/data/` files
+
+| File | Imported by | Status |
+|---|---|---|
+| `src/data/jobs.ts` | `src/repositories/mock/jobs.ts` ONLY | ✅ Isolated |
+| `src/data/seekers.ts` | `src/repositories/mock/candidates.ts` ONLY | ✅ Isolated |
+
+No page or component imports data files directly anymore.
+
 ## Key directories
 
 | Path | Purpose |
@@ -33,7 +77,9 @@ The app follows a **repository/adapter pattern** to cleanly separate UI from dat
 | `src/services/interfaces.ts` | External service contracts (analytics, email, AI, etc.) |
 | `src/services/noop.ts` | Console-log/no-op implementations for dev |
 | `src/providers/registry.ts` | Single place to swap mock ↔ real implementations |
-| `src/data/` | Static demo data (jobs.ts, seekers.ts) — ONLY imported by mock repos |
+| `src/hooks/useJobs.ts` | Hook wrapping `getProvider("jobs")` |
+| `src/hooks/useCandidates.ts` | Hook wrapping `getProvider("candidates")` |
+| `src/data/` | Static demo data — ONLY imported by mock repos |
 | `docs/` | Architecture and integration docs |
 
 ## Domain models
