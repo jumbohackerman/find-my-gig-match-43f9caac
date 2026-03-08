@@ -24,7 +24,7 @@ export type Seniority = "Junior" | "Mid" | "Senior" | "Lead";
 export type WorkMode = "Zdalnie" | "Hybrydowo" | "Stacjonarnie";
 export type EmploymentType = "Full-time" | "Contract" | "Part-time";
 export type JobType = "Full-time" | "Part-time" | "Contract" | "Remote";
-export type JobStatus = "active" | "closed" | "draft";
+export type JobStatus = "active" | "closed" | "draft" | "hidden";
 export type UserRole = "candidate" | "employer";
 
 export type ApplicationStatus =
