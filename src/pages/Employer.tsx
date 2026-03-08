@@ -125,12 +125,12 @@ const Employer = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 shrink-0">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
           <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
             <Briefcase className="w-4 h-4 text-primary-foreground" />
           </div>
           <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-1.5 sm:gap-2">
           <Link to="/" className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5">
             <Briefcase className="w-4 h-4 sm:hidden" />

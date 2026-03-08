@@ -85,7 +85,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
 
 
       <Navbar />
@@ -114,7 +114,7 @@ const Index = () => {
         ))}
       </div>
 
-      <main className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full">
+      <main className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full min-h-0 overflow-y-auto">
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
@@ -164,9 +164,9 @@ const Index = () => {
                 <p className="text-muted-foreground text-sm">Brak ofert pasujących do filtrów.</p>
               </div>
             ) : (
-              <>
-                {/* Card stack — buttons use z-10 so no overflow-hidden needed */}
-                <div className="relative w-full" style={{ height: 'clamp(340px, 55vh, 520px)' }}>
+              <div className="flex-1 flex flex-col items-center min-h-0 w-full">
+                {/* Card stack — flex-1 fills available space, min-h ensures usability */}
+                <div className="relative w-full flex-1 min-h-[280px]">
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
@@ -185,8 +185,8 @@ const Index = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Action buttons — z-10 ensures they sit above any card overflow */}
-                <div className="relative z-10 flex items-center gap-5 mt-4">
+                {/* Action buttons — z-10, shrink-0 so they never get pushed off */}
+                <div className="relative z-10 flex items-center gap-5 mt-3 shrink-0 pb-1">
                   <button
                     onClick={() => handleSwipeWithRefetch("left")}
                     className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"
@@ -210,10 +210,10 @@ const Index = () => {
                   </button>
                 </div>
 
-                <p className="text-muted-foreground text-xs mt-3">
+                <p className="text-muted-foreground text-xs mt-2 shrink-0">
                   {currentIndex + 1} / {filteredJobs.length}
                 </p>
-              </>
+              </div>
             )}
           </>
         )}

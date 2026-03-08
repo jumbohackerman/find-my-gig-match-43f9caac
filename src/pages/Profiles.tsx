@@ -28,12 +28,12 @@ const Profiles = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-6 py-4 border-b border-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
             <Briefcase className="w-4 h-4 text-primary-foreground" />
           </div>
           <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
-        </div>
+        </Link>
         <Link
           to="/"
           className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
