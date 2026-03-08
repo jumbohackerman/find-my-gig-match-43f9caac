@@ -392,6 +392,7 @@ const Index = () => {
             )}
           </>
         )}
+        </LocalErrorBoundary>
       </main>
 
       <OnboardingModal
