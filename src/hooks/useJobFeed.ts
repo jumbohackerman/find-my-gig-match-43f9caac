@@ -156,11 +156,17 @@ export function useJobFeed() {
   // ── Apply from saved list ────────────────────────────────────────────────
   const applyFromSaved = useCallback(
     async (job: Job) => {
-      await unsaveJob(job.id);
-      toast.info("Usunięto z zapisanych");
-      await applyToJob(job);
+      if (actionPending) return;
+      setActionPending(true);
+      try {
+        await unsaveJob(job.id);
+        toast.info("Usunięto z zapisanych");
+        await applyToJob(job);
+      } finally {
+        setActionPending(false);
+      }
     },
-    [unsaveJob, applyToJob],
+    [unsaveJob, applyToJob, actionPending],
   );
 
   // ── Reset feed ───────────────────────────────────────────────────────────

@@ -128,7 +128,7 @@ const MyProfile = () => {
   }, [user, profile, authLoading, isEmployer]);
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user || saving) return;
     setSaving(true);
 
     try {

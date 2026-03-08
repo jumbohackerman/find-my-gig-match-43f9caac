@@ -2,7 +2,7 @@
  * useSavedJobs — hook for saved-jobs through the provider registry.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -11,6 +11,7 @@ export function useSavedJobs() {
   const userId = user?.id ?? "anonymous";
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const pendingOps = useRef(new Set<string>());
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -25,20 +26,32 @@ export function useSavedJobs() {
 
   const saveJob = useCallback(
     async (jobId: string) => {
-      await getProvider("savedJobs").save(userId, jobId);
-      setSavedJobIds((prev) => new Set(prev).add(jobId));
+      if (pendingOps.current.has(`save-${jobId}`)) return;
+      pendingOps.current.add(`save-${jobId}`);
+      try {
+        await getProvider("savedJobs").save(userId, jobId);
+        setSavedJobIds((prev) => new Set(prev).add(jobId));
+      } finally {
+        pendingOps.current.delete(`save-${jobId}`);
+      }
     },
     [userId],
   );
 
   const removeJob = useCallback(
     async (jobId: string) => {
-      await getProvider("savedJobs").remove(userId, jobId);
-      setSavedJobIds((prev) => {
-        const next = new Set(prev);
-        next.delete(jobId);
-        return next;
-      });
+      if (pendingOps.current.has(`remove-${jobId}`)) return;
+      pendingOps.current.add(`remove-${jobId}`);
+      try {
+        await getProvider("savedJobs").remove(userId, jobId);
+        setSavedJobIds((prev) => {
+          const next = new Set(prev);
+          next.delete(jobId);
+          return next;
+        });
+      } finally {
+        pendingOps.current.delete(`remove-${jobId}`);
+      }
     },
     [userId],
   );

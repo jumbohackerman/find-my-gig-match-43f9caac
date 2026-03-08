@@ -47,6 +47,7 @@ const Employer = () => {
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
+  const [hidePending, setHidePending] = useState<string | null>(null);
   const [statusPending, setStatusPending] = useState<string | null>(null);
 
   const handleAdvanceStatus = async (appId: string, newStatus: ApplicationStatus) => {
@@ -274,6 +275,8 @@ const Employer = () => {
                           <div className="flex items-center gap-1 shrink-0">
                             <button
                               onClick={async () => {
+                                if (hidePending) return;
+                                setHidePending(job.id);
                                 try {
                                   if (job.status === "hidden") {
                                     await unhideJob(job.id);
@@ -284,8 +287,10 @@ const Employer = () => {
                                   }
                                   refetch();
                                 } catch { toast.error("Nie udało się zmienić statusu"); }
+                                finally { setHidePending(null); }
                               }}
-                              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                              disabled={hidePending === job.id}
+                              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
                               title={job.status === "hidden" ? "Opublikuj" : "Ukryj"}
                             >
                               {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}

@@ -34,6 +34,7 @@ export function useEmployerJobs() {
   const [submitting, setSubmitting] = useState(false);
 
   const createJob = useCallback(async (form: JobFormData, employerId: string): Promise<Job | null> => {
+    if (submitting) return null;
     setSubmitting(true);
     try {
       const job = await getProvider("jobs").create({
