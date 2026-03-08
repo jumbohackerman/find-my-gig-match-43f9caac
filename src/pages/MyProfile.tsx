@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Briefcase, Save, Plus, X, Upload, FileText,
-  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus,
+  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2
 } from "lucide-react";
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
