@@ -5,12 +5,11 @@ import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
   BarChart3, Zap, Layers, UserCheck, ArrowLeftRight,
 } from "lucide-react";
-import { type Job } from "@/domain/models";
+import { type Job, type Candidate, type MatchResult, getActivityLabel } from "@/domain/models";
+import { dbCandidateToCandidate } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 import MatchScoreBreakdown from "@/components/MatchScoreBreakdown";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
-import type { ExtendedSeeker } from "@/components/CandidateProfileModal";
-import { type MatchResult } from "@/lib/matchScoring";
 import { useUpdateApplicationStatus } from "@/hooks/useApplications";
 import { useEmployerDashboardData, type EmployerApplication } from "@/hooks/useEmployerDashboard";
 import StatusBadge from "@/components/employer/StatusBadge";
@@ -38,48 +37,36 @@ function getCandidateAvatar(app: EmployerApplication): string {
   return (c as any).avatar || "👤";
 }
 
-function appToSeeker(app: EmployerApplication): ExtendedSeeker {
+function appToCandidate(app: EmployerApplication): Candidate {
   const c = app.candidate;
   if (!c) {
     return {
       id: app.candidate_id,
+      userId: app.candidate_id,
       name: "Kandydat",
-      title: "",
       avatar: "👤",
-      skills: [],
-      experience: "",
+      title: "",
       location: "",
       bio: "",
-    } as ExtendedSeeker;
+      summary: "",
+      skills: [],
+      seniority: "Mid",
+      experience: "",
+      workMode: "Zdalnie",
+      employmentType: "Full-time",
+      availability: "Elastycznie",
+      salaryMin: 0,
+      salaryMax: 0,
+      experienceEntries: [],
+      links: {},
+      cvUrl: null,
+      lastActive: new Date().toISOString(),
+    } as Candidate;
   }
-  return {
-    id: c.id,
-    name: getCandidateDisplayName(app),
-    title: c.title,
-    avatar: getCandidateAvatar(app),
-    skills: c.skills || [],
-    experience: c.experience,
-    location: c.location,
-    bio: c.bio,
-    seniority: c.seniority,
-    summary: c.summary,
-    work_mode: c.work_mode,
-    experience_entries: c.experience_entries as any,
-    links: c.links as any,
-    cv_url: c.cv_url || undefined,
-    last_active: c.last_active,
-    salary_min: c.salary_min,
-    salary_max: c.salary_max,
-  } as ExtendedSeeker;
-}
-
-function getActivityLabel(lastActive?: string): { label: string; color: string } {
-  if (!lastActive) return { label: "Aktywny", color: "text-accent" };
-  const diffMs = Date.now() - new Date(lastActive).getTime();
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
-  if (diffDays < 1) return { label: "Aktywny dziś", color: "text-accent" };
-  if (diffDays < 7) return { label: `Aktywny ${Math.floor(diffDays)} dn. temu`, color: "text-yellow-400" };
-  return { label: "Nieaktywny", color: "text-muted-foreground" };
+  return dbCandidateToCandidate(c, {
+    full_name: (c as any).full_name,
+    avatar: (c as any).avatar,
+  });
 }
 
 const Employer = () => {
