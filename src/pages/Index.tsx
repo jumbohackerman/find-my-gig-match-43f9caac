@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, Star, RotateCcw } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import SwipeCard from "@/components/SwipeCard";
 import SavedList from "@/components/SavedList";
 import ApplicationStatusList from "@/components/ApplicationStatusList";
@@ -224,6 +225,7 @@ const Index = () => {
           refetchApps();
         }}
       />
+      <Footer />
     </div>
   );
 };
