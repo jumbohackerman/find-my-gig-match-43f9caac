@@ -91,7 +91,7 @@ export const jobs: Job[] = [
     benefits: [
       "Prywatna opieka medyczna",
       "Budżet na konferencje i kursy",
-      "Piątkowe „design jamy"",
+      "Piątkowe 'design jamy'",
       "Nowoczesne biuro w centrum Krakowa",
       "Licencja na narzędzia Adobe i Figma",
     ],
