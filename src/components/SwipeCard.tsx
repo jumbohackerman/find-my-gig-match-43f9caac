@@ -37,7 +37,6 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
   // When parent signals a button-triggered direction, apply it immediately
   const resolvedExit = forcedExitDirection ?? exitDirection;
-  const didDrag = useRef(false);
 
   const handleDragStart = () => {
     didDrag.current = false;
