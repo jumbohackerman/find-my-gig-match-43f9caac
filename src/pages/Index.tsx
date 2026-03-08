@@ -8,7 +8,6 @@ import SavedList from "@/components/SavedList";
 import ApplicationStatusList from "@/components/ApplicationStatusList";
 import JobFilters, { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
-import DemoBanner from "@/components/DemoBanner";
 import JobDetailModal from "@/components/JobDetailModal";
 import { jobs, type Job } from "@/data/jobs";
 import { useAuth } from "@/hooks/useAuth";
