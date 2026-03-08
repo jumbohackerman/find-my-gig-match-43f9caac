@@ -169,23 +169,12 @@ export interface Notification {
   referenceId?: string;
 }
 
-// ─── Match scoring (domain logic) ────────────────────────────────────────────
+// ─── Match scoring (re-exported from domain/scoring) ─────────────────────────
 
-export interface MatchResult {
-  score: number; // 0–100
-  matchedSkills: string[];
-  missingSkills: string[];
-  reasons: string[];
-  breakdown: ScoreBreakdown;
-}
-
-export interface ScoreBreakdown {
-  skills: number;
-  experience: number;
-  salary: number;
-  location: number;
-  workMode: number;
-}
+import type { MatchResult as _MatchResult, ScoreBreakdown as _ScoreBreakdown, DimensionScore as _DimensionScore } from "@/domain/scoring/types";
+export type MatchResult = _MatchResult;
+export type ScoreBreakdown = _ScoreBreakdown;
+export type DimensionScore = _DimensionScore;
 
 // ─── Enriched types for UI ───────────────────────────────────────────────────
 
