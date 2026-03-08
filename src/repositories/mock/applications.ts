@@ -9,6 +9,7 @@ import type {
   ApplicationSource,
   ApplicationWithJob,
   EnrichedEmployerApplication,
+  Job,
 } from "@/domain/models";
 
 let store: Application[] = [];
@@ -21,14 +22,13 @@ export const mockApplicationRepository: ApplicationRepository = {
   },
 
   async listForEmployer(_employerId: string): Promise<EnrichedEmployerApplication[]> {
-    // In mock mode, return all applications (no real employer ownership)
     return store.map((a) => ({ ...a }));
   },
 
-  async apply(jobId, candidateId, source = "candidate"): Promise<Application> {
+  async apply(job: Job, candidateId: string, source = "candidate"): Promise<Application> {
     const app: Application = {
       id: `mock-app-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      jobId,
+      jobId: job.id,
       candidateId,
       status: "applied",
       source: source as ApplicationSource,
@@ -46,5 +46,13 @@ export const mockApplicationRepository: ApplicationRepository = {
         : a,
     );
     console.debug("[mockApplicationRepo] updateStatus", applicationId, status);
+  },
+
+  subscribeForCandidate(_candidateId, _onPayload) {
+    return () => {};
+  },
+
+  subscribeForEmployer(_employerId, _onChange) {
+    return () => {};
   },
 };

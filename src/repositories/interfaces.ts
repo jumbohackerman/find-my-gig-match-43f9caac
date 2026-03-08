@@ -22,6 +22,8 @@ import type {
 export interface JobRepository {
   /** List all active jobs, optionally filtered */
   list(filters?: JobFilters): Promise<Job[]>;
+  /** List jobs owned by employer + system-seeded jobs */
+  listForEmployer(employerId: string): Promise<Job[]>;
   /** Get a single job by ID */
   getById(id: string): Promise<Job | null>;
   /** Create a new job posting (employer) */
@@ -62,12 +64,30 @@ export interface CandidateFilters {
 export interface ApplicationRepository {
   /** Candidate-side: list own applications with job data */
   listForCandidate(candidateId: string): Promise<ApplicationWithJob[]>;
-  /** Employer-side: list enriched applications for employer's jobs */
+  /**
+   * Employer-side: list enriched applications for employer's jobs.
+   * Returns applications with candidate + job data populated.
+   * matchResult is NOT populated — the hook computes it.
+   */
   listForEmployer(employerId: string): Promise<EnrichedEmployerApplication[]>;
-  /** Apply to a job */
-  apply(jobId: string, candidateId: string, source?: ApplicationSource): Promise<Application>;
+  /**
+   * Apply to a job — compound operation.
+   * For static/demo jobs, the implementation may upsert the job row
+   * before creating the application (e.g. via the apply_to_job RPC).
+   */
+  apply(job: Job, candidateId: string, source?: ApplicationSource): Promise<Application>;
   /** Update application status */
   updateStatus(applicationId: string, status: ApplicationStatus, source?: ApplicationSource): Promise<void>;
+  /**
+   * Subscribe to candidate's application changes.
+   * Returns an unsubscribe function.
+   */
+  subscribeForCandidate(candidateId: string, onPayload: (payload: any) => void): () => void;
+  /**
+   * Subscribe to application changes for employer's jobs.
+   * Returns an unsubscribe function.
+   */
+  subscribeForEmployer(employerId: string, onChange: () => void): () => void;
 }
 
 // ─── Messages ────────────────────────────────────────────────────────────────

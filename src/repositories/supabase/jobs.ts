@@ -1,8 +1,5 @@
 /**
  * Supabase implementation of JobRepository.
- *
- * READY TO USE — swap into provider registry when migrating from mock.
- * Currently not wired in; mock is still active.
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -67,6 +64,21 @@ export const supabaseJobRepository: JobRepository = {
     const { data, error } = await query;
     if (error) {
       console.error("[supabaseJobRepo] list error:", error);
+      return [];
+    }
+    return (data as unknown as DbJob[]).map(toDomain);
+  },
+
+  async listForEmployer(employerId: string): Promise<Job[]> {
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*")
+      .or(
+        `employer_id.eq.${employerId},employer_id.eq.00000000-0000-0000-0000-000000000000`,
+      );
+
+    if (error) {
+      console.error("[supabaseJobRepo] listForEmployer error:", error);
       return [];
     }
     return (data as unknown as DbJob[]).map(toDomain);
