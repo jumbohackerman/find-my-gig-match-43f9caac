@@ -96,7 +96,7 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
       </div>
       <div className="space-y-2">
         <label className="text-xs text-muted-foreground font-medium">Poziom doświadczenia</label>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {SENIORITY_OPTIONS.map((s) => (
             <button
               key={s}

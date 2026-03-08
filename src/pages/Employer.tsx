@@ -134,14 +134,14 @@ const Employer = () => {
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h2 className="font-display text-2xl font-bold text-foreground">Panel pracodawcy</h2>
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">Panel pracodawcy</h2>
               <p className="text-muted-foreground text-sm mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
             </div>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
             >
               <Plus className="w-4 h-4" /> Dodaj ogłoszenie
             </button>
@@ -160,7 +160,7 @@ const Employer = () => {
             >
               <div className="card-gradient rounded-2xl border border-border p-5 mb-6 space-y-4">
                 <h3 className="font-display text-lg font-semibold text-foreground">Nowe ogłoszenie</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs text-muted-foreground font-medium">Stanowisko *</label>
                     <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="np. Frontend Developer" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
@@ -170,7 +170,7 @@ const Employer = () => {
                     <input required value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="np. TechNova" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs text-muted-foreground font-medium">Lokalizacja *</label>
                     <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="np. Zdalnie" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />

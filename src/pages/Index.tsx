@@ -208,7 +208,7 @@ const Index = () => {
       <Navbar />
 
       {/* Tabs */}
-      <div className="px-6 pt-4 flex gap-1" role="tablist" aria-label="Sekcje przeglądania">
+      <div className="px-4 sm:px-6 pt-4 flex gap-1 overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -216,7 +216,7 @@ const Index = () => {
             role="tab"
             aria-selected={activeTab === tab.key}
             aria-controls={`panel-${tab.key}`}
-            className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               activeTab === tab.key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-muted"

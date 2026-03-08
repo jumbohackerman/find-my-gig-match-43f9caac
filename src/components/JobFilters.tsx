@@ -86,7 +86,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
             className="overflow-hidden"
           >
             <div className="mt-3 p-4 rounded-xl bg-secondary/50 border border-border space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Location */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Lokalizacja</label>
