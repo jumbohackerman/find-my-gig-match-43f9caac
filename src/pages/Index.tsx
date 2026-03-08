@@ -9,7 +9,7 @@ import JobFilters from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
 import type { Job } from "@/domain/models";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth"; // kept for potential future use
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
@@ -17,7 +17,7 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 type Tab = "swipe" | "applied" | "saved";
 
 const Index = () => {
-  const { user } = useAuth();
+  useAuth(); // ensure auth context is available
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
 
