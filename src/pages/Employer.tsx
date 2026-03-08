@@ -583,7 +583,8 @@ const Employer = () => {
                                     )}
                                   </div>
                                 );
-                              })}
+                              })
+                              })()}
                             </div>
                           )}
                         </div>
