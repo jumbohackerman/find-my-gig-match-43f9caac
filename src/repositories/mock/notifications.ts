@@ -23,4 +23,12 @@ export const mockNotificationRepository: NotificationRepository = {
       n.userId === userId ? { ...n, read: true } : n,
     );
   },
+
+  async countUnread(userId: string): Promise<number> {
+    return store.filter((n) => n.userId === userId && !n.read).length;
+  },
+
+  subscribe(_userId, _onNotification) {
+    return () => {};
+  },
 };

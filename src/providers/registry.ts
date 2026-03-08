@@ -27,10 +27,10 @@ import { supabaseJobRepository } from "@/repositories/supabase/jobs";
 import { supabaseCandidateRepository } from "@/repositories/supabase/candidates";
 import { supabaseApplicationRepository } from "@/repositories/supabase/applications";
 import { supabaseProfileRepository } from "@/repositories/supabase/profiles";
+import { supabaseMessageRepository } from "@/repositories/supabase/messages";
 import { supabaseStorageService } from "@/services/supabaseStorage";
 
 // ── Import mock implementations (for providers not yet migrated) ─────────────
-import { mockMessageRepository } from "@/repositories/mock/messages";
 import { mockNotificationRepository } from "@/repositories/mock/notifications";
 import { mockPreferencesRepository } from "@/repositories/mock/preferences";
 import { mockSavedJobRepository } from "@/repositories/mock/savedJobs";
@@ -67,9 +67,10 @@ const providers: ProviderMap = {
   candidates: supabaseCandidateRepository,
   applications: supabaseApplicationRepository,
   profiles: supabaseProfileRepository,
+  messages: supabaseMessageRepository,
+  storage: supabaseStorageService,
 
   // Data repositories — still mock (no DB tables yet)
-  messages: mockMessageRepository,
   notifications: mockNotificationRepository,
   preferences: mockPreferencesRepository,
   savedJobs: mockSavedJobRepository,
@@ -80,7 +81,6 @@ const providers: ProviderMap = {
   errorTracking: noopErrorTracking,
   email: noopEmail,
   ai: noopAI,
-  storage: supabaseStorageService,
 };
 
 /** Type-safe provider accessor */

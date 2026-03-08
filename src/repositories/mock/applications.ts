@@ -35,7 +35,6 @@ export const mockApplicationRepository: ApplicationRepository = {
       appliedAt: new Date().toISOString(),
     };
     store = [app, ...store];
-    console.debug("[mockApplicationRepo] apply", app);
     return app;
   },
 
@@ -45,7 +44,6 @@ export const mockApplicationRepository: ApplicationRepository = {
         ? { ...a, status: status as ApplicationStatus, ...(source ? { source } : {}) }
         : a,
     );
-    console.debug("[mockApplicationRepo] updateStatus", applicationId, status);
   },
 
   subscribeForCandidate(_candidateId, _onPayload) {
@@ -54,5 +52,16 @@ export const mockApplicationRepository: ApplicationRepository = {
 
   subscribeForEmployer(_employerId, _onChange) {
     return () => {};
+  },
+
+  async countByStatus(jobId: string): Promise<Record<ApplicationStatus, number>> {
+    const counts = {} as Record<ApplicationStatus, number>;
+    const statuses: ApplicationStatus[] = [
+      "applied", "shortlisted", "viewed", "interview", "hired", "not_selected", "position_closed",
+    ];
+    statuses.forEach((s) => {
+      counts[s] = store.filter((a) => a.jobId === jobId && a.status === s).length;
+    });
+    return counts;
   },
 };

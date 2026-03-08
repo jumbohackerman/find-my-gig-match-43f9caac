@@ -28,7 +28,11 @@ export interface JobRepository {
   getById(id: string): Promise<Job | null>;
   /** Create a new job posting (employer) */
   create(job: Omit<Job, "id" | "posted">): Promise<Job>;
-  /** Delete a job posting */
+  /** Update an existing job posting */
+  update(id: string, data: Partial<Omit<Job, "id" | "posted">>): Promise<Job>;
+  /** Archive/close a job (sets status to "closed") */
+  archive(id: string): Promise<void>;
+  /** Permanently delete a job posting */
   delete(id: string): Promise<void>;
 }
 
@@ -66,7 +70,6 @@ export interface ApplicationRepository {
   listForCandidate(candidateId: string): Promise<ApplicationWithJob[]>;
   /**
    * Employer-side: list enriched applications for employer's jobs.
-   * Returns applications with candidate + job data populated.
    * matchResult is NOT populated — the hook computes it.
    */
   listForEmployer(employerId: string): Promise<EnrichedEmployerApplication[]>;
@@ -76,18 +79,14 @@ export interface ApplicationRepository {
    * before creating the application (e.g. via the apply_to_job RPC).
    */
   apply(job: Job, candidateId: string, source?: ApplicationSource): Promise<Application>;
-  /** Update application status */
+  /** Update application status (with optional source tracking) */
   updateStatus(applicationId: string, status: ApplicationStatus, source?: ApplicationSource): Promise<void>;
-  /**
-   * Subscribe to candidate's application changes.
-   * Returns an unsubscribe function.
-   */
+  /** Subscribe to candidate's application changes. Returns unsubscribe fn. */
   subscribeForCandidate(candidateId: string, onPayload: (payload: any) => void): () => void;
-  /**
-   * Subscribe to application changes for employer's jobs.
-   * Returns an unsubscribe function.
-   */
+  /** Subscribe to application changes for employer's jobs. Returns unsubscribe fn. */
   subscribeForEmployer(employerId: string, onChange: () => void): () => void;
+  /** Count applications by status for a specific job */
+  countByStatus(jobId: string): Promise<Record<ApplicationStatus, number>>;
 }
 
 // ─── Messages ────────────────────────────────────────────────────────────────
@@ -110,6 +109,10 @@ export interface NotificationRepository {
   markRead(notificationId: string): Promise<void>;
   /** Mark all notifications as read */
   markAllRead(userId: string): Promise<void>;
+  /** Get unread count for a user */
+  countUnread(userId: string): Promise<number>;
+  /** Subscribe to new notifications. Returns unsubscribe fn. */
+  subscribe(userId: string, onNotification: (notification: Notification) => void): () => void;
 }
 
 // ─── Profiles ────────────────────────────────────────────────────────────────
@@ -152,4 +155,6 @@ export interface PreferencesRepository {
   get(userId: string, key: string): Promise<string | null>;
   /** Set a preference value */
   set(userId: string, key: string, value: string): Promise<void>;
+  /** Delete a preference */
+  delete(userId: string, key: string): Promise<void>;
 }

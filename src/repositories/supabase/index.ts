@@ -6,3 +6,4 @@ export { supabaseJobRepository } from "./jobs";
 export { supabaseApplicationRepository } from "./applications";
 export { supabaseCandidateRepository } from "./candidates";
 export { supabaseProfileRepository } from "./profiles";
+export { supabaseMessageRepository } from "./messages";
