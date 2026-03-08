@@ -149,7 +149,7 @@ const Index = () => {
             ) : (
               <>
                 {/* Card stack */}
-                <div className="relative w-full" style={{ height: 'clamp(260px, 42vh, 380px)' }}>
+                <div className="relative w-full" style={{ height: 'clamp(320px, 50vh, 440px)' }}>
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
