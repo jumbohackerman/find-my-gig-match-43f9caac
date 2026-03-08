@@ -19,14 +19,22 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
   const rightOpacity = useTransform(x, [0, 100], [0, 1]);
   const leftOpacity = useTransform(x, [-100, 0], [1, 0]);
 
+  const dragStartPos = { x: 0, y: 0 };
+
+  const handleDragStart = (_: any, info: PanInfo) => {
+    dragStartPos.x = info.point.x;
+    dragStartPos.y = info.point.y;
+  };
+
   const handleDragEnd = (_: any, info: PanInfo) => {
     const absX = Math.abs(info.offset.x);
-    const absY = Math.abs(info.offset.y);
     if (absX > 120) {
       onSwipe(info.offset.x > 0 ? "right" : "left");
-    } else if (absX < 5 && absY < 5 && onTap) {
-      onTap();
     }
+  };
+
+  const handleTap = () => {
+    if (onTap) onTap();
   };
 
   const hasSalary = job.salary && job.salary.trim().length > 0;
