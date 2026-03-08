@@ -12,10 +12,12 @@
  * Can be called as a pre-check from other edge functions or directly from client.
  */
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 // In-memory rate limit store (resets on cold start — acceptable for edge functions)
@@ -48,7 +50,30 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Validate auth
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ error: "Missing authorization header" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Invalid or expired token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const { key, maxRequests = 10, windowMs = 60_000 } = await req.json();
 
     if (!key) {
@@ -58,7 +83,9 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const result = checkRateLimit(key, maxRequests, windowMs);
+    // Prefix key with user ID to prevent cross-user rate limit manipulation
+    const scopedKey = `${user.id}:${key}`;
+    const result = checkRateLimit(scopedKey, maxRequests, windowMs);
 
     return new Response(JSON.stringify(result), {
       status: result.allowed ? 200 : 429,

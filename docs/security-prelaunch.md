@@ -1,6 +1,6 @@
 # Security Pre-Launch Checklist
 
-**Date:** 2026-03-08
+**Date:** 2026-03-08 (post security hardening phase)
 
 ---
 
@@ -53,27 +53,84 @@ The `.env` file is **auto-managed by Lovable Cloud** and cannot be removed from 
 
 ---
 
-## Current Security Posture
+## Security Posture
 
-### ✅ Secure
+### ✅ Secured (implemented)
 
-1. **RLS policies** on all 5 tables (candidates, jobs, applications, messages, profiles) — restrictive mode
-2. **Security definer functions** (`get_user_role`, `apply_to_job`) prevent RLS recursion attacks
-3. **Role-aware route guards** via `useRequireRole` + `<RoleGate>` in App.tsx
-4. **No service role key in client code** — only anon key exposed
-5. **Auth enforcement** — all routes require authentication
-6. **Navigation guards** — role-conditional UI prevents accidental cross-role access
-7. **Provider abstraction** — no direct Supabase queries in UI layer (except auth bootstrap)
+1. **RLS policies on all 9 tables** — restrictive mode
+   - `jobs`: 4 policies (SELECT active/own, INSERT/UPDATE/DELETE employer-owned)
+   - `applications`: 5 policies (candidate CRUD, employer SELECT/UPDATE via job ownership)
+   - `candidates`: 2 policies (self-manage, employer cross-read via applications)
+   - `profiles`: 4 policies (self CRUD + **employer cross-read for applicants**)
+   - `messages`: 2 policies (participant SELECT/INSERT)
+   - `saved_jobs`: 3 policies (self SELECT/INSERT/DELETE)
+   - `swipe_events`: 3 policies (self SELECT/INSERT/DELETE)
+   - `notifications`: 3 policies (self SELECT/UPDATE/DELETE, INSERT is server-only)
+   - `user_preferences`: 4 policies (self full CRUD)
 
-### ⚠️ Risks to Address Before Launch
+2. **Storage bucket RLS** ✅ FIXED
+   - `cvs` bucket: candidate self-access (INSERT/SELECT/UPDATE/DELETE)
+   - Employer cross-read: can read CVs of candidates who applied to their jobs
+   - Path enforcement: files must be in `{user_id}/` folder
 
-| Risk | Severity | Description | Remediation |
-|------|----------|-------------|-------------|
-| **Missing Storage RLS** | HIGH | `cvs` bucket has no RLS policies — uploaded CVs may be accessible to anyone with the URL | Add bucket-level RLS: owner can upload/read own files, employers can read CVs of applicants |
-| **Profiles RLS too restrictive** | MEDIUM | Employers cannot read candidate profiles directly (only via joined application queries). The `profiles` table SELECT policy is `user_id = auth.uid()` only | Add employer SELECT policy for profiles of candidates who applied to their jobs |
-| **No rate limiting on auth** | MEDIUM | Sign-up and login endpoints have no rate limiting beyond Supabase defaults | Configure Supabase auth rate limits or use the `rate-limiter` edge function |
-| **Email not verified by default** | LOW | Email auto-confirm may be disabled but should be explicitly verified | Confirm `enable_confirmations = true` in auth config |
-| **No CORS policy for edge functions** | LOW | Edge function stubs have permissive CORS (`*`) | Restrict to production domain before launch |
+3. **Profiles cross-read** ✅ FIXED
+   - Employers can read profiles of candidates who applied to their jobs
+   - Least-privilege: only applicant profiles are visible, not all candidates
+
+4. **Security definer functions** (`get_user_role`, `apply_to_job`) prevent RLS recursion
+5. **Role-aware route guards** via `useRequireRole` + `<RoleGate>` in App.tsx
+6. **No service role key in client code** — only anon key exposed
+7. **Auth enforcement** — all routes require authentication
+8. **Provider abstraction** — no direct Supabase queries in UI layer (except auth)
+
+### ✅ Edge Function Security Hardening
+
+All 4 edge functions have been hardened:
+
+| Function | Auth Check | CORS Headers | User Scoping |
+|----------|-----------|--------------|--------------|
+| `process-cv` | ✅ Token validation | ✅ Full Supabase headers | ✅ Path must match `{userId}/` |
+| `send-email` | ✅ Token validation | ✅ Full Supabase headers | ✅ Authenticated users only |
+| `rate-limiter` | ✅ Token validation | ✅ Full Supabase headers | ✅ Keys prefixed with userId |
+| `validate-status-transition` | ✅ Token validation | ✅ Full Supabase headers | ✅ Authenticated users only |
+
+CORS headers now include all Supabase client headers:
+```
+authorization, x-client-info, apikey, content-type,
+x-supabase-client-platform, x-supabase-client-platform-version,
+x-supabase-client-runtime, x-supabase-client-runtime-version
+```
+
+### ⚠️ Remaining Risks for Launch
+
+| Risk | Severity | Status | Remediation |
+|------|----------|--------|-------------|
+| **Leaked password protection** | MEDIUM | ⚠️ Config-only | Enable in Supabase auth settings (not a migration — requires dashboard toggle) |
+| **CORS origin wildcard** | LOW | ⚠️ Pre-launch | Replace `*` with production domain before launch. Currently acceptable for development. |
+| **No server-side status transition enforcement** | MEDIUM | ⚠️ Planned | `validate-status-transition` exists but is not yet wired as a DB trigger. Client can still call `updateStatus` with any valid status. |
+| **Message spam** | LOW | ⚠️ Planned | Rate limiter exists but is not yet integrated into message send flow |
+| **Application spam** | LOW | ⚠️ Planned | Rate limiter exists but is not yet integrated into apply flow |
+| **No email verification enforcement** | LOW | ⚠️ Config | Verify `enable_confirmations = true` in auth config |
+
+---
+
+## Abuse Prevention Notes
+
+### Application Spam
+- **Current protection**: RLS ensures `candidate_id = auth.uid()`, unique constraint on `(candidate_id, job_id)` in the `apply_to_job` RPC prevents duplicate applications.
+- **TODO**: Integrate `rate-limiter` edge function to limit applications per candidate per hour (e.g., 20/hour).
+
+### Message Spam
+- **Current protection**: RLS ensures only application participants can send messages. `sender_id = auth.uid()` check.
+- **TODO**: Integrate `rate-limiter` to limit message sends per user per minute (e.g., 30/minute).
+
+### CV Upload Abuse
+- **Current protection**: Storage RLS restricts uploads to `{user_id}/` folder. Only authenticated users.
+- **TODO**: Integrate `rate-limiter` to limit uploads per user per day (e.g., 5/day). Add file size validation in `process-cv`.
+
+### Status Transition Abuse
+- **Current protection**: Only employers owning the job can update application status (RLS).
+- **TODO**: Wire `validate-status-transition` as a Postgres trigger to enforce valid state machine server-side.
 
 ---
 
@@ -81,35 +138,26 @@ The `.env` file is **auto-managed by Lovable Cloud** and cannot be removed from 
 
 ### Before connecting Resend
 1. Add `RESEND_API_KEY` to Supabase secrets
-2. Update `send-email` edge function CORS to allow only production domain
+2. Update `send-email` edge function CORS origin to production domain
 3. Verify sender domain in Resend dashboard
 4. Test with a non-production email first
 
 ### Before connecting PostHog / GA4
-1. Set `VITE_POSTHOG_KEY` (this is a publishable key — safe in client code)
+1. Set `VITE_POSTHOG_KEY` (publishable key — safe in client code)
 2. Set `VITE_ANALYTICS_ENABLED=true`
 3. Create PostHog analytics provider in `src/services/posthog.ts`
 4. Register in provider registry
-5. No secrets needed — PostHog client key is designed to be public
 
 ### Before connecting Sentry
-1. Set `VITE_SENTRY_DSN` (this is a publishable DSN — safe in client code)
+1. Set `VITE_SENTRY_DSN` (publishable DSN — safe in client code)
 2. Set `VITE_ERROR_TRACKING_ENABLED=true`
 3. Create Sentry provider in `src/services/sentry.ts`
-4. For source maps: add `SENTRY_AUTH_TOKEN` to GitHub Actions secrets (never in `.env`)
+4. For source maps: add `SENTRY_AUTH_TOKEN` to GitHub Actions secrets
 
 ### Before enabling AI pipeline
-1. `LOVABLE_API_KEY` is already auto-provisioned in Supabase secrets
+1. `LOVABLE_API_KEY` is already auto-provisioned
 2. Update `process-cv` edge function with actual Lovable AI calls
 3. Test with sample CV uploads
-4. No additional secrets needed for Lovable AI supported models
-
-### Before adding Storage RLS (CRITICAL)
-1. Add policies to `cvs` bucket:
-   - Candidates can upload to `cvs/{user_id}/*`
-   - Candidates can read own files: `cvs/{user_id}/*`
-   - Employers can read CVs of candidates who applied to their jobs
-2. This must be done before any production CV uploads
 
 ---
 
