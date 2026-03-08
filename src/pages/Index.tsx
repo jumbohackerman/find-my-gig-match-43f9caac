@@ -66,14 +66,6 @@ const Index = () => {
       workMode: data.remotePreference as Candidate["workMode"],
       seniority: data.seniority as Candidate["seniority"],
     });
-      ...candidateProfile,
-      title: data.title,
-      skills: data.skills,
-      salaryMin: data.salaryMin,
-      salaryMax: data.salaryMax,
-      workMode: data.remotePreference as any,
-      seniority: data.seniority as Candidate["seniority"],
-    });
     setShowOnboarding(false);
   };
 
