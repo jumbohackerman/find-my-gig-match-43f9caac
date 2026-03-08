@@ -233,6 +233,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_to_job: {
+        Args: {
+          _job_company: string
+          _job_description: string
+          _job_location: string
+          _job_logo: string
+          _job_salary: string
+          _job_tags: string[]
+          _job_title: string
+          _job_type: string
+          _static_job_id: string
+        }
+        Returns: string
+      }
       get_user_role: { Args: { _user_id: string }; Returns: string }
     }
     Enums: {
