@@ -22,15 +22,21 @@ interface SwipeCardProps {
   matchResult?: MatchResult;
   isSaved?: boolean;
   onTap?: () => void;
+  /** Set externally by button-triggered skip/apply so exit direction is correct */
+  forcedExitDirection?: "left" | "right" | null;
 }
 
-const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCardProps) => {
+const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const rightOpacity = useTransform(x, [0, 100], [0, 1]);
   const leftOpacity = useTransform(x, [-100, 0], [1, 0]);
 
   const [exitDirection, setExitDirection] = useState<"left" | "right">("right");
+  const didDrag = useRef(false);
+
+  // When parent signals a button-triggered direction, apply it immediately
+  const resolvedExit = forcedExitDirection ?? exitDirection;
   const didDrag = useRef(false);
 
   const handleDragStart = () => {
@@ -77,7 +83,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
       initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
       exit={{
-        x: exitDirection === "right" ? 500 : -500,
+        x: resolvedExit === "right" ? 500 : -500,
         opacity: 0,
         transition: { duration: 0.35, ease: "easeInOut" },
       }}
