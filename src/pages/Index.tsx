@@ -190,7 +190,7 @@ const Index = () => {
                 </div>
 
                 {/* Action buttons — dedicated fixed-height row, never overlapped */}
-                <div className="relative z-10 flex items-center gap-5 shrink-0 py-3">
+                <div className="relative z-10 flex items-center gap-5 shrink-0 py-3" role="group" aria-label="Akcje swipe">
                   <button
                     onClick={() => handleSwipeWithRefetch("left")}
                     disabled={actionPending}
