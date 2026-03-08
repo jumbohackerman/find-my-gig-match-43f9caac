@@ -19,7 +19,9 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 type Tab = "swipe" | "applied" | "saved";
 
 const Index = () => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, profile } = useAuth();
+  const isEmployer = profile?.role === "employer";
+  const isCandidate = profile?.role === "candidate";
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { notifications, unreadCount, markAllRead } = useNotifications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
@@ -128,27 +130,33 @@ const Index = () => {
             </AnimatePresence>
           </div>
 
-          <Link
-            to="/my-profile"
-            className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-          >
-            <User className="w-4 h-4" />
-            <span className="hidden sm:inline">Mój profil</span>
-          </Link>
-          <Link
-            to="/employer"
-            className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-          >
-            <Building2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Dla firm</span>
-          </Link>
-          <Link
-            to="/profiles"
-            className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
-          >
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Znajdź talent</span>
-          </Link>
+          {isCandidate && (
+            <Link
+              to="/my-profile"
+              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+            >
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">Mój profil</span>
+            </Link>
+          )}
+          {isEmployer && (
+            <Link
+              to="/employer"
+              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+            >
+              <Building2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Panel pracodawcy</span>
+            </Link>
+          )}
+          {isEmployer && (
+            <Link
+              to="/profiles"
+              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+            >
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Znajdź talent</span>
+            </Link>
+          )}
           {user && (
             <button
               onClick={signOut}
