@@ -1,147 +1,198 @@
 # Production Readiness Report
 
-**Date:** 2026-03-08
+**Date:** 2026-03-08 (reconciled audit)
 **Target Stack:** Lovable → GitHub → Cloudflare Pages + Supabase + Edge Functions + Resend + PostHog/GA4 + Sentry
 
 ---
 
-## ✅ What Is Now Production-Ready
+## Reconciliation Summary
+
+This report has been verified against the actual codebase. Every claim below was confirmed by reading the real files.
+
+---
+
+## ✅ What Is Now Production-Ready (verified)
 
 ### Architecture & Abstractions
-- [x] **Domain models** — `src/domain/models.ts` is the single source of truth, zero Supabase leaks
+- [x] **Domain models** — `src/domain/models.ts` is the single source of truth, zero Supabase type leaks
 - [x] **Provider registry** — `src/providers/registry.ts` enables runtime backend swapping
-- [x] **Repository interfaces** — `src/repositories/interfaces.ts` covers all data contracts
+- [x] **Repository interfaces** — `src/repositories/interfaces.ts` covers all 9 data contracts
 - [x] **Service interfaces** — `src/services/interfaces.ts` defines analytics, email, AI, storage, error tracking
 - [x] **Config layer** — `src/config/index.ts` centralizes all env-var access with typed accessors
 - [x] **Integration boundaries** — `src/config/integrations.ts` maps each service's status and required secrets
 - [x] **Scoring engine** — `src/domain/scoring/` is stateless, backend-agnostic, ready for pgvector hybrid
+- [x] **Supabase repo implementations** — `src/repositories/supabase/jobs.ts` and `applications.ts` written, not yet wired
 
 ### Security & Access Control
-- [x] **Role-aware route guards** — `useRequireRole` hook + `<RoleGate>` component
-- [x] **Protected routes** — `/employer` and `/profiles` require `employer` role; `/my-profile` requires `candidate`
-- [x] **RLS policies** — all 5 tables have restrictive policies (candidates, jobs, applications, messages, profiles)
+- [x] **Role-aware route guards** — `useRequireRole` hook + `<RoleGate>` component exist and are used
+- [x] **Route-level enforcement** — App.tsx wraps `/employer` and `/profiles` in `<RoleGate role="employer">`, `/my-profile` in `<RoleGate role="candidate">`
+- [x] **Navigation guards** — Index.tsx conditionally renders nav links based on `profile.role` (candidates see "Mój profil", employers see "Panel pracodawcy" + "Znajdź talent")
+- [x] **RLS policies** — all 5 tables (candidates, jobs, applications, messages, profiles) have restrictive policies
 - [x] **Auth enforcement** — all routes require authentication, unauthenticated users redirect to `/auth`
-- [x] **Security definer functions** — `get_user_role()`, `apply_to_job()` avoid RLS bypass
+- [x] **Security definer functions** — `get_user_role()`, `apply_to_job()` avoid RLS recursion
 
 ### CI/CD
 - [x] **GitHub Actions CI** — `.github/workflows/ci.yml` runs install → lint → type-check → test → build
-- [x] **Environment isolation** — CI uses placeholder env vars, no secrets in workflow
+- [x] **Environment isolation** — CI uses placeholder env vars, no real secrets in workflow
 
-### Edge Functions (Stubs)
-- [x] `send-email` — Resend integration point, CORS configured
-- [x] `process-cv` — AI CV parsing pipeline, references Lovable AI
-- [x] `validate-status-transition` — Application status state machine
-- [x] `rate-limiter` — In-memory rate limiting for sensitive endpoints
+### Edge Functions (Stubs — deployed automatically)
+- [x] `send-email/index.ts` — Resend integration point with CORS
+- [x] `process-cv/index.ts` — AI CV parsing pipeline stub
+- [x] `validate-status-transition/index.ts` — Application status state machine with valid transitions map
+- [x] `rate-limiter/index.ts` — In-memory rate limiting with configurable window
 
 ### Documentation
-- [x] Real project README with architecture overview, tech stack, user flows
+- [x] `README.md` — Real project README (starts with "# JobSwipe — Tinder-style Job Matching Platform")
 - [x] `docs/match-scoring-plan.md` — scoring engine roadmap
 - [x] `docs/provider-integration-plan.md` — integration onboarding process
 - [x] `docs/cleanup-notes.md` — technical debt inventory
 - [x] `docs/production-readiness-report.md` — this document
 
----
-
-## 🟡 What Is Still Mock-Only
-
-| Component | Current State | Migration Path |
-|-----------|--------------|----------------|
-| `jobs` provider | Mock in-memory | `supabaseJobRepository` already written, swap in registry |
-| `applications` provider | Mock in-memory | `supabaseApplicationRepository` already written, swap in registry |
-| `candidates` provider | Mock in-memory | Need `src/repositories/supabase/candidates.ts` |
-| `messages` provider | Mock in-memory | Need `src/repositories/supabase/messages.ts` |
-| `notifications` provider | Mock in-memory | Need notifications table + repo |
-| `savedJobs` provider | Mock in-memory | Need saved_jobs table + repo |
-| `swipeEvents` provider | Mock in-memory | Need swipe_events table + repo |
-| `preferences` provider | localStorage | Need user_preferences table + repo |
-| Analytics service | console.debug noop | Wire PostHog SDK |
-| Error tracking | console.error noop | Wire Sentry SDK |
-| Email service | console.debug noop | Wire Resend via edge function |
-| AI service | Noop stubs | Wire Lovable AI via edge function |
-| Storage service | Noop stubs | Wire Supabase Storage (bucket `cvs` already exists) |
+### Environment
+- [x] `.env.example` — complete template with all config groups, no secrets
+- [x] `.env` — auto-managed by Lovable Cloud (contains only publishable anon key + URL + project ID). **Cannot be removed or .gitignored** — Lovable auto-generates it. This is safe because it only contains the publishable anon key, not the service role key.
 
 ---
 
-## 🔴 What Still Blocks Full Supabase Integration
+## 🔴 Files That Still Import Supabase Client Directly
 
-### Direct Supabase Bypasses (5 files)
-These files import `supabase` client directly instead of going through the repository layer:
+Verified by `grep` — these 6 files import `from "@/integrations/supabase/client"`:
 
-1. **`src/hooks/useJobFeed.ts`** — `supabase.rpc("apply_to_job", ...)` (line 61)
-   - **Fix:** Replace with `getProvider("applications").apply(...)` after swapping to Supabase app repo
-   - **Blocker:** The RPC function `apply_to_job` does atomic job upsert + application insert. The application repository needs to support this compound operation.
+### 1. `src/hooks/useAuth.tsx` (line 2)
+- **Status:** ✅ **INTENTIONALLY ALLOWED**
+- **Reason:** Auth context is the foundational cross-cutting concern. It wraps `supabase.auth.onAuthStateChange()` and `supabase.auth.getSession()` which are SDK-level auth operations, not data queries. Also fetches `profiles` for role — this is the auth bootstrap, not a general data query.
+- **No action needed.**
 
-2. **`src/hooks/useEmployerDashboard.ts`** — Direct queries to jobs, applications, candidates, profiles tables
-   - **Fix:** Create Supabase implementations for `listForEmployer()` that return fully enriched data
-   - **Blocker:** Enrichment (candidate + profile + match score) requires joined queries not yet in the repo interface
+### 2. `src/pages/Auth.tsx` (line 5)
+- **Status:** ✅ **INTENTIONALLY ALLOWED**
+- **Reason:** Calls `supabase.auth.signUp()`, `supabase.auth.signInWithPassword()`, `supabase.auth.resetPasswordForEmail()`. These are auth-layer operations. There is no repository abstraction for auth sign-in flows — it's a Supabase SDK responsibility.
+- **No action needed.**
 
-3. **`src/hooks/useApplications.ts`** — Direct Supabase queries + realtime subscriptions
-   - **Fix:** Move to application repository with realtime support
-   - **Blocker:** Repository interface doesn't define realtime subscription pattern
+### 3. `src/pages/ResetPassword.tsx` (line 5)
+- **Status:** ✅ **INTENTIONALLY ALLOWED**
+- **Reason:** Calls `supabase.auth.onAuthStateChange()` and `supabase.auth.updateUser()`. Same justification as Auth.tsx.
+- **No action needed.**
 
-4. **`src/pages/MyProfile.tsx`** — Direct CRUD on candidates + profiles tables + storage upload
-   - **Fix:** Move to candidate and profile repositories + storage service
-   - **Blocker:** 762-line page component needs refactoring into smaller hooks
+### 4. `src/hooks/useJobFeed.ts` (line 18)
+- **Status:** ❌ **BYPASS — needs migration**
+- **What it does:** Calls `supabase.rpc("apply_to_job", {...})` at line 61 for atomic job upsert + application creation.
+- **Why not fixed yet:** The `apply_to_job` RPC does a compound operation (upsert job row + insert application) that doesn't map cleanly to the current `ApplicationRepository.apply()` interface. The Supabase application repo in `src/repositories/supabase/applications.ts` uses a simple `INSERT` instead.
+- **Fix path:** Either (a) update the Supabase application repo to call the RPC, or (b) change the `apply` method signature to accept job metadata for the upsert pattern.
 
-5. **`src/pages/Auth.tsx`** + **`src/pages/ResetPassword.tsx`** — Direct `supabase.auth.*` calls
-   - **Status:** ✅ ACCEPTABLE. Auth is a cross-cutting concern. The `useAuth` hook already wraps session management. Login/signup/reset are auth-layer operations, not data-layer.
+### 5. `src/hooks/useEmployerDashboard.ts` (line 9)
+- **Status:** ❌ **BYPASS — needs migration**
+- **What it does:** Directly queries `jobs`, `applications`, `candidates`, and `profiles` tables with `.select()`, `.in()`, and `.or()` across 4 separate queries, then enriches applications with candidate data and match scores in memory.
+- **Why not fixed yet:** The `ApplicationRepository.listForEmployer()` currently returns flat `EnrichedEmployerApplication[]` without the joined candidate/profile/match data. A proper enrichment requires either (a) a database view/function, or (b) the repo doing the multi-table join internally.
+- **Fix path:** Create a `supabaseEmployerDashboardRepository` that encapsulates the 4-query enrichment pattern, or add a database view `employer_applications_enriched`.
 
-### Missing Database Tables
-| Table | Purpose | Status |
-|-------|---------|--------|
-| `saved_jobs` | Persistent saved/bookmarked jobs | Not created |
-| `swipe_events` | Feed state — which jobs user has seen | Not created |
-| `notifications` | In-app notification storage | Not created |
-| `user_preferences` | Per-user settings (onboarding, filters) | Not created |
+### 6. `src/hooks/useApplications.ts` (line 2)
+- **Status:** ❌ **BYPASS — needs migration**
+- **What it does:** `useCandidateApplications()` queries `applications` with joined `jobs` data + realtime subscription. `useEmployerApplications()` does similar for employer side. `useUpdateApplicationStatus()` does a direct `.update()`.
+- **Why not fixed yet:** The repository interface doesn't define a realtime subscription pattern (`subscribe()` is only on `MessageRepository`). Also, this hook returns `ApplicationWithJob` with snake_case DB fields, not domain-model `ApplicationWithJob` from `src/domain/models.ts` — a type mismatch.
+- **Fix path:** (a) Add `subscribeForCandidate()` and `subscribeForEmployer()` to `ApplicationRepository`, (b) Map DB rows to domain types in the Supabase repo, (c) Delete this hook once the Supabase application repo is wired.
 
-### Missing Infrastructure
-- [ ] Cloudflare Pages deployment config (`wrangler.toml` or Pages settings)
-- [ ] Supabase Storage RLS policies for `cvs` bucket (owner-only + employer read)
-- [ ] Database trigger for `handle_new_user` (exists as function but trigger not verified)
-- [ ] pgvector extension not yet enabled (needed for future semantic matching)
-
----
-
-## 🟢 What Can Be Connected Next With Minimal Risk
-
-### Phase 1: Zero-risk (no new secrets, no new services)
-1. **Swap job + application providers to Supabase repos** — implementations already written
-2. **Create `saved_jobs` and `swipe_events` tables** — simple schema, no external deps
-3. **Refactor MyProfile.tsx** — extract hooks, move Supabase calls behind providers
-4. **Add realtime support to repository interfaces** — extend with `subscribe()` method
-
-### Phase 2: Low-risk (one secret each)
-5. **Connect PostHog** — add `VITE_POSTHOG_KEY`, create real analytics provider
-6. **Connect Sentry** — add `VITE_SENTRY_DSN`, create real error tracking provider
-7. **Wire `send-email` edge function** — add `RESEND_API_KEY` secret
-
-### Phase 3: Moderate complexity
-8. **Wire `process-cv` edge function** — uses Lovable AI (key already configured)
-9. **Enable pgvector** — add embedding columns, update scoring engine
-10. **Cloudflare Pages deployment** — build output config, env var mapping
+### 7. `src/pages/MyProfile.tsx` (line 8)
+- **Status:** ❌ **BYPASS — needs migration**
+- **What it does:** Reads candidate data (`supabase.from("candidates").select("*")`), updates profile (`supabase.from("profiles").update()`), updates candidate (`supabase.from("candidates").update()`), uploads CV (`supabase.storage.from("cvs").upload()`).
+- **Why not fixed yet:** This 762-line page component mixes UI with data operations. Needs refactoring into hooks (`useCandidateEditor`, `useCvUpload`) that use the provider layer.
+- **Fix path:** (a) Extract data operations into `src/hooks/useCandidateEditor.ts`, (b) Use `getProvider("profiles").update()` and `getProvider("candidates").upsert()`, (c) Use `getProvider("storage").upload()` for CV.
 
 ---
 
-## File Change Summary
+## 🟡 What Is Still Mock-Only (provider registry still points to mock)
 
-### Created
-| File | Purpose |
-|------|---------|
-| `src/hooks/useRequireRole.ts` | Role-aware hook for route protection |
-| `src/components/RoleGate.tsx` | Declarative role gate wrapper component |
-| `src/repositories/supabase/jobs.ts` | Production-ready Supabase job repository |
-| `src/repositories/supabase/applications.ts` | Production-ready Supabase application repository |
-| `src/repositories/supabase/index.ts` | Barrel export for Supabase repos |
-| `.github/workflows/ci.yml` | GitHub Actions CI pipeline |
-| `supabase/functions/send-email/index.ts` | Resend email integration stub |
-| `supabase/functions/process-cv/index.ts` | AI CV parsing stub |
-| `supabase/functions/validate-status-transition/index.ts` | Status state machine |
-| `supabase/functions/rate-limiter/index.ts` | Rate limiting middleware stub |
-| `docs/production-readiness-report.md` | This document |
+| Provider Key | Current Implementation | Supabase Repo Written? | Missing |
+|-------------|----------------------|----------------------|---------|
+| `jobs` | `mockJobRepository` | ✅ `supabase/jobs.ts` | Swap in registry |
+| `applications` | `mockApplicationRepository` | ✅ `supabase/applications.ts` | Swap in registry + fix RPC pattern |
+| `candidates` | `mockCandidateRepository` | ❌ | Need `supabase/candidates.ts` |
+| `messages` | `mockMessageRepository` | ❌ | Need `supabase/messages.ts` |
+| `notifications` | `mockNotificationRepository` | ❌ | Need `notifications` table + repo |
+| `savedJobs` | `mockSavedJobRepository` | ❌ | Need `saved_jobs` table + repo |
+| `swipeEvents` | `mockSwipeEventRepository` | ❌ | Need `swipe_events` table + repo |
+| `preferences` | `mockPreferencesRepository` (localStorage) | ❌ | Need `user_preferences` table + repo |
+| `profiles` | `mockProfileRepository` | ❌ | Need `supabase/profiles.ts` |
+| `analytics` | `noopAnalytics` | N/A | Wire PostHog SDK |
+| `errorTracking` | `noopErrorTracking` | N/A | Wire Sentry SDK |
+| `email` | `noopEmail` | N/A | Wire Resend via edge function |
+| `ai` | `noopAI` | N/A | Wire Lovable AI |
+| `storage` | `noopStorage` | N/A | Wire Supabase Storage |
 
-### Modified
-| File | Change |
-|------|--------|
-| `src/App.tsx` | Added `<RoleGate>` to `/employer`, `/profiles`, `/my-profile` routes |
-| `README.md` | Replaced generic Lovable README with real project documentation |
-| `.env.example` | Already up-to-date from previous pass |
+---
+
+## Missing Database Tables
+
+| Table | Purpose | Exists? |
+|-------|---------|---------|
+| `saved_jobs` | Persistent saved/bookmarked jobs | ❌ Not created |
+| `swipe_events` | Feed state — which jobs user has seen | ❌ Not created |
+| `notifications` | In-app notification storage | ❌ Not created |
+| `user_preferences` | Per-user settings (onboarding, filters) | ❌ Not created |
+
+---
+
+## Missing Infrastructure
+
+- [ ] Cloudflare Pages deployment config
+- [ ] Supabase Storage RLS policies for `cvs` bucket
+- [ ] Verify `handle_new_user` trigger is attached to `auth.users` (function exists, trigger unconfirmed)
+- [ ] pgvector extension not yet enabled
+
+---
+
+## 🟢 Phased Migration Path
+
+### Phase 1: Zero-risk swaps
+1. Swap `jobs` provider → `supabaseJobRepository` (one line in registry)
+2. Swap `applications` provider → `supabaseApplicationRepository` (update to use RPC)
+3. Create `saved_jobs` + `swipe_events` tables with RLS
+4. Write Supabase repos for saved jobs and swipe events
+5. Refactor `MyProfile.tsx` → extract `useCandidateEditor` hook
+
+### Phase 2: Low-risk integrations
+6. Wire PostHog (add `VITE_POSTHOG_KEY` secret)
+7. Wire Sentry (add `VITE_SENTRY_DSN` secret)
+8. Wire `send-email` edge function (add `RESEND_API_KEY` secret)
+
+### Phase 3: Complex migrations
+9. Migrate `useEmployerDashboard.ts` to repository layer (needs enrichment view/function)
+10. Migrate `useApplications.ts` to repository layer (needs realtime interface)
+11. Wire `process-cv` edge function with Lovable AI
+12. Enable pgvector, add embedding columns
+
+---
+
+## Verified File Inventory
+
+### Files created in audit passes
+| File | Verified Exists | Content Correct |
+|------|----------------|-----------------|
+| `src/hooks/useRequireRole.ts` | ✅ | ✅ Returns `{allowed, loading, currentRole}` |
+| `src/components/RoleGate.tsx` | ✅ | ✅ Uses `useRequireRole`, renders children or `<Navigate>` |
+| `src/repositories/supabase/jobs.ts` | ✅ | ✅ Full CRUD implementation |
+| `src/repositories/supabase/applications.ts` | ✅ | ✅ list + apply + updateStatus |
+| `src/repositories/supabase/index.ts` | ✅ | ✅ Barrel export |
+| `.github/workflows/ci.yml` | ✅ | ✅ install → lint → tsc → test → build |
+| `supabase/functions/send-email/index.ts` | ✅ | ✅ CORS + stub |
+| `supabase/functions/process-cv/index.ts` | ✅ | ✅ CORS + stub |
+| `supabase/functions/validate-status-transition/index.ts` | ✅ | ✅ State machine |
+| `supabase/functions/rate-limiter/index.ts` | ✅ | ✅ In-memory limiter |
+
+### Files modified in audit passes
+| File | Change | Verified |
+|------|--------|----------|
+| `src/App.tsx` | `<RoleGate>` on `/employer`, `/profiles`, `/my-profile` | ✅ Lines 40, 50, 60 |
+| `src/pages/Index.tsx` | Nav links conditional on `profile.role` | ✅ Candidate sees "Mój profil", employer sees "Panel pracodawcy" + "Znajdź talent" |
+| `README.md` | Replaced with real project README | ✅ Starts with "# JobSwipe" |
+| `.env.example` | Complete template, no secrets | ✅ |
+
+### Files NOT modified (direct Supabase imports remain)
+| File | Import Line | Justification |
+|------|------------|---------------|
+| `src/hooks/useAuth.tsx` | Line 2 | Auth bootstrap — intentionally allowed |
+| `src/pages/Auth.tsx` | Line 5 | Auth sign-in/sign-up — intentionally allowed |
+| `src/pages/ResetPassword.tsx` | Line 5 | Password reset — intentionally allowed |
+| `src/hooks/useJobFeed.ts` | Line 18 | ❌ Needs migration (RPC bypass) |
+| `src/hooks/useEmployerDashboard.ts` | Line 9 | ❌ Needs migration (enrichment queries) |
+| `src/hooks/useApplications.ts` | Line 2 | ❌ Needs migration (queries + realtime) |
+| `src/pages/MyProfile.tsx` | Line 8 | ❌ Needs migration (CRUD + storage) |
