@@ -21,6 +21,7 @@ import SourceLabel from "@/components/employer/SourceLabel";
 import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 import { hideJob, unhideJob } from "@/lib/moderation";
@@ -220,6 +221,7 @@ const Employer = () => {
             description="Dodaj swoje pierwsze ogłoszenie lub poczekaj na aplikacje."
           />
         ) : (
+          <LocalErrorBoundary label="Lista ogłoszeń">
           <div className="space-y-3">
             <AnimatePresence>
               {domainJobs.map((job, i) => {
