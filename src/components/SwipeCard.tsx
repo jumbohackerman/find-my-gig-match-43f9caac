@@ -1,8 +1,17 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Clock, Briefcase, DollarSign, Wifi } from "lucide-react";
+import { MapPin, Clock, Briefcase, Wifi } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { pl } from "date-fns/locale";
 import MatchBadge from "@/components/MatchBadge";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
+
+function formatPosted(raw: string): string {
+  if (!raw) return "";
+  const date = new Date(raw);
+  if (isNaN(date.getTime())) return raw;
+  return formatDistanceToNow(date, { addSuffix: true, locale: pl });
+}
 
 interface SwipeCardProps {
   job: Job;
@@ -58,7 +67,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
         transition: { duration: 0.3 },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border">
+      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border max-h-full">
         {/* Swipe indicators */}
         {isTop && (
           <>
@@ -85,7 +94,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
             </div>
             <div className="flex-1">
               <h3 className="font-display text-sm text-muted-foreground">{job.company}</h3>
-              <p className="text-xs text-muted-foreground">{job.posted}</p>
+              <p className="text-xs text-muted-foreground">{formatPosted(job.posted)}</p>
             </div>
             <div className="flex items-center gap-2">
               {isSaved && (
@@ -136,7 +145,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-              {job.posted}
+              {formatPosted(job.posted)}
             </div>
           </div>
 
