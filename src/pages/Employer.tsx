@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 import { createFallbackCandidate } from "@/data/defaults";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -104,14 +105,7 @@ const Employer = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
-              <Briefcase className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
-          </div>
-        </header>
+        <Navbar />
         <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-gradient rounded-xl border border-border p-4 space-y-3">
@@ -135,24 +129,7 @@ const Employer = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
-            <Briefcase className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
-        </Link>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <Link to="/" className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5">
-            <Briefcase className="w-4 h-4 sm:hidden" />
-            <span className="hidden sm:inline">Przeglądaj oferty</span>
-          </Link>
-          <Link to="/profiles" className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5">
-            <Users className="w-4 h-4" />
-            <span className="hidden sm:inline">Znajdź talent</span>
-          </Link>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
