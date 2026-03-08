@@ -5,7 +5,7 @@ import {
   Briefcase, Save, Plus, X, Upload, FileText,
   Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
@@ -99,28 +99,24 @@ const MyProfile = () => {
       return;
     }
     const load = async () => {
-      const { data } = await supabase
-        .from("candidates")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const candidate = await getProvider("candidates").getByUserId(user.id);
 
-      if (data) {
-        setTitle(data.title || "");
-        setLocation(data.location || "");
-        setSummary(data.summary || "");
-        setSkills(data.skills || []);
-        setSeniority(data.seniority || "Mid");
-        setWorkMode(data.work_mode || "Zdalnie");
-        setEmploymentType(data.employment_type || "Full-time");
-        setSalaryMin(data.salary_min || 0);
-        setSalaryMax(data.salary_max || 0);
-        setAvailability(data.availability || "Otwarty na oferty");
-        setExperienceEntries((data.experience_entries as any) || []);
-        setLinks((data.links as any) || {});
-        setCvUrl(data.cv_url || null);
+      if (candidate) {
+        setTitle(candidate.title || "");
+        setLocation(candidate.location || "");
+        setSummary(candidate.summary || "");
+        setSkills(candidate.skills || []);
+        setSeniority(candidate.seniority || "Mid");
+        setWorkMode(candidate.workMode || "Zdalnie");
+        setEmploymentType(candidate.employmentType || "Full-time");
+        setSalaryMin(candidate.salaryMin || 0);
+        setSalaryMax(candidate.salaryMax || 0);
+        setAvailability(candidate.availability || "Otwarty na oferty");
+        setExperienceEntries(candidate.experienceEntries as ExperienceEntry[] || []);
+        setLinks(candidate.links as Links || {});
+        setCvUrl(candidate.cvUrl || null);
 
-        const expMatch = data.experience?.match(/(\d+)/);
+        const expMatch = candidate.experience?.match(/(\d+)/);
         setExperienceYears(expMatch ? parseInt(expMatch[1]) : 0);
       }
 
@@ -134,38 +130,32 @@ const MyProfile = () => {
     if (!user) return;
     setSaving(true);
 
-    await supabase
-      .from("profiles")
-      .update({ full_name: fullName })
-      .eq("user_id", user.id);
+    try {
+      await getProvider("profiles").update(user.id, { fullName });
 
-    const { error } = await supabase
-      .from("candidates")
-      .update({
+      await getProvider("candidates").upsert(user.id, {
         title,
         location,
         summary,
         skills,
-        seniority,
-        work_mode: workMode,
-        employment_type: employmentType,
-        salary_min: salaryMin,
-        salary_max: salaryMax,
+        seniority: seniority as any,
+        workMode: workMode as any,
+        employmentType: employmentType as any,
+        salaryMin,
+        salaryMax,
         availability,
-        experience_entries: experienceEntries as any,
+        experienceEntries: experienceEntries as any,
         links: links as any,
         experience: `${experienceYears} lat`,
-        cv_url: cvUrl,
-        last_active: new Date().toISOString(),
-      } as any)
-      .eq("user_id", user.id);
+        cvUrl,
+      });
+
+      toast.success("Profil zapisany");
+    } catch (error) {
+      toast.error("Nie udało się zapisać profilu");
+    }
 
     setSaving(false);
-    if (error) {
-      toast.error("Nie udało się zapisać profilu");
-    } else {
-      toast.success("Profil zapisany");
-    }
   };
 
   const addSkill = (skill: string) => {
@@ -210,8 +200,8 @@ const MyProfile = () => {
     }
     setUploading(true);
     const path = `${user.id}/cv-${Date.now()}.pdf`;
-    const { error } = await supabase.storage.from("cvs").upload(path, file);
-    if (error) {
+    const result = await getProvider("storage").upload("cvs", path, file);
+    if (result.error) {
       toast.error("Przesyłanie nie powiodło się");
     } else {
       setCvUrl(path);
@@ -396,39 +386,15 @@ const MyProfile = () => {
                   </label>
                   <div className="flex gap-3 items-center">
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setSalaryMin(Math.max(0, salaryMin - 1))}
-                        className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <div className="w-14 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-sm font-semibold text-foreground">
-                        {salaryMin || "Min"}
-                      </div>
-                      <button
-                        onClick={() => setSalaryMin(Math.min(100, salaryMin + 1))}
-                        className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
+                      <button onClick={() => setSalaryMin(Math.max(0, salaryMin - 1))} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"><Minus className="w-3 h-3" /></button>
+                      <div className="w-14 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-sm font-semibold text-foreground">{salaryMin || "Min"}</div>
+                      <button onClick={() => setSalaryMin(Math.min(100, salaryMin + 1))} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"><Plus className="w-3 h-3" /></button>
                     </div>
                     <span className="text-muted-foreground text-sm">–</span>
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setSalaryMax(Math.max(0, salaryMax - 1))}
-                        className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <div className="w-14 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-sm font-semibold text-foreground">
-                        {salaryMax || "Max"}
-                      </div>
-                      <button
-                        onClick={() => setSalaryMax(Math.min(100, salaryMax + 1))}
-                        className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
+                      <button onClick={() => setSalaryMax(Math.max(0, salaryMax - 1))} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"><Minus className="w-3 h-3" /></button>
+                      <div className="w-14 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-sm font-semibold text-foreground">{salaryMax || "Max"}</div>
+                      <button onClick={() => setSalaryMax(Math.min(100, salaryMax + 1))} className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"><Plus className="w-3 h-3" /></button>
                     </div>
                     <span className="text-xs text-muted-foreground">tys. zł</span>
                   </div>
@@ -452,7 +418,7 @@ const MyProfile = () => {
               </div>
             </AccordionSection>
 
-            {/* SKILLS & EXPERIENCE (merged) */}
+            {/* SKILLS & EXPERIENCE */}
             <AccordionSection
               id="competence"
               label="Umiejętności i doświadczenie"
@@ -462,97 +428,44 @@ const MyProfile = () => {
               badge={skills.length > 0 ? `${skills.length} umiejętności · ${experienceEntries.length} pozycje` : undefined}
             >
               <div className="space-y-6">
-                {/* Skills subsection */}
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-accent uppercase tracking-wider">Umiejętności</p>
                   <div className="flex gap-2">
-                    <input
-                      value={skillInput}
-                      onChange={(e) => setSkillInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))}
-                      placeholder="Dodaj umiejętność..."
-                      className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
-                    <button
-                      onClick={() => addSkill(skillInput)}
-                      className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                    <input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))} placeholder="Dodaj umiejętność..." className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <button onClick={() => addSkill(skillInput)} className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium"><Plus className="w-4 h-4" /></button>
                   </div>
-
-                  {/* Suggestions */}
                   <div className="flex flex-wrap gap-1.5">
-                    {SKILL_SUGGESTIONS.filter((s) => !skills.includes(s))
-                      .slice(0, 10)
-                      .map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => addSkill(s)}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-secondary text-secondary-foreground hover:bg-muted transition-colors"
-                        >
-                          + {s}
-                        </button>
-                      ))}
+                    {SKILL_SUGGESTIONS.filter((s) => !skills.includes(s)).slice(0, 10).map((s) => (
+                      <button key={s} onClick={() => addSkill(s)} className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-secondary text-secondary-foreground hover:bg-muted transition-colors">+ {s}</button>
+                    ))}
                   </div>
-
-                  {/* Skills list as tags */}
                   {skills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {skills.map((skill, i) => (
-                        <span
-                          key={skill}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${
-                            i < 5
-                              ? "bg-accent/15 text-accent border border-accent/30"
-                              : "bg-secondary text-secondary-foreground border border-border"
-                          }`}
-                        >
+                        <span key={skill} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${i < 5 ? "bg-accent/15 text-accent border border-accent/30" : "bg-secondary text-secondary-foreground border border-border"}`}>
                           {skill}
-                          <button onClick={() => removeSkill(skill)} className="hover:text-destructive transition-colors">
-                            <X className="w-3 h-3" />
-                          </button>
+                          <button onClick={() => removeSkill(skill)} className="hover:text-destructive transition-colors"><X className="w-3 h-3" /></button>
                         </span>
                       ))}
                     </div>
                   )}
-                  {skills.length > 0 && (
-                    <p className="text-[10px] text-muted-foreground">
-                      Pierwsze 5 umiejętności są wyróżnione jako kluczowe.
-                    </p>
-                  )}
+                  {skills.length > 0 && <p className="text-[10px] text-muted-foreground">Pierwsze 5 umiejętności są wyróżnione jako kluczowe.</p>}
                 </div>
 
-                {/* Divider */}
                 <div className="border-t border-border" />
 
-                {/* Experience subsection */}
                 <div className="space-y-3">
                   <p className="text-xs font-semibold text-accent uppercase tracking-wider">Doświadczenie zawodowe</p>
-
                   {experienceEntries.map((entry, idx) => (
                     <div key={idx} className="rounded-xl border border-border bg-secondary/30 overflow-hidden">
-                      <button
-                        onClick={() => setExpandedExp(expandedExp === idx ? null : idx)}
-                        className="w-full p-3 flex items-center gap-2 text-left"
-                      >
+                      <button onClick={() => setExpandedExp(expandedExp === idx ? null : idx)} className="w-full p-3 flex items-center gap-2 text-left">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">
-                            {entry.title || "Nowe stanowisko"}{entry.company ? ` — ${entry.company}` : ""}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {entry.startDate || "Początek"} – {entry.isCurrent ? "Obecnie" : entry.endDate || "Koniec"}
-                          </p>
+                          <p className="text-sm font-medium text-foreground truncate">{entry.title || "Nowe stanowisko"}{entry.company ? ` — ${entry.company}` : ""}</p>
+                          <p className="text-xs text-muted-foreground">{entry.startDate || "Początek"} – {entry.isCurrent ? "Obecnie" : entry.endDate || "Koniec"}</p>
                         </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); removeExperience(idx); }}
-                          className="p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); removeExperience(idx); }} className="p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive"><X className="w-4 h-4" /></button>
                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedExp === idx ? "rotate-180" : ""}`} />
                       </button>
-
                       {expandedExp === idx && (
                         <div className="px-3 pb-3 space-y-3 border-t border-border pt-3">
                           <div className="grid grid-cols-2 gap-3">
@@ -564,80 +477,34 @@ const MyProfile = () => {
                             <div className="space-y-1.5">
                               <label className="text-xs font-medium text-muted-foreground">Data zakończenia</label>
                               {entry.isCurrent ? (
-                                <div className="flex items-center gap-2">
-                                  <div className="flex-1 px-3 py-2 rounded-xl bg-accent/15 border border-accent/30 text-accent text-sm font-medium text-center">
-                                    Obecnie
-                                  </div>
-                                </div>
+                                <div className="flex-1 px-3 py-2 rounded-xl bg-accent/15 border border-accent/30 text-accent text-sm font-medium text-center">Obecnie</div>
                               ) : (
-                                <input
-                                  value={entry.endDate}
-                                  onChange={(e) => updateExperience(idx, "endDate", e.target.value)}
-                                  placeholder="2024"
-                                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                                />
+                                <input value={entry.endDate} onChange={(e) => updateExperience(idx, "endDate", e.target.value)} placeholder="2024" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                               )}
-                              <button
-                                onClick={() => updateExperience(idx, "isCurrent", !entry.isCurrent)}
-                                className={`mt-1 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                                  entry.isCurrent
-                                    ? "bg-accent text-accent-foreground"
-                                    : "bg-secondary text-secondary-foreground hover:bg-muted border border-border"
-                                }`}
-                              >
+                              <button onClick={() => updateExperience(idx, "isCurrent", !entry.isCurrent)} className={`mt-1 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${entry.isCurrent ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted border border-border"}`}>
                                 {entry.isCurrent ? "✓ Obecnie tu pracuję" : "Obecnie tu pracuję"}
                               </button>
                             </div>
                           </div>
                           {entry.bullets.map((bullet, bi) => (
                             <div key={bi} className="space-y-1.5">
-                              <label className="text-xs font-medium text-muted-foreground">
-                                Punkt {bi + 1} ({bullet.length}/200)
-                              </label>
-                              <input
-                                value={bullet}
-                                onChange={(e) => {
-                                  const bullets = [...entry.bullets];
-                                  bullets[bi] = e.target.value.slice(0, 200);
-                                  updateExperience(idx, "bullets", bullets);
-                                }}
-                                placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników"
-                                className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                              />
+                              <label className="text-xs font-medium text-muted-foreground">Punkt {bi + 1} ({bullet.length}/200)</label>
+                              <input value={bullet} onChange={(e) => { const bullets = [...entry.bullets]; bullets[bi] = e.target.value.slice(0, 200); updateExperience(idx, "bullets", bullets); }} placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
                             </div>
                           ))}
                           {entry.bullets.length < 3 && (
-                            <button
-                              onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])}
-                              className="text-xs text-primary hover:underline flex items-center gap-1"
-                            >
-                              <Plus className="w-3 h-3" /> Dodaj punkt
-                            </button>
+                            <button onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])} className="text-xs text-primary hover:underline flex items-center gap-1"><Plus className="w-3 h-3" /> Dodaj punkt</button>
                           )}
-
-                          {/* Extended description - only visible when expanded */}
                           <div className="space-y-1.5 pt-2 border-t border-border">
-                            <label className="text-xs font-medium text-muted-foreground">
-                              Opis stanowiska ({(entry.description || "").length}/500)
-                            </label>
-                            <textarea
-                              value={entry.description || ""}
-                              onChange={(e) => updateExperience(idx, "description", e.target.value.slice(0, 500))}
-                              placeholder="Opisz szczegółowo swoje obowiązki, osiągnięcia i wpływ na organizację..."
-                              rows={4}
-                              className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                            />
+                            <label className="text-xs font-medium text-muted-foreground">Opis stanowiska ({(entry.description || "").length}/500)</label>
+                            <textarea value={entry.description || ""} onChange={(e) => updateExperience(idx, "description", e.target.value.slice(0, 500))} placeholder="Opisz szczegółowo swoje obowiązki, osiągnięcia i wpływ na organizację..." rows={4} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
                           </div>
                         </div>
                       )}
                     </div>
                   ))}
-
                   {experienceEntries.length < 3 && (
-                    <button
-                      onClick={addExperience}
-                      className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2"
-                    >
+                    <button onClick={addExperience} className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2">
                       <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/3)
                     </button>
                   )}
@@ -659,11 +526,8 @@ const MyProfile = () => {
                 <LinkField icon={<Github className="w-4 h-4 text-primary" />} label="GitHub" value={links.github || ""} onChange={(v) => setLinks({ ...links, github: v })} placeholder="https://github.com/username" />
                 <LinkField icon={<Linkedin className="w-4 h-4 text-primary" />} label="LinkedIn" value={links.linkedin || ""} onChange={(v) => setLinks({ ...links, linkedin: v })} placeholder="https://linkedin.com/in/username" />
                 <LinkField icon={<ExternalLink className="w-4 h-4 text-primary" />} label="Strona osobista" value={links.website || ""} onChange={(v) => setLinks({ ...links, website: v })} placeholder="https://mojastrona.pl" />
-
                 <div className="pt-2 border-t border-border">
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                    Prześlij CV (opcjonalne, tylko PDF)
-                  </label>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">Prześlij CV (opcjonalne, tylko PDF)</label>
                   <div className="flex items-center gap-3">
                     <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
                       <Upload className="w-4 h-4" />
@@ -709,11 +573,7 @@ function AccordionSection({
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="px-4 pb-4 pt-2 border-t border-border"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-4 pb-4 pt-2 border-t border-border">
           {children}
         </motion.div>
       )}
@@ -721,40 +581,20 @@ function AccordionSection({
   );
 }
 
-function Field({
-  label, value, onChange, placeholder,
-}: {
-  label: string; value: string; onChange: (v: string) => void; placeholder: string;
-}) {
+function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-medium text-muted-foreground">{label}</label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-      />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
     </div>
   );
 }
 
-function LinkField({
-  icon, label, value, onChange, placeholder,
-}: {
-  icon: React.ReactNode; label: string; value: string; onChange: (v: string) => void; placeholder: string;
-}) {
+function LinkField({ icon, label, value, onChange, placeholder }: { icon: React.ReactNode; label: string; value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <div className="space-y-1.5">
-      <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-        {icon} {label}
-      </label>
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-      />
+      <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">{icon} {label}</label>
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
     </div>
   );
 }

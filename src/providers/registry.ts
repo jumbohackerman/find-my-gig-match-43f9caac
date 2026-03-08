@@ -1,12 +1,5 @@
 /**
  * Provider registry — single place to swap between mock and real implementations.
- *
- * Usage in any component/hook:
- *   import { getProvider } from "@/providers/registry";
- *   const jobs = getProvider("jobs");
- *   const analytics = getProvider("analytics");
- *
- * To switch to Supabase later, just change the registrations here.
  */
 
 import type {
@@ -29,13 +22,16 @@ import type {
   StorageService,
 } from "@/services/interfaces";
 
-// ── Import mock implementations ──────────────────────────────────────────────
-import { mockJobRepository } from "@/repositories/mock/jobs";
-import { mockCandidateRepository } from "@/repositories/mock/candidates";
-import { mockApplicationRepository } from "@/repositories/mock/applications";
+// ── Import Supabase implementations ──────────────────────────────────────────
+import { supabaseJobRepository } from "@/repositories/supabase/jobs";
+import { supabaseCandidateRepository } from "@/repositories/supabase/candidates";
+import { supabaseApplicationRepository } from "@/repositories/supabase/applications";
+import { supabaseProfileRepository } from "@/repositories/supabase/profiles";
+import { supabaseStorageService } from "@/services/supabaseStorage";
+
+// ── Import mock implementations (for providers not yet migrated) ─────────────
 import { mockMessageRepository } from "@/repositories/mock/messages";
 import { mockNotificationRepository } from "@/repositories/mock/notifications";
-import { mockProfileRepository } from "@/repositories/mock/profiles";
 import { mockPreferencesRepository } from "@/repositories/mock/preferences";
 import { mockSavedJobRepository } from "@/repositories/mock/savedJobs";
 import { mockSwipeEventRepository } from "@/repositories/mock/swipeEvents";
@@ -44,7 +40,6 @@ import {
   noopErrorTracking,
   noopEmail,
   noopAI,
-  noopStorage,
 } from "@/services/noop";
 
 // ── Provider map ─────────────────────────────────────────────────────────────
@@ -67,23 +62,25 @@ interface ProviderMap {
 }
 
 const providers: ProviderMap = {
-  // Data repositories — currently mock, swap to Supabase repos later
-  jobs: mockJobRepository,
-  candidates: mockCandidateRepository,
-  applications: mockApplicationRepository,
+  // Data repositories — Supabase for core flows
+  jobs: supabaseJobRepository,
+  candidates: supabaseCandidateRepository,
+  applications: supabaseApplicationRepository,
+  profiles: supabaseProfileRepository,
+
+  // Data repositories — still mock (no DB tables yet)
   messages: mockMessageRepository,
   notifications: mockNotificationRepository,
-  profiles: mockProfileRepository,
   preferences: mockPreferencesRepository,
   savedJobs: mockSavedJobRepository,
   swipeEvents: mockSwipeEventRepository,
 
-  // External services — currently no-op, swap to real providers later
+  // External services
   analytics: noopAnalytics,
   errorTracking: noopErrorTracking,
   email: noopEmail,
   ai: noopAI,
-  storage: noopStorage,
+  storage: supabaseStorageService,
 };
 
 /** Type-safe provider accessor */
@@ -97,9 +94,4 @@ export function registerProvider<K extends keyof ProviderMap>(
   implementation: ProviderMap[K],
 ): void {
   providers[key] = implementation;
-}
-
-/** Check if we're running in demo mode (all mock providers) */
-export function isDemoMode(): boolean {
-  return providers.jobs === mockJobRepository;
 }

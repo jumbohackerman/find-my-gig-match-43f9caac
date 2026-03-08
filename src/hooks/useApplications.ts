@@ -1,27 +1,17 @@
+/**
+ * Application hooks — candidate-side and employer-side.
+ * All data access goes through the provider registry.
+ * NO direct Supabase imports.
+ */
+
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
 import type { ApplicationStatus } from "@/types/application";
+import type { ApplicationWithJob } from "@/domain/models";
 
-export interface ApplicationWithJob {
-  id: string;
-  job_id: string;
-  candidate_id: string;
-  status: string;
-  source: string;
-  applied_at: string;
-  job?: {
-    id: string;
-    title: string;
-    company: string;
-    location: string;
-    logo: string;
-    salary: string;
-    tags: string[];
-    type: string;
-    description: string;
-  };
-}
+// Re-export the domain type so existing imports still work
+export type { ApplicationWithJob } from "@/domain/models";
 
 /** Candidate-side: fetch own applications with job info */
 export function useCandidateApplications() {
@@ -35,15 +25,8 @@ export function useCandidateApplications() {
       setLoading(false);
       return;
     }
-    const { data, error } = await supabase
-      .from("applications")
-      .select("*, job:jobs(id, title, company, location, logo, salary, tags, type, description)")
-      .eq("candidate_id", user.id)
-      .order("applied_at", { ascending: false });
-
-    if (!error && data) {
-      setApplications(data as unknown as ApplicationWithJob[]);
-    }
+    const data = await getProvider("applications").listForCandidate(user.id);
+    setApplications(data);
     setLoading(false);
   }, [user]);
 
@@ -51,32 +34,20 @@ export function useCandidateApplications() {
     fetchApplications();
   }, [fetchApplications]);
 
-  // Subscribe to realtime changes
+  // Subscribe to realtime changes through provider
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel("candidate-applications")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "applications",
-          filter: `candidate_id=eq.${user.id}`,
-        },
-        (payload) => {
-          setApplications((prev) =>
-            prev.map((a) =>
-              a.id === payload.new.id ? { ...a, ...payload.new } : a
-            )
-          );
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    const unsubscribe = getProvider("applications").subscribeForCandidate(
+      user.id,
+      (payload) => {
+        setApplications((prev) =>
+          prev.map((a) =>
+            a.id === payload.new?.id ? { ...a, ...payload.new } : a,
+          ),
+        );
+      },
+    );
+    return unsubscribe;
   }, [user]);
 
   return { applications, loading, refetch: fetchApplications };
@@ -88,12 +59,14 @@ export function useUpdateApplicationStatus() {
 
   const updateStatus = useCallback(async (applicationId: string, status: ApplicationStatus) => {
     setUpdating(true);
-    const { error } = await supabase
-      .from("applications")
-      .update({ status })
-      .eq("id", applicationId);
-    setUpdating(false);
-    return { error };
+    try {
+      await getProvider("applications").updateStatus(applicationId, status);
+      return { error: null };
+    } catch (err: any) {
+      return { error: err };
+    } finally {
+      setUpdating(false);
+    }
   }, []);
 
   return { updateStatus, updating };
@@ -111,38 +84,9 @@ export function useEmployerApplications() {
       setLoading(false);
       return;
     }
-
-    // First get employer's job IDs
-    const { data: jobsData } = await supabase
-      .from("jobs")
-      .select("id")
-      .eq("employer_id", user.id);
-
-    if (!jobsData || jobsData.length === 0) {
-      // Also fetch applications for system-seeded jobs (employer_id = 00000000...)
-      // since demo jobs use a placeholder employer_id
-      const { data, error } = await supabase
-        .from("applications")
-        .select("*, job:jobs(id, title, company, location, logo, salary, tags, type, description)")
-        .order("applied_at", { ascending: false });
-
-      if (!error && data) {
-        setApplications(data as unknown as ApplicationWithJob[]);
-      }
-      setLoading(false);
-      return;
-    }
-
-    const jobIds = jobsData.map((j) => j.id);
-    const { data, error } = await supabase
-      .from("applications")
-      .select("*, job:jobs(id, title, company, location, logo, salary, tags, type, description)")
-      .in("job_id", jobIds)
-      .order("applied_at", { ascending: false });
-
-    if (!error && data) {
-      setApplications(data as unknown as ApplicationWithJob[]);
-    }
+    const data = await getProvider("applications").listForEmployer(user.id);
+    // Cast enriched to ApplicationWithJob (compatible superset)
+    setApplications(data as unknown as ApplicationWithJob[]);
     setLoading(false);
   }, [user]);
 
@@ -150,27 +94,13 @@ export function useEmployerApplications() {
     fetchApplications();
   }, [fetchApplications]);
 
-  // Realtime subscription for status changes
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel("employer-applications")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "applications",
-        },
-        () => {
-          fetchApplications();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    const unsubscribe = getProvider("applications").subscribeForEmployer(
+      user.id,
+      () => fetchApplications(),
+    );
+    return unsubscribe;
   }, [user, fetchApplications]);
 
   return { applications, loading, refetch: fetchApplications };
@@ -180,21 +110,16 @@ export function useEmployerApplications() {
 export function useJobApplications(jobId: string | null) {
   const [applications, setApplications] = useState<ApplicationWithJob[]>([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const fetchApplications = useCallback(async () => {
-    if (!jobId) return;
+    if (!jobId || !user) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("applications")
-      .select("*")
-      .eq("job_id", jobId)
-      .order("applied_at", { ascending: false });
-
-    if (!error && data) {
-      setApplications(data as unknown as ApplicationWithJob[]);
-    }
+    const allApps = await getProvider("applications").listForEmployer(user.id);
+    const filtered = allApps.filter((a) => a.jobId === jobId);
+    setApplications(filtered as unknown as ApplicationWithJob[]);
     setLoading(false);
-  }, [jobId]);
+  }, [jobId, user]);
 
   useEffect(() => {
     fetchApplications();

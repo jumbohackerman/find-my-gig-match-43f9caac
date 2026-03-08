@@ -1,10 +1,8 @@
 /**
  * useJobFeed — orchestrator hook for the candidate job browsing flow.
  *
- * Manages: filtered job list, current card index, swipe actions (skip/save/apply),
- * match scoring, and feed reset. All persistence goes through the provider registry.
- *
- * Pages use this instead of managing swipe state inline.
+ * All persistence goes through the provider registry.
+ * NO direct Supabase imports.
  */
 
 import { useState, useCallback, useMemo, useEffect } from "react";
@@ -15,7 +13,6 @@ import { useCandidateProfile } from "@/hooks/useCandidateProfile";
 import { useSavedJobs } from "@/hooks/useSavedJobs";
 import { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import { calculateMatch, type MatchResult } from "@/lib/matchScoring";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Job } from "@/domain/models";
 
@@ -53,30 +50,16 @@ export function useJobFeed() {
   const remainingJobs = filteredJobs.slice(currentIndex);
   const isFinished = currentIndex >= filteredJobs.length;
 
-  // ── Apply to job (backend call) ──────────────────────────────────────────
+  // ── Apply to job (through provider) ────────────────────────────────────
   const applyToJob = useCallback(
     async (job: Job) => {
       if (!user) return;
       try {
-        const { error } = await supabase.rpc("apply_to_job", {
-          _static_job_id: job.id,
-          _job_title: job.title,
-          _job_company: job.company,
-          _job_location: job.location,
-          _job_logo: job.logo,
-          _job_salary: job.salary,
-          _job_tags: job.tags,
-          _job_type: job.type,
-          _job_description: job.description,
-        });
-        if (error) {
-          console.error("Apply error:", error);
-          toast.error("Nie udało się zaaplikować");
-        } else {
-          toast.success(`Zaaplikowano na: ${job.title}`);
-        }
-      } catch (err) {
+        await getProvider("applications").apply(job, user.id);
+        toast.success(`Zaaplikowano na: ${job.title}`);
+      } catch (err: any) {
         console.error("Apply error:", err);
+        toast.error("Nie udało się zaaplikować");
       }
     },
     [user],
@@ -88,7 +71,6 @@ export function useJobFeed() {
       const job = filteredJobs[currentIndex];
       if (!job) return;
 
-      // Record swipe event
       await getProvider("swipeEvents").record(userId, job.id, direction);
       setSwipedJobIds((prev) => new Set(prev).add(job.id));
 
@@ -132,7 +114,6 @@ export function useJobFeed() {
   );
 
   return {
-    // State
     allJobs,
     filteredJobs,
     remainingJobs,
@@ -143,8 +124,6 @@ export function useJobFeed() {
     jobsLoading,
     filters,
     matchResults,
-
-    // Actions
     handleSwipe,
     applyFromSaved,
     applyToJob,
