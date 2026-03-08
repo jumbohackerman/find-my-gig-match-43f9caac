@@ -26,6 +26,7 @@ interface Notification {
 
 const Index = () => {
   const { signOut, user, profile } = useAuth();
+  const { applications: dbApplications, loading: appsLoading } = useCandidateApplications();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
@@ -262,9 +263,13 @@ const Index = () => {
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
-              Moje aplikacje ({appliedJobs.length})
+              Moje aplikacje ({user ? dbApplications.length : appliedJobs.length})
             </h2>
-            <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} />
+            {user ? (
+              <ApplicationStatusList applications={dbApplications} loading={appsLoading} />
+            ) : (
+              <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} />
+            )}
           </motion.div>
         ) : activeTab === "saved" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
