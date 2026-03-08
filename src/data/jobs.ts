@@ -9,6 +9,15 @@ export interface Job {
   description: string;
   tags: string[];
   posted: string;
+  // Extended fields
+  requirements?: string[];
+  responsibilities?: string[];
+  benefits?: string[];
+  aboutCompany?: string;
+  teamSize?: string;
+  seniority?: string;
+  contractType?: string;
+  applyUrl?: string;
 }
 
 export const jobs: Job[] = [
@@ -23,6 +32,32 @@ export const jobs: Job[] = [
     description: "Twórz nowoczesne aplikacje webowe w React i TypeScript. Dołącz do zespołu pasjonatów budujących przyszłość SaaS.",
     tags: ["React", "TypeScript", "GraphQL"],
     posted: "2 dni temu",
+    seniority: "Senior",
+    contractType: "B2B / UoP",
+    teamSize: "12 osób",
+    aboutCompany: "TechNova to dynamiczny startup technologiczny z Warszawy, tworzący narzędzia SaaS dla branży e-commerce. Działamy na rynkach europejskich i obsługujemy ponad 500 klientów biznesowych.",
+    requirements: [
+      "Min. 4 lata doświadczenia z React i TypeScript",
+      "Praktyczna znajomość GraphQL (Apollo/Relay)",
+      "Doświadczenie z design systemami i komponentami UI",
+      "Umiejętność pracy w metodyce Agile/Scrum",
+      "Dobra znajomość języka angielskiego (B2+)",
+    ],
+    responsibilities: [
+      "Rozwijanie i utrzymanie głównej aplikacji SaaS",
+      "Code review i mentoring juniorów",
+      "Współpraca z designerami przy tworzeniu nowych feature'ów",
+      "Optymalizacja wydajności frontendu",
+      "Udział w planowaniu sprintów i estymacji zadań",
+    ],
+    benefits: [
+      "Prywatna opieka medyczna (Medicover)",
+      "Karta MultiSport",
+      "Elastyczny czas pracy",
+      "Budżet szkoleniowy 5 000 zł/rok",
+      "Praca hybrydowa (2 dni z biura)",
+      "MacBook Pro do pracy",
+    ],
   },
   {
     id: "2",
@@ -35,6 +70,31 @@ export const jobs: Job[] = [
     description: "Projektuj piękne, intuicyjne interfejsy dla milionów użytkowników. Cenimy kreatywność, empatię i perfekcję w każdym detalu.",
     tags: ["Figma", "UI/UX", "Design Systems"],
     posted: "1 dzień temu",
+    seniority: "Mid / Senior",
+    contractType: "UoP",
+    teamSize: "8 osób (dział designu)",
+    aboutCompany: "PixelCraft Studios to krakowska agencja designu specjalizująca się w projektowaniu produktów cyfrowych. Pracujemy z klientami z Polski i Europy Zachodniej, tworząc aplikacje używane przez miliony osób.",
+    requirements: [
+      "Min. 3 lata doświadczenia w product design",
+      "Biegłość w Figma i tworzeniu prototypów",
+      "Portfolio z realnie wdrożonymi projektami",
+      "Znajomość zasad design systemów i accessibility",
+      "Doświadczenie w prowadzeniu badań użytkowników",
+    ],
+    responsibilities: [
+      "Projektowanie interfejsów od konceptu do pixel-perfect mockupu",
+      "Tworzenie i utrzymanie design systemu",
+      "Prowadzenie warsztatów z klientami i interesariuszami",
+      "Testowanie użyteczności i iterowanie na podstawie danych",
+      "Współpraca z developerami przy implementacji",
+    ],
+    benefits: [
+      "Prywatna opieka medyczna",
+      "Budżet na konferencje i kursy",
+      "Piątkowe „design jamy"",
+      "Nowoczesne biuro w centrum Krakowa",
+      "Licencja na narzędzia Adobe i Figma",
+    ],
   },
   {
     id: "3",
@@ -47,6 +107,32 @@ export const jobs: Job[] = [
     description: "Skaluj nasze systemy rozproszone przetwarzające miliardy zdarzeń dziennie. Pracuj z Go, Kafka i PostgreSQL.",
     tags: ["Go", "PostgreSQL", "Kafka"],
     posted: "3 dni temu",
+    seniority: "Senior",
+    contractType: "B2B",
+    teamSize: "20 osób (inżynieria)",
+    aboutCompany: "DataForge to firma produktowa z siedzibą w Gdańsku, budująca platformę do przetwarzania danych w czasie rzeczywistym. Obsługujemy klientów z branży fintech i adtech w Europie i USA.",
+    requirements: [
+      "Min. 5 lat doświadczenia backendowego (Go preferowany)",
+      "Doświadczenie z systemami rozproszonymi i event streaming (Kafka)",
+      "Silna znajomość PostgreSQL i optymalizacji zapytań",
+      "Znajomość wzorców mikroserwisów",
+      "Doświadczenie z konteneryzacją (Docker, Kubernetes)",
+    ],
+    responsibilities: [
+      "Projektowanie i implementacja nowych mikroserwisów",
+      "Optymalizacja istniejących pipeline'ów danych",
+      "Współtworzenie architektury systemowej",
+      "Pisanie testów integracyjnych i e2e",
+      "Udział w on-call rotation (co 4 tygodnie)",
+    ],
+    benefits: [
+      "100% praca zdalna",
+      "Budżet na home office (3 000 zł jednorazowo)",
+      "Karta MultiSport",
+      "Udział w zyskach firmy (profit sharing)",
+      "26 dni urlopu niezależnie od stażu",
+      "Konferencje zagraniczne raz w roku",
+    ],
   },
   {
     id: "4",
@@ -59,6 +145,31 @@ export const jobs: Job[] = [
     description: "Twórz świetne doświadczenia mobilne w React Native. Dostarczaj funkcje wpływające na miliony aktywnych użytkowników.",
     tags: ["React Native", "iOS", "Android"],
     posted: "5 godzin temu",
+    seniority: "Mid",
+    contractType: "B2B / UoP",
+    teamSize: "6 osób (mobile team)",
+    aboutCompany: "AppVenture to wrocławski startup rozwijający aplikację mobilną do zarządzania finansami osobistymi. Mamy ponad 2 mln pobrań w Polsce i rozszerzamy się na rynki CEE.",
+    requirements: [
+      "Min. 2 lata doświadczenia z React Native",
+      "Znajomość natywnych API iOS i Android",
+      "Doświadczenie z CI/CD dla aplikacji mobilnych",
+      "Znajomość state management (Redux/Zustand)",
+      "Publikacja aplikacji w App Store i Google Play",
+    ],
+    responsibilities: [
+      "Rozwój aplikacji React Native na iOS i Android",
+      "Implementacja nowych feature'ów wg roadmapy produktu",
+      "Naprawa bugów i poprawa UX",
+      "Pisanie unit testów i snapshot testów",
+      "Współpraca z backend teamem przy integracji API",
+    ],
+    benefits: [
+      "Prywatna opieka medyczna (LuxMed)",
+      "Karta Benefit (kafeteria)",
+      "Elastyczne godziny pracy",
+      "Owocowe środy i pizza piątki 🍕",
+      "Dofinansowanie do nauki języków",
+    ],
   },
   {
     id: "5",
@@ -71,6 +182,31 @@ export const jobs: Job[] = [
     description: "Projektuj i utrzymuj infrastrukturę chmurową na AWS. Automatyzuj wszystko i zapewniaj 99.99% dostępności.",
     tags: ["AWS", "Terraform", "Docker"],
     posted: "tydzień temu",
+    seniority: "Mid / Senior",
+    contractType: "B2B",
+    teamSize: "4 osoby (platforma)",
+    aboutCompany: "CloudPeak to gdańska firma konsultingowa specjalizująca się w migracji do chmury i zarządzaniu infrastrukturą. Pomagamy średnim i dużym firmom przejść na AWS i GCP.",
+    requirements: [
+      "Min. 3 lata doświadczenia z AWS (certyfikat mile widziany)",
+      "Biegłość w Terraform i Infrastructure as Code",
+      "Doświadczenie z Docker i Kubernetes",
+      "Znajomość CI/CD (GitHub Actions, GitLab CI)",
+      "Umiejętność scripting (Bash, Python)",
+    ],
+    responsibilities: [
+      "Zarządzanie infrastrukturą AWS dla klientów",
+      "Tworzenie modułów Terraform i automatyzacji",
+      "Konfiguracja monitoringu (Prometheus, Grafana)",
+      "Wdrażanie best practices bezpieczeństwa cloud",
+      "Wsparcie developerów w deploymentach",
+    ],
+    benefits: [
+      "Certyfikacje AWS opłacane przez firmę",
+      "Praca hybrydowa (1 dzień w biurze)",
+      "Budżet szkoleniowy 8 000 zł/rok",
+      "Prywatna opieka medyczna",
+      "Parking dla pracowników",
+    ],
   },
   {
     id: "6",
@@ -83,6 +219,31 @@ export const jobs: Job[] = [
     description: "Stosuj uczenie maszynowe do realnych problemów. Buduj modele, które napędzają decyzje biznesowe i funkcje produktu.",
     tags: ["Python", "ML", "TensorFlow"],
     posted: "4 dni temu",
+    seniority: "Senior",
+    contractType: "B2B / UoP",
+    teamSize: "10 osób (AI & Data)",
+    aboutCompany: "InsightAI to polska firma AI-first tworząca rozwiązania predykcyjne dla branży retail i logistyki. Nasze modele pomagają firmom optymalizować łańcuchy dostaw i przewidywać popyt.",
+    requirements: [
+      "Min. 4 lata doświadczenia w Data Science / ML",
+      "Silna znajomość Python, scikit-learn, TensorFlow/PyTorch",
+      "Doświadczenie z przetwarzaniem dużych zbiorów danych (Spark)",
+      "Znajomość statystyki i metod eksperymentalnych (A/B testy)",
+      "Umiejętność komunikowania wyników nietechnicznej publiczności",
+    ],
+    responsibilities: [
+      "Budowanie modeli ML od prototypu do produkcji",
+      "Analiza danych i identyfikacja wzorców biznesowych",
+      "Współpraca z inżynierami danych przy pipeline'ach",
+      "Prezentowanie wyników zarządowi i klientom",
+      "Badanie nowych podejść i publikowanie wyników wewnętrznie",
+    ],
+    benefits: [
+      "100% praca zdalna z dowolnego miejsca",
+      "Budżet na sprzęt GPU / cloud compute",
+      "Konferencje (NeurIPS, PyData) finansowane przez firmę",
+      "4-dniowy tydzień pracy (pilotaż)",
+      "Ubezpieczenie na życie",
+    ],
   },
   {
     id: "7",
@@ -95,6 +256,31 @@ export const jobs: Job[] = [
     description: "Kieruj inicjatywami marketingu wzrostu w wielu kanałach. Napędzaj pozyskiwanie użytkowników i budowanie marki.",
     tags: ["SEO", "Content", "Analytics"],
     posted: "6 dni temu",
+    seniority: "Mid",
+    contractType: "UoP",
+    teamSize: "5 osób (marketing)",
+    aboutCompany: "GrowthLab to poznańska agencja growth marketingowa pomagająca startupom i scale-upom rosnąć. Pracujemy z klientami z branży SaaS, e-commerce i fintech.",
+    requirements: [
+      "Min. 3 lata doświadczenia w digital marketingu",
+      "Znajomość SEO, SEM i content marketingu",
+      "Doświadczenie z Google Analytics, Tag Manager",
+      "Umiejętność analizy danych i raportowania",
+      "Kreatywność i umiejętność pisania angażujących treści",
+    ],
+    responsibilities: [
+      "Planowanie i realizacja kampanii marketingowych",
+      "Zarządzanie budżetem reklamowym",
+      "Tworzenie strategii content marketingowej",
+      "Analiza KPI i optymalizacja konwersji",
+      "Zarządzanie zespołem copywriterów i grafików",
+    ],
+    benefits: [
+      "Prywatna opieka medyczna",
+      "Karta MultiSport",
+      "Elastyczne godziny pracy",
+      "Budżet na rozwój osobisty",
+      "Integracje zespołowe raz w miesiącu",
+    ],
   },
   {
     id: "8",
@@ -107,5 +293,31 @@ export const jobs: Job[] = [
     description: "Dołącz do dynamicznego startupu budującego nową generację narzędzi do zarządzania projektami. Pełna odpowiedzialność end-to-end.",
     tags: ["Next.js", "Node.js", "MongoDB"],
     posted: "12 godzin temu",
+    seniority: "Mid / Senior",
+    contractType: "B2B",
+    teamSize: "8 osób",
+    aboutCompany: "BuildBetter to w pełni zdalny startup tworzący narzędzie do zarządzania projektami nowej generacji. Łączymy AI z intuicyjnym UX, aby zespoły mogły pracować efektywniej. Mamy finansowanie na etapie Seed.",
+    requirements: [
+      "Min. 3 lata doświadczenia full-stack",
+      "Biegłość w Next.js i Node.js",
+      "Doświadczenie z MongoDB lub inną bazą NoSQL",
+      "Znajomość REST API i WebSockets",
+      "Samodzielność i umiejętność pracy w małym zespole",
+    ],
+    responsibilities: [
+      "Rozwijanie funkcjonalności frontend i backend",
+      "Projektowanie API i struktur baz danych",
+      "Wdrażanie integracji z narzędziami trzecimi (Slack, Jira)",
+      "Pisanie dokumentacji technicznej",
+      "Uczestnictwo w decyzjach architektonicznych",
+    ],
+    benefits: [
+      "100% praca zdalna",
+      "Elastyczne godziny – liczy się wynik",
+      "Equity / udziały w firmie",
+      "Budżet na narzędzia i sprzęt",
+      "Brak dress code'u i korporacyjnych procedur",
+      "Roczne spotkanie zespołu w ciekawym miejscu",
+    ],
   },
 ];
