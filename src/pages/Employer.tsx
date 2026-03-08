@@ -368,15 +368,20 @@ const Employer = () => {
                     <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr. dopasowanie</span>
                   </div>
 
-                  <div className="p-4 pt-2 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0">
-                      {job.logo}
+                  <div className="p-4 pt-2">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0">
+                        {job.logo}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
+                        <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location} · {job.posted}</p>
+                      </div>
+                      <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors shrink-0">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
-                      <p className="text-xs text-muted-foreground">{job.company} · {job.location} · {job.posted}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <button
                         onClick={() => handleGenerateShortlist(job.id)}
                         disabled={shortlisted.length >= MAX_SHORTLIST}
@@ -420,9 +425,6 @@ const Employer = () => {
                         <Eye className="w-3.5 h-3.5" />
                         {jobApplicants.length}
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                      </button>
-                      <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors">
-                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
