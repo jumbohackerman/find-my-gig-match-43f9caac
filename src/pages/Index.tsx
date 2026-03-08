@@ -37,7 +37,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("swipe");
   const [filters, setFilters] = useState<JobFiltersState>({ ...defaultFilters });
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [candidateProfile, setCandidateProfile] = useState<CandidateProfile>(DEMO_CANDIDATE);
+  const [candidateProfile, setCandidateProfile] = useState<Candidate>(DEMO_CANDIDATE);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -57,16 +57,15 @@ const Index = () => {
     remotePreference: string;
     seniority: string;
   }) => {
-    const newProfile: CandidateProfile = {
+    setCandidateProfile({
       ...candidateProfile,
       title: data.title,
       skills: data.skills,
-      preferredSalaryMin: data.salaryMin,
-      preferredSalaryMax: data.salaryMax,
-      remotePreference: data.remotePreference,
-      seniority: data.seniority,
-    };
-    setCandidateProfile({
+      salaryMin: data.salaryMin,
+      salaryMax: data.salaryMax,
+      workMode: data.remotePreference as Candidate["workMode"],
+      seniority: data.seniority as Candidate["seniority"],
+    });
       ...candidateProfile,
       title: data.title,
       skills: data.skills,
