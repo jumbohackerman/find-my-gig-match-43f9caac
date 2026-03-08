@@ -92,6 +92,7 @@ const MyProfile = () => {
 
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [activeSection, setActiveSection] = useState<string>("basic");
 
