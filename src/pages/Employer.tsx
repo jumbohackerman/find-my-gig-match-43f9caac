@@ -20,7 +20,17 @@ import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
 import EmployerCandidateSwipe from "@/components/employer/EmployerCandidateSwipe";
-import type { ApplicationStatus, ApplicationSource, DemoApplication, DemoMessage } from "@/types/application";
+import type { ApplicationStatus, ApplicationSource } from "@/types/application";
+import type { ChatMessage } from "@/components/employer/ChatPanel";
+
+interface DemoApplication {
+  id: string;
+  candidateId: string;
+  jobId: string;
+  status: ApplicationStatus;
+  source: ApplicationSource;
+  appliedAt: string;
+}
 import { useAuth } from "@/hooks/useAuth";
 
 const MAX_SHORTLIST = 5;
@@ -554,7 +564,7 @@ const Employer = () => {
                                                   Zatrudnij
                                                 </button>
                                                 <button
-                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "closed"); }}
+                                                  onClick={(e) => { e.stopPropagation(); handleAdvanceStatus(app.id, "position_closed"); }}
                                                   className="text-[10px] px-2 py-0.5 rounded bg-destructive/15 text-destructive hover:bg-destructive/25"
                                                 >
                                                   Zamknij
