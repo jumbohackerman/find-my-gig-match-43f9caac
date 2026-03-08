@@ -92,12 +92,15 @@ const Index = () => {
       <Navbar />
 
       {/* Tabs */}
-      <div className="px-6 pt-4 flex gap-1">
+      <div className="px-6 pt-4 flex gap-1" role="tablist" aria-label="Sekcje przeglądania">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            role="tab"
+            aria-selected={activeTab === tab.key}
+            aria-controls={`panel-${tab.key}`}
+            className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               activeTab === tab.key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-muted"
@@ -107,7 +110,7 @@ const Index = () => {
             {tab.count != null && tab.count > 0 && (
               <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                 activeTab === tab.key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary text-primary-foreground"
-              }`}>
+              }`} aria-label={`${tab.count} elementów`}>
                 {tab.count}
               </span>
             )}
