@@ -274,7 +274,7 @@ const Index = () => {
             {user ? (
               <ApplicationStatusList applications={dbApplications} loading={appsLoading} />
             ) : (
-              <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} />
+              <AppliedList jobs={appliedJobs} onJobClick={setSelectedJob} statuses={demoStatuses} />
             )}
           </motion.div>
         ) : activeTab === "saved" ? (
