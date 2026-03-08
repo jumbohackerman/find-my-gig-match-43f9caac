@@ -48,18 +48,21 @@ const Index = () => {
     }
   }, [user, profile]);
 
-  // Demo: simulate shortlist notifications after some applications
+  // Demo: simulate shortlist notifications and status changes after some applications
   useEffect(() => {
     if (appliedJobs.length >= 2 && notifications.length === 0) {
       const timer = setTimeout(() => {
+        const firstJob = appliedJobs[0];
         setNotifications([
           {
             id: "n1",
             message: "Zostałeś dodany do shortlisty na tę rolę.",
-            jobTitle: appliedJobs[0].title,
+            jobTitle: firstJob.title,
             read: false,
           },
         ]);
+        // Simulate status change to shortlisted
+        setDemoStatuses((prev) => ({ ...prev, [firstJob.id]: "shortlisted" }));
       }, 3000);
       return () => clearTimeout(timer);
     }
