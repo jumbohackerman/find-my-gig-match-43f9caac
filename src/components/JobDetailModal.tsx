@@ -8,6 +8,7 @@ import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 
 function formatPostedDate(raw: string): string {
   if (!raw) return "";
@@ -73,6 +74,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
         aria-modal="true"
         aria-label={`Szczegóły oferty: ${job.title}`}
       >
+        <LocalErrorBoundary label="Szczegóły oferty">
         <motion.div
           ref={dialogRef}
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -257,6 +259,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
             </button>
           )}
         </motion.div>
+        </LocalErrorBoundary>
       </div>
     </AnimatePresence>
   );

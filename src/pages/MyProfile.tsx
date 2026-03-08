@@ -9,6 +9,7 @@ import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
 import { Progress } from "@/components/ui/progress";
 import { ProfileSkeleton } from "@/components/StateViews";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 
 interface ExperienceEntry {
@@ -268,6 +269,7 @@ const MyProfile = () => {
       </header>
 
       <main className="flex-1 flex flex-col px-4 py-6 max-w-lg mx-auto w-full">
+        <LocalErrorBoundary label="Formularz profilu">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
             {isEmployer ? "Profil pracodawcy" : "Mój profil"}
@@ -589,6 +591,7 @@ const MyProfile = () => {
           )}
           </div>
         </motion.div>
+        </LocalErrorBoundary>
       </main>
     </div>
   );

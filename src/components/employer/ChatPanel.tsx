@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { timeAgo } from "@/lib/timeAgo";
 import EmptyState from "./EmptyState";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 
 export interface ChatMessage {
   id: string;
@@ -64,6 +65,7 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, curr
   }
 
   return (
+    <LocalErrorBoundary label="Chat" compact>
     <div className="border-t border-border">
       <div className="max-h-40 overflow-y-auto p-3 space-y-2">
         {messages.length === 0 ? (
@@ -134,6 +136,7 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, curr
         </button>
       </div>
     </div>
+    </LocalErrorBoundary>
   );
 };
 

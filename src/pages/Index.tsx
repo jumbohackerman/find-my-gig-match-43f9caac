@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter } from "lucide-react";
 import { SwipeCardSkeleton, EmptyView } from "@/components/StateViews";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SwipeCard from "@/components/SwipeCard";
@@ -235,6 +236,7 @@ const Index = () => {
       </div>
 
       <main className={`flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full min-h-0 ${activeTab === "swipe" ? "overflow-y-clip" : "overflow-y-auto"}`}>
+        <LocalErrorBoundary label="Panel">
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
             <h2 className="font-display text-lg font-bold text-foreground mb-4">
@@ -390,6 +392,7 @@ const Index = () => {
             )}
           </>
         )}
+        </LocalErrorBoundary>
       </main>
 
       <OnboardingModal
