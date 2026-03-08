@@ -1,56 +1,38 @@
 /**
  * Match scoring engine.
+ * Uses domain Candidate model. Eliminates the old CandidateProfile type.
  * Weights: skills 40%, seniority 15%, salary 15%, location 15%, work_mode 15%.
  */
 
-export interface CandidateProfile {
-  skills: string[];
-  seniority: string; // Junior | Mid | Senior | Lead
-  preferredSalaryMin: number; // in thousands PLN
-  preferredSalaryMax: number;
-  remotePreference: string; // Zdalnie | Hybrydowo | Stacjonarnie | Dowolnie | Any
-  location: string;
-  experienceYears: number;
-  title: string;
-  workMode?: string; // Remote | Hybrid | On-site
-}
+import type { Candidate, Job, MatchResult, ScoreBreakdown } from "@/domain/models";
 
-export interface JobForScoring {
-  tags: string[];
-  salary: string;
-  location: string;
-  type: string;
-  title: string;
-  description: string;
-}
+export type { MatchResult, ScoreBreakdown } from "@/domain/models";
 
-export interface MatchResult {
-  score: number; // 0–100
-  matchedSkills: string[];
-  missingSkills: string[];
-  reasons: string[];
-  breakdown: ScoreBreakdown;
-}
+/** Subset of Job fields needed for scoring (avoids importing full Job in tests) */
+export type JobForScoring = Pick<Job, "tags" | "salary" | "location" | "type" | "title" | "description">;
 
-export interface ScoreBreakdown {
-  skills: number;
-  experience: number;
-  salary: number;
-  location: number;
-  workMode: number;
-}
-
-// Default demo candidate
-export const DEMO_CANDIDATE: CandidateProfile = {
+// Default demo candidate — used when no real profile is loaded
+export const DEMO_CANDIDATE: Candidate = {
+  id: "demo",
+  userId: "demo",
+  name: "Demo User",
+  avatar: "👤",
+  title: "Frontend Developer",
+  location: "Warszawa",
+  bio: "",
+  summary: "",
   skills: ["React", "TypeScript", "Node.js", "GraphQL", "Tailwind CSS", "Next.js"],
   seniority: "Senior",
-  preferredSalaryMin: 18,
-  preferredSalaryMax: 28,
-  remotePreference: "Any",
-  location: "Warszawa",
-  experienceYears: 5,
-  title: "Frontend Developer",
-  workMode: "Remote",
+  experience: "5 lat",
+  workMode: "Zdalnie",
+  employmentType: "Full-time",
+  availability: "Elastycznie",
+  salaryMin: 18000,
+  salaryMax: 28000,
+  experienceEntries: [],
+  links: {},
+  cvUrl: null,
+  lastActive: new Date().toISOString(),
 };
 
 function parseSalaryRange(salary: string): { min: number; max: number } | null {
@@ -76,13 +58,13 @@ function inferSeniority(title: string): string {
   return "Mid";
 }
 
-function computeWorkModeScore(candidate: CandidateProfile, job: JobForScoring): { score: number; reason: string } {
+function computeWorkModeScore(candidate: Candidate, job: JobForScoring): { score: number; reason: string } {
   const jobLoc = job.location.toLowerCase();
   const jobType = job.type.toLowerCase();
   const isJobRemote = jobLoc.includes("zdaln") || jobLoc.includes("remote") || jobType === "remote";
   const isJobHybrid = jobLoc.includes("hybry") || jobType.includes("hybrid");
 
-  const candPref = (candidate.workMode || candidate.remotePreference || "Any").toLowerCase();
+  const candPref = (candidate.workMode || "Zdalnie").toLowerCase();
 
   if (candPref === "any" || candPref === "dowolnie" || candPref === "flexible") {
     return { score: 100, reason: "Elastyczny tryb pracy" };
@@ -100,7 +82,6 @@ function computeWorkModeScore(candidate: CandidateProfile, job: JobForScoring): 
     return { score: 100, reason: "Tryb pracy pasuje — stacjonarnie" };
   }
 
-  // Partial match
   if (isJobRemote || candPref.includes("zdaln") || candPref.includes("remote")) {
     return { score: 60, reason: "Częściowe dopasowanie trybu pracy" };
   }
@@ -108,7 +89,15 @@ function computeWorkModeScore(candidate: CandidateProfile, job: JobForScoring): 
   return { score: 40, reason: "Tryb pracy może nie odpowiadać" };
 }
 
-export function calculateMatch(candidate: CandidateProfile, job: JobForScoring): MatchResult {
+/** Convert Candidate salaryMin/salaryMax to thousands for scoring comparison */
+function candidateSalaryInThousands(candidate: Candidate): { min: number; max: number } {
+  // If values are > 1000, assume they're in PLN; convert to thousands
+  const min = candidate.salaryMin > 1000 ? candidate.salaryMin / 1000 : candidate.salaryMin;
+  const max = candidate.salaryMax > 1000 ? candidate.salaryMax / 1000 : candidate.salaryMax;
+  return { min, max };
+}
+
+export function calculateMatch(candidate: Candidate, job: JobForScoring): MatchResult {
   const reasons: string[] = [];
 
   // 1. Skill match (40%)
@@ -141,11 +130,12 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
 
   // 3. Salary alignment (15%)
   const salaryRange = parseSalaryRange(job.salary);
+  const candSalary = candidateSalaryInThousands(candidate);
   let salaryScore = 50;
   if (salaryRange) {
     const overlap =
-      Math.min(salaryRange.max, candidate.preferredSalaryMax) -
-      Math.max(salaryRange.min, candidate.preferredSalaryMin);
+      Math.min(salaryRange.max, candSalary.max) -
+      Math.max(salaryRange.min, candSalary.min);
     const range = salaryRange.max - salaryRange.min || 1;
     salaryScore = overlap >= 0 ? Math.min(100, (overlap / range) * 100 + 30) : 10;
     if (overlap >= 0) {
@@ -160,8 +150,7 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
   const jobLoc = job.location.toLowerCase();
   const candLoc = candidate.location.toLowerCase();
   if (
-    candidate.remotePreference === "Any" ||
-    candidate.remotePreference === "Dowolnie" ||
+    candidate.workMode === "Zdalnie" ||
     jobLoc.includes("zdaln") ||
     jobLoc.includes("remote") ||
     job.type === "Remote"
@@ -206,7 +195,68 @@ export function calculateMatch(candidate: CandidateProfile, job: JobForScoring):
   };
 }
 
-/** Convert DB candidate row to CandidateProfile for scoring */
+/** Convert DB candidate row to domain Candidate for scoring */
+export function dbCandidateToCandidate(row: {
+  id?: string;
+  user_id: string;
+  skills: string[];
+  seniority: string;
+  salary_min: number;
+  salary_max: number;
+  work_mode: string;
+  location: string;
+  experience: string;
+  title: string;
+  bio?: string;
+  summary?: string;
+  availability?: string;
+  employment_type?: string;
+  experience_entries?: unknown[];
+  links?: Record<string, string>;
+  cv_url?: string | null;
+  last_active?: string;
+}, profile?: { full_name?: string; avatar?: string | null }): Candidate {
+  return {
+    id: row.id || row.user_id,
+    userId: row.user_id,
+    name: profile?.full_name || row.title || "Kandydat",
+    avatar: profile?.avatar || "👤",
+    title: row.title || "",
+    location: row.location || "",
+    bio: row.bio || "",
+    summary: row.summary || "",
+    skills: row.skills || [],
+    seniority: (row.seniority || "Mid") as Candidate["seniority"],
+    experience: row.experience || "",
+    workMode: (row.work_mode || "Zdalnie") as Candidate["workMode"],
+    employmentType: (row.employment_type || "Full-time") as Candidate["employmentType"],
+    availability: row.availability || "Elastycznie",
+    salaryMin: row.salary_min || 0,
+    salaryMax: row.salary_max || 0,
+    experienceEntries: ((row.experience_entries || []) as any[]).map((e: any) => ({
+      title: e.title || "",
+      company: e.company || "",
+      startDate: e.startDate || e.start_date || "",
+      endDate: e.endDate || e.end_date || "",
+      isCurrent: e.isCurrent || false,
+      description: e.description || "",
+      bullets: e.bullets || [],
+    })),
+    links: (row.links || {}) as Candidate["links"],
+    cvUrl: row.cv_url || null,
+    lastActive: row.last_active || new Date().toISOString(),
+  };
+}
+
+/**
+ * @deprecated Use `calculateMatch(candidate, job)` directly with a Candidate.
+ * Kept only for backward compatibility during migration.
+ */
+export type CandidateProfile = Candidate;
+
+/**
+ * @deprecated Use `dbCandidateToCandidate` instead.
+ */
 export function dbCandidateToProfile(candidate: {
   skills: string[];
   seniority: string;
@@ -216,17 +266,9 @@ export function dbCandidateToProfile(candidate: {
   location: string;
   experience: string;
   title: string;
-}): CandidateProfile {
-  const expMatch = candidate.experience.match(/(\d+)/);
-  return {
-    skills: candidate.skills || [],
-    seniority: candidate.seniority || "Mid",
-    preferredSalaryMin: (candidate.salary_min || 0) / 1000, // stored as PLN, convert to thousands
-    preferredSalaryMax: (candidate.salary_max || 0) / 1000,
-    remotePreference: candidate.work_mode || "Any",
-    workMode: candidate.work_mode || "Any",
-    location: candidate.location || "",
-    experienceYears: parseInt(expMatch?.[1] || "3"),
-    title: candidate.title || "",
-  };
+}): Candidate {
+  return dbCandidateToCandidate({
+    user_id: "",
+    ...candidate,
+  });
 }

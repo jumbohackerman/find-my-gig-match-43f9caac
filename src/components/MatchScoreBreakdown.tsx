@@ -1,4 +1,4 @@
-import type { ScoreBreakdown } from "@/lib/matchScoring";
+import type { ScoreBreakdown } from "@/domain/models";
 
 interface Props {
   breakdown: ScoreBreakdown;
@@ -48,5 +48,5 @@ const MatchScoreBreakdown = ({ breakdown, totalScore }: Props) => {
 
 export default MatchScoreBreakdown;
 
-// Re-export computeBreakdown for backward compatibility — now built into calculateMatch
-export { type ScoreBreakdown } from "@/lib/matchScoring";
+// Re-export for backward compatibility
+export { type ScoreBreakdown } from "@/domain/models";

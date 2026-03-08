@@ -84,14 +84,15 @@ No page or component imports data files directly anymore.
 
 ## Domain models
 
-All entities are defined in `src/domain/models.ts`:
+All entities are defined in `src/domain/models.ts` (see `docs/domain-model.md` for full reference):
 
-- **Job** — job posting
-- **Candidate** — candidate/seeker profile
+- **Job** — job posting with optional structured `SalaryRange`
+- **Candidate** — canonical candidate profile (replaces legacy Seeker, ExtendedSeeker, CandidateProfile)
 - **Application** — link between candidate and job
 - **Message** — chat message in application context
 - **UserProfile** — auth-adjacent profile data
-- **MatchResult** — scoring output
+- **Notification** — in-app notification (future)
+- **MatchResult** / **ScoreBreakdown** — scoring output
 
 ## Repositories
 

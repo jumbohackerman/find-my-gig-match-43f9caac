@@ -1,5 +1,6 @@
 /**
  * Mock candidate repository — backed by static seekers data.
+ * Maps legacy Seeker shape to domain Candidate with name/avatar fields.
  */
 
 import type { CandidateRepository, CandidateFilters } from "@/repositories/interfaces";
@@ -10,6 +11,8 @@ function seekerToDomain(s: typeof seekers[number]): Candidate {
   return {
     id: s.id,
     userId: s.id, // mock: user_id === seeker id
+    name: s.name,
+    avatar: s.avatar,
     title: s.title,
     location: s.location,
     bio: s.bio,
@@ -41,6 +44,7 @@ export const mockCandidateRepository: CandidateRepository = {
       const q = filters.search.toLowerCase();
       result = result.filter(
         (c) =>
+          c.name.toLowerCase().includes(q) ||
           c.title.toLowerCase().includes(q) ||
           c.bio.toLowerCase().includes(q) ||
           c.skills.some((sk) => sk.toLowerCase().includes(q)) ||
@@ -68,6 +72,8 @@ export const mockCandidateRepository: CandidateRepository = {
     const base = existing ? seekerToDomain(existing) : {
       id: userId,
       userId,
+      name: "Nowy kandydat",
+      avatar: "👤",
       title: "",
       location: "",
       bio: "",
@@ -79,7 +85,7 @@ export const mockCandidateRepository: CandidateRepository = {
       employmentType: "Full-time" as EmploymentType,
       salaryMin: 0,
       salaryMax: 0,
-      availability: "Otwarty na oferty",
+      availability: "Elastycznie",
       experienceEntries: [],
       links: {},
       cvUrl: null,

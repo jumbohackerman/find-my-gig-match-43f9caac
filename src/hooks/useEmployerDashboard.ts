@@ -123,7 +123,7 @@ export function useEmployerDashboardData() {
 
         if (candidate && job) {
           candidateProfile = dbCandidateToProfile(candidate);
-          matchResult = calculateMatch(candidateProfile, job);
+          matchResult = calculateMatch(candidateProfile, { ...job, type: job.type as any });
         }
 
         // Attach profile name to candidate

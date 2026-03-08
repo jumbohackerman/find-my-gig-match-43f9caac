@@ -1,4 +1,4 @@
-import type { MatchResult } from "@/lib/matchScoring";
+import type { MatchResult } from "@/domain/models";
 
 interface Props {
   result: MatchResult;

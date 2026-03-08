@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Users } from "lucide-react";
-import type { Seeker } from "@/data/seekers"; // Legacy type — kept for backward compat
-import type { MatchResult } from "@/lib/matchScoring";
+import type { Candidate, MatchResult } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import EmptyState from "./EmptyState";
 
 interface RankedCandidate {
-  seeker: Seeker;
+  candidate: Candidate;
   match: MatchResult;
 }
 
@@ -15,10 +14,10 @@ interface Props {
   candidates: RankedCandidate[];
   picksRemaining: number;
   maxPicks: number;
-  onSwipeRight: (seekerId: string) => void;
+  onSwipeRight: (candidateId: string) => void;
   onSkip: () => void;
   currentIndex: number;
-  onViewProfile: (seeker: Seeker, match: MatchResult) => void;
+  onViewProfile: (candidate: Candidate, match: MatchResult) => void;
 }
 
 const EmployerCandidateSwipe = ({
@@ -67,7 +66,7 @@ const EmployerCandidateSwipe = ({
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={current.seeker.id}
+          key={current.candidate.id}
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -30 }}
@@ -75,18 +74,18 @@ const EmployerCandidateSwipe = ({
         >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center text-2xl">
-              {current.seeker.avatar}
+              {current.candidate.avatar}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground">{current.seeker.name}</p>
-              <p className="text-xs text-muted-foreground">{current.seeker.title} · {current.seeker.experience}</p>
-              <p className="text-xs text-muted-foreground">{current.seeker.location}</p>
+              <p className="text-sm font-semibold text-foreground">{current.candidate.name}</p>
+              <p className="text-xs text-muted-foreground">{current.candidate.title} · {current.candidate.experience}</p>
+              <p className="text-xs text-muted-foreground">{current.candidate.location}</p>
             </div>
             <MatchBadge result={current.match} compact />
           </div>
 
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {current.seeker.skills.slice(0, 4).map((skill) => {
+            {current.candidate.skills.slice(0, 4).map((skill) => {
               const matched = current.match.matchedSkills.includes(skill);
               return (
                 <span
@@ -112,14 +111,14 @@ const EmployerCandidateSwipe = ({
             </button>
             <button
               onClick={() => {
-                onViewProfile(current.seeker, current.match);
+                onViewProfile(current.candidate, current.match);
               }}
               className="px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
             >
               Zobacz profil
             </button>
             <button
-              onClick={() => onSwipeRight(current.seeker.id)}
+              onClick={() => onSwipeRight(current.candidate.id)}
               className="w-12 h-12 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform"
             >
               <Check className="w-5 h-5" />

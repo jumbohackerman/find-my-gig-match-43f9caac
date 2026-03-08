@@ -8,12 +8,13 @@ import ApplicationStatusList from "@/components/ApplicationStatusList";
 import JobFilters, { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
-import type { Job } from "@/domain/models";
+import type { Job, Candidate } from "@/domain/models";
 import { useJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { supabase } from "@/integrations/supabase/client";
-import { calculateMatch, DEMO_CANDIDATE, type CandidateProfile, type MatchResult } from "@/lib/matchScoring";
+import { calculateMatch, DEMO_CANDIDATE, type MatchResult } from "@/lib/matchScoring";
+
 import { toast } from "sonner";
 
 type Tab = "swipe" | "applied" | "saved";
@@ -36,7 +37,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<Tab>("swipe");
   const [filters, setFilters] = useState<JobFiltersState>({ ...defaultFilters });
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [candidateProfile, setCandidateProfile] = useState<CandidateProfile>(DEMO_CANDIDATE);
+  const [candidateProfile, setCandidateProfile] = useState<Candidate>(DEMO_CANDIDATE);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -56,17 +57,15 @@ const Index = () => {
     remotePreference: string;
     seniority: string;
   }) => {
-    const newProfile: CandidateProfile = {
+    setCandidateProfile({
       ...candidateProfile,
       title: data.title,
       skills: data.skills,
-      preferredSalaryMin: data.salaryMin,
-      preferredSalaryMax: data.salaryMax,
-      remotePreference: data.remotePreference,
-      seniority: data.seniority,
-    };
-    setCandidateProfile(newProfile);
-    if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
+      salaryMin: data.salaryMin,
+      salaryMax: data.salaryMax,
+      workMode: data.remotePreference as Candidate["workMode"],
+      seniority: data.seniority as Candidate["seniority"],
+    });
     setShowOnboarding(false);
   };
 

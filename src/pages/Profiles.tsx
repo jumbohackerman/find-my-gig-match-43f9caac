@@ -4,59 +4,25 @@ import { Briefcase, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import SeekerCard from "@/components/SeekerCard";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
-import type { ExtendedSeeker } from "@/components/CandidateProfileModal";
 import { useCandidates } from "@/hooks/useCandidates";
 import type { Candidate } from "@/domain/models";
 
-/** Map domain Candidate to the shape SeekerCard/CandidateProfileModal expect */
-function candidateToSeeker(c: Candidate): ExtendedSeeker {
-  return {
-    id: c.id,
-    name: c.title, // fallback — name not in Candidate model yet
-    avatar: "👤",
-    title: c.title,
-    location: c.location,
-    bio: c.bio,
-    experience: c.experience,
-    skills: c.skills,
-    availability: c.availability as any,
-    seniority: c.seniority,
-    summary: c.summary,
-    work_mode: c.workMode,
-    employment_type: c.employmentType,
-    salary_min: c.salaryMin,
-    salary_max: c.salaryMax,
-    experience_entries: c.experienceEntries?.map((e) => ({
-      title: e.title,
-      company: e.company,
-      startDate: e.startDate,
-      endDate: e.endDate,
-      bullets: e.bullets,
-    })),
-    links: c.links,
-    cv_url: c.cvUrl || undefined,
-    last_active: c.lastActive,
-  } as ExtendedSeeker;
-}
-
 const Profiles = () => {
   const [search, setSearch] = useState("");
-  const [selectedSeeker, setSelectedSeeker] = useState<ExtendedSeeker | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
   const { candidates, loading } = useCandidates();
 
-  const seekers = useMemo(() => candidates.map(candidateToSeeker), [candidates]);
-
   const filtered = useMemo(() => {
-    if (!search.trim()) return seekers;
+    if (!search.trim()) return candidates;
     const q = search.toLowerCase();
-    return seekers.filter(
-      (s) =>
-        s.name.toLowerCase().includes(q) ||
-        s.title.toLowerCase().includes(q) ||
-        s.skills.some((sk: string) => sk.toLowerCase().includes(q)) ||
-        s.location.toLowerCase().includes(q)
+    return candidates.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.title.toLowerCase().includes(q) ||
+        c.skills.some((sk) => sk.toLowerCase().includes(q)) ||
+        c.location.toLowerCase().includes(q)
     );
-  }, [search, seekers]);
+  }, [search, candidates]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -105,12 +71,12 @@ const Profiles = () => {
           </p>
         ) : (
           <div className="flex flex-col gap-4">
-            {filtered.map((seeker, i) => (
+            {filtered.map((candidate, i) => (
               <SeekerCard
-                key={seeker.id}
-                seeker={seeker}
+                key={candidate.id}
+                candidate={candidate}
                 index={i}
-                onClick={() => setSelectedSeeker(seeker)}
+                onClick={() => setSelectedCandidate(candidate)}
               />
             ))}
           </div>
@@ -118,8 +84,8 @@ const Profiles = () => {
       </main>
 
       <CandidateProfileModal
-        seeker={selectedSeeker}
-        onClose={() => setSelectedSeeker(null)}
+        candidate={selectedCandidate}
+        onClose={() => setSelectedCandidate(null)}
       />
     </div>
   );
