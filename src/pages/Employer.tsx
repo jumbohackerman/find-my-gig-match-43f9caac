@@ -47,6 +47,7 @@ const Employer = () => {
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
+  const [hidePending, setHidePending] = useState<string | null>(null);
   const [statusPending, setStatusPending] = useState<string | null>(null);
 
   const handleAdvanceStatus = async (appId: string, newStatus: ApplicationStatus) => {
