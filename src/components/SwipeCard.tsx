@@ -10,19 +10,22 @@ interface SwipeCardProps {
   isTop: boolean;
   matchResult?: MatchResult;
   isSaved?: boolean;
+  onTap?: () => void;
 }
 
-const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved }: SwipeCardProps) => {
+const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCardProps) => {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-15, 15]);
   const rightOpacity = useTransform(x, [0, 100], [0, 1]);
   const leftOpacity = useTransform(x, [-100, 0], [1, 0]);
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    if (info.offset.x > 120) {
-      onSwipe("right");
-    } else if (info.offset.x < -120) {
-      onSwipe("left");
+    const absX = Math.abs(info.offset.x);
+    const absY = Math.abs(info.offset.y);
+    if (absX > 120) {
+      onSwipe(info.offset.x > 0 ? "right" : "left");
+    } else if (absX < 5 && absY < 5 && onTap) {
+      onTap();
     }
   };
 
