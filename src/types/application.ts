@@ -1,13 +1,9 @@
-export type ApplicationStatus =
-  | "applied"
-  | "shortlisted"
-  | "viewed"
-  | "interview"
-  | "hired"
-  | "not_selected"
-  | "position_closed";
+/**
+ * Application status constants — labels, colors, ordering.
+ * Types are canonical in domain/models.ts; this file holds UI constants.
+ */
 
-export type ApplicationSource = "candidate" | "ai" | "employer";
+import type { ApplicationStatus } from "@/domain/models";
 
 export const STATUS_ORDER: ApplicationStatus[] = [
   "applied",
@@ -41,3 +37,6 @@ export const STATUS_COLORS: Record<ApplicationStatus, string> = {
 export function isOutcome(status: ApplicationStatus): boolean {
   return OUTCOME_STATUSES.includes(status);
 }
+
+// Re-export type for backward compatibility
+export type { ApplicationStatus, ApplicationSource } from "@/domain/models";
