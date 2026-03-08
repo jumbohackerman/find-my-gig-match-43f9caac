@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, RotateCcw } from "lucide-react";
+import { X, Check, Star, RotateCcw, Loader2 } from "lucide-react";
 import { SwipeCardSkeleton, EmptyView } from "@/components/StateViews";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
