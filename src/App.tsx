@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
+import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/cookies" element={<Cookies />} />
             <Route path="/" element={<ProtectedRoute><HomeRedirect><Index /></HomeRedirect></ProtectedRoute>} />
             <Route
               path="/my-profile"
