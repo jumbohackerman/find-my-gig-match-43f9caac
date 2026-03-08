@@ -42,6 +42,10 @@ export const mockJobRepository: JobRepository = {
     return result;
   },
 
+  async listForEmployer(_employerId: string): Promise<Job[]> {
+    return staticJobs.map(toDomain);
+  },
+
   async getById(id: string): Promise<Job | null> {
     const found = staticJobs.find((j) => j.id === id);
     return found ? toDomain(found) : null;
