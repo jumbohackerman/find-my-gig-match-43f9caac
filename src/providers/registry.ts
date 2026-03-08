@@ -28,13 +28,13 @@ import { supabaseCandidateRepository } from "@/repositories/supabase/candidates"
 import { supabaseApplicationRepository } from "@/repositories/supabase/applications";
 import { supabaseProfileRepository } from "@/repositories/supabase/profiles";
 import { supabaseMessageRepository } from "@/repositories/supabase/messages";
+import { supabaseSavedJobRepository } from "@/repositories/supabase/savedJobs";
+import { supabaseSwipeEventRepository } from "@/repositories/supabase/swipeEvents";
 import { supabaseStorageService } from "@/services/supabaseStorage";
 
 // ── Import mock implementations (for providers not yet migrated) ─────────────
 import { mockNotificationRepository } from "@/repositories/mock/notifications";
 import { mockPreferencesRepository } from "@/repositories/mock/preferences";
-import { mockSavedJobRepository } from "@/repositories/mock/savedJobs";
-import { mockSwipeEventRepository } from "@/repositories/mock/swipeEvents";
 import {
   noopAnalytics,
   noopErrorTracking,
@@ -70,11 +70,13 @@ const providers: ProviderMap = {
   messages: supabaseMessageRepository,
   storage: supabaseStorageService,
 
+  // Data repositories — Supabase (migrated)
+  savedJobs: supabaseSavedJobRepository,
+  swipeEvents: supabaseSwipeEventRepository,
+
   // Data repositories — still mock (no DB tables yet)
   notifications: mockNotificationRepository,
   preferences: mockPreferencesRepository,
-  savedJobs: mockSavedJobRepository,
-  swipeEvents: mockSwipeEventRepository,
 
   // External services
   analytics: noopAnalytics,
