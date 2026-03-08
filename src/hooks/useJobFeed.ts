@@ -74,6 +74,34 @@ export function useJobFeed() {
     [user],
   );
 
+  // ── Undo last skip/save ──────────────────────────────────────────────────
+  const undoLast = useCallback(async () => {
+    const entry = lastUndoableRef.current;
+    if (!entry || actionPending) return;
+    lastUndoableRef.current = null;
+
+    // Revert index
+    setCurrentIndex(entry.previousIndex);
+
+    // Remove from swiped set
+    setSwipedJobIds((prev) => {
+      const next = new Set(prev);
+      next.delete(entry.job.id);
+      return next;
+    });
+
+    // Revert side-effect
+    if (entry.direction === "save") {
+      try {
+        await unsaveJob(entry.job.id);
+      } catch {
+        // best-effort
+      }
+    }
+
+    toast.info("Cofnięto");
+  }, [actionPending, unsaveJob]);
+
   // ── Swipe handler ────────────────────────────────────────────────────────
   const handleSwipe = useCallback(
     async (direction: "left" | "right" | "save") => {
@@ -82,6 +110,7 @@ export function useJobFeed() {
       if (!job) return;
 
       setActionPending(true);
+      lastUndoableRef.current = null; // clear previous undo
 
       // Record swipe event — non-blocking; don't let failures stop the UX
       try {
@@ -97,19 +126,31 @@ export function useJobFeed() {
         } catch {
           // toast already shown in applyToJob — advance card anyway
         }
+        // Apply is not undoable
       } else if (direction === "save") {
         try {
           await saveJob(job.id);
-          toast.success("Oferta zapisana ⭐");
+          lastUndoableRef.current = { direction: "save", job, previousIndex: currentIndex };
+          toast.success("Oferta zapisana ⭐", {
+            action: { label: "Cofnij", onClick: () => undoLast() },
+            duration: 5000,
+          });
         } catch {
           toast.error("Nie udało się zapisać oferty");
         }
+      } else {
+        // direction === "left" (skip)
+        lastUndoableRef.current = { direction: "left", job, previousIndex: currentIndex };
+        toast("Pominięto", {
+          action: { label: "Cofnij", onClick: () => undoLast() },
+          duration: 5000,
+        });
       }
 
       setCurrentIndex((prev) => prev + 1);
       setActionPending(false);
     },
-    [currentIndex, filteredJobs, userId, applyToJob, saveJob, actionPending],
+    [currentIndex, filteredJobs, userId, applyToJob, saveJob, actionPending, undoLast],
   );
 
   // ── Apply from saved list ────────────────────────────────────────────────
