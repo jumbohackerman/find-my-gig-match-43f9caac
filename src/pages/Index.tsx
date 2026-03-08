@@ -8,12 +8,13 @@ import ApplicationStatusList from "@/components/ApplicationStatusList";
 import JobFilters, { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
-import type { Job } from "@/domain/models";
+import type { Job, Candidate } from "@/domain/models";
 import { useJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/hooks/useAuth";
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { supabase } from "@/integrations/supabase/client";
-import { calculateMatch, DEMO_CANDIDATE, type CandidateProfile, type MatchResult } from "@/lib/matchScoring";
+import { calculateMatch, DEMO_CANDIDATE, type MatchResult } from "@/lib/matchScoring";
+import type { Candidate as CandidateType } from "@/domain/models";
 import { toast } from "sonner";
 
 type Tab = "swipe" | "applied" | "saved";
