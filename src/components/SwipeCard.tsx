@@ -48,7 +48,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
   const handleDragEnd = (_: any, info: PanInfo) => {
     const absX = Math.abs(info.offset.x);
-    if (absX > 120) {
+    if (absX > 100) {
       const dir = info.offset.x > 0 ? "right" : "left";
       setExitDirection(dir);
       onSwipe(dir);
