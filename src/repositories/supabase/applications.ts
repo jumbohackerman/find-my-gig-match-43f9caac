@@ -6,6 +6,7 @@
  * - Employer enrichment (applications + candidates + profiles)
  * - Atomic apply via apply_to_job RPC
  * - Realtime subscriptions for both roles
+ * - Status counting per job
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -79,7 +80,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
   },
 
   async listForEmployer(employerId: string): Promise<EnrichedEmployerApplication[]> {
-    // 1. Get employer's jobs + system-seeded jobs
     const { data: jobsData } = await supabase
       .from("jobs")
       .select("*")
@@ -92,7 +92,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
     const domainJobs = jobsData.map(dbJobToDomain);
     const jobIds = jobsData.map((j: any) => j.id);
 
-    // 2. Get applications for those jobs
     const { data: appsData } = await supabase
       .from("applications")
       .select("*")
@@ -101,7 +100,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
 
     if (!appsData || appsData.length === 0) return [];
 
-    // 3. Fetch candidate data for all unique candidate IDs
     const candidateIds = [...new Set(appsData.map((a: any) => a.candidate_id))];
     const candidateMap: Record<string, any> = {};
     const profileMap: Record<string, { full_name: string; avatar: string | null }> = {};
@@ -126,7 +124,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
       });
     }
 
-    // 4. Enrich applications with candidate + job data (matchResult computed by hook)
     return appsData.map((app: any) => {
       const dbCandidate = candidateMap[app.candidate_id];
       const job = domainJobs.find((j) => j.id === app.job_id);
@@ -148,7 +145,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
   },
 
   async apply(job: Job, candidateId: string, source = "candidate"): Promise<Application> {
-    // Use the apply_to_job RPC for atomic job upsert + application creation
     const { data, error } = await supabase.rpc("apply_to_job", {
       _static_job_id: job.id,
       _job_title: job.title,
@@ -173,10 +169,13 @@ export const supabaseApplicationRepository: ApplicationRepository = {
     };
   },
 
-  async updateStatus(applicationId, status): Promise<void> {
+  async updateStatus(applicationId, status, source): Promise<void> {
+    const updateData: Record<string, unknown> = { status };
+    if (source) updateData.source = source;
+
     const { error } = await supabase
       .from("applications")
-      .update({ status })
+      .update(updateData)
       .eq("id", applicationId);
 
     if (error) throw new Error(`Failed to update status: ${error.message}`);
@@ -215,5 +214,27 @@ export const supabaseApplicationRepository: ApplicationRepository = {
     return () => {
       supabase.removeChannel(channel);
     };
+  },
+
+  async countByStatus(jobId: string): Promise<Record<ApplicationStatus, number>> {
+    const { data, error } = await supabase
+      .from("applications")
+      .select("status")
+      .eq("job_id", jobId);
+
+    const counts = {} as Record<ApplicationStatus, number>;
+    const statuses: ApplicationStatus[] = [
+      "applied", "shortlisted", "viewed", "interview", "hired", "not_selected", "position_closed",
+    ];
+    statuses.forEach((s) => { counts[s] = 0; });
+
+    if (!error && data) {
+      data.forEach((row: any) => {
+        const s = row.status as ApplicationStatus;
+        if (counts[s] !== undefined) counts[s]++;
+      });
+    }
+
+    return counts;
   },
 };

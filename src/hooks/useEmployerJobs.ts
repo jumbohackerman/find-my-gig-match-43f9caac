@@ -51,6 +51,31 @@ export function useEmployerJobs() {
     }
   }, []);
 
+  const editJob = useCallback(async (jobId: string, data: Partial<JobFormData>): Promise<Job | null> => {
+    setSubmitting(true);
+    try {
+      const job = await getProvider("jobs").update(jobId, data);
+      toast.success("Ogłoszenie zaktualizowane");
+      return job;
+    } catch (e) {
+      toast.error("Nie udało się zaktualizować ogłoszenia");
+      console.error("[useEmployerJobs] editJob error", e);
+      return null;
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  const archiveJob = useCallback(async (jobId: string): Promise<void> => {
+    try {
+      await getProvider("jobs").archive(jobId);
+      toast.success("Ogłoszenie zamknięte");
+    } catch (e) {
+      toast.error("Nie udało się zamknąć ogłoszenia");
+      console.error("[useEmployerJobs] archiveJob error", e);
+    }
+  }, []);
+
   const deleteJob = useCallback(async (jobId: string): Promise<void> => {
     try {
       await getProvider("jobs").delete(jobId);
@@ -61,5 +86,5 @@ export function useEmployerJobs() {
     }
   }, []);
 
-  return { createJob, deleteJob, submitting, EMPTY_FORM };
+  return { createJob, editJob, archiveJob, deleteJob, submitting, EMPTY_FORM };
 }

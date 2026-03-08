@@ -1,20 +1,22 @@
 /**
  * Mock job repository — backed by static data from src/data/jobs.ts.
- * Drop-in replacement interface; swap for Supabase repo later.
  */
 
 import type { JobRepository, JobFilters } from "@/repositories/interfaces";
 import type { Job } from "@/domain/models";
 import { jobs as staticJobs } from "@/data/jobs";
 
-/** Map legacy static Job type to domain Job (they're compatible) */
 function toDomain(j: typeof staticJobs[number]): Job {
   return { ...j, status: "active" as const };
 }
 
+let dynamicJobs: Job[] = [];
+
 export const mockJobRepository: JobRepository = {
   async list(filters?: JobFilters): Promise<Job[]> {
-    let result = staticJobs.map(toDomain);
+    let result = [...staticJobs.map(toDomain), ...dynamicJobs].filter(
+      (j) => j.status === "active",
+    );
 
     if (filters?.search) {
       const q = filters.search.toLowerCase();
@@ -43,12 +45,13 @@ export const mockJobRepository: JobRepository = {
   },
 
   async listForEmployer(_employerId: string): Promise<Job[]> {
-    return staticJobs.map(toDomain);
+    return [...staticJobs.map(toDomain), ...dynamicJobs];
   },
 
   async getById(id: string): Promise<Job | null> {
     const found = staticJobs.find((j) => j.id === id);
-    return found ? toDomain(found) : null;
+    if (found) return toDomain(found);
+    return dynamicJobs.find((j) => j.id === id) || null;
   },
 
   async create(job): Promise<Job> {
@@ -58,12 +61,35 @@ export const mockJobRepository: JobRepository = {
       posted: "Właśnie dodano",
       status: "active",
     };
-    // In mock mode, we don't persist — just return the created object
-    console.debug("[mockJobRepo] create", newJob);
+    dynamicJobs = [newJob, ...dynamicJobs];
     return newJob;
   },
 
+  async update(id, data): Promise<Job> {
+    const idx = dynamicJobs.findIndex((j) => j.id === id);
+    if (idx >= 0) {
+      dynamicJobs[idx] = { ...dynamicJobs[idx], ...data };
+      return dynamicJobs[idx];
+    }
+    const staticJob = staticJobs.find((j) => j.id === id);
+    if (staticJob) {
+      const updated: Job = { ...toDomain(staticJob), ...data };
+      dynamicJobs.push(updated);
+      return updated;
+    }
+    throw new Error(`Job ${id} not found`);
+  },
+
+  async archive(id: string): Promise<void> {
+    const idx = dynamicJobs.findIndex((j) => j.id === id);
+    if (idx >= 0) {
+      dynamicJobs[idx] = { ...dynamicJobs[idx], status: "closed" };
+    }
+    console.debug("[mockJobRepo] archive", id);
+  },
+
   async delete(id: string): Promise<void> {
+    dynamicJobs = dynamicJobs.filter((j) => j.id !== id);
     console.debug("[mockJobRepo] delete", id);
   },
 };

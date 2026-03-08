@@ -117,6 +117,34 @@ export const supabaseJobRepository: JobRepository = {
     return toDomain(data as unknown as DbJob);
   },
 
+  async update(id: string, data: Partial<Omit<Job, "id" | "posted">>): Promise<Job> {
+    const dbData: Record<string, unknown> = {};
+    if (data.title !== undefined) dbData.title = data.title;
+    if (data.company !== undefined) dbData.company = data.company;
+    if (data.location !== undefined) dbData.location = data.location;
+    if (data.logo !== undefined) dbData.logo = data.logo;
+    if (data.salary !== undefined) dbData.salary = data.salary;
+    if (data.tags !== undefined) dbData.tags = data.tags;
+    if (data.type !== undefined) dbData.type = data.type;
+    if (data.description !== undefined) dbData.description = data.description;
+    if (data.status !== undefined) dbData.status = data.status;
+
+    const { error } = await supabase.from("jobs").update(dbData).eq("id", id);
+    if (error) throw new Error(`Failed to update job: ${error.message}`);
+
+    const result = await supabaseJobRepository.getById(id);
+    if (!result) throw new Error("Job not found after update");
+    return result;
+  },
+
+  async archive(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("jobs")
+      .update({ status: "closed" })
+      .eq("id", id);
+    if (error) throw new Error(`Failed to archive job: ${error.message}`);
+  },
+
   async delete(id: string): Promise<void> {
     const { error } = await supabase.from("jobs").delete().eq("id", id);
     if (error) throw new Error(`Failed to delete job: ${error.message}`);
