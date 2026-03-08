@@ -97,6 +97,7 @@ const Employer = () => {
   const [swipeIndexes, setSwipeIndexes] = useState<Record<string, number>>({});
   const [picksUsed, setPicksUsed] = useState<Record<string, number>>({});
   const [activeTab, setActiveTab] = useState<EmployerTab>("listings");
+  const [sortByScore, setSortByScore] = useState<Record<string, boolean>>({});
 
   const [form, setForm] = useState({
     title: "", company: "", logo: "🏢", location: "", salary: "",
@@ -464,9 +465,22 @@ const Employer = () => {
                     {isExpanded && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                         <div className="px-4 pb-4 border-t border-border pt-3">
-                          <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                            Kandydaci ({jobApplicants.length})
-                          </h5>
+                          <div className="flex items-center justify-between mb-3">
+                            <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Kandydaci ({jobApplicants.length})
+                            </h5>
+                            <button
+                              onClick={() => setSortByScore((prev) => ({ ...prev, [job.id]: !prev[job.id] }))}
+                              className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg font-medium transition-colors ${
+                                sortByScore[job.id]
+                                  ? "bg-accent/15 text-accent"
+                                  : "bg-secondary text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              <BarChart3 className="w-3 h-3" />
+                              {sortByScore[job.id] ? "Wg dopasowania ↓" : "Sortuj wg dopasowania"}
+                            </button>
+                          </div>
                           {jobApplicants.length === 0 ? (
                             <EmptyState
                               title="Brak kandydatów"
@@ -474,7 +488,15 @@ const Employer = () => {
                             />
                           ) : (
                             <div className="space-y-2">
-                              {jobApplicants.map((seeker) => {
+                              {(() => {
+                                const applicantsWithScore = jobApplicants.map((seeker) => ({
+                                  seeker,
+                                  matchResult: calculateMatch(seekerToProfile(seeker), job),
+                                }));
+                                if (sortByScore[job.id]) {
+                                  applicantsWithScore.sort((a, b) => b.matchResult.score - a.matchResult.score);
+                                }
+                                return applicantsWithScore.map(({ seeker, matchResult }) => {
                                 const app = getApp(job.id, seeker.id);
                                 const activity = getActivityLabel(undefined);
                                 const appMessages = messages.filter((m) => m.applicationId === app?.id);
