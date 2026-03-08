@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Clock, Briefcase, Wifi } from "lucide-react";
+import { MapPin, Briefcase } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { pl } from "date-fns/locale";
 import MatchBadge from "@/components/MatchBadge";
@@ -67,7 +67,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
         transition: { duration: 0.3 },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border" style={{ maxHeight: 'clamp(300px, 52vh, 440px)' }}>
+      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border" style={{ maxHeight: 'clamp(260px, 42vh, 380px)' }}>
         {/* Swipe indicators */}
         {isTop && (
           <>
@@ -119,18 +119,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
 
           <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">{job.description}</p>
 
-          {/* Match explainability */}
-          {matchResult && (
-            <div className="mb-3 p-2.5 rounded-xl bg-secondary/50 border border-border">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                Dlaczego to pasuje
-              </p>
-              <MatchBadge result={matchResult} />
-            </div>
-          )}
-
           {/* Details */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="flex items-center gap-4 mb-3">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="w-3.5 h-3.5 text-primary" />
               {job.location}
@@ -139,19 +129,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
               <Briefcase className="w-3.5 h-3.5 text-primary" />
               {job.type}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Wifi className="w-3.5 h-3.5 text-accent" />
-              {workMode}
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-              {formatPosted(job.posted)}
-            </div>
           </div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            {job.tags.map((tag) => {
+            {job.tags.slice(0, 4).map((tag) => {
               const isMatched = matchResult?.matchedSkills.includes(tag);
               const isMissing = matchResult?.missingSkills.includes(tag);
               return (
