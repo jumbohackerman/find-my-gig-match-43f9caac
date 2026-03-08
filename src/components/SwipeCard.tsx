@@ -77,9 +77,9 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
       initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
       animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 10 }}
       exit={{
-        x: exitDirection === "right" ? 300 : -300,
+        x: exitDirection === "right" ? 500 : -500,
         opacity: 0,
-        transition: { duration: 0.3 },
+        transition: { duration: 0.35, ease: "easeInOut" },
       }}
     >
       <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border cursor-grab active:cursor-grabbing">

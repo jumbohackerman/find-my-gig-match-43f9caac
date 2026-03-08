@@ -148,8 +148,8 @@ const Index = () => {
               </div>
             ) : (
               <>
-                {/* Card stack — overflow hidden prevents card from covering buttons */}
-                <div className="relative w-full overflow-hidden" style={{ height: 'clamp(300px, 45vh, 420px)' }}>
+                {/* Card stack — buttons use z-10 so no overflow-hidden needed */}
+                <div className="relative w-full" style={{ height: 'clamp(340px, 55vh, 520px)' }}>
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
