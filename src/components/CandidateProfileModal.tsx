@@ -8,6 +8,7 @@ import type { Candidate, MatchResult } from "@/domain/models";
 import { getActivityLabel } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 
 interface Props {
   candidate: Candidate | null;
