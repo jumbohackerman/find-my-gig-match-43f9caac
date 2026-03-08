@@ -199,20 +199,53 @@ const MyProfile = () => {
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    
     if (file.type !== "application/pdf") {
       toast.error("Dozwolone tylko pliki PDF");
       return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Plik jest za duży. Maksymalny rozmiar to 5MB.");
+      return;
+    }
+
     setUploading(true);
+    setUploadProgress(10);
+    
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => Math.min(prev + 15, 90));
+    }, 100);
+
     const path = `${user.id}/cv-${Date.now()}.pdf`;
     const result = await getProvider("storage").upload("cvs", path, file);
+    
+    clearInterval(progressInterval);
+    setUploadProgress(100);
+
     if (result.error) {
       toast.error("Przesyłanie nie powiodło się");
+      setUploading(false);
+      setUploadProgress(0);
     } else {
-      setCvUrl(path);
-      toast.success("CV przesłane");
+      setTimeout(() => {
+        setCvUrl(path);
+        toast.success("CV przesłane");
+        setUploading(false);
+        setUploadProgress(0);
+      }, 300);
     }
-    setUploading(false);
+  };
+
+  const handleRemoveCv = async () => {
+    if (!cvUrl || !user) return;
+    try {
+      await getProvider("storage").delete("cvs", cvUrl);
+      setCvUrl(null);
+      toast.success("CV zostało usunięte");
+    } catch (e) {
+      toast.error("Nie udało się usunąć CV");
+    }
   };
 
   const completeness = computeCompleteness({
