@@ -8,7 +8,8 @@
 
 export { calculateMatch } from "@/domain/scoring";
 export type { MatchResult, ScoreBreakdown, ScoringJob as JobForScoring } from "@/domain/scoring";
-export { dbCandidateToCandidate } from "@/domain/mappers";
+import { dbCandidateToCandidate } from "@/domain/mappers";
+export { dbCandidateToCandidate };
 
 // Legacy aliases
 import type { Candidate } from "@/domain/models";
