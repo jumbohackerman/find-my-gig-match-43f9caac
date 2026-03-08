@@ -5,7 +5,7 @@
  * NO direct Supabase imports.
  */
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { getProvider } from "@/providers/registry";
 import { useJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,12 @@ import { filterJobs, defaultFilters, type JobFiltersState } from "@/components/J
 import { calculateMatch, type MatchResult } from "@/lib/matchScoring";
 import { toast } from "sonner";
 import type { Job } from "@/domain/models";
+
+interface UndoEntry {
+  direction: "left" | "save";
+  job: Job;
+  previousIndex: number;
+}
 
 export function useJobFeed() {
   const { user } = useAuth();
@@ -26,6 +32,7 @@ export function useJobFeed() {
   const [swipedJobIds, setSwipedJobIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<JobFiltersState>({ ...defaultFilters });
   const [actionPending, setActionPending] = useState(false);
+  const lastUndoableRef = useRef<UndoEntry | null>(null);
 
   const userId = user?.id ?? "anonymous";
 
