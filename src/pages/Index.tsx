@@ -144,15 +144,15 @@ const Index = () => {
       <DemoBanner />
 
       {/* Header */}
-      <header className="px-6 py-4 border-b border-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
             <Briefcase className="w-4 h-4 text-primary-foreground" />
           </div>
           <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
           {/* Notifications bell */}
           <div className="relative">
             <button
@@ -167,7 +167,6 @@ const Index = () => {
               )}
             </button>
 
-            {/* Notification dropdown */}
             <AnimatePresence>
               {showNotifications && (
                 <motion.div
@@ -200,24 +199,24 @@ const Index = () => {
 
           <Link
             to="/my-profile"
-            className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+            className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
           >
             <User className="w-4 h-4" />
-            Mój profil
+            <span className="hidden sm:inline">Mój profil</span>
           </Link>
           <Link
             to="/employer"
-            className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+            className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
           >
             <Building2 className="w-4 h-4" />
-            Dla firm
+            <span className="hidden sm:inline">Dla firm</span>
           </Link>
           <Link
             to="/profiles"
-            className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
+            className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5"
           >
             <Users className="w-4 h-4" />
-            Znajdź talent
+            <span className="hidden sm:inline">Znajdź talent</span>
           </Link>
           {user && (
             <button
