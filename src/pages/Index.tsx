@@ -355,6 +355,15 @@ const Index = () => {
         onComplete={handleOnboardingComplete}
         onClose={() => setShowOnboarding(false)}
       />
+
+      <JobDetailModal
+        job={selectedJob}
+        matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
+        onClose={() => setSelectedJob(null)}
+        onApply={(job) => {
+          setAppliedJobs((prev) => (prev.some((j) => j.id === job.id) ? prev : [job, ...prev]));
+        }}
+      />
     </div>
   );
 };
