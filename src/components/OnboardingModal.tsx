@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -135,17 +135,25 @@ const OnboardingModal = ({ open, onComplete, onClose }: Props) => {
 
   const canNext = step === 0 ? title.trim().length > 0 : step === 1 ? skills.length >= 1 : true;
 
+  // ESC to close
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" role="dialog" aria-modal="true" aria-label="Onboarding — konfiguracja profilu">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md card-gradient rounded-2xl border border-border p-6 relative"
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
-          <X className="w-5 h-5" />
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1" aria-label="Zamknij">
+          <X className="w-5 h-5" aria-hidden="true" />
         </button>
 
         <div className="flex gap-1 mb-5">
