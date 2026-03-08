@@ -231,12 +231,15 @@ const MyProfile = () => {
   const additionalSkills = skills.slice(5);
 
   const sections = [
-    { id: "basic", label: "Dane podstawowe" },
-    { id: "prefs", label: "Preferencje" },
-    { id: "skills", label: "Umiejętności" },
-    { id: "experience", label: "Doświadczenie" },
-    { id: "links", label: "Linki i CV" },
+    { id: "basic", label: "Dane podstawowe", icon: "👤" },
+    { id: "prefs", label: "Preferencje pracy", icon: "⚙️" },
+    { id: "competence", label: "Umiejętności i doświadczenie", icon: "🚀" },
+    { id: "links", label: "Linki i CV", icon: "🔗" },
   ];
+
+  const toggleSection = (id: string) => {
+    setActiveSection(activeSection === id ? "" : id);
+  };
 
   if (loading) {
     return (
@@ -289,22 +292,8 @@ const MyProfile = () => {
             <Progress value={completeness} className="h-2" />
           </div>
 
-          {/* Section nav */}
-          <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActiveSection(s.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                  activeSection === s.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-muted"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
+          {/* Accordion sections */}
+          <div className="space-y-2">
 
           {/* BASIC INFO */}
           {activeSection === "basic" && (
