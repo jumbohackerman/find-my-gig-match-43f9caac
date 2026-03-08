@@ -67,7 +67,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap }: SwipeCa
         transition: { duration: 0.3 },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-y-auto border border-border" style={{ maxHeight: 'clamp(300px, 52vh, 440px)' }}>
+      <div className="card-gradient rounded-2xl shadow-card overflow-hidden border border-border" style={{ maxHeight: 'clamp(300px, 52vh, 440px)' }}>
         {/* Swipe indicators */}
         {isTop && (
           <>
