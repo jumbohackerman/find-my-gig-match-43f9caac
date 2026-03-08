@@ -109,6 +109,7 @@ export function useJobFeed() {
   const applyFromSaved = useCallback(
     async (job: Job) => {
       await unsaveJob(job.id);
+      toast.info("Usunięto z zapisanych");
       await applyToJob(job);
     },
     [unsaveJob, applyToJob],

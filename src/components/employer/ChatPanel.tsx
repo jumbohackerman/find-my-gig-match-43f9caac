@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Send, MessageSquare, Loader2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import EmptyState from "./EmptyState";
 
@@ -36,6 +37,7 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, curr
     try {
       await onSend(msg);
       setText("");
+      toast.success("Wiadomość wysłana");
     } catch {
       setSendError("Nie udało się wysłać wiadomości");
       setLastFailedText(msg);
