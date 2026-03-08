@@ -88,7 +88,7 @@ const Auth = () => {
               : "Podaj email, aby otrzymać link do resetowania."}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" aria-label={mode === "login" ? "Formularz logowania" : mode === "signup" ? "Formularz rejestracji" : "Formularz resetowania hasła"}>
             {mode === "signup" && (
               <>
                 {/* Role selector */}
@@ -110,14 +110,16 @@ const Auth = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground font-medium">Imię i nazwisko</label>
+                  <label htmlFor="auth-fullname" className="text-xs text-muted-foreground font-medium">Imię i nazwisko</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
+                      id="auth-fullname"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Twoje imię i nazwisko"
+                      autoComplete="name"
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
@@ -126,15 +128,17 @@ const Auth = () => {
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground font-medium">Email</label>
+              <label htmlFor="auth-email" className="text-xs text-muted-foreground font-medium">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
+                  id="auth-email"
                   required
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ty@przyklad.pl"
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
@@ -142,18 +146,20 @@ const Auth = () => {
 
             {mode !== "forgot" && (
               <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground font-medium">Hasło</label>
+                <label htmlFor="auth-password" className="text-xs text-muted-foreground font-medium">Hasło</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    required
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    minLength={6}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
+                    <input
+                      id="auth-password"
+                      required
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      minLength={6}
+                      autoComplete={mode === "login" ? "current-password" : "new-password"}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
                 </div>
               </div>
             )}

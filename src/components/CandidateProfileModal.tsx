@@ -1,3 +1,4 @@
+import { useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, MapPin, Clock, Globe, Github, Linkedin, ExternalLink,
@@ -15,6 +16,17 @@ interface Props {
 }
 
 const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // ESC to close + auto-focus
+  useEffect(() => {
+    if (!candidate) return;
+    requestAnimationFrame(() => closeRef.current?.focus());
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [candidate, onClose]);
+
   if (!candidate) return null;
 
   const activity = getActivityLabel(candidate.lastActive);
@@ -25,7 +37,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Profil kandydata: ${candidate.name}`}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -35,8 +47,8 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
         >
           <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
             <ReportButton targetType="profile" targetId={candidate.id} targetLabel={candidate.name} />
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-              <X className="w-5 h-5" />
+            <button ref={closeRef} onClick={onClose} className="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1" aria-label="Zamknij">
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
 
