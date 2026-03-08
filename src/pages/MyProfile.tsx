@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Briefcase, Save, Plus, X, GripVertical, Upload, FileText,
+  Briefcase, Save, Plus, X, Upload, FileText,
   Globe, Github, Linkedin, ExternalLink, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -176,12 +176,6 @@ const MyProfile = () => {
 
   const removeSkill = (skill: string) => setSkills(skills.filter((s) => s !== skill));
 
-  const moveSkill = (from: number, to: number) => {
-    const arr = [...skills];
-    const [item] = arr.splice(from, 1);
-    arr.splice(to, 0, item);
-    setSkills(arr);
-  };
 
   const addExperience = () => {
     if (experienceEntries.length >= 3) return;
@@ -227,16 +221,17 @@ const MyProfile = () => {
     salary_min: salaryMin, links, title, location,
   });
 
-  const coreSkills = skills.slice(0, 5);
-  const additionalSkills = skills.slice(5);
 
   const sections = [
-    { id: "basic", label: "Dane podstawowe" },
-    { id: "prefs", label: "Preferencje" },
-    { id: "skills", label: "Umiejętności" },
-    { id: "experience", label: "Doświadczenie" },
-    { id: "links", label: "Linki i CV" },
+    { id: "basic", label: "Dane podstawowe", icon: "👤" },
+    { id: "prefs", label: "Preferencje pracy", icon: "⚙️" },
+    { id: "competence", label: "Umiejętności i doświadczenie", icon: "🚀" },
+    { id: "links", label: "Linki i CV", icon: "🔗" },
   ];
+
+  const toggleSection = (id: string) => {
+    setActiveSection(activeSection === id ? "" : id);
+  };
 
   if (loading) {
     return (
@@ -289,366 +284,365 @@ const MyProfile = () => {
             <Progress value={completeness} className="h-2" />
           </div>
 
-          {/* Section nav */}
-          <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActiveSection(s.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                  activeSection === s.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-muted"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-
-          {/* BASIC INFO */}
-          {activeSection === "basic" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <Field label="Imię i nazwisko" value={fullName} onChange={setFullName} placeholder="Jan Kowalski" />
-              <Field label="Tytuł zawodowy" value={title} onChange={setTitle} placeholder="Frontend Engineer" />
-              <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Warszawa" />
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Lata doświadczenia</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={40}
-                  value={experienceYears}
-                  onChange={(e) => setExperienceYears(parseInt(e.target.value) || 0)}
-                  className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Poziom doświadczenia</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {SENIORITY_OPTIONS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSeniority(s)}
-                      className={`py-2 rounded-xl text-xs font-medium transition-all ${
-                        seniority === s ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Podsumowanie zawodowe ({summary.length}/300)
-                </label>
-                <textarea
-                  value={summary}
-                  onChange={(e) => setSummary(e.target.value.slice(0, 300))}
-                  placeholder="Frontend engineer specjalizujący się w React i skalowalnych systemach UI."
-                  rows={3}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {/* WORK PREFERENCES */}
-          {activeSection === "prefs" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Tryb pracy</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {WORK_MODE_OPTIONS.map((w) => (
-                    <button
-                      key={w}
-                      onClick={() => setWorkMode(w)}
-                      className={`py-2 rounded-xl text-xs font-medium transition-all ${
-                        workMode === w ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {w}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Typ zatrudnienia</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {EMPLOYMENT_OPTIONS.map((e) => (
-                    <button
-                      key={e}
-                      onClick={() => setEmploymentType(e)}
-                      className={`py-2 rounded-xl text-xs font-medium transition-all ${
-                        employmentType === e ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {e}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Oczekiwania finansowe: {salaryMin > 0 || salaryMax > 0 ? `${salaryMin} 000 zł – ${salaryMax} 000 zł brutto` : "Nie ustawiono"}
-                </label>
-                <div className="flex gap-3 items-center">
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={salaryMin || ""}
-                    onChange={(e) => setSalaryMin(parseInt(e.target.value) || 0)}
-                    placeholder="Min"
-                    className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <span className="text-muted-foreground text-sm">–</span>
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={salaryMax || ""}
-                    onChange={(e) => setSalaryMax(parseInt(e.target.value) || 0)}
-                    placeholder="Max"
-                    className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <span className="text-xs text-muted-foreground">tys. zł brutto</span>
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Dostępność</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {AVAILABILITY_OPTIONS.map((a) => (
-                    <button
-                      key={a}
-                      onClick={() => setAvailability(a)}
-                      className={`py-2 rounded-xl text-xs font-medium transition-all ${
-                        availability === a ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {a}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* SKILLS */}
-          {activeSection === "skills" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <div className="flex gap-2">
-                <input
-                  value={skillInput}
-                  onChange={(e) => setSkillInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))}
-                  placeholder="Dodaj umiejętność..."
-                  className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  onClick={() => addSkill(skillInput)}
-                  className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {SKILL_SUGGESTIONS.filter((s) => !skills.includes(s))
-                  .slice(0, 12)
-                  .map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => addSkill(s)}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-secondary text-secondary-foreground hover:bg-muted transition-colors"
-                    >
-                      + {s}
-                    </button>
-                  ))}
-              </div>
-
-              {coreSkills.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Kluczowe umiejętności ({coreSkills.length})
-                  </p>
-                  <div className="space-y-1">
-                    {coreSkills.map((skill, i) => (
-                      <SkillRow
-                        key={skill}
-                        skill={skill}
-                        index={i}
-                        total={skills.length}
-                        onRemove={removeSkill}
-                        onMove={moveSkill}
-                      />
-                    ))}
+          {/* Accordion sections */}
+          <div className="space-y-2">
+            {/* BASIC INFO */}
+            <AccordionSection
+              id="basic"
+              label="Dane podstawowe"
+              icon="👤"
+              isOpen={activeSection === "basic"}
+              onToggle={() => toggleSection("basic")}
+              badge={title ? `${title}` : undefined}
+            >
+              <div className="space-y-4">
+                <Field label="Imię i nazwisko" value={fullName} onChange={setFullName} placeholder="Jan Kowalski" />
+                <Field label="Tytuł zawodowy" value={title} onChange={setTitle} placeholder="Frontend Engineer" />
+                <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Warszawa" />
+                <div className="flex gap-4 items-end">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Lata doświadczenia</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={40}
+                      value={experienceYears}
+                      onChange={(e) => setExperienceYears(parseInt(e.target.value) || 0)}
+                      className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
                   </div>
-                </div>
-              )}
-
-              {additionalSkills.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    Dodatkowe umiejętności ({additionalSkills.length})
-                  </p>
-                  <div className="space-y-1">
-                    {additionalSkills.map((skill, i) => (
-                      <SkillRow
-                        key={skill}
-                        skill={skill}
-                        index={i + 5}
-                        total={skills.length}
-                        onRemove={removeSkill}
-                        onMove={moveSkill}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* EXPERIENCE */}
-          {activeSection === "experience" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
-              {experienceEntries.map((entry, idx) => (
-                <div key={idx} className="rounded-xl border border-border bg-secondary/30 overflow-hidden">
-                  <button
-                    onClick={() => setExpandedExp(expandedExp === idx ? null : idx)}
-                    className="w-full p-3 flex items-center gap-2 text-left"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {entry.title || "Nowe stanowisko"}{entry.company ? ` — ${entry.company}` : ""}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {entry.startDate || "Początek"} – {entry.endDate || "Koniec"}
-                      </p>
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); removeExperience(idx); }}
-                      className="p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                    {expandedExp === idx ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-                  </button>
-
-                  {expandedExp === idx && (
-                    <div className="px-3 pb-3 space-y-3 border-t border-border pt-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <Field label="Stanowisko" value={entry.title} onChange={(v) => updateExperience(idx, "title", v)} placeholder="Senior Frontend Engineer" />
-                        <Field label="Firma" value={entry.company} onChange={(v) => updateExperience(idx, "company", v)} placeholder="Allegro" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <Field label="Data rozpoczęcia" value={entry.startDate} onChange={(v) => updateExperience(idx, "startDate", v)} placeholder="2022" />
-                        <Field label="Data zakończenia" value={entry.endDate} onChange={(v) => updateExperience(idx, "endDate", v)} placeholder="2024 lub Obecnie" />
-                      </div>
-                      {entry.bullets.map((bullet, bi) => (
-                        <div key={bi} className="space-y-1.5">
-                          <label className="text-xs font-medium text-muted-foreground">
-                            Punkt {bi + 1} ({bullet.length}/200)
-                          </label>
-                          <input
-                            value={bullet}
-                            onChange={(e) => {
-                              const bullets = [...entry.bullets];
-                              bullets[bi] = e.target.value.slice(0, 200);
-                              updateExperience(idx, "bullets", bullets);
-                            }}
-                            placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników"
-                            className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                          />
-                        </div>
-                      ))}
-                      {entry.bullets.length < 2 && (
+                  <div className="flex-1 space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Poziom</label>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {SENIORITY_OPTIONS.map((s) => (
                         <button
-                          onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])}
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
+                          key={s}
+                          onClick={() => setSeniority(s)}
+                          className={`py-2 rounded-xl text-xs font-medium transition-all ${
+                            seniority === s ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
+                          }`}
                         >
-                          <Plus className="w-3 h-3" /> Dodaj punkt
+                          {s}
                         </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Podsumowanie zawodowe ({summary.length}/300)
+                  </label>
+                  <textarea
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value.slice(0, 300))}
+                    placeholder="Frontend engineer specjalizujący się w React i skalowalnych systemach UI."
+                    rows={3}
+                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                  />
+                </div>
+              </div>
+            </AccordionSection>
+
+            {/* WORK PREFERENCES */}
+            <AccordionSection
+              id="prefs"
+              label="Preferencje pracy"
+              icon="⚙️"
+              isOpen={activeSection === "prefs"}
+              onToggle={() => toggleSection("prefs")}
+              badge={`${workMode} · ${employmentType}`}
+            >
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Tryb pracy</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {WORK_MODE_OPTIONS.map((w) => (
+                      <button
+                        key={w}
+                        onClick={() => setWorkMode(w)}
+                        className={`py-2 rounded-xl text-xs font-medium transition-all ${
+                          workMode === w ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {w}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Typ zatrudnienia</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {EMPLOYMENT_OPTIONS.map((e) => (
+                      <button
+                        key={e}
+                        onClick={() => setEmploymentType(e)}
+                        className={`py-2 rounded-xl text-xs font-medium transition-all ${
+                          employmentType === e ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Oczekiwania finansowe: {salaryMin > 0 || salaryMax > 0 ? `${salaryMin} 000 zł – ${salaryMax} 000 zł brutto` : "Nie ustawiono"}
+                  </label>
+                  <div className="flex gap-3 items-center">
+                    <input type="number" min={0} max={100} value={salaryMin || ""} onChange={(e) => setSalaryMin(parseInt(e.target.value) || 0)} placeholder="Min" className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <span className="text-muted-foreground text-sm">–</span>
+                    <input type="number" min={0} max={100} value={salaryMax || ""} onChange={(e) => setSalaryMax(parseInt(e.target.value) || 0)} placeholder="Max" className="w-24 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                    <span className="text-xs text-muted-foreground">tys. zł brutto</span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Dostępność</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {AVAILABILITY_OPTIONS.map((a) => (
+                      <button
+                        key={a}
+                        onClick={() => setAvailability(a)}
+                        className={`py-2 rounded-xl text-xs font-medium transition-all ${
+                          availability === a ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </AccordionSection>
+
+            {/* SKILLS & EXPERIENCE (merged) */}
+            <AccordionSection
+              id="competence"
+              label="Umiejętności i doświadczenie"
+              icon="🚀"
+              isOpen={activeSection === "competence"}
+              onToggle={() => toggleSection("competence")}
+              badge={skills.length > 0 ? `${skills.length} umiejętności · ${experienceEntries.length} pozycje` : undefined}
+            >
+              <div className="space-y-6">
+                {/* Skills subsection */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-accent uppercase tracking-wider">Umiejętności</p>
+                  <div className="flex gap-2">
+                    <input
+                      value={skillInput}
+                      onChange={(e) => setSkillInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill(skillInput))}
+                      placeholder="Dodaj umiejętność..."
+                      className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                    <button
+                      onClick={() => addSkill(skillInput)}
+                      className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Suggestions */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {SKILL_SUGGESTIONS.filter((s) => !skills.includes(s))
+                      .slice(0, 10)
+                      .map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => addSkill(s)}
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-secondary text-secondary-foreground hover:bg-muted transition-colors"
+                        >
+                          + {s}
+                        </button>
+                      ))}
+                  </div>
+
+                  {/* Skills list as tags */}
+                  {skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {skills.map((skill, i) => (
+                        <span
+                          key={skill}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${
+                            i < 5
+                              ? "bg-accent/15 text-accent border border-accent/30"
+                              : "bg-secondary text-secondary-foreground border border-border"
+                          }`}
+                        >
+                          {skill}
+                          <button onClick={() => removeSkill(skill)} className="hover:text-destructive transition-colors">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {skills.length > 0 && (
+                    <p className="text-[10px] text-muted-foreground">
+                      Pierwsze 5 umiejętności są wyróżnione jako kluczowe. Przeciągnij, aby zmienić kolejność.
+                    </p>
+                  )}
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-border" />
+
+                {/* Experience subsection */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold text-accent uppercase tracking-wider">Doświadczenie zawodowe</p>
+
+                  {experienceEntries.map((entry, idx) => (
+                    <div key={idx} className="rounded-xl border border-border bg-secondary/30 overflow-hidden">
+                      <button
+                        onClick={() => setExpandedExp(expandedExp === idx ? null : idx)}
+                        className="w-full p-3 flex items-center gap-2 text-left"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {entry.title || "Nowe stanowisko"}{entry.company ? ` — ${entry.company}` : ""}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {entry.startDate || "Początek"} – {entry.endDate || "Koniec"}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeExperience(idx); }}
+                          className="p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                        {expandedExp === idx ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                      </button>
+
+                      {expandedExp === idx && (
+                        <div className="px-3 pb-3 space-y-3 border-t border-border pt-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <Field label="Stanowisko" value={entry.title} onChange={(v) => updateExperience(idx, "title", v)} placeholder="Senior Frontend Engineer" />
+                            <Field label="Firma" value={entry.company} onChange={(v) => updateExperience(idx, "company", v)} placeholder="Allegro" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <Field label="Data rozpoczęcia" value={entry.startDate} onChange={(v) => updateExperience(idx, "startDate", v)} placeholder="2022" />
+                            <Field label="Data zakończenia" value={entry.endDate} onChange={(v) => updateExperience(idx, "endDate", v)} placeholder="2024 lub Obecnie" />
+                          </div>
+                          {entry.bullets.map((bullet, bi) => (
+                            <div key={bi} className="space-y-1.5">
+                              <label className="text-xs font-medium text-muted-foreground">
+                                Punkt {bi + 1} ({bullet.length}/200)
+                              </label>
+                              <input
+                                value={bullet}
+                                onChange={(e) => {
+                                  const bullets = [...entry.bullets];
+                                  bullets[bi] = e.target.value.slice(0, 200);
+                                  updateExperience(idx, "bullets", bullets);
+                                }}
+                                placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników"
+                                className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              />
+                            </div>
+                          ))}
+                          {entry.bullets.length < 2 && (
+                            <button
+                              onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])}
+                              className="text-xs text-primary hover:underline flex items-center gap-1"
+                            >
+                              <Plus className="w-3 h-3" /> Dodaj punkt
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-              ))}
+                  ))}
 
-              {experienceEntries.length < 3 && (
-                <button
-                  onClick={addExperience}
-                  className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/3)
-                </button>
-              )}
-            </motion.div>
-          )}
-
-          {/* LINKS & CV */}
-          {activeSection === "links" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-              <LinkField
-                icon={<Globe className="w-4 h-4 text-primary" />}
-                label="Portfolio"
-                value={links.portfolio || ""}
-                onChange={(v) => setLinks({ ...links, portfolio: v })}
-                placeholder="https://mojeportfolio.pl"
-              />
-              <LinkField
-                icon={<Github className="w-4 h-4 text-primary" />}
-                label="GitHub"
-                value={links.github || ""}
-                onChange={(v) => setLinks({ ...links, github: v })}
-                placeholder="https://github.com/username"
-              />
-              <LinkField
-                icon={<Linkedin className="w-4 h-4 text-primary" />}
-                label="LinkedIn"
-                value={links.linkedin || ""}
-                onChange={(v) => setLinks({ ...links, linkedin: v })}
-                placeholder="https://linkedin.com/in/username"
-              />
-              <LinkField
-                icon={<ExternalLink className="w-4 h-4 text-primary" />}
-                label="Strona osobista"
-                value={links.website || ""}
-                onChange={(v) => setLinks({ ...links, website: v })}
-                placeholder="https://mojastrona.pl"
-              />
-
-              <div className="pt-2 border-t border-border">
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                  Prześlij CV (opcjonalne, tylko PDF)
-                </label>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
-                    <Upload className="w-4 h-4" />
-                    {uploading ? "Przesyłanie..." : "Prześlij CV"}
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handleCvUpload}
-                      className="hidden"
-                      disabled={uploading}
-                    />
-                  </label>
-                  {cvUrl && (
-                    <span className="flex items-center gap-1.5 text-xs text-accent">
-                      <FileText className="w-3.5 h-3.5" /> CV przesłane
-                    </span>
+                  {experienceEntries.length < 3 && (
+                    <button
+                      onClick={addExperience}
+                      className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/3)
+                    </button>
                   )}
                 </div>
               </div>
-            </motion.div>
-          )}
+            </AccordionSection>
+
+            {/* LINKS & CV */}
+            <AccordionSection
+              id="links"
+              label="Linki i CV"
+              icon="🔗"
+              isOpen={activeSection === "links"}
+              onToggle={() => toggleSection("links")}
+              badge={cvUrl ? "CV przesłane" : undefined}
+            >
+              <div className="space-y-4">
+                <LinkField icon={<Globe className="w-4 h-4 text-primary" />} label="Portfolio" value={links.portfolio || ""} onChange={(v) => setLinks({ ...links, portfolio: v })} placeholder="https://mojeportfolio.pl" />
+                <LinkField icon={<Github className="w-4 h-4 text-primary" />} label="GitHub" value={links.github || ""} onChange={(v) => setLinks({ ...links, github: v })} placeholder="https://github.com/username" />
+                <LinkField icon={<Linkedin className="w-4 h-4 text-primary" />} label="LinkedIn" value={links.linkedin || ""} onChange={(v) => setLinks({ ...links, linkedin: v })} placeholder="https://linkedin.com/in/username" />
+                <LinkField icon={<ExternalLink className="w-4 h-4 text-primary" />} label="Strona osobista" value={links.website || ""} onChange={(v) => setLinks({ ...links, website: v })} placeholder="https://mojastrona.pl" />
+
+                <div className="pt-2 border-t border-border">
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                    Prześlij CV (opcjonalne, tylko PDF)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
+                      <Upload className="w-4 h-4" />
+                      {uploading ? "Przesyłanie..." : "Prześlij CV"}
+                      <input type="file" accept="application/pdf" onChange={handleCvUpload} className="hidden" disabled={uploading} />
+                    </label>
+                    {cvUrl && (
+                      <span className="flex items-center gap-1.5 text-xs text-accent">
+                        <FileText className="w-3.5 h-3.5" /> CV przesłane
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </AccordionSection>
+          </div>
         </motion.div>
       </main>
     </div>
   );
 };
+
+function AccordionSection({
+  id, label, icon, isOpen, onToggle, badge, children,
+}: {
+  id: string; label: string; icon: string; isOpen: boolean; onToggle: () => void; badge?: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-border overflow-hidden">
+      <button
+        onClick={onToggle}
+        className={`w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors ${
+          isOpen ? "bg-primary/5" : "hover:bg-secondary/80"
+        }`}
+      >
+        <span className="text-lg">{icon}</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">{label}</p>
+          {badge && !isOpen && (
+            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{badge}</p>
+          )}
+        </div>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="px-4 pb-4 pt-2 border-t border-border"
+        >
+          {children}
+        </motion.div>
+      )}
+    </div>
+  );
+}
 
 function Field({
   label, value, onChange, placeholder,
@@ -688,32 +682,5 @@ function LinkField({
   );
 }
 
-function SkillRow({
-  skill, index, total, onRemove, onMove,
-}: {
-  skill: string; index: number; total: number; onRemove: (s: string) => void; onMove: (from: number, to: number) => void;
-}) {
-  return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50">
-      <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
-      <span className="flex-1 text-sm text-foreground">{skill}</span>
-      <div className="flex gap-1">
-        {index > 0 && (
-          <button onClick={() => onMove(index, index - 1)} className="p-0.5 text-muted-foreground hover:text-foreground">
-            <ChevronUp className="w-3.5 h-3.5" />
-          </button>
-        )}
-        {index < total - 1 && (
-          <button onClick={() => onMove(index, index + 1)} className="p-0.5 text-muted-foreground hover:text-foreground">
-            <ChevronDown className="w-3.5 h-3.5" />
-          </button>
-        )}
-      </div>
-      <button onClick={() => onRemove(skill)} className="p-0.5 text-muted-foreground hover:text-destructive">
-        <X className="w-3.5 h-3.5" />
-      </button>
-    </div>
-  );
-}
 
 export default MyProfile;
