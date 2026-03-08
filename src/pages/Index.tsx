@@ -39,6 +39,7 @@ const Index = () => {
     applyToJob,
     resetFeed,
     updateFilters,
+    actionPending,
   } = useJobFeed();
 
   const [activeTab, setActiveTab] = useState<Tab>("swipe");
