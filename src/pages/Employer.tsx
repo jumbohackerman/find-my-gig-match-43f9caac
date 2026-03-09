@@ -28,8 +28,10 @@ import { hideJob, unhideJob } from "@/lib/moderation";
 import { toast } from "sonner";
 import { timeAgo } from "@/lib/timeAgo";
 
+import { Progress } from "@/components/ui/progress";
+
 const Employer = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { jobs: domainJobs, applicationsByJob, loading, refetch } = useEmployerDashboardData();
   const { createJob, deleteJob, submitting, EMPTY_FORM } = useEmployerJobs();
   const shortlist = useEmployerShortlist(refetch);
@@ -150,6 +152,48 @@ const Employer = () => {
             </button>
           </div>
         </motion.div>
+
+        {/* Employer Setup Completion */}
+        {(() => {
+          let score = 0;
+          const missing = [];
+          if (user?.user_metadata?.full_name || profile?.full_name) {
+            score++;
+          } else {
+            missing.push("Dodaj nazwę firmy w zakładce Mój Profil");
+          }
+          if (domainJobs.length > 0) {
+            score++;
+          } else {
+            missing.push("Opublikuj pierwszą ofertę pracy");
+          }
+          const finalScore = Math.round((score / 2) * 100);
+
+          if (finalScore === 100) return null;
+
+          return (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-muted-foreground">Gotowość konta pracodawcy</span>
+                <span className={`text-sm font-bold ${finalScore >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
+                  {finalScore}%
+                </span>
+              </div>
+              <Progress value={finalScore} className="h-2 mb-3" />
+              <div className="mt-3">
+                <p className="text-[11px] font-semibold text-foreground uppercase tracking-wider mb-2">Kolejne kroki:</p>
+                <ul className="text-xs text-muted-foreground space-y-1.5">
+                  {missing.map((item, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <div className="w-1 h-1 rounded-full bg-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          );
+        })()}
 
         {/* Post Job Form */}
         <AnimatePresence>

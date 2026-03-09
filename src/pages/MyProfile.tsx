@@ -322,14 +322,33 @@ const MyProfile = () => {
 
           {/* Completeness - only for candidates */}
           {!isEmployer && (
-            <div className="mb-6 p-3 rounded-xl bg-secondary/50 border border-border">
+            <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-muted-foreground">Kompletność profilu</span>
-                <span className={`text-sm font-bold ${completeness >= 80 ? "text-accent" : completeness >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
-                  {completeness}%
+                <span className={`text-sm font-bold ${completeness.score >= 80 ? "text-accent" : completeness.score >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
+                  {completeness.score}%
                 </span>
               </div>
-              <Progress value={completeness} className="h-2" />
+              <Progress value={completeness.score} className="h-2 mb-3" />
+              {completeness.missing.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-[11px] font-semibold text-foreground uppercase tracking-wider mb-2">Kolejne kroki:</p>
+                  <ul className="text-xs text-muted-foreground space-y-1.5">
+                    {completeness.missing.slice(0, 3).map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <div className="w-1 h-1 rounded-full bg-primary" />
+                        {item}
+                      </li>
+                    ))}
+                    {completeness.missing.length > 3 && (
+                      <li className="flex items-center gap-2 text-[10px] italic">
+                        <div className="w-1 h-1 rounded-full bg-muted-foreground" />
+                        ...oraz {completeness.missing.length - 3} innych
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
