@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Briefcase, Save, Plus, X, Upload, FileText,
-  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2
+  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2, Eye
 } from "lucide-react";
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { ProfileSkeleton } from "@/components/StateViews";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
+import CandidateProfileModal from "@/components/CandidateProfileModal";
 
 interface ExperienceEntry {
   title: string;
@@ -100,6 +101,7 @@ const MyProfile = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [activeSection, setActiveSection] = useState<string>("basic");
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -295,6 +297,15 @@ const MyProfile = () => {
             <span className="hidden sm:inline">Przeglądaj oferty</span>
             <Briefcase className="w-4 h-4 sm:hidden" />
           </Link>
+          {!isEmployer && (
+            <button
+              onClick={() => setShowPreview(true)}
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-muted transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              <span className="hidden sm:inline">Podgląd</span>
+            </button>
+          )}
           <button
             onClick={handleSave}
             disabled={saving}
@@ -686,6 +697,36 @@ const MyProfile = () => {
         </motion.div>
         </LocalErrorBoundary>
       </main>
+
+      {showPreview && (
+        <CandidateProfileModal
+          candidate={{
+            id: user?.id || "preview",
+            userId: user?.id || "preview",
+            name: fullName || "Nie podano imienia",
+            avatar: "👤",
+            title: title || "Brak stanowiska",
+            location: location || "Brak lokalizacji",
+            experience: `${experienceYears} lat`,
+            skills: skills,
+            summary: summary,
+            seniority: seniority,
+            workMode: workMode,
+            employmentType: employmentType,
+            salaryMin: salaryMin,
+            salaryMax: salaryMax,
+            availability: availability,
+            experienceEntries: experienceEntries,
+            links: links,
+            cvUrl: cvUrl,
+            lastActive: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            bio: "",
+          }}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </div>
   );
 };
