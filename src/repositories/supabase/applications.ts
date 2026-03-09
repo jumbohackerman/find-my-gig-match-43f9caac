@@ -218,6 +218,24 @@ export const supabaseApplicationRepository: ApplicationRepository = {
   },
 
   async updateStatus(applicationId, status, source): Promise<void> {
+    // 1. Fetch current status to validate transition
+    const { data: currentApp, error: fetchError } = await supabase
+      .from("applications")
+      .select("status")
+      .eq("id", applicationId)
+      .single();
+
+    if (fetchError || !currentApp) {
+      throw new Error(`Application not found: ${fetchError?.message}`);
+    }
+
+    const currentStatus = currentApp.status as ApplicationStatus;
+
+    // 2. Validate transition
+    const { validateTransition } = await import("@/domain/application-state-machine");
+    validateTransition(currentStatus, status, "employer");
+
+    // 3. Perform update
     const updateData: Record<string, unknown> = { status };
     if (source) updateData.source = source;
 

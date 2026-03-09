@@ -39,6 +39,12 @@ export const mockApplicationRepository: ApplicationRepository = {
   },
 
   async updateStatus(applicationId, status, source): Promise<void> {
+    const app = store.find((a) => a.id === applicationId);
+    if (!app) throw new Error(`Application ${applicationId} not found`);
+
+    const { validateTransition } = await import("@/domain/application-state-machine");
+    validateTransition(app.status, status, "employer");
+
     store = store.map((a) =>
       a.id === applicationId
         ? { ...a, status: status as ApplicationStatus, ...(source ? { source } : {}) }
