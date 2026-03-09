@@ -5,15 +5,7 @@ import MatchBadge from "@/components/MatchBadge";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 
-function formatPosted(raw: string): string {
-  if (!raw) return "";
-  const date = new Date(raw);
-  if (isNaN(date.getTime())) return raw;
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}.${month}.${year}`;
-}
+import { timeAgo } from "@/lib/timeAgo";
 
 interface SwipeCardProps {
   job: Job;
@@ -118,7 +110,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-display text-sm text-muted-foreground truncate">{job.company}</h3>
-              <p className="text-xs text-muted-foreground">{formatPosted(job.posted)}</p>
+              <p className="text-xs text-muted-foreground">{timeAgo(job.posted)}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isSaved && (
@@ -169,7 +161,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Clock className="w-3 h-3 text-muted-foreground shrink-0" />
-              {formatPosted(job.posted)}
+              {timeAgo(job.posted)}
             </div>
           </div>
 

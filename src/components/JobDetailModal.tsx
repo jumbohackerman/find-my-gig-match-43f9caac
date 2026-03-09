@@ -10,15 +10,7 @@ import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 
-function formatPostedDate(raw: string): string {
-  if (!raw) return "";
-  const date = new Date(raw);
-  if (isNaN(date.getTime())) return raw;
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}.${month}.${year}`;
-}
+import { timeAgo } from "@/lib/timeAgo";
 
 interface Props {
   job: Job | null;
@@ -103,7 +95,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
                   <MapPin className="w-3 h-3" aria-hidden="true" /> {job.location}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" aria-hidden="true" /> {formatPostedDate(job.posted)}
+                  <Clock className="w-3 h-3" aria-hidden="true" /> {timeAgo(job.posted)}
                 </span>
               </div>
             </div>
@@ -135,14 +127,14 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
           </div>
 
           {/* Salary */}
-          {job.salary && job.salary.trim().length > 0 && (
-            <div className="mb-4 p-3 rounded-xl bg-accent/10 border border-accent/20">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-accent" aria-hidden="true" />
-                <span className="text-base font-bold text-accent">{job.salary}</span>
-              </div>
+          <div className="mb-4 p-3 rounded-xl bg-accent/10 border border-accent/20">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-accent" aria-hidden="true" />
+              <span className={`text-base font-bold ${job.salary?.trim() ? 'text-accent' : 'text-muted-foreground italic text-sm'}`}>
+                {job.salary?.trim() ? job.salary : 'Wynagrodzenie nie podane'}
+              </span>
             </div>
-          )}
+          </div>
 
           {/* Match */}
           {matchResult && (

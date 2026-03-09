@@ -135,7 +135,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
               {/* Salary */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">
-                  Min. wynagrodzenie: {filters.salaryMin > 0 ? `${filters.salaryMin} 000 zł+` : "Dowolne"}
+                  Min. wynagrodzenie: {filters.salaryMin > 0 ? `od ${filters.salaryMin} 000 zł` : "Dowolne"}
                 </label>
                 <Slider
                   value={[filters.salaryMin]}

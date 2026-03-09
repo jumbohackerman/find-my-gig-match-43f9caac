@@ -1,3 +1,5 @@
+import { formatDate } from "./utils";
+
 /**
  * Polish relative time formatter.
  * Returns human-readable strings like "2 min temu", "3 godz. temu", "wczoraj".
@@ -19,5 +21,5 @@ export function timeAgo(dateStr: string | undefined | null): string {
   if (days === 1) return "wczoraj";
   if (days < 7) return `${days} dni temu`;
   if (days < 30) return `${Math.floor(days / 7)} tyg. temu`;
-  return new Date(dateStr).toLocaleDateString("pl-PL", { day: "numeric", month: "short" });
+  return formatDate(dateStr);
 }
