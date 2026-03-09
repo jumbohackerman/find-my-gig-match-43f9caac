@@ -29,6 +29,7 @@ All transitions are strictly validated. If a status is **Terminal**, no further 
 | `applied` | `interview` | `employer` | Yes | Yes | Yes |
 | `applied` | `not_selected` | `employer` | Yes | Yes | Yes |
 | `applied` | `position_closed` | `employer`, `system` | Yes | No | Yes |
+| `shortlisted` | `applied` | `employer` | No | No | Yes |
 | `shortlisted` | `viewed` | `employer` | No | No | No |
 | `shortlisted` | `interview` | `employer` | Yes | Yes | Yes |
 | `shortlisted` | `not_selected` | `employer` | Yes | Yes | Yes |

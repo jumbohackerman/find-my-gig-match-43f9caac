@@ -29,6 +29,7 @@ export const APPLICATION_STATE_MACHINE: Record<ApplicationStatus, StatusDefiniti
   shortlisted: {
     isTerminal: false,
     allowedTransitions: [
+      { to: "applied", allowedActors: ["employer"], triggersNotification: false, triggersEmail: false, requiresAudit: true }, // Removal from shortlist
       { to: "viewed", allowedActors: ["employer"], triggersNotification: false, triggersEmail: false, requiresAudit: false },
       { to: "interview", allowedActors: ["employer"], triggersNotification: true, triggersEmail: true, requiresAudit: true },
       { to: "not_selected", allowedActors: ["employer"], triggersNotification: true, triggersEmail: true, requiresAudit: true },
