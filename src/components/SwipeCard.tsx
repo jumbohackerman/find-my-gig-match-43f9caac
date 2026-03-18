@@ -122,7 +122,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
           </div>
 
-          <h2 className="font-display text-lg font-bold text-foreground mb-0.5 leading-tight">{job.title}</h2>
+          <h2 className="font-display text-base sm:text-lg font-bold text-foreground mb-0.5 leading-tight">{job.title}</h2>
 
           {/* Salary */}
           <div className="mb-1.5">

@@ -125,4 +125,21 @@
     outline-offset: 2px;
     border-radius: var(--radius);
   }
+
+  /* Prevent horizontal overflow globally */
+  html, body, #root {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+}
+
+/* ── Safe-area padding for iOS notch devices ── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
