@@ -83,7 +83,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
         },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-y-auto border border-border cursor-grab active:cursor-grabbing" data-testid="swipe-card">
+      <div className="card-gradient rounded-2xl shadow-card overflow-y-auto border border-border cursor-grab active:cursor-grabbing h-full" data-testid="swipe-card">
         {/* Swipe indicators */}
         {isTop && (
           <>
@@ -103,7 +103,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
         )}
 
         {/* Company header */}
-        <div className="p-4 pb-3">
+        <div className="p-3 sm:p-4 pb-2 sm:pb-3">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
               {job.logo}
@@ -122,7 +122,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
           </div>
 
-          <h2 className="font-display text-lg font-bold text-foreground mb-0.5 leading-tight">{job.title}</h2>
+          <h2 className="font-display text-base sm:text-lg font-bold text-foreground mb-0.5 leading-tight">{job.title}</h2>
 
           {/* Salary */}
           <div className="mb-1.5">

@@ -192,14 +192,14 @@ const Index = () => {
 
   if (jobsLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-[100dvh] bg-background flex flex-col">
         <Navbar />
-        <div className="px-6 pt-4 flex gap-1">
+        <div className="px-3 sm:px-6 pt-4 flex gap-1">
           {["Przeglądaj", "Moje aplikacje", "Zapisane"].map((l) => (
-            <div key={l} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium opacity-50">{l}</div>
+            <div key={l} className="px-3 sm:px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs sm:text-sm font-medium opacity-50">{l}</div>
           ))}
         </div>
-        <main className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full">
+        <main className="flex-1 flex flex-col items-center px-3 sm:px-4 py-4 max-w-[min(28rem,100%)] sm:max-w-md mx-auto w-full">
           <SwipeCardSkeleton />
         </main>
       </div>
@@ -207,7 +207,7 @@ const Index = () => {
   }
 
   return (
-    <div className="h-[100dvh] bg-background flex flex-col overflow-y-clip">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden safe-bottom">
 
 
       <Navbar />
@@ -240,7 +240,7 @@ const Index = () => {
         ))}
       </div>
 
-      <main className={`flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full min-h-0 ${activeTab === "swipe" ? "overflow-y-clip" : "overflow-y-auto"}`}>
+      <main className={`flex-1 flex flex-col items-center px-3 sm:px-4 lg:px-6 py-2 sm:py-4 max-w-[min(28rem,100%)] sm:max-w-md lg:max-w-lg mx-auto w-full min-h-0 ${activeTab === "swipe" ? "overflow-hidden" : "overflow-y-auto"}`}>
         <LocalErrorBoundary label="Panel">
         {activeTab === "applied" ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
@@ -341,7 +341,7 @@ const Index = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="flex-1 flex flex-col items-center min-h-0 w-full">
+              <div className="flex-1 flex flex-col items-center min-h-0 w-full overflow-hidden">
                 {/* Contextual Suggestion UX */}
                 {!hideSuggestion && (!candidate.cvUrl || savedJobs.length > 0) && (
                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="w-full mb-3 flex items-center justify-between p-3 rounded-xl bg-secondary/60 border border-border">
@@ -363,8 +363,8 @@ const Index = () => {
                   </motion.div>
                 )}
 
-                {/* Card stack — overflow-visible allows exit animation to fly beyond container */}
-                <div className="relative w-full flex-1 min-h-0 overflow-visible">
+                {/* Card stack */}
+                <div className="relative w-full flex-1 min-h-0 overflow-hidden">
                   <AnimatePresence>
                     {remainingJobs.slice(0, 2).map((job, i) => (
                       <SwipeCard
@@ -383,38 +383,38 @@ const Index = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Action buttons — dedicated fixed-height row, never overlapped */}
-                <div className="relative z-10 flex items-center gap-5 shrink-0 py-3" role="group" aria-label="Akcje swipe">
+                {/* Action buttons — below card, never overlapping */}
+                <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-5 shrink-0 py-2 sm:py-3" role="group" aria-label="Akcje swipe">
                   <button
                     onClick={() => handleSwipeWithRefetch("left")}
                     disabled={actionPending}
-                    className="w-14 h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                    className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     title="Pomiń"
                     data-testid="swipe-skip"
                   >
-                    <X className="w-6 h-6" />
+                    <X className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
                   <button
                     onClick={() => handleSwipeWithRefetch("save")}
                     disabled={actionPending}
-                    className="w-12 h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors disabled:opacity-40 disabled:pointer-events-none"
                     title="Zapisz na później"
                     data-testid="swipe-save"
                   >
-                    <Star className="w-5 h-5" />
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <button
                     onClick={() => handleSwipeWithRefetch("right")}
                     disabled={actionPending}
-                    className="w-16 h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-13 h-13 sm:w-16 sm:h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform disabled:opacity-50 disabled:hover:scale-100"
                     title="Aplikuj"
                     data-testid="swipe-apply"
                   >
-                    {actionPending ? <Loader2 className="w-7 h-7 animate-spin" /> : <Check className="w-7 h-7" />}
+                    {actionPending ? <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin" /> : <Check className="w-6 h-6 sm:w-7 sm:h-7" />}
                   </button>
                 </div>
 
-                <p className="text-muted-foreground text-xs shrink-0 pb-1">
+                <p className="text-muted-foreground text-[10px] sm:text-xs shrink-0 pb-0.5">
                   {currentIndex + 1} / {filteredJobs.length}
                 </p>
               </div>
