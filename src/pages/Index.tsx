@@ -192,14 +192,14 @@ const Index = () => {
 
   if (jobsLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-[100dvh] bg-background flex flex-col">
         <Navbar />
-        <div className="px-6 pt-4 flex gap-1">
+        <div className="px-3 sm:px-6 pt-4 flex gap-1">
           {["Przeglądaj", "Moje aplikacje", "Zapisane"].map((l) => (
-            <div key={l} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium opacity-50">{l}</div>
+            <div key={l} className="px-3 sm:px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs sm:text-sm font-medium opacity-50">{l}</div>
           ))}
         </div>
-        <main className="flex-1 flex flex-col items-center px-4 py-4 max-w-md mx-auto w-full">
+        <main className="flex-1 flex flex-col items-center px-3 sm:px-4 py-4 max-w-[min(28rem,100%)] sm:max-w-md mx-auto w-full">
           <SwipeCardSkeleton />
         </main>
       </div>
