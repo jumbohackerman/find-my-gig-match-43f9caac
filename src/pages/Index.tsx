@@ -341,7 +341,7 @@ const Index = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="flex-1 flex flex-col items-center min-h-0 w-full overflow-hidden">
+              <div className="flex-1 flex flex-col items-center min-h-0 w-full">
                 {/* Contextual Suggestion UX */}
                 {!hideSuggestion && (!candidate.cvUrl || savedJobs.length > 0) && (
                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="w-full mb-3 flex items-center justify-between p-3 rounded-xl bg-secondary/60 border border-border">
