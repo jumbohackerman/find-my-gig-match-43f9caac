@@ -4,7 +4,6 @@ import { MapPin, Clock, Briefcase, Wifi } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
-
 import { timeAgo } from "@/lib/timeAgo";
 
 interface SwipeCardProps {
@@ -14,33 +13,28 @@ interface SwipeCardProps {
   matchResult?: MatchResult;
   isSaved?: boolean;
   onTap?: () => void;
-  /** Set externally by button-triggered skip/apply so exit direction is correct */
   forcedExitDirection?: "left" | "right" | null;
 }
 
+/* ── Premium spring config ─────────────────────────────────────────────── */
+const EXIT_SPRING = { type: "spring" as const, stiffness: 80, damping: 18, mass: 1.2 };
+
 const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 300], [-10, 10]);
+  const rotate = useTransform(x, [-300, 300], [-12, 12]);
   const rightOpacity = useTransform(x, [0, 80], [0, 1]);
   const leftOpacity = useTransform(x, [-80, 0], [1, 0]);
 
   const [exitDirection, setExitDirection] = useState<"left" | "right">("right");
   const didDrag = useRef(false);
 
-  // When parent signals a button-triggered direction, apply it immediately
   const resolvedExit = forcedExitDirection ?? exitDirection;
 
-  const handleDragStart = () => {
-    didDrag.current = false;
-  };
-
-  const handleDrag = () => {
-    didDrag.current = true;
-  };
+  const handleDragStart = () => { didDrag.current = false; };
+  const handleDrag = () => { didDrag.current = true; };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    const absX = Math.abs(info.offset.x);
-    if (absX > 100) {
+    if (Math.abs(info.offset.x) > 100) {
       const dir = info.offset.x > 0 ? "right" : "left";
       setExitDirection(dir);
       onSwipe(dir);
@@ -52,7 +46,12 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
   };
 
   const hasSalary = job.salary && job.salary.trim().length > 0;
-  const workMode = job.type === "Remote" || job.location.toLowerCase().includes("zdaln") ? "Zdalnie" : job.type === "Contract" ? "Hybrydowo" : "Stacjonarnie";
+  const workMode =
+    job.type === "Remote" || job.location.toLowerCase().includes("zdaln")
+      ? "Zdalnie"
+      : job.type === "Contract"
+      ? "Hybrydowo"
+      : "Stacjonarnie";
 
   return (
     <motion.div
@@ -70,20 +69,23 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       onTap={handleTap}
-      initial={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 8 }}
-      animate={{ scale: isTop ? 1 : 0.95, y: isTop ? 0 : 8 }}
+      initial={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 10, opacity: isTop ? 1 : 0.7 }}
+      animate={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 10, opacity: 1 }}
       exit={{
-        x: resolvedExit === "right" ? 1200 : -1200,
-        rotate: resolvedExit === "right" ? 18 : -18,
+        x: resolvedExit === "right" ? 600 : -600,
+        rotate: resolvedExit === "right" ? 15 : -15,
         opacity: 0,
         transition: {
-          x: { type: "spring", stiffness: 120, damping: 22, mass: 1 },
-          rotate: { type: "spring", stiffness: 120, damping: 22, mass: 1 },
-          opacity: { duration: 0.4, delay: 0.15 },
+          x: EXIT_SPRING,
+          rotate: EXIT_SPRING,
+          opacity: { duration: 0.35, delay: 0.1 },
         },
       }}
     >
-      <div className="card-gradient rounded-2xl shadow-card overflow-y-auto border border-border cursor-grab active:cursor-grabbing h-full" data-testid="swipe-card">
+      <div
+        className="card-gradient rounded-2xl shadow-card border border-border cursor-grab active:cursor-grabbing h-full flex flex-col"
+        data-testid="swipe-card"
+      >
         {/* Swipe indicators */}
         {isTop && (
           <>
@@ -102,10 +104,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </>
         )}
 
-        {/* Company header */}
-        <div className="p-3 sm:p-4 pb-2 sm:pb-3">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl shrink-0">
+        {/* Card content — single scrollable region if needed */}
+        <div className="p-4 sm:p-5 flex-1 min-h-0 overflow-y-auto">
+          {/* Company header */}
+          <div className="flex items-center gap-3 mb-2.5">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center text-xl sm:text-2xl shrink-0">
               {job.logo}
             </div>
             <div className="flex-1 min-w-0">
@@ -122,10 +125,10 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
           </div>
 
-          <h2 className="font-display text-base sm:text-lg font-bold text-foreground mb-0.5 leading-tight">{job.title}</h2>
+          <h2 className="font-display text-base sm:text-lg font-bold text-foreground mb-1 leading-tight">{job.title}</h2>
 
           {/* Salary */}
-          <div className="mb-1.5">
+          <div className="mb-2">
             {hasSalary ? (
               <span className="text-sm font-bold text-accent">{job.salary}</span>
             ) : (
@@ -133,11 +136,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             )}
           </div>
 
-          <p className="text-muted-foreground text-xs leading-relaxed mb-2 line-clamp-2">{job.description}</p>
+          <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">{job.description}</p>
 
           {/* Match explainability */}
           {matchResult && (
-            <div className="mb-2 p-2 rounded-xl bg-secondary/50 border border-border">
+            <div className="mb-3 p-2.5 rounded-xl bg-secondary/50 border border-border">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
                 Dlaczego to pasuje
               </p>
@@ -145,8 +148,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
           )}
 
-          {/* Details */}
-          <div className="grid grid-cols-2 gap-1.5 mb-2">
+          {/* Details grid */}
+          <div className="grid grid-cols-2 gap-1.5 mb-3">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="w-3 h-3 text-primary shrink-0" />
               <span className="truncate">{job.location}</span>
