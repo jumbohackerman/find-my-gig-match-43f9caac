@@ -42,6 +42,8 @@
     --gradient-primary: linear-gradient(135deg, hsl(16 85% 60%), hsl(350 80% 55%));
     --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
     --shadow-glow: 0 0 30px -5px hsl(16 85% 60% / 0.3);
+    --browse-card-column: 22rem;
+    --browse-card-max-height: 31rem;
 
     --sidebar-background: 225 25% 8%;
     --sidebar-foreground: 210 20% 95%;
@@ -51,6 +53,20 @@
     --sidebar-accent-foreground: 210 20% 90%;
     --sidebar-border: 225 15% 20%;
     --sidebar-ring: 16 85% 60%;
+  }
+}
+
+@media (min-width: 640px) {
+  :root {
+    --browse-card-column: 23.5rem;
+    --browse-card-max-height: 33rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --browse-card-column: 25rem;
+    --browse-card-max-height: 37rem;
   }
 }
 
@@ -103,8 +119,40 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  .browse-shell {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
+  .browse-column {
+    width: 100%;
+    max-width: var(--browse-card-column);
+    margin-inline: auto;
+  }
+
+  .browse-card-stage {
+    @apply flex flex-1 min-h-0 w-full items-center justify-center;
+    overflow: visible;
+  }
+
+  .browse-card-frame {
+    position: relative;
+    height: min(100%, var(--browse-card-max-height));
+    width: auto;
+    max-width: 100%;
+    aspect-ratio: 10 / 16;
+    margin-inline: auto;
+  }
+
+  .min-h-screen-dynamic {
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 }
 
@@ -126,7 +174,6 @@
     border-radius: var(--radius);
   }
 
-  /* Prevent horizontal overflow globally */
   html, body, #root {
     overflow-x: hidden;
     width: 100%;

@@ -16,24 +16,29 @@ interface SwipeCardProps {
   forcedExitDirection?: "left" | "right" | null;
 }
 
-/* ── Premium spring config ─────────────────────────────────────────────── */
-const EXIT_SPRING = { type: "spring" as const, stiffness: 80, damping: 18, mass: 1.2 };
+const EXIT_SPRING = { type: "spring" as const, stiffness: 68, damping: 16, mass: 0.95 };
+const EXIT_DISTANCE = 900;
 
 const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 300], [-12, 12]);
-  const rightOpacity = useTransform(x, [0, 80], [0, 1]);
-  const leftOpacity = useTransform(x, [-80, 0], [1, 0]);
+  const rotate = useTransform(x, [-320, 320], [-14, 14]);
+  const rightOpacity = useTransform(x, [20, 120], [0, 1]);
+  const leftOpacity = useTransform(x, [-120, -20], [1, 0]);
 
   const [exitDirection, setExitDirection] = useState<"left" | "right">("right");
   const didDrag = useRef(false);
 
   const resolvedExit = forcedExitDirection ?? exitDirection;
 
-  const handleDragStart = () => { didDrag.current = false; };
-  const handleDrag = () => { didDrag.current = true; };
+  const handleDragStart = () => {
+    didDrag.current = false;
+  };
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDrag = () => {
+    didDrag.current = true;
+  };
+
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (Math.abs(info.offset.x) > 100) {
       const dir = info.offset.x > 0 ? "right" : "left";
       setExitDirection(dir);
@@ -50,8 +55,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
     job.type === "Remote" || job.location.toLowerCase().includes("zdaln")
       ? "Zdalnie"
       : job.type === "Contract"
-      ? "Hybrydowo"
-      : "Stacjonarnie";
+        ? "Hybrydowo"
+        : "Stacjonarnie";
 
   return (
     <motion.div
@@ -61,32 +66,35 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
         rotate,
         zIndex: isTop ? 2 : 1,
         pointerEvents: isTop ? "auto" : "none",
+        willChange: "transform",
       }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
+      dragElastic={0.18}
+      dragMomentum={false}
       onDragStart={handleDragStart}
       onDrag={handleDrag}
       onDragEnd={handleDragEnd}
       onTap={handleTap}
-      initial={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 10, opacity: isTop ? 1 : 0.7 }}
-      animate={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 10, opacity: 1 }}
+      initial={{ scale: isTop ? 1 : 0.97, y: isTop ? 0 : 12, opacity: isTop ? 1 : 0.72 }}
+      animate={{ scale: isTop ? 1 : 0.97, y: isTop ? 0 : 12, opacity: 1 }}
       exit={{
-        x: resolvedExit === "right" ? 600 : -600,
-        rotate: resolvedExit === "right" ? 15 : -15,
+        x: resolvedExit === "right" ? EXIT_DISTANCE : -EXIT_DISTANCE,
+        rotate: resolvedExit === "right" ? 18 : -18,
+        scale: 0.96,
         opacity: 0,
         transition: {
           x: EXIT_SPRING,
           rotate: EXIT_SPRING,
-          opacity: { duration: 0.35, delay: 0.1 },
+          scale: { duration: 0.24 },
+          opacity: { duration: 0.24, ease: "easeOut" },
         },
       }}
     >
       <div
-        className="card-gradient rounded-2xl shadow-card border border-border cursor-grab active:cursor-grabbing h-full flex flex-col"
+        className="card-gradient rounded-2xl shadow-card border border-border cursor-grab active:cursor-grabbing h-full flex flex-col overflow-hidden"
         data-testid="swipe-card"
       >
-        {/* Swipe indicators */}
         {isTop && (
           <>
             <motion.div
@@ -104,10 +112,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </>
         )}
 
-        {/* Card content — single scrollable region if needed */}
-        <div className="p-4 sm:p-5 flex-1 min-h-0 overflow-y-auto">
-          {/* Company header */}
-          <div className="flex items-center gap-3 mb-2.5">
+        <div className="h-full p-4 sm:p-5 flex flex-col">
+          <div className="flex items-start gap-3 mb-3">
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center text-xl sm:text-2xl shrink-0">
               {job.logo}
             </div>
@@ -125,51 +131,55 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
           </div>
 
-          <h2 className="font-display text-base sm:text-lg font-bold text-foreground mb-1 leading-tight">{job.title}</h2>
-
-          {/* Salary */}
-          <div className="mb-2">
-            {hasSalary ? (
-              <span className="text-sm font-bold text-accent">{job.salary}</span>
-            ) : (
-              <span className="text-xs text-muted-foreground italic">Wynagrodzenie nie podane</span>
-            )}
+          <div className="space-y-2.5">
+            <h2 className="font-display text-base sm:text-lg font-bold text-foreground leading-tight">{job.title}</h2>
+            <div>
+              {hasSalary ? (
+                <span className="text-sm font-bold text-accent">{job.salary}</span>
+              ) : (
+                <span className="text-xs text-muted-foreground italic">Wynagrodzenie nie podane</span>
+              )}
+            </div>
+            <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3">{job.description}</p>
           </div>
 
-          <p className="text-muted-foreground text-xs leading-relaxed mb-3 line-clamp-2">{job.description}</p>
-
-          {/* Match explainability */}
           {matchResult && (
-            <div className="mb-3 p-2.5 rounded-xl bg-secondary/50 border border-border">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+            <div className="mt-3 p-3 rounded-xl bg-secondary/50 border border-border">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
                 Dlaczego to pasuje
               </p>
-              <MatchBadge result={matchResult} />
+              <p className="text-base font-bold text-foreground">{matchResult.score}% dopasowania</p>
+              <div className="mt-2 space-y-1">
+                {matchResult.reasons.slice(0, 2).map((reason) => (
+                  <p key={reason} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="mt-0.5">•</span>
+                    <span>{reason}</span>
+                  </p>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Details grid */}
-          <div className="grid grid-cols-2 gap-1.5 mb-3">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="mt-3 grid grid-cols-2 gap-1.5">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
               <MapPin className="w-3 h-3 text-primary shrink-0" />
               <span className="truncate">{job.location}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
               <Briefcase className="w-3 h-3 text-primary shrink-0" />
-              {job.type}
+              <span className="truncate">{job.type}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
               <Wifi className="w-3 h-3 text-accent shrink-0" />
-              {workMode}
+              <span className="truncate">{workMode}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
               <Clock className="w-3 h-3 text-muted-foreground shrink-0" />
-              {timeAgo(job.posted)}
+              <span className="truncate">{timeAgo(job.posted)}</span>
             </div>
           </div>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5">
+          <div className="mt-auto pt-3 flex flex-wrap gap-1.5">
             {job.tags.map((tag) => {
               const isMatched = matchResult?.matchedSkills.includes(tag);
               const isMissing = matchResult?.missingSkills.includes(tag);
@@ -180,8 +190,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                     isMatched
                       ? "bg-accent/15 text-accent border border-accent/30"
                       : isMissing
-                      ? "bg-destructive/10 text-muted-foreground border border-destructive/20"
-                      : "bg-muted text-muted-foreground"
+                        ? "bg-destructive/10 text-muted-foreground border border-destructive/20"
+                        : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {tag}

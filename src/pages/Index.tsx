@@ -154,7 +154,7 @@ const Index = () => {
     else setButtonExitDir(null);
     await handleSwipe(direction);
     if (direction === "right") refetchApps();
-    setTimeout(() => setButtonExitDir(null), 500);
+    setTimeout(() => setButtonExitDir(null), 650);
   };
 
   const handleSavedApply = async (job: Job) => {
@@ -169,187 +169,144 @@ const Index = () => {
     { key: "recent", label: "Ostatnie", count: recentCount > 0 ? recentCount : undefined },
   ];
 
-  /* ═══════════════════════════════════════════════════════════════════════════
-   * LOADING STATE
-   * ═══════════════════════════════════════════════════════════════════════════ */
   if (jobsLoading) {
     return (
-      <div className="min-h-[100dvh] bg-background flex flex-col">
+      <div className="min-h-screen-dynamic bg-background flex flex-col">
         <Navbar />
-        <div className="px-4 sm:px-6 pt-4 flex gap-1">
-          {["Przeglądaj", "Moje aplikacje", "Zapisane"].map((l) => (
-            <div key={l} className="px-3 sm:px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs sm:text-sm font-medium opacity-50">{l}</div>
-          ))}
+        <div className="shrink-0 px-4 sm:px-6 pt-3 pb-1">
+          <div className="browse-shell overflow-x-auto scrollbar-none">
+            <div className="flex min-w-max gap-1">
+              {["Przeglądaj", "Moje aplikacje", "Zapisane"].map((label) => (
+                <div key={label} className="px-3 sm:px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs sm:text-sm font-medium opacity-50">
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-6">
-          <div className="w-full max-w-md">
-            <SwipeCardSkeleton />
+        <main className="flex-1 px-4 sm:px-6 py-4">
+          <div className="browse-shell flex h-full min-h-0 items-center justify-center">
+            <div className="browse-column w-full">
+              <SwipeCardSkeleton />
+            </div>
           </div>
         </main>
       </div>
     );
   }
 
-  /* ═══════════════════════════════════════════════════════════════════════════
-   * MAIN RENDER
-   *
-   * Layout strategy:
-   * ┌─────────────────────────┐  shrink-0
-   * │        Navbar           │
-   * ├─────────────────────────┤  shrink-0
-   * │         Tabs            │
-   * ├─────────────────────────┤  flex-1 / min-h-0
-   * │        <main>           │  ← scrollable for lists, flex-col for swipe
-   * │  ┌───────────────────┐  │
-   * │  │   filters/banner  │  │  shrink-0
-   * │  ├───────────────────┤  │
-   * │  │    CARD AREA      │  │  flex-1 (relative, for absolute card)
-   * │  ├───────────────────┤  │
-   * │  │  buttons + count  │  │  shrink-0
-   * │  └───────────────────┘  │
-   * ├─────────────────────────┤  shrink-0
-   * │        Footer           │
-   * └─────────────────────────┘
-   * ═══════════════════════════════════════════════════════════════════════════ */
-
   return (
-    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden safe-bottom">
+    <div className="min-h-screen-dynamic bg-background flex flex-col safe-bottom">
       <Navbar />
 
-      {/* ── Tabs ─────────────────────────────────────────────────────────── */}
-      <div className="shrink-0 px-4 sm:px-6 pt-3 pb-1 flex gap-1 overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => changeTab(tab.key)}
-            role="tab"
-            aria-selected={activeTab === tab.key}
-            aria-controls={`panel-${tab.key}`}
-            data-testid={`tab-${tab.key}`}
-            className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              activeTab === tab.key
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-muted"
-            }`}
-          >
-            {tab.label}
-            {tab.count != null && tab.count > 0 && (
-              <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                activeTab === tab.key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary text-primary-foreground"
-              }`} aria-label={`${tab.count} elementów`}>
-                {tab.count}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="shrink-0 px-4 sm:px-6 pt-3 pb-1">
+        <div className="browse-shell overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
+          <div className="flex min-w-max gap-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => changeTab(tab.key)}
+                role="tab"
+                aria-selected={activeTab === tab.key}
+                aria-controls={`panel-${tab.key}`}
+                data-testid={`tab-${tab.key}`}
+                className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  activeTab === tab.key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-muted"
+                }`}
+              >
+                {tab.label}
+                {tab.count != null && tab.count > 0 && (
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    activeTab === tab.key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary text-primary-foreground"
+                  }`} aria-label={`${tab.count} elementów`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* ── Main content area ────────────────────────────────────────────── */}
-      <main className="flex-1 min-h-0 flex flex-col">
-        <div className={`flex-1 min-h-0 flex flex-col items-center w-full max-w-md lg:max-w-lg mx-auto px-4 sm:px-5 ${
-          activeTab === "swipe" ? "" : "overflow-y-auto py-4"
-        }`}>
+      <main className="flex-1 min-h-0 w-full px-4 sm:px-6 pb-4 pt-2 sm:pt-4">
+        <div className={`browse-shell h-full min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto"}`}>
           <LocalErrorBoundary label="Panel">
-
-          {/* ── List tabs ──────────────────────────────────────────────── */}
-          {activeTab === "applied" ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
-              <h2 className="font-display text-lg font-bold text-foreground mb-4">
-                Moje aplikacje ({dbApplications.length})
-              </h2>
-              <ApplicationStatusList
-                applications={dbApplications}
-                loading={appsLoading}
-                onJobClick={(dbJob) => {
-                  if (!dbJob) return;
-                  const fullJob = allJobs.find(j => j.title === dbJob.title && j.company === dbJob.company);
-                  openJobModal(fullJob || dbJob as any);
-                }}
-              />
-            </motion.div>
-          ) : activeTab === "saved" ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
-              <h2 className="font-display text-lg font-bold text-foreground mb-4">
-                Zapisane oferty ({savedJobs.length})
-              </h2>
-              <SavedList jobs={savedJobs} onApply={handleSavedApply} onJobClick={openJobModal} />
-            </motion.div>
-          ) : activeTab === "recent" ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
-              <h2 className="font-display text-lg font-bold text-foreground mb-4">
-                Ostatnio przeglądane ({recentCount})
-              </h2>
-              <RecentlyViewedList entries={recentEntries} onJobClick={openJobModal} onClear={clearRecent} />
-            </motion.div>
-
-          /* ── Finished state ──────────────────────────────────────────── */
-          ) : isFinished ? (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center w-full max-w-xs mx-auto py-8">
-              <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-4xl">🎉</div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-2">Wszystko przejrzane!</h2>
-              <p className="text-muted-foreground text-sm mb-1">
-                Przejrzano {filteredJobs.length} ofert{filteredJobs.length === 1 ? "ę" : ""}.
-              </p>
-              {(savedJobs.length > 0 || dbApplications.length > 0) && (
-                <p className="text-muted-foreground text-xs mb-4">
-                  {savedJobs.length > 0 && `${savedJobs.length} zapisanych`}
-                  {savedJobs.length > 0 && dbApplications.length > 0 && " · "}
-                  {dbApplications.length > 0 && `${dbApplications.length} aplikacji`}
+            {activeTab === "applied" ? (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full" id="panel-applied">
+                <h2 className="font-display text-lg font-bold text-foreground mb-4">
+                  Moje aplikacje ({dbApplications.length})
+                </h2>
+                <ApplicationStatusList
+                  applications={dbApplications}
+                  loading={appsLoading}
+                  onJobClick={(dbJob) => {
+                    if (!dbJob) return;
+                    const fullJob = allJobs.find((job) => job.title === dbJob.title && job.company === dbJob.company);
+                    openJobModal(fullJob || dbJob as any);
+                  }}
+                />
+              </motion.div>
+            ) : activeTab === "saved" ? (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full" id="panel-saved">
+                <h2 className="font-display text-lg font-bold text-foreground mb-4">
+                  Zapisane oferty ({savedJobs.length})
+                </h2>
+                <SavedList jobs={savedJobs} onApply={handleSavedApply} onJobClick={openJobModal} />
+              </motion.div>
+            ) : activeTab === "recent" ? (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full" id="panel-recent">
+                <h2 className="font-display text-lg font-bold text-foreground mb-4">
+                  Ostatnio przeglądane ({recentCount})
+                </h2>
+                <RecentlyViewedList entries={recentEntries} onJobClick={openJobModal} onClear={clearRecent} />
+              </motion.div>
+            ) : isFinished ? (
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="browse-column text-center py-8" id="panel-swipe">
+                <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-4xl">🎉</div>
+                <h2 className="font-display text-2xl font-bold text-foreground mb-2">Wszystko przejrzane!</h2>
+                <p className="text-muted-foreground text-sm mb-1">
+                  Przejrzano {filteredJobs.length} ofert{filteredJobs.length === 1 ? "ę" : ""}.
                 </p>
-              )}
-              <div className="flex flex-col gap-2 mt-5">
-                <button onClick={resetFeed} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform">
-                  <RotateCcw className="w-4 h-4" /> Zacznij od nowa
-                </button>
-                {hasActiveFilters && (
-                  <button onClick={() => handleFiltersChange({ ...defaultFilters })} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
-                    <SlidersHorizontal className="w-4 h-4" /> Zmień filtry
-                  </button>
+                {(savedJobs.length > 0 || dbApplications.length > 0) && (
+                  <p className="text-muted-foreground text-xs mb-4">
+                    {savedJobs.length > 0 && `${savedJobs.length} zapisanych`}
+                    {savedJobs.length > 0 && dbApplications.length > 0 && " · "}
+                    {dbApplications.length > 0 && `${dbApplications.length} aplikacji`}
+                  </p>
                 )}
-                {savedJobs.length > 0 && (
-                  <button onClick={() => changeTab("saved")} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
-                    <Bookmark className="w-4 h-4" /> Przeglądaj zapisane ({savedJobs.length})
+                <div className="flex flex-col gap-2 mt-5">
+                  <button onClick={resetFeed} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform">
+                    <RotateCcw className="w-4 h-4" /> Zacznij od nowa
                   </button>
-                )}
-              </div>
-            </motion.div>
-
-          /* ── Swipe view ──────────────────────────────────────────────── */
-          ) : (
-            <>
-              {/* Filters — shrink-0 */}
-              <div className="shrink-0 w-full pt-2">
-                <JobFilters filters={filters} onChange={handleFiltersChange} />
-              </div>
-
-              {filteredJobs.length === 0 ? (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 w-full max-w-xs mx-auto">
-                  <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-3xl">🔍</div>
-                  <h3 className="font-display text-lg font-bold text-foreground mb-1">Brak pasujących ofert</h3>
-                  <p className="text-muted-foreground text-sm mb-5">Spróbuj zmienić kryteria wyszukiwania.</p>
-                  <div className="flex flex-col gap-2">
-                    <button onClick={() => handleFiltersChange({ ...defaultFilters })} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform">
-                      <Filter className="w-4 h-4" /> Wyczyść filtry
+                  {hasActiveFilters && (
+                    <button onClick={() => handleFiltersChange({ ...defaultFilters })} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
+                      <SlidersHorizontal className="w-4 h-4" /> Zmień filtry
                     </button>
-                    {savedJobs.length > 0 && (
-                      <button onClick={() => changeTab("saved")} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
-                        <Bookmark className="w-4 h-4" /> Zapisane oferty ({savedJobs.length})
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              ) : (
-                /* ── Card + buttons layout ─────────────────────────────── */
-                <div className="flex-1 min-h-0 flex flex-col w-full py-2">
-                  {/* Suggestion banner */}
-                  {!hideSuggestion && (!candidate.cvUrl || savedJobs.length > 0) && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="shrink-0 w-full mb-2 flex items-center justify-between p-3 rounded-xl bg-secondary/60 border border-border"
-                    >
-                      <div className="flex-1 min-w-0 pr-2">
-                        <p className="text-xs font-medium text-foreground">
+                  )}
+                  {savedJobs.length > 0 && (
+                    <button onClick={() => changeTab("saved")} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
+                      <Bookmark className="w-4 h-4" /> Przeglądaj zapisane ({savedJobs.length})
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            ) : (
+              <div className="browse-column flex h-full min-h-0 flex-col gap-3 pb-1" id="panel-swipe">
+                <div className="shrink-0">
+                  <JobFilters filters={filters} onChange={handleFiltersChange} />
+                </div>
+
+                {!hideSuggestion && (!candidate.cvUrl || savedJobs.length > 0) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="shrink-0 w-full rounded-xl bg-secondary/60 border border-border p-3"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium leading-relaxed text-foreground">
                           {!candidate.cvUrl
                             ? "Zwiększ szanse na odpowiedź. Dodaj CV do profilu."
                             : `Masz ${savedJobs.length} zapisan${savedJobs.length === 1 ? "ą" : savedJobs.length > 1 && savedJobs.length < 5 ? "e" : "ych"} ofert${savedJobs.length === 1 ? "ę" : "y"}. Zobacz je!`}
@@ -357,75 +314,93 @@ const Index = () => {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {!candidate.cvUrl ? (
-                          <Link to="/profile" className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground">Dodaj CV</Link>
+                          <Link to="/profile" className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground whitespace-nowrap">Dodaj CV</Link>
                         ) : (
-                          <button onClick={() => changeTab("saved")} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground">Przejdź</button>
+                          <button onClick={() => changeTab("saved")} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground whitespace-nowrap">Przejdź</button>
                         )}
-                        <button onClick={() => setHideSuggestion(true)} className="p-1 rounded-lg text-muted-foreground hover:bg-secondary transition-colors">
+                        <button onClick={() => setHideSuggestion(true)} className="p-1 rounded-lg text-muted-foreground hover:bg-secondary transition-colors" aria-label="Zamknij podpowiedź">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
-                    </motion.div>
-                  )}
+                    </div>
+                  </motion.div>
+                )}
 
-                  {/* Card stack — takes remaining space */}
-                  <div className="relative flex-1 min-h-0 w-full">
-                    <AnimatePresence>
-                      {remainingJobs.slice(0, 2).map((job, i) => (
-                        <SwipeCard
-                          key={job.id}
-                          job={job}
-                          onSwipe={handleSwipeWithRefetch}
-                          isTop={i === 0}
-                          matchResult={matchResults[job.id]}
-                          isSaved={savedJobIds.has(job.id)}
-                          onTap={() => openJobModal(job)}
-                          forcedExitDirection={i === 0 ? buttonExitDir : null}
-                        />
-                      ))}
-                    </AnimatePresence>
-                  </div>
+                {filteredJobs.length === 0 ? (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 w-full max-w-xs mx-auto">
+                    <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-3xl">🔍</div>
+                    <h3 className="font-display text-lg font-bold text-foreground mb-1">Brak pasujących ofert</h3>
+                    <p className="text-muted-foreground text-sm mb-5">Spróbuj zmienić kryteria wyszukiwania.</p>
+                    <div className="flex flex-col gap-2">
+                      <button onClick={() => handleFiltersChange({ ...defaultFilters })} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform">
+                        <Filter className="w-4 h-4" /> Wyczyść filtry
+                      </button>
+                      {savedJobs.length > 0 && (
+                        <button onClick={() => changeTab("saved")} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
+                          <Bookmark className="w-4 h-4" /> Zobacz zapisane ({savedJobs.length})
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <>
+                    <div className="browse-card-stage min-h-[18rem] sm:min-h-[20rem]">
+                      <div className="browse-card-frame">
+                        <AnimatePresence initial={false}>
+                          {remainingJobs.slice(0, 2).map((job, index) => (
+                            <SwipeCard
+                              key={job.id}
+                              job={job}
+                              onSwipe={handleSwipeWithRefetch}
+                              isTop={index === 0}
+                              matchResult={matchResults[job.id]}
+                              isSaved={savedJobIds.has(job.id)}
+                              onTap={() => openJobModal(job)}
+                              forcedExitDirection={index === 0 ? buttonExitDir : null}
+                            />
+                          ))}
+                        </AnimatePresence>
+                      </div>
+                    </div>
 
-                  {/* Action buttons — fixed height, never overlaps card */}
-                  <div className="shrink-0 flex items-center justify-center gap-4 sm:gap-5 py-3" role="group" aria-label="Akcje swipe">
-                    <button
-                      onClick={() => handleSwipeWithRefetch("left")}
-                      disabled={actionPending}
-                      className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-40 disabled:pointer-events-none"
-                      title="Pomiń"
-                      data-testid="swipe-skip"
-                    >
-                      <X className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </button>
-                    <button
-                      onClick={() => handleSwipeWithRefetch("save")}
-                      disabled={actionPending}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors disabled:opacity-40 disabled:pointer-events-none"
-                      title="Zapisz na później"
-                      data-testid="swipe-save"
-                    >
-                      <Star className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleSwipeWithRefetch("right")}
-                      disabled={actionPending}
-                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow hover:scale-110 transition-transform disabled:opacity-50 disabled:hover:scale-100"
-                      title="Aplikuj"
-                      data-testid="swipe-apply"
-                    >
-                      {actionPending ? <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin" /> : <Check className="w-6 h-6 sm:w-7 sm:h-7" />}
-                    </button>
-                  </div>
-
-                  {/* Counter */}
-                  <p className="shrink-0 text-center text-muted-foreground text-[10px] sm:text-xs pb-1">
-                    {currentIndex + 1} / {filteredJobs.length}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-
+                    <div className="shrink-0 w-full">
+                      <div className="flex items-center justify-center gap-4 sm:gap-5 pt-1" role="group" aria-label="Akcje swipe">
+                        <button
+                          onClick={() => handleSwipeWithRefetch("left")}
+                          disabled={actionPending}
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                          title="Pomiń"
+                          data-testid="swipe-skip"
+                        >
+                          <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </button>
+                        <button
+                          onClick={() => handleSwipeWithRefetch("save")}
+                          disabled={actionPending}
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                          title="Zapisz na później"
+                          data-testid="swipe-save"
+                        >
+                          <Star className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleSwipeWithRefetch("right")}
+                          disabled={actionPending}
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow transition-transform sm:hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
+                          title="Aplikuj"
+                          data-testid="swipe-apply"
+                        >
+                          {actionPending ? <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin" /> : <Check className="w-6 h-6 sm:w-7 sm:h-7" />}
+                        </button>
+                      </div>
+                      <p className="text-center text-muted-foreground text-[10px] sm:text-xs pt-2">
+                        {currentIndex + 1} / {filteredJobs.length}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </LocalErrorBoundary>
         </div>
       </main>
