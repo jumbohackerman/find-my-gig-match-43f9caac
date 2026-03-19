@@ -65,7 +65,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
   };
 
   return (
-    <div className="w-full mb-4">
+    <div className="w-full">
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
