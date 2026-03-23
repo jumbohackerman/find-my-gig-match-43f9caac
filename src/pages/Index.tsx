@@ -196,7 +196,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen-dynamic bg-background flex flex-col safe-bottom">
+    <div className="h-[100dvh] bg-background flex flex-col safe-bottom overflow-hidden">
       <Navbar />
 
       <div className="shrink-0 px-4 sm:px-6 pt-3 pb-1">
