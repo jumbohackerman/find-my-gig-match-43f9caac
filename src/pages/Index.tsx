@@ -344,7 +344,7 @@ const Index = () => {
                   </motion.div>
                 ) : (
                   <>
-                    <div className="browse-card-stage min-h-[18rem] sm:min-h-[20rem]">
+                    <div className="browse-card-stage">
                       <div className="browse-card-frame">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
