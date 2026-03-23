@@ -60,7 +60,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
   return (
     <motion.div
-      className={isTop ? "relative w-full" : "absolute inset-0"}
+      className="absolute inset-0"
       style={{
         x,
         rotate,
