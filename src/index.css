@@ -43,7 +43,6 @@
     --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
     --shadow-glow: 0 0 30px -5px hsl(16 85% 60% / 0.3);
     --browse-card-column: 22rem;
-    --browse-card-max-height: 31rem;
 
     --sidebar-background: 225 25% 8%;
     --sidebar-foreground: 210 20% 95%;
