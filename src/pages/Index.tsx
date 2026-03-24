@@ -401,7 +401,7 @@ const Index = () => {
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
         onClose={closeJobModal}
-        onApply={(job) => { applyToJob(job); refetchApps(); }}
+        onApply={(job) => { handleSwipeWithRefetch("right"); }}
       />
       <Footer />
     </div>
