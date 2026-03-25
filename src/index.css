@@ -125,6 +125,7 @@
     width: 100%;
     max-width: 72rem;
     margin-inline: auto;
+    overflow-x: hidden;
   }
 
   .browse-column {

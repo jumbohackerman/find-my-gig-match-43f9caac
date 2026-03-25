@@ -231,7 +231,7 @@ const Index = () => {
       </div>
 
       <main className="flex-1 min-h-0 w-full px-4 sm:px-6 pb-2 pt-2 sm:pt-3 flex flex-col">
-        <div className={`browse-shell flex-1 min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto"}`}>
+        <div className={`browse-shell flex-1 min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
           <LocalErrorBoundary label="Panel">
             {activeTab === "applied" ? (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full" id="panel-applied">
