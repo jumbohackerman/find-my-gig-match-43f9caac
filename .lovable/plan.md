@@ -1,25 +1,36 @@
 
 
-## Problem
+## Issues identified
 
-When clicking "Aplikuj na to stanowisko" inside the JobDetailModal, the modal closes but the same job card remains visible. The `onApply` callback on line 404 of `Index.tsx` only calls `applyToJob(job)` — it does not advance the card to the next one.
+1. **Horizontal scrollbar on tab switch** — The non-swipe tabs (applied, saved, recent) use `overflow-y-auto` on the `.browse-shell` container (line 234) without restricting horizontal overflow. Content or motion animations can cause horizontal overflow, producing the visible scrollbar in the "Ostatnie" tab screenshot.
 
-Meanwhile, swiping right (which also applies) uses `handleSwipeWithRefetch("right")`, which both applies AND advances `currentIndex`.
+2. **Filters panel causing horizontal overflow** — The skill tags row and the filter grid can extend beyond the container on certain viewports, contributing to the horizontal scrollbar.
 
-## Fix
+## Plan
 
-**File: `src/pages/Index.tsx`, line 404**
+### File: `src/pages/Index.tsx`
 
-Change the `onApply` handler from:
-```ts
-onApply={(job) => { applyToJob(job); refetchApps(); }}
-```
-to:
-```ts
-onApply={(job) => { handleSwipeWithRefetch("right"); }}
+**Line 234** — Add `overflow-x-hidden` to the browse-shell for non-swipe tabs:
+```tsx
+<div className={`browse-shell flex-1 min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
 ```
 
-This reuses the same swipe-right logic (record swipe event, apply, advance index, refetch apps, trigger exit animation). The modal already calls `onClose()` internally after `onApply`, so it will close and the next card will appear immediately.
+### File: `src/index.css`
 
-**One change, one file, one line.**
+Add `overflow-x: hidden` to `.browse-shell` as a global safeguard so no child can produce a horizontal scrollbar:
+```css
+.browse-shell {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  overflow-x: hidden;
+}
+```
+
+### File: `src/components/JobFilters.tsx`
+
+Add `overflow-hidden` to the skills flex-wrap container to prevent any skill tag from extending beyond the panel boundary. Also ensure the filter panel itself has `overflow-hidden`:
+- Add `overflow-hidden` to the outer `motion.div` wrapper (the collapsible panel)
+
+These are three small, targeted changes — no redesign, no layout restructuring.
 
