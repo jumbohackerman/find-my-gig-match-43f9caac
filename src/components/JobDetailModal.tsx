@@ -84,8 +84,12 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
 
           {/* Header */}
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center text-4xl" aria-hidden="true">
-              {job.logo}
+            <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center overflow-hidden" aria-hidden="true">
+              {job.logo ? (
+                <img src={job.logo} alt={`${job.company} logo`} className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-lg font-semibold text-muted-foreground">{job.company?.slice(0, 2).toUpperCase()}</span>
+              )}
             </div>
             <div className="flex-1">
               <h3 className="font-display text-xl font-bold text-foreground">{job.title}</h3>

@@ -114,8 +114,12 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
         <div className="h-full p-4 sm:p-5 flex flex-col">
           <div className="flex items-start gap-3 mb-3">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center text-xl sm:text-2xl shrink-0">
-              {job.logo}
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
+              {job.logo ? (
+                <img src={job.logo} alt={`${job.company} logo`} className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-sm font-semibold text-muted-foreground">{job.company?.slice(0, 2).toUpperCase()}</span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-display text-sm text-muted-foreground truncate">{job.company}</h3>
