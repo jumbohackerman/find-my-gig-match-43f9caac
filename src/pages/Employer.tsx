@@ -44,10 +44,7 @@ const Employer = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult } | null>(null);
 
-  const [form, setForm] = useState({
-    title: "", company: "", logo: "🏢", location: "", salary: "",
-    type: "Full-time" as Job["type"], description: "", tags: "",
-  });
+  // Old form state removed — using JobPostForm component instead
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
@@ -75,22 +72,10 @@ const Employer = () => {
     setSelectedCandidate({ candidate, match: app.matchResult! });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStructuredSubmit = async (formData: StructuredJobFormData) => {
     if (!user) return;
-    const formData: JobFormData = {
-      title: form.title,
-      company: form.company,
-      logo: form.logo,
-      location: form.location,
-      salary: form.salary,
-      type: form.type,
-      description: form.description,
-      tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-    };
-    const job = await createJob(formData, user.id);
+    const job = await createStructuredJob(formData, user.id);
     if (job) {
-      setForm({ title: "", company: "", logo: "🏢", location: "", salary: "", type: "Full-time", description: "", tags: "" });
       setShowForm(false);
       refetch();
     }
