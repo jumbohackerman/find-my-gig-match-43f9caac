@@ -196,65 +196,11 @@ const Employer = () => {
         {/* Post Job Form */}
         <AnimatePresence>
           {showForm && (
-            <motion.form
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-              onSubmit={handleSubmit}
-            >
-              <div className="card-gradient rounded-2xl border border-border p-5 mb-6 space-y-4">
-                <h3 className="font-display text-lg font-semibold text-foreground">Nowe ogłoszenie</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Stanowisko *</label>
-                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="np. Frontend Developer" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Firma *</label>
-                    <input required value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="np. TechNova" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Lokalizacja *</label>
-                    <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="np. Zdalnie" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                  </div>
-                   <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Wynagrodzenie <span className="text-muted-foreground/60 font-normal">(opcjonalne)</span></label>
-                    <input value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} placeholder="np. 18 000 zł – 25 000 zł brutto" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Typ</label>
-                    <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as Job["type"] })} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-                      <option value="Full-time">Full-time</option>
-                      <option value="Part-time">Part-time</option>
-                      <option value="Contract">Contract</option>
-                      <option value="Remote">Remote</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Logo (emoji) <span className="text-muted-foreground/60 font-normal">(opcjonalne)</span></label>
-                    <input value={form.logo} onChange={(e) => setForm({ ...form, logo: e.target.value })} placeholder="🏢" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-muted-foreground font-medium">Tagi <span className="text-muted-foreground/60 font-normal">(opcjonalne, po przecinku)</span></label>
-                    <input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="React, TypeScript, Node.js" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground font-medium">Opis *</label>
-                  <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value.slice(0, 2000) })} placeholder="Opisz zakres obowiązków, wymagania i co oferujesz…" rows={3} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
-                  <p className="text-[10px] text-muted-foreground text-right">{form.description.length}/2000</p>
-                </div>
-                <div className="flex gap-3 justify-end">
-                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">Anuluj</button>
-                  <button type="submit" disabled={submitting} data-testid="employer-submit-job" className="px-5 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50">{submitting ? "Publikuję…" : "Opublikuj"}</button>
-                </div>
-              </div>
-            </motion.form>
+            <JobPostForm
+              onSubmit={handleStructuredSubmit}
+              onCancel={() => setShowForm(false)}
+              submitting={submitting}
+            />
           )}
         </AnimatePresence>
 
