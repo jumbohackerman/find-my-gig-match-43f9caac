@@ -396,7 +396,8 @@ const Index = () => {
         </div>
       </main>
 
-      <OnboardingModal open={showOnboarding} onComplete={completeOnboarding} onClose={dismissOnboarding} />
+      {/* Onboarding modal temporarily disabled */}
+      {/* <OnboardingModal open={showOnboarding} onComplete={completeOnboarding} onClose={dismissOnboarding} /> */}
       <JobDetailModal
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
