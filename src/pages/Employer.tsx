@@ -34,7 +34,7 @@ import { Progress } from "@/components/ui/progress";
 const Employer = () => {
   const { user, profile } = useAuth();
   const { jobs: domainJobs, applicationsByJob, loading, refetch } = useEmployerDashboardData();
-  const { createJob, deleteJob, submitting, EMPTY_FORM } = useEmployerJobs();
+  const { createJob, createStructuredJob, deleteJob, submitting, EMPTY_FORM } = useEmployerJobs();
   const shortlist = useEmployerShortlist(refetch);
   const appActions = useEmployerApplicationActions(refetch);
   const messaging = useEmployerMessages(user?.id);
