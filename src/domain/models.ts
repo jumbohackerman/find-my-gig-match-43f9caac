@@ -58,19 +58,39 @@ export interface Job {
   /** Structured salary — populated when parsing is possible. */
   salaryRange?: SalaryRange;
   type: JobType;
+  /** Legacy single-text description. New structured offers use aboutRole instead. */
   description: string;
   tags: string[];
   posted: string;
   status?: JobStatus;
   employerId?: string;
-  // Extended fields
-  requirements?: string[];
+
+  // ── Structured offer fields ────────────────────────────────────────────────
+  /** Short teaser shown on card, max ~300 chars */
+  summary?: string;
+  /** "O roli" — longer role description */
+  aboutRole?: string;
+  /** Bullet list: scope of work */
   responsibilities?: string[];
+  /** Bullet list: must-haves */
+  requirements?: string[];
+  /** Bullet list: nice-to-haves */
+  niceToHave?: string[];
+  /** Bullet list: perks */
   benefits?: string[];
+  /** "O firmie" section */
   aboutCompany?: string;
+  /** Recruitment process steps */
+  recruitmentSteps?: string[];
+  /** Key highlights shown on card (max 3) */
+  highlights?: string[];
+
+  // ── Meta fields ────────────────────────────────────────────────────────────
   teamSize?: string;
   seniority?: string;
+  workMode?: string;
   contractType?: string;
+  experienceLevel?: string;
   applyUrl?: string;
 }
 

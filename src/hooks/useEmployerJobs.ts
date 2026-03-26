@@ -7,6 +7,7 @@ import { useState, useCallback } from "react";
 import { getProvider } from "@/providers/registry";
 import type { Job, JobType } from "@/domain/models";
 import { toast } from "sonner";
+import type { StructuredJobFormData } from "@/components/employer/JobPostForm";
 
 export interface JobFormData {
   title: string;
@@ -33,6 +34,7 @@ const EMPTY_FORM: JobFormData = {
 export function useEmployerJobs() {
   const [submitting, setSubmitting] = useState(false);
 
+  /** Create from legacy simple form */
   const createJob = useCallback(async (form: JobFormData, employerId: string): Promise<Job | null> => {
     if (submitting) return null;
     setSubmitting(true);
@@ -46,6 +48,61 @@ export function useEmployerJobs() {
     } catch (e) {
       toast.error("Nie udało się opublikować ogłoszenia");
       console.error("[useEmployerJobs] createJob error", e);
+      return null;
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  /** Create from new structured form */
+  const createStructuredJob = useCallback(async (form: StructuredJobFormData, employerId: string): Promise<Job | null> => {
+    if (submitting) return null;
+    setSubmitting(true);
+    try {
+      const salary = form.salaryFrom && form.salaryTo
+        ? `${Number(form.salaryFrom).toLocaleString("pl-PL")} zł - ${Number(form.salaryTo).toLocaleString("pl-PL")} zł`
+        : "";
+
+      const type: JobType = form.workMode === "Zdalnie" ? "Remote"
+        : form.contractType.includes("B2B") ? "Contract" : "Full-time";
+
+      const description = form.aboutRole || form.summary || "";
+
+      const responsibilities = form.responsibilities.filter(Boolean);
+      const requirements = form.requirements.filter(Boolean);
+      const niceToHave = form.niceToHave.filter(Boolean);
+      const benefits = form.benefits.filter(Boolean);
+      const recruitmentSteps = form.recruitmentSteps.filter(Boolean);
+
+      const job = await getProvider("jobs").create({
+        title: form.title,
+        company: form.company,
+        logo: form.logo,
+        location: form.location,
+        salary,
+        type,
+        description,
+        tags: form.techStack,
+        employerId,
+        summary: form.summary,
+        aboutRole: form.aboutRole,
+        responsibilities,
+        requirements,
+        niceToHave,
+        benefits,
+        aboutCompany: form.aboutCompany,
+        recruitmentSteps,
+        workMode: form.workMode,
+        contractType: form.contractType,
+        experienceLevel: form.experienceLevel,
+        seniority: form.experienceLevel,
+        highlights: responsibilities.slice(0, 3),
+      });
+      toast.success("Ogłoszenie opublikowane");
+      return job;
+    } catch (e) {
+      toast.error("Nie udało się opublikować ogłoszenia");
+      console.error("[useEmployerJobs] createStructuredJob error", e);
       return null;
     } finally {
       setSubmitting(false);
@@ -87,5 +144,5 @@ export function useEmployerJobs() {
     }
   }, []);
 
-  return { createJob, editJob, archiveJob, deleteJob, submitting, EMPTY_FORM };
+  return { createJob, createStructuredJob, editJob, archiveJob, deleteJob, submitting, EMPTY_FORM };
 }
