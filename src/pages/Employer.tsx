@@ -13,6 +13,7 @@ import MatchScoreBreakdown from "@/components/MatchScoreBreakdown";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import { useEmployerDashboardData } from "@/hooks/useEmployerDashboard";
 import { useEmployerJobs, type JobFormData } from "@/hooks/useEmployerJobs";
+import { JobPostForm, type StructuredJobFormData } from "@/components/employer/JobPostForm";
 import { useEmployerShortlist, MAX_SHORTLIST } from "@/hooks/useEmployerShortlist";
 import { useEmployerApplicationActions, getCandidateDisplayName, getCandidateAvatar } from "@/hooks/useEmployerApplications";
 import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
