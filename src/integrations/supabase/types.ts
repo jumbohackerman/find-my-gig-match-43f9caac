@@ -148,6 +148,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cv_uploads: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          mime_type: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          mime_type?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          mime_type?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           about_company: string
