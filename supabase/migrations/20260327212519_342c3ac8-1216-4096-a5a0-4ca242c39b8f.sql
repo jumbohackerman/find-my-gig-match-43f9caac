@@ -1,0 +1,20 @@
+
+ALTER TABLE public.jobs
+  ADD COLUMN IF NOT EXISTS summary text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS about_role text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS responsibilities text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS requirements text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS nice_to_have text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS benefits text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS about_company text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS recruitment_steps text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS offer_highlights text[] NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS team_size text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS seniority text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS contract_type text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS work_mode text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS experience_level text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS apply_url text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS salary_from integer NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS salary_to integer NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS salary_currency text NOT NULL DEFAULT 'PLN';

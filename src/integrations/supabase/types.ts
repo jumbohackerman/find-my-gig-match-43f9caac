@@ -150,49 +150,103 @@ export type Database = {
       }
       jobs: {
         Row: {
+          about_company: string
+          about_role: string
+          apply_url: string
+          benefits: string[]
           company: string
+          contract_type: string
           created_at: string
           description: string
           employer_id: string
+          experience_level: string
           id: string
           location: string
           logo: string
+          nice_to_have: string[]
+          offer_highlights: string[]
+          recruitment_steps: string[]
+          requirements: string[]
+          responsibilities: string[]
           salary: string
+          salary_currency: string
+          salary_from: number
+          salary_to: number
+          seniority: string
           status: string
+          summary: string
           tags: string[]
+          team_size: string
           title: string
           type: string
           updated_at: string
+          work_mode: string
         }
         Insert: {
+          about_company?: string
+          about_role?: string
+          apply_url?: string
+          benefits?: string[]
           company: string
+          contract_type?: string
           created_at?: string
           description?: string
           employer_id: string
+          experience_level?: string
           id?: string
           location: string
           logo?: string
+          nice_to_have?: string[]
+          offer_highlights?: string[]
+          recruitment_steps?: string[]
+          requirements?: string[]
+          responsibilities?: string[]
           salary?: string
+          salary_currency?: string
+          salary_from?: number
+          salary_to?: number
+          seniority?: string
           status?: string
+          summary?: string
           tags?: string[]
+          team_size?: string
           title: string
           type?: string
           updated_at?: string
+          work_mode?: string
         }
         Update: {
+          about_company?: string
+          about_role?: string
+          apply_url?: string
+          benefits?: string[]
           company?: string
+          contract_type?: string
           created_at?: string
           description?: string
           employer_id?: string
+          experience_level?: string
           id?: string
           location?: string
           logo?: string
+          nice_to_have?: string[]
+          offer_highlights?: string[]
+          recruitment_steps?: string[]
+          requirements?: string[]
+          responsibilities?: string[]
           salary?: string
+          salary_currency?: string
+          salary_from?: number
+          salary_to?: number
+          seniority?: string
           status?: string
+          summary?: string
           tags?: string[]
+          team_size?: string
           title?: string
           type?: string
           updated_at?: string
+          work_mode?: string
         }
         Relationships: []
       }
