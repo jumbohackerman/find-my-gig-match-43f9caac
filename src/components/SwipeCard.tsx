@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Briefcase, Wifi, GraduationCap, Sparkles } from "lucide-react";
+import { MapPin, Briefcase, Wifi, GraduationCap, Sparkles, Users, ListChecks, Clock, ChevronRight } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
+import { timeAgo } from "@/lib/timeAgo";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 
@@ -53,6 +54,12 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
   const highlights = job.highlights || [];
   const seniority = job.seniority || job.experienceLevel;
 
+  // Build metadata items for the compact strip
+  const metaItems: { icon: typeof Clock; label: string }[] = [];
+  if (job.teamSize) metaItems.push({ icon: Users, label: job.teamSize });
+  if (job.recruitmentSteps?.length) metaItems.push({ icon: ListChecks, label: `${job.recruitmentSteps.length} etapów` });
+  if (job.posted) metaItems.push({ icon: Clock, label: timeAgo(job.posted) });
+
   return (
     <motion.div
       className="absolute inset-0"
@@ -92,7 +99,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </>
         )}
 
-        <div className="h-full p-4 sm:p-5 flex flex-col gap-2.5">
+        <div className="h-full p-4 sm:p-5 flex flex-col gap-2">
           {/* Header: Logo + Title + Company */}
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
@@ -144,56 +151,81 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           {/* Summary teaser (max 2 lines) */}
           <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">{summaryText}</p>
 
-          {/* Key highlights (max 3) */}
+          {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
-            <div className="space-y-1">
-              {highlights.slice(0, 3).map((h, i) => (
-                <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
-                  <Sparkles className="w-3 h-3 text-accent shrink-0 mt-0.5" />
-                  <span className="line-clamp-1">{h}</span>
-                </div>
-              ))}
+            <div className="rounded-lg bg-accent/5 border border-accent/15 p-2.5">
+              <span className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1.5 block">Dlaczego warto</span>
+              <div className="space-y-1">
+                {highlights.slice(0, 3).map((h, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
+                    <Sparkles className="w-3 h-3 text-accent shrink-0 mt-0.5" />
+                    <span className="line-clamp-1">{h}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Match score box */}
+          {/* Compact match score row */}
           {matchResult && (
-            <div className="p-2.5 rounded-xl bg-secondary/50 border border-border">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Dopasowanie</span>
-                <span className="text-sm font-bold text-foreground">{matchResult.score}%</span>
-              </div>
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-secondary/50 border border-border">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Dopasowanie</span>
+              <span className="text-sm font-bold text-foreground">{matchResult.score}%</span>
               {matchResult.reasons.length > 0 && (
-                <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{matchResult.reasons[0]}</p>
+                <>
+                  <span className="text-border">·</span>
+                  <span className="text-[11px] text-muted-foreground truncate flex-1">{matchResult.reasons[0]}</span>
+                </>
               )}
             </div>
           )}
 
-          {/* Tech stack tags */}
-          <div className="mt-auto pt-1 flex flex-wrap gap-1.5">
-            {job.tags.slice(0, 6).map((tag) => {
-              const isMatched = matchResult?.matchedSkills.includes(tag);
-              const isMissing = matchResult?.missingSkills.includes(tag);
-              return (
-                <span
-                  key={tag}
-                  className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${
-                    isMatched
-                      ? "bg-accent/15 text-accent border border-accent/30"
-                      : isMissing
-                        ? "bg-destructive/10 text-muted-foreground border border-destructive/20"
-                        : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {tag}
-                </span>
-              );
-            })}
-            {job.tags.length > 6 && (
-              <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground">
-                +{job.tags.length - 6}
-              </span>
+          {/* Bottom section: metadata strip + tech tags */}
+          <div className="mt-auto flex flex-col gap-2">
+            {/* Metadata strip */}
+            {metaItems.length > 0 && (
+              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                {metaItems.map((item, i) => (
+                  <span key={i} className="inline-flex items-center gap-1">
+                    <item.icon className="w-3 h-3" />
+                    {item.label}
+                  </span>
+                ))}
+              </div>
             )}
+
+            {/* Tech stack tags */}
+            <div className="flex flex-wrap gap-1.5">
+              {job.tags.slice(0, 6).map((tag) => {
+                const isMatched = matchResult?.matchedSkills.includes(tag);
+                const isMissing = matchResult?.missingSkills.includes(tag);
+                return (
+                  <span
+                    key={tag}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${
+                      isMatched
+                        ? "bg-accent/15 text-accent border border-accent/30"
+                        : isMissing
+                          ? "bg-destructive/10 text-muted-foreground border border-destructive/20"
+                          : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
+              {job.tags.length > 6 && (
+                <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground">
+                  +{job.tags.length - 6}
+                </span>
+              )}
+            </div>
+
+            {/* Tap hint */}
+            <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground/60">
+              <span>Kliknij, aby zobaczyć szczegóły</span>
+              <ChevronRight className="w-3 h-3" />
+            </div>
           </div>
         </div>
       </div>
