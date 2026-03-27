@@ -112,7 +112,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto card-gradient rounded-2xl border border-border relative"
+            className="w-full max-w-3xl max-h-[90vh] overflow-y-auto card-gradient rounded-2xl border border-border relative scrollbar-thin"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top bar */}
