@@ -306,7 +306,7 @@ const Index = () => {
                           : `${savedJobs.length} zapisanych ofert`}
                       </p>
                       {!candidate.cvUrl ? (
-                        <Link to="/profile" className="px-2 py-1 rounded-md text-[11px] font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">Dodaj CV</Link>
+                        <Link to="/my-profile" className="px-2 py-1 rounded-md text-[11px] font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">Dodaj CV</Link>
                       ) : (
                         <button onClick={() => changeTab("saved")} className="px-2 py-1 rounded-md text-[11px] font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">Zobacz</button>
                       )}

@@ -12,6 +12,7 @@ import { ProfileSkeleton } from "@/components/StateViews";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
+import CandidateCvUpload from "@/components/CandidateCvUpload";
 
 interface ExperienceEntry {
   title: string;
@@ -643,51 +644,9 @@ const MyProfile = () => {
                 <div className="pt-2 border-t border-border mt-4">
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
-                    <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5MB</span>
+                    <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
                   </div>
-                  
-                  {cvUrl && !uploading ? (
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                          <FileText className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">Twoje CV</p>
-                          <p className="text-xs text-muted-foreground">Przesłane pomyślnie</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <label className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer" title="Zmień plik">
-                          <Upload className="w-4 h-4" />
-                          <input type="file" accept="application/pdf" onChange={handleCvUpload} className="hidden" />
-                        </label>
-                        <button onClick={handleRemoveCv} className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Usuń plik">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-primary/50 hover:bg-secondary/20 transition-all">
-                      <input type="file" accept="application/pdf" onChange={handleCvUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" disabled={uploading} />
-                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground mb-3">
-                        <Upload className="w-5 h-5" />
-                      </div>
-                      <p className="text-sm font-medium text-foreground mb-1">
-                        {uploading ? "Przesyłanie..." : "Kliknij aby dodać plik"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        lub przeciągnij i upuść
-                      </p>
-                      
-                      {uploading && (
-                        <div className="w-full max-w-xs mt-4">
-                          <Progress value={uploadProgress} className="h-1.5" />
-                          <p className="text-[10px] text-muted-foreground mt-2 text-right">{uploadProgress}%</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <CandidateCvUpload />
                 </div>
               </div>
             </AccordionSection>
