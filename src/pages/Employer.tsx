@@ -183,7 +183,7 @@ const Employer = () => {
                     </button>
                   )}
                   {!(user?.user_metadata?.full_name || profile?.full_name) && (
-                     <Link to="/profile" className="px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium border border-border hover:bg-muted transition-colors">
+                     <Link to="/my-profile" className="px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium border border-border hover:bg-muted transition-colors">
                         Przejdź do profilu
                      </Link>
                   )}

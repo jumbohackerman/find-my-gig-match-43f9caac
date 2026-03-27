@@ -78,6 +78,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route path="/profile" element={<Navigate to="/my-profile" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieBanner />

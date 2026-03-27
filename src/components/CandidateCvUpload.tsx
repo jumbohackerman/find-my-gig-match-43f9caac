@@ -20,14 +20,13 @@ export default function CandidateCvUpload() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loadingRecord, setLoadingRecord] = useState(true);
 
-  // Load last cv_uploads record
   useEffect(() => {
     if (!user) {
       setLoadingRecord(false);
       return;
     }
     const load = async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("cv_uploads")
         .select("id, file_name, file_path, status, created_at")
         .eq("user_id", user.id)
@@ -42,7 +41,6 @@ export default function CandidateCvUpload() {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    // Reset input so same file can be re-selected
     e.target.value = "";
 
     if (!user) {
@@ -69,7 +67,6 @@ export default function CandidateCvUpload() {
 
     const storagePath = `${user.id}/${Date.now()}-${file.name}`;
 
-    // 1. Upload to Storage
     const { error: storageErr } = await supabase.storage
       .from("candidate-cvs")
       .upload(storagePath, file);
@@ -82,8 +79,7 @@ export default function CandidateCvUpload() {
       return;
     }
 
-    // 2. Insert record into cv_uploads
-    const { data: insertedRow, error: dbErr } = await supabase
+    const { data: insertedRow, error: dbErr } = await (supabase as any)
       .from("cv_uploads")
       .insert({
         user_id: user.id,
@@ -98,7 +94,6 @@ export default function CandidateCvUpload() {
     clearInterval(progressInterval);
 
     if (dbErr) {
-      // Rollback: remove orphaned file
       await supabase.storage.from("candidate-cvs").remove([storagePath]);
       setUploading(false);
       setUploadProgress(0);
@@ -119,7 +114,7 @@ export default function CandidateCvUpload() {
     if (!lastCv || !user) return;
     try {
       await supabase.storage.from("candidate-cvs").remove([lastCv.file_path]);
-      await supabase.from("cv_uploads").delete().eq("id", lastCv.id);
+      await (supabase as any).from("cv_uploads").delete().eq("id", lastCv.id);
       setLastCv(null);
       toast.success("CV zostało usunięte.");
     } catch {
@@ -144,7 +139,6 @@ export default function CandidateCvUpload() {
     );
   }
 
-  // Show last uploaded file
   if (lastCv && !uploading) {
     const date = new Date(lastCv.created_at);
     const dateStr = date.toLocaleDateString("pl-PL", { day: "numeric", month: "short", year: "numeric" });
@@ -175,7 +169,6 @@ export default function CandidateCvUpload() {
     );
   }
 
-  // Upload zone
   return (
     <div className="space-y-2">
       <div className="relative border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-primary/50 hover:bg-secondary/20 transition-all">
