@@ -180,6 +180,24 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             </div>
           )}
 
+          {/* Requirements preview */}
+          {job.requirements && job.requirements.length > 0 && (
+            <div className="rounded-lg bg-secondary/40 border border-border p-2.5">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 block">Wymagania</span>
+              <div className="space-y-1">
+                {job.requirements.slice(0, 3).map((r, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
+                    <span className="text-primary shrink-0 mt-0.5">•</span>
+                    <span className="line-clamp-1">{r}</span>
+                  </div>
+                ))}
+                {job.requirements.length > 3 && (
+                  <span className="text-[10px] text-muted-foreground">+{job.requirements.length - 3} więcej</span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Bottom section: metadata strip + tech tags */}
           <div className="mt-auto flex flex-col gap-2">
             {/* Metadata strip */}
