@@ -183,16 +183,26 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
                 {/* Match */}
                 {matchResult && (
                   <div className="p-3 rounded-xl bg-secondary/50 border border-border mb-4">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 mb-2">
                       <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Dopasowanie do Twojego profilu</span>
-                      <MatchBadge result={matchResult} />
+                      <MatchBadge result={matchResult} compact />
                     </div>
                     {matchResult.reasons.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {matchResult.reasons.slice(0, 3).map((r, i) => (
+                      <div className="space-y-1">
+                        {matchResult.reasons.slice(0, 5).map((r, i) => (
                           <p key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
                             <span className="mt-0.5">•</span><span>{r}</span>
                           </p>
+                        ))}
+                      </div>
+                    )}
+                    {(matchResult.matchedSkills.length > 0 || matchResult.missingSkills.length > 0) && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {matchResult.matchedSkills.map((s) => (
+                          <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/15 text-accent font-medium">✓ {s}</span>
+                        ))}
+                        {matchResult.missingSkills.map((s) => (
+                          <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">{s}</span>
                         ))}
                       </div>
                     )}
