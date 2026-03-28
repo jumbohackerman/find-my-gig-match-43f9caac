@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { downloadFromBucket, extractTextFromPdf, validateExtractedText } from "@/lib/pdfExtract";
 
 export interface CvRecord {
   id: string;
@@ -34,7 +35,6 @@ export async function fetchLatestCv(userId: string): Promise<CvRecord | null> {
     console.error("[cvHelpers] fetchLatestCv error:", error);
     return null;
   }
-  console.log("[cvHelpers] fetchLatestCv result:", data);
   return data as CvRecord | null;
 }
 
@@ -50,88 +50,126 @@ export async function fetchParsedData(cvUploadId: string): Promise<CvParsedRecor
     console.error("[cvHelpers] fetchParsedData error:", error);
     return null;
   }
-  console.log("[cvHelpers] fetchParsedData result:", data);
   return data as CvParsedRecord | null;
 }
 
-/** Begin the AI preparation flow: set status to processing, create parsed_data placeholder */
+/** Helper to set cv_uploads status */
+async function setCvStatus(
+  cvUploadId: string,
+  userId: string,
+  status: string,
+  errorMessage: string | null = null
+) {
+  const { data, error } = await (supabase as any)
+    .from("cv_uploads")
+    .update({ status, error_message: errorMessage })
+    .eq("id", cvUploadId)
+    .eq("user_id", userId)
+    .select("id, status")
+    .maybeSingle();
+
+  if (error) console.error(`[cvHelpers] setCvStatus(${status}) error:`, error);
+  return { data, error };
+}
+
+/**
+ * Full AI preparation flow:
+ * 1. Set status → processing
+ * 2. Download PDF from bucket
+ * 3. Extract text
+ * 4. Validate text quality
+ * 5. Upsert cv_parsed_data with raw_text
+ * 6. Set status → needs_review
+ */
 export async function startAiPreparation(
   cvUploadId: string,
-  userId: string
+  userId: string,
+  filePath: string
 ): Promise<{ success: boolean; error?: string }> {
-  console.log("[cvHelpers] startAiPreparation called with", { cvUploadId, userId });
+  console.log("[cvHelpers] startAiPreparation called with", { cvUploadId, userId, filePath });
 
-  // 1. Set cv_uploads status to 'processing' — use .select() to verify row was actually updated
-  const { data: updateData, error: updateErr } = await (supabase as any)
-    .from("cv_uploads")
-    .update({ status: "processing", error_message: null })
-    .eq("id", cvUploadId)
-    .eq("user_id", userId)
-    .select("id, status")
-    .maybeSingle();
-
-  console.log("[cvHelpers] update to processing:", { updateData, updateErr });
-
-  if (updateErr) {
-    console.error("[cvHelpers] Failed to set processing:", updateErr);
-    return { success: false, error: updateErr.message };
-  }
-  if (!updateData) {
-    console.error("[cvHelpers] Update to processing returned no rows — RLS or row not found");
-    return { success: false, error: "Nie znaleziono rekordu CV do aktualizacji." };
+  // 1. Set status to processing
+  const { data: updateData, error: updateErr } = await setCvStatus(cvUploadId, userId, "processing");
+  if (updateErr || !updateData) {
+    return { success: false, error: updateErr?.message || "Nie znaleziono rekordu CV do aktualizacji." };
   }
 
-  // 2. Insert cv_parsed_data (unique constraint prevents duplicates)
-  const { data: insertData, error: insertErr } = await (supabase as any)
-    .from("cv_parsed_data")
-    .insert({
-      cv_upload_id: cvUploadId,
-      user_id: userId,
-      raw_text: null,
-      parsed_json: null,
-      parse_confidence: null,
-      model_name: null,
-    })
-    .select("id")
-    .maybeSingle();
-
-  console.log("[cvHelpers] insert cv_parsed_data:", { insertData, insertErr });
-
-  // 23505 = unique_violation — record already exists, that's OK
-  if (insertErr && insertErr.code !== "23505") {
-    console.error("[cvHelpers] Failed to insert cv_parsed_data:", insertErr);
-    // Rollback status
-    await (supabase as any)
-      .from("cv_uploads")
-      .update({ status: "failed", error_message: insertErr.message })
-      .eq("id", cvUploadId)
-      .eq("user_id", userId);
-    return { success: false, error: insertErr.message };
+  // 2. Download PDF
+  let pdfBuffer: ArrayBuffer;
+  try {
+    pdfBuffer = await downloadFromBucket("candidate-cvs", filePath);
+    console.log("[cvHelpers] PDF downloaded, size:", pdfBuffer.byteLength);
+  } catch (err: any) {
+    console.error("[cvHelpers] PDF download failed:", err);
+    await setCvStatus(cvUploadId, userId, "failed", err.message);
+    return { success: false, error: err.message };
   }
 
-  // 3. Set status to needs_review
-  const { data: finalData, error: finalErr } = await (supabase as any)
-    .from("cv_uploads")
-    .update({ status: "needs_review" })
-    .eq("id", cvUploadId)
-    .eq("user_id", userId)
-    .select("id, status")
-    .maybeSingle();
+  // 3. Extract text
+  let rawText: string;
+  try {
+    rawText = await extractTextFromPdf(pdfBuffer);
+    console.log("[cvHelpers] Extracted text length:", rawText.length);
+  } catch (err: any) {
+    console.error("[cvHelpers] PDF text extraction failed:", err);
+    const msg = "Nie udało się odczytać tekstu z PDF: " + err.message;
+    await setCvStatus(cvUploadId, userId, "failed", msg);
+    return { success: false, error: msg };
+  }
 
-  console.log("[cvHelpers] update to needs_review:", { finalData, finalErr });
+  // 4. Validate quality
+  const validationError = validateExtractedText(rawText);
+  if (validationError) {
+    console.warn("[cvHelpers] Text validation failed:", validationError);
+    await setCvStatus(cvUploadId, userId, "failed", validationError);
+    return { success: false, error: validationError };
+  }
 
+  // 5. Upsert cv_parsed_data (try update first, then insert)
+  const existing = await fetchParsedData(cvUploadId);
+
+  if (existing) {
+    const { error: updErr } = await (supabase as any)
+      .from("cv_parsed_data")
+      .update({ raw_text: rawText })
+      .eq("id", existing.id)
+      .eq("user_id", userId)
+      .select("id")
+      .maybeSingle();
+
+    if (updErr) {
+      console.error("[cvHelpers] cv_parsed_data update failed:", updErr);
+      await setCvStatus(cvUploadId, userId, "failed", updErr.message);
+      return { success: false, error: updErr.message };
+    }
+    console.log("[cvHelpers] cv_parsed_data updated with raw_text");
+  } else {
+    const { error: insErr } = await (supabase as any)
+      .from("cv_parsed_data")
+      .insert({
+        cv_upload_id: cvUploadId,
+        user_id: userId,
+        raw_text: rawText,
+        parsed_json: null,
+        parse_confidence: null,
+        model_name: null,
+      })
+      .select("id")
+      .maybeSingle();
+
+    if (insErr && insErr.code !== "23505") {
+      console.error("[cvHelpers] cv_parsed_data insert failed:", insErr);
+      await setCvStatus(cvUploadId, userId, "failed", insErr.message);
+      return { success: false, error: insErr.message };
+    }
+    console.log("[cvHelpers] cv_parsed_data inserted with raw_text");
+  }
+
+  // 6. Set status to needs_review
+  const { error: finalErr } = await setCvStatus(cvUploadId, userId, "needs_review");
   if (finalErr) {
-    console.error("[cvHelpers] Failed to set needs_review:", finalErr);
-    await (supabase as any)
-      .from("cv_uploads")
-      .update({ status: "failed", error_message: finalErr.message })
-      .eq("id", cvUploadId)
-      .eq("user_id", userId);
+    await setCvStatus(cvUploadId, userId, "failed", finalErr.message);
     return { success: false, error: finalErr.message };
-  }
-  if (!finalData) {
-    console.error("[cvHelpers] Update to needs_review returned no rows");
-    return { success: false, error: "Nie udało się zaktualizować statusu CV." };
   }
 
   console.log("[cvHelpers] startAiPreparation completed successfully");
