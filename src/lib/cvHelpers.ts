@@ -165,7 +165,7 @@ export async function startAiPreparation(
     console.log("[cvHelpers] cv_parsed_data inserted with raw_text");
   }
 
-  // 6. Set status to needs_review
+  // 6. Set status to needs_review (text extracted, ready for AI parsing)
   const { error: finalErr } = await setCvStatus(cvUploadId, userId, "needs_review");
   if (finalErr) {
     await setCvStatus(cvUploadId, userId, "failed", finalErr.message);
@@ -174,4 +174,49 @@ export async function startAiPreparation(
 
   console.log("[cvHelpers] startAiPreparation completed successfully");
   return { success: true };
+}
+
+/**
+ * Call the parse-cv-ai edge function to parse raw_text into structured JSON.
+ * Returns the parsed JSON on success.
+ */
+export async function startAiParsing(
+  cvUploadId: string,
+  userId: string
+): Promise<{ success: boolean; error?: string; parsedJson?: unknown }> {
+  console.log("[cvHelpers] startAiParsing called", { cvUploadId, userId });
+
+  // Verify parsed data with raw_text exists
+  const existing = await fetchParsedData(cvUploadId);
+  if (!existing || !existing.raw_text || existing.raw_text.length < 30) {
+    return { success: false, error: "Brak tekstu z CV do analizy. Najpierw odczytaj tekst z PDF." };
+  }
+
+  // If parsed_json already exists, don't re-parse
+  if (existing.parsed_json && typeof existing.parsed_json === "object" && Object.keys(existing.parsed_json as Record<string, unknown>).length > 0) {
+    console.log("[cvHelpers] parsed_json already exists, skipping AI call");
+    return { success: true, parsedJson: existing.parsed_json };
+  }
+
+  // Call edge function
+  const { data, error } = await supabase.functions.invoke("parse-cv-ai", {
+    body: { cv_upload_id: cvUploadId },
+  });
+
+  if (error) {
+    console.error("[cvHelpers] parse-cv-ai invoke error:", error);
+    return { success: false, error: error.message || "Błąd wywołania analizy AI." };
+  }
+
+  if (data?.error) {
+    console.error("[cvHelpers] parse-cv-ai returned error:", data.error);
+    return { success: false, error: data.error };
+  }
+
+  if (!data?.success) {
+    return { success: false, error: "Nieoczekiwana odpowiedź z serwera." };
+  }
+
+  console.log("[cvHelpers] AI parsing succeeded, confidence:", data.parse_confidence);
+  return { success: true, parsedJson: data.parsed_json };
 }

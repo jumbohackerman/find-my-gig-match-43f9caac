@@ -10,16 +10,18 @@ import {
   fetchLatestCv,
   fetchParsedData,
   startAiPreparation,
+  startAiParsing,
 } from "@/lib/cvHelpers";
 
-type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "failed";
+type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "ai_parsing" | "parsed" | "failed";
 
 function deriveCvState(cv: CvRecord | null, parsed: CvParsedRecord | null): CvState {
   if (!cv) return "empty";
   if (cv.status === "processing") return "processing";
+  if (cv.status === "ai_processing") return "ai_parsing";
   if (cv.status === "failed") return "failed";
-  if (cv.status === "needs_review" || parsed) return "needs_review";
-  // Has CV, no parsed data yet → ready for AI
+  if (cv.status === "parsed" || (parsed?.parsed_json && typeof parsed.parsed_json === "object" && Object.keys(parsed.parsed_json as Record<string, unknown>).length > 0)) return "parsed";
+  if (cv.status === "needs_review" || parsed?.raw_text) return "needs_review";
   return "ready_for_ai";
 }
 
@@ -139,25 +141,61 @@ export default function CandidateCvUpload() {
   const handleStartAi = async () => {
     if (!lastCv || !user || aiProcessing) return;
 
-    // Check for existing parsed data with raw_text to prevent re-extraction
+    // Check for existing parsed data
     const existing = await fetchParsedData(lastCv.id);
-    if (existing?.raw_text && existing.raw_text.length > 0) {
+    
+    // If already has parsed_json, just refresh state
+    if (existing?.parsed_json && typeof existing.parsed_json === "object" && Object.keys(existing.parsed_json as Record<string, unknown>).length > 0) {
       setParsedData(existing);
       const refreshed = await fetchLatestCv(user.id);
       if (refreshed) setLastCv(refreshed);
-      toast.info("Tekst z CV został już odczytany. Gotowe do kolejnego kroku.");
+      toast.info("CV zostało już przeanalizowane przez AI.");
       return;
     }
 
+    // If raw_text exists, skip extraction and go straight to AI parsing
+    if (existing?.raw_text && existing.raw_text.length > 0) {
+      setParsedData(existing);
+      setAiProcessing(true);
+      setLastCv({ ...lastCv, status: "ai_processing" });
+
+      const parseResult = await startAiParsing(lastCv.id, user.id);
+      if (!parseResult.success) {
+        setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
+        setAiProcessing(false);
+        toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
+        return;
+      }
+
+      const refreshedCv = await fetchLatestCv(user.id);
+      if (refreshedCv) setLastCv(refreshedCv);
+      const refreshedParsed = await fetchParsedData(lastCv.id);
+      setParsedData(refreshedParsed);
+      setAiProcessing(false);
+      toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
+      return;
+    }
+
+    // No raw_text yet — extract text first, then parse with AI
     setAiProcessing(true);
     setLastCv({ ...lastCv, status: "processing" });
 
-    const result = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
-
-    if (!result.success) {
-      setLastCv({ ...lastCv, status: "failed", error_message: result.error || "Nieznany błąd" });
+    const extractResult = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
+    if (!extractResult.success) {
+      setLastCv({ ...lastCv, status: "failed", error_message: extractResult.error || "Nieznany błąd" });
       setAiProcessing(false);
-      toast.error("Nie udało się odczytać CV: " + (result.error || "Nieznany błąd"));
+      toast.error("Nie udało się odczytać CV: " + (extractResult.error || "Nieznany błąd"));
+      return;
+    }
+
+    // Text extracted, now run AI parsing
+    setLastCv({ ...lastCv, status: "ai_processing" });
+
+    const parseResult = await startAiParsing(lastCv.id, user.id);
+    if (!parseResult.success) {
+      setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
+      setAiProcessing(false);
+      toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
       return;
     }
 
@@ -167,7 +205,7 @@ export default function CandidateCvUpload() {
     const refreshedParsed = await fetchParsedData(lastCv.id);
     setParsedData(refreshedParsed);
     setAiProcessing(false);
-    toast.success("Tekst z CV został odczytany! Gotowe do analizy AI.");
+    toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
   };
 
   if (loadingRecord) {
@@ -261,14 +299,28 @@ function FileCard({ cv, onUpload, onRemove }: { cv: CvRecord; onUpload: (e: Reac
 function AiSection({ state, onStart, processing, errorMessage }: { state: CvState; onStart: () => void; processing: boolean; errorMessage: string | null }) {
   if (state === "empty") return null;
 
-  if (state === "processing" || processing) {
+  if (state === "processing") {
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
           <div>
             <p className="text-sm font-medium text-foreground">Odczytywanie treści z CV…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu. To może chwilę potrwać.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (state === "ai_parsing" || processing) {
+    return (
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-foreground">AI analizuje Twoje CV…</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Wyciąganie danych: umiejętności, doświadczenie, wykształcenie. To może potrwać kilkanaście sekund.</p>
           </div>
         </div>
       </div>
@@ -281,7 +333,7 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
         <div className="flex items-start gap-3">
           <XCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-destructive">Nie udało się przygotować analizy</p>
+            <p className="text-sm font-medium text-destructive">Nie udało się przeanalizować CV</p>
             {errorMessage && <p className="text-xs text-destructive/70 mt-0.5 break-words">{errorMessage}</p>}
             <button
               onClick={onStart}
@@ -296,16 +348,40 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
     );
   }
 
-  if (state === "needs_review") {
+  if (state === "parsed") {
     return (
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-foreground">Tekst z CV został odczytany</p>
+            <p className="text-sm font-medium text-foreground">AI przeanalizowało Twoje CV</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              W kolejnym kroku AI przeanalizuje treść Twojego CV i zaproponuje uzupełnienie profilu. Będziesz mógł wszystko sprawdzić i poprawić przed zapisaniem.
+              Dane z CV zostały odczytane i uporządkowane. W kolejnym kroku będziesz mógł sprawdzić wyniki i uzupełnić swój profil.
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (state === "needs_review") {
+    return (
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <div className="flex items-start gap-3">
+          <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">Tekst odczytany — uruchom analizę AI</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Tekst z CV został odczytany. Kliknij poniżej, aby AI wyciągnęło uporządkowane dane: umiejętności, doświadczenie, wykształcenie i inne.
+            </p>
+            <button
+              onClick={onStart}
+              disabled={processing}
+              className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <Sparkles className="w-4 h-4" />
+              Analizuj z AI
+            </button>
           </div>
         </div>
       </div>
