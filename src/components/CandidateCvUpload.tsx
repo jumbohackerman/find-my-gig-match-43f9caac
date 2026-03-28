@@ -299,14 +299,28 @@ function FileCard({ cv, onUpload, onRemove }: { cv: CvRecord; onUpload: (e: Reac
 function AiSection({ state, onStart, processing, errorMessage }: { state: CvState; onStart: () => void; processing: boolean; errorMessage: string | null }) {
   if (state === "empty") return null;
 
-  if (state === "processing" || processing) {
+  if (state === "processing") {
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
           <div>
             <p className="text-sm font-medium text-foreground">Odczytywanie treści z CV…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu. To może chwilę potrwać.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (state === "ai_parsing" || (processing && state !== "processing")) {
+    return (
+      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-foreground">AI analizuje Twoje CV…</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Wyciąganie danych: umiejętności, doświadczenie, wykształcenie. To może potrwać kilkanaście sekund.</p>
           </div>
         </div>
       </div>
@@ -319,7 +333,7 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
         <div className="flex items-start gap-3">
           <XCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-destructive">Nie udało się przygotować analizy</p>
+            <p className="text-sm font-medium text-destructive">Nie udało się przeanalizować CV</p>
             {errorMessage && <p className="text-xs text-destructive/70 mt-0.5 break-words">{errorMessage}</p>}
             <button
               onClick={onStart}
@@ -334,16 +348,40 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
     );
   }
 
-  if (state === "needs_review") {
+  if (state === "parsed") {
     return (
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-foreground">Tekst z CV został odczytany</p>
+            <p className="text-sm font-medium text-foreground">AI przeanalizowało Twoje CV</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              W kolejnym kroku AI przeanalizuje treść Twojego CV i zaproponuje uzupełnienie profilu. Będziesz mógł wszystko sprawdzić i poprawić przed zapisaniem.
+              Dane z CV zostały odczytane i uporządkowane. W kolejnym kroku będziesz mógł sprawdzić wyniki i uzupełnić swój profil.
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (state === "needs_review") {
+    return (
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <div className="flex items-start gap-3">
+          <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">Tekst odczytany — uruchom analizę AI</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Tekst z CV został odczytany. Kliknij poniżej, aby AI wyciągnęło uporządkowane dane: umiejętności, doświadczenie, wykształcenie i inne.
+            </p>
+            <button
+              onClick={onStart}
+              disabled={processing}
+              className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <Sparkles className="w-4 h-4" />
+              Analizuj z AI
+            </button>
           </div>
         </div>
       </div>
