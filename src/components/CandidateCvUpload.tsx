@@ -313,7 +313,7 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
     );
   }
 
-  if (state === "ai_parsing" || (processing && state !== "processing")) {
+  if (state === "ai_parsing" || processing) {
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
         <div className="flex items-center gap-3">
