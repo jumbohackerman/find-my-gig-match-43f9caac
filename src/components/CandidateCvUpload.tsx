@@ -267,8 +267,8 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
           <div>
-            <p className="text-sm font-medium text-foreground">Przygotowywanie analizy AI…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">To może chwilę potrwać. Nie zamykaj tej strony.</p>
+            <p className="text-sm font-medium text-foreground">Odczytywanie treści z CV…</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu. To może chwilę potrwać.</p>
           </div>
         </div>
       </div>
@@ -302,9 +302,9 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-foreground">CV przygotowane do analizy AI</p>
+            <p className="text-sm font-medium text-foreground">Tekst z CV został odczytany</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              W kolejnym kroku AI odczyta dane z Twojego CV i zaproponuje uzupełnienie profilu. Będziesz mógł wszystko sprawdzić i poprawić przed zapisaniem.
+              W kolejnym kroku AI przeanalizuje treść Twojego CV i zaproponuje uzupełnienie profilu. Będziesz mógł wszystko sprawdzić i poprawić przed zapisaniem.
             </p>
           </div>
         </div>
