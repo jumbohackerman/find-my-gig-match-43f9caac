@@ -10,6 +10,7 @@ import {
   fetchLatestCv,
   fetchParsedData,
   startAiPreparation,
+  startAiParsing,
 } from "@/lib/cvHelpers";
 
 type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "failed";
