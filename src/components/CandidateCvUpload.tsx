@@ -139,26 +139,25 @@ export default function CandidateCvUpload() {
   const handleStartAi = async () => {
     if (!lastCv || !user || aiProcessing) return;
 
-    // Check for existing parsed data to prevent duplicates
+    // Check for existing parsed data with raw_text to prevent re-extraction
     const existing = await fetchParsedData(lastCv.id);
-    if (existing) {
+    if (existing?.raw_text && existing.raw_text.length > 0) {
       setParsedData(existing);
-      // Refresh CV status
       const refreshed = await fetchLatestCv(user.id);
       if (refreshed) setLastCv(refreshed);
-      toast.info("Analiza AI została już przygotowana dla tego CV.");
+      toast.info("Tekst z CV został już odczytany. Gotowe do kolejnego kroku.");
       return;
     }
 
     setAiProcessing(true);
     setLastCv({ ...lastCv, status: "processing" });
 
-    const result = await startAiPreparation(lastCv.id, user.id);
+    const result = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
 
     if (!result.success) {
       setLastCv({ ...lastCv, status: "failed", error_message: result.error || "Nieznany błąd" });
       setAiProcessing(false);
-      toast.error("Nie udało się przygotować analizy: " + (result.error || "Nieznany błąd"));
+      toast.error("Nie udało się odczytać CV: " + (result.error || "Nieznany błąd"));
       return;
     }
 
@@ -168,7 +167,7 @@ export default function CandidateCvUpload() {
     const refreshedParsed = await fetchParsedData(lastCv.id);
     setParsedData(refreshedParsed);
     setAiProcessing(false);
-    toast.success("CV przygotowane do analizy AI!");
+    toast.success("Tekst z CV został odczytany! Gotowe do analizy AI.");
   };
 
   if (loadingRecord) {
@@ -268,8 +267,8 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
           <div>
-            <p className="text-sm font-medium text-foreground">Przygotowywanie analizy AI…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">To może chwilę potrwać. Nie zamykaj tej strony.</p>
+            <p className="text-sm font-medium text-foreground">Odczytywanie treści z CV…</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu. To może chwilę potrwać.</p>
           </div>
         </div>
       </div>
@@ -303,9 +302,9 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-foreground">CV przygotowane do analizy AI</p>
+            <p className="text-sm font-medium text-foreground">Tekst z CV został odczytany</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              W kolejnym kroku AI odczyta dane z Twojego CV i zaproponuje uzupełnienie profilu. Będziesz mógł wszystko sprawdzić i poprawić przed zapisaniem.
+              W kolejnym kroku AI przeanalizuje treść Twojego CV i zaproponuje uzupełnienie profilu. Będziesz mógł wszystko sprawdzić i poprawić przed zapisaniem.
             </p>
           </div>
         </div>
