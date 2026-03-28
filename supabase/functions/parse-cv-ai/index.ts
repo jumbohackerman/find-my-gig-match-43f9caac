@@ -4,7 +4,15 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+function jsonResponse(body: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 const CV_PARSE_SCHEMA = {
   type: "function" as const,
@@ -116,19 +124,20 @@ Rules:
 const MODEL_NAME = "google/gemini-2.5-flash";
 
 Deno.serve(async (req: Request) => {
+  console.log("[parse-cv-ai] Incoming request, method:", req.method);
+
   if (req.method === "OPTIONS") {
+    console.log("[parse-cv-ai] Handling OPTIONS preflight");
     return new Response(null, { headers: corsHeaders });
   }
 
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) {
-    return new Response(
-      JSON.stringify({ error: "Missing authorization header" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
-  }
-
   try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      console.log("[parse-cv-ai] Missing authorization header");
+      return jsonResponse({ error: "Missing authorization header" }, 401);
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey, {
@@ -137,18 +146,24 @@ Deno.serve(async (req: Request) => {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Invalid or expired token" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      console.log("[parse-cv-ai] Auth error:", authError?.message);
+      return jsonResponse({ error: "Invalid or expired token" }, 401);
     }
 
-    const { cv_upload_id } = await req.json();
+    console.log("[parse-cv-ai] Authenticated user:", user.id);
+
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      console.log("[parse-cv-ai] Invalid JSON body");
+      return jsonResponse({ error: "Invalid request body" }, 400);
+    }
+
+    const cv_upload_id = body.cv_upload_id as string | undefined;
     if (!cv_upload_id) {
-      return new Response(
-        JSON.stringify({ error: "Missing cv_upload_id" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      console.log("[parse-cv-ai] Missing cv_upload_id");
+      return jsonResponse({ error: "Missing cv_upload_id" }, 400);
     }
 
     // Fetch parsed data record
@@ -161,17 +176,11 @@ Deno.serve(async (req: Request) => {
 
     if (fetchErr || !parsedRecord) {
       console.error("[parse-cv-ai] fetch error:", fetchErr);
-      return new Response(
-        JSON.stringify({ error: "Nie znaleziono danych CV do analizy." }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: "Nie znaleziono danych CV do analizy." }, 404);
     }
 
     if (!parsedRecord.raw_text || parsedRecord.raw_text.length < 30) {
-      return new Response(
-        JSON.stringify({ error: "Tekst CV jest zbyt krótki lub pusty. Spróbuj ponownie wgrać CV." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: "Tekst CV jest zbyt krótki lub pusty. Spróbuj ponownie wgrać CV." }, 400);
     }
 
     // Set cv_uploads status to processing
@@ -187,6 +196,7 @@ Deno.serve(async (req: Request) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    console.log("[parse-cv-ai] Calling AI gateway...");
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -220,10 +230,7 @@ Deno.serve(async (req: Request) => {
         .eq("id", cv_upload_id)
         .eq("user_id", user.id);
 
-      return new Response(
-        JSON.stringify({ error: statusMsg }),
-        { status: aiResponse.status >= 500 ? 502 : aiResponse.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: statusMsg }, aiResponse.status >= 500 ? 502 : aiResponse.status);
     }
 
     const aiResult = await aiResponse.json();
@@ -237,10 +244,7 @@ Deno.serve(async (req: Request) => {
         .update({ status: "failed", error_message: msg })
         .eq("id", cv_upload_id)
         .eq("user_id", user.id);
-      return new Response(
-        JSON.stringify({ error: msg }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: msg }, 502);
     }
 
     let parsedJson: Record<string, unknown>;
@@ -254,16 +258,11 @@ Deno.serve(async (req: Request) => {
         .update({ status: "failed", error_message: msg })
         .eq("id", cv_upload_id)
         .eq("user_id", user.id);
-      return new Response(
-        JSON.stringify({ error: msg }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: msg }, 502);
     }
 
-    // Basic confidence: count how many top-level fields are non-null/non-empty
-    const topFields = [
-      "full_name", "email", "city", "summary", "current_role",
-    ];
+    // Basic confidence
+    const topFields = ["full_name", "email", "city", "summary", "current_role"];
     const filledCount = topFields.filter((f) => {
       const v = parsedJson[f];
       return v !== null && v !== undefined && v !== "";
@@ -288,10 +287,7 @@ Deno.serve(async (req: Request) => {
         .update({ status: "failed", error_message: saveErr.message })
         .eq("id", cv_upload_id)
         .eq("user_id", user.id);
-      return new Response(
-        JSON.stringify({ error: "Nie udało się zapisać wyników analizy." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return jsonResponse({ error: "Nie udało się zapisać wyników analizy." }, 500);
     }
 
     // Set final status
@@ -303,20 +299,17 @@ Deno.serve(async (req: Request) => {
 
     console.log("[parse-cv-ai] Success for user:", user.id, "confidence:", confidence);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        parsed_json: parsedJson,
-        model_name: MODEL_NAME,
-        parse_confidence: confidence,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return jsonResponse({
+      success: true,
+      parsed_json: parsedJson,
+      model_name: MODEL_NAME,
+      parse_confidence: confidence,
+    });
   } catch (error) {
-    console.error("[parse-cv-ai] Error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    console.error("[parse-cv-ai] Unhandled error:", error);
+    return jsonResponse(
+      { error: error instanceof Error ? error.message : "Internal server error" },
+      500,
     );
   }
 });
