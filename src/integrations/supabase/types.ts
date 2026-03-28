@@ -148,9 +148,54 @@ export type Database = {
         }
         Relationships: []
       }
+      cv_parsed_data: {
+        Row: {
+          created_at: string
+          cv_upload_id: string
+          id: string
+          model_name: string | null
+          parse_confidence: number | null
+          parsed_json: Json | null
+          raw_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cv_upload_id: string
+          id?: string
+          model_name?: string | null
+          parse_confidence?: number | null
+          parsed_json?: Json | null
+          raw_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cv_upload_id?: string
+          id?: string
+          model_name?: string | null
+          parse_confidence?: number | null
+          parsed_json?: Json | null
+          raw_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cv_parsed_data_cv_upload_id_fkey"
+            columns: ["cv_upload_id"]
+            isOneToOne: true
+            referencedRelation: "cv_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cv_uploads: {
         Row: {
           created_at: string
+          error_message: string | null
           file_name: string
           file_path: string
           id: string
@@ -160,6 +205,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          error_message?: string | null
           file_name: string
           file_path: string
           id?: string
@@ -169,6 +215,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          error_message?: string | null
           file_name?: string
           file_path?: string
           id?: string
