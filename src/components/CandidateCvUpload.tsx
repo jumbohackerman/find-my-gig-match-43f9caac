@@ -13,14 +13,15 @@ import {
   startAiParsing,
 } from "@/lib/cvHelpers";
 
-type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "failed";
+type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "ai_parsing" | "parsed" | "failed";
 
 function deriveCvState(cv: CvRecord | null, parsed: CvParsedRecord | null): CvState {
   if (!cv) return "empty";
   if (cv.status === "processing") return "processing";
+  if (cv.status === "ai_processing") return "ai_parsing";
   if (cv.status === "failed") return "failed";
-  if (cv.status === "needs_review" || parsed) return "needs_review";
-  // Has CV, no parsed data yet → ready for AI
+  if (cv.status === "parsed" || (parsed?.parsed_json && typeof parsed.parsed_json === "object" && Object.keys(parsed.parsed_json as Record<string, unknown>).length > 0)) return "parsed";
+  if (cv.status === "needs_review" || parsed?.raw_text) return "needs_review";
   return "ready_for_ai";
 }
 
