@@ -141,25 +141,61 @@ export default function CandidateCvUpload() {
   const handleStartAi = async () => {
     if (!lastCv || !user || aiProcessing) return;
 
-    // Check for existing parsed data with raw_text to prevent re-extraction
+    // Check for existing parsed data
     const existing = await fetchParsedData(lastCv.id);
-    if (existing?.raw_text && existing.raw_text.length > 0) {
+    
+    // If already has parsed_json, just refresh state
+    if (existing?.parsed_json && typeof existing.parsed_json === "object" && Object.keys(existing.parsed_json as Record<string, unknown>).length > 0) {
       setParsedData(existing);
       const refreshed = await fetchLatestCv(user.id);
       if (refreshed) setLastCv(refreshed);
-      toast.info("Tekst z CV został już odczytany. Gotowe do kolejnego kroku.");
+      toast.info("CV zostało już przeanalizowane przez AI.");
       return;
     }
 
+    // If raw_text exists, skip extraction and go straight to AI parsing
+    if (existing?.raw_text && existing.raw_text.length > 0) {
+      setParsedData(existing);
+      setAiProcessing(true);
+      setLastCv({ ...lastCv, status: "ai_processing" });
+
+      const parseResult = await startAiParsing(lastCv.id, user.id);
+      if (!parseResult.success) {
+        setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
+        setAiProcessing(false);
+        toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
+        return;
+      }
+
+      const refreshedCv = await fetchLatestCv(user.id);
+      if (refreshedCv) setLastCv(refreshedCv);
+      const refreshedParsed = await fetchParsedData(lastCv.id);
+      setParsedData(refreshedParsed);
+      setAiProcessing(false);
+      toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
+      return;
+    }
+
+    // No raw_text yet — extract text first, then parse with AI
     setAiProcessing(true);
     setLastCv({ ...lastCv, status: "processing" });
 
-    const result = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
-
-    if (!result.success) {
-      setLastCv({ ...lastCv, status: "failed", error_message: result.error || "Nieznany błąd" });
+    const extractResult = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
+    if (!extractResult.success) {
+      setLastCv({ ...lastCv, status: "failed", error_message: extractResult.error || "Nieznany błąd" });
       setAiProcessing(false);
-      toast.error("Nie udało się odczytać CV: " + (result.error || "Nieznany błąd"));
+      toast.error("Nie udało się odczytać CV: " + (extractResult.error || "Nieznany błąd"));
+      return;
+    }
+
+    // Text extracted, now run AI parsing
+    setLastCv({ ...lastCv, status: "ai_processing" });
+
+    const parseResult = await startAiParsing(lastCv.id, user.id);
+    if (!parseResult.success) {
+      setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
+      setAiProcessing(false);
+      toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
       return;
     }
 
@@ -169,7 +205,7 @@ export default function CandidateCvUpload() {
     const refreshedParsed = await fetchParsedData(lastCv.id);
     setParsedData(refreshedParsed);
     setAiProcessing(false);
-    toast.success("Tekst z CV został odczytany! Gotowe do analizy AI.");
+    toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
   };
 
   if (loadingRecord) {
