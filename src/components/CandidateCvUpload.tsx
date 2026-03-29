@@ -15,12 +15,17 @@ import {
 
 type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "ai_parsing" | "parsed" | "failed";
 
+function hasParsedJson(parsed: CvParsedRecord | null): boolean {
+  return !!(parsed?.parsed_json && typeof parsed.parsed_json === "object" && Object.keys(parsed.parsed_json as Record<string, unknown>).length > 0);
+}
+
 function deriveCvState(cv: CvRecord | null, parsed: CvParsedRecord | null): CvState {
   if (!cv) return "empty";
+  // parsed_json takes priority over any status, including failed
+  if (cv.status === "parsed" || hasParsedJson(parsed)) return "parsed";
   if (cv.status === "processing") return "processing";
   if (cv.status === "ai_processing") return "ai_parsing";
   if (cv.status === "failed") return "failed";
-  if (cv.status === "parsed" || (parsed?.parsed_json && typeof parsed.parsed_json === "object" && Object.keys(parsed.parsed_json as Record<string, unknown>).length > 0)) return "parsed";
   if (cv.status === "needs_review" || parsed?.raw_text) return "needs_review";
   return "ready_for_ai";
 }
@@ -43,10 +48,17 @@ export default function CandidateCvUpload() {
     }
     const load = async () => {
       const cv = await fetchLatestCv(user.id);
-      setLastCv(cv);
       if (cv) {
         const parsed = await fetchParsedData(cv.id);
         setParsedData(parsed);
+        // Normalize local state: if parsed_json exists, treat as parsed regardless of stored status
+        if (hasParsedJson(parsed) && cv.status !== "parsed") {
+          setLastCv({ ...cv, status: "parsed", error_message: null });
+        } else {
+          setLastCv(cv);
+        }
+      } else {
+        setLastCv(null);
       }
       setLoadingRecord(false);
     };
@@ -141,14 +153,12 @@ export default function CandidateCvUpload() {
   const handleStartAi = async () => {
     if (!lastCv || !user || aiProcessing) return;
 
-    // Check for existing parsed data
+    // Check for existing parsed data — don't re-run AI if already parsed
     const existing = await fetchParsedData(lastCv.id);
     
-    // If already has parsed_json, just refresh state
-    if (existing?.parsed_json && typeof existing.parsed_json === "object" && Object.keys(existing.parsed_json as Record<string, unknown>).length > 0) {
+    if (hasParsedJson(existing)) {
       setParsedData(existing);
-      const refreshed = await fetchLatestCv(user.id);
-      if (refreshed) setLastCv(refreshed);
+      setLastCv({ ...lastCv, status: "parsed", error_message: null });
       toast.info("CV zostało już przeanalizowane przez AI.");
       return;
     }
@@ -167,10 +177,9 @@ export default function CandidateCvUpload() {
         return;
       }
 
-      const refreshedCv = await fetchLatestCv(user.id);
-      if (refreshedCv) setLastCv(refreshedCv);
       const refreshedParsed = await fetchParsedData(lastCv.id);
       setParsedData(refreshedParsed);
+      setLastCv({ ...lastCv, status: "parsed", error_message: null });
       setAiProcessing(false);
       toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
       return;
@@ -199,11 +208,10 @@ export default function CandidateCvUpload() {
       return;
     }
 
-    // Refresh state
-    const refreshedCv = await fetchLatestCv(user.id);
-    if (refreshedCv) setLastCv(refreshedCv);
+    // Refresh state — force parsed status locally
     const refreshedParsed = await fetchParsedData(lastCv.id);
     setParsedData(refreshedParsed);
+    setLastCv({ ...lastCv, status: "parsed", error_message: null });
     setAiProcessing(false);
     toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
   };
