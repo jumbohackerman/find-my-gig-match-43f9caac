@@ -30,7 +30,11 @@ function deriveCvState(cv: CvRecord | null, parsed: CvParsedRecord | null): CvSt
   return "ready_for_ai";
 }
 
-export default function CandidateCvUpload() {
+interface CandidateCvUploadProps {
+  onParsed?: (parsedJson: unknown) => void;
+}
+
+export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps = {}) {
   const { user } = useAuth();
   const [lastCv, setLastCv] = useState<CvRecord | null>(null);
   const [parsedData, setParsedData] = useState<CvParsedRecord | null>(null);
@@ -52,10 +56,12 @@ export default function CandidateCvUpload() {
         const parsed = await fetchParsedData(cv.id);
         setParsedData(parsed);
         // Normalize local state: if parsed_json exists, treat as parsed regardless of stored status
-        if (hasParsedJson(parsed) && cv.status !== "parsed") {
+      if (hasParsedJson(parsed) && cv.status !== "parsed") {
           setLastCv({ ...cv, status: "parsed", error_message: null });
+          onParsed?.(parsed.parsed_json);
         } else {
           setLastCv(cv);
+          if (hasParsedJson(parsed)) onParsed?.(parsed.parsed_json);
         }
       } else {
         setLastCv(null);
@@ -160,6 +166,7 @@ export default function CandidateCvUpload() {
       setParsedData(existing);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
       toast.info("CV zostało już przeanalizowane przez AI.");
+      onParsed?.(existing!.parsed_json);
       return;
     }
 
@@ -181,7 +188,8 @@ export default function CandidateCvUpload() {
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
       setAiProcessing(false);
-      toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
+      toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
+      if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
       return;
     }
 
@@ -213,7 +221,8 @@ export default function CandidateCvUpload() {
     setParsedData(refreshedParsed);
     setLastCv({ ...lastCv, status: "parsed", error_message: null });
     setAiProcessing(false);
-    toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
+    toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
+    if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
   };
 
   if (loadingRecord) {
@@ -364,7 +373,7 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
           <div>
             <p className="text-sm font-medium text-foreground">AI przeanalizowało Twoje CV</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Dane z CV zostały odczytane i uporządkowane. W kolejnym kroku będziesz mógł sprawdzić wyniki i uzupełnić swój profil.
+              Dane z CV zostały zaimportowane do formularza profilu. Sprawdź uzupełnione pola i zapisz profil.
             </p>
           </div>
         </div>

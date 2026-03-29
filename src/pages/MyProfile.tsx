@@ -13,6 +13,7 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
+import { extractProfileFields, mergeWithExisting, countMappableFields, type ProfileFormFields } from "@/lib/cvProfileMapper";
 
 interface ExperienceEntry {
   title: string;
@@ -255,6 +256,47 @@ const MyProfile = () => {
       toast.error("Nie udało się usunąć CV");
     }
   };
+
+  const handleCvParsed = useCallback((parsedJson: unknown) => {
+    const fromCv = extractProfileFields(parsedJson);
+    if (countMappableFields(fromCv) === 0) {
+      toast.info("AI przeanalizowało CV, ale nie znaleziono danych do zaimportowania.");
+      return;
+    }
+
+    const existing: ProfileFormFields = {
+      fullName,
+      title,
+      location,
+      summary,
+      skills,
+      experienceYears,
+      seniority,
+      links,
+      experienceEntries,
+    };
+
+    const { merged, fieldsUpdated } = mergeWithExisting(existing, fromCv);
+
+    if (fieldsUpdated.length === 0) {
+      toast.info("Wszystkie pola profilu są już uzupełnione — import z CV pominięty.");
+      return;
+    }
+
+    // Apply merged values to form state
+    setFullName(merged.fullName);
+    setTitle(merged.title);
+    setLocation(merged.location);
+    setSummary(merged.summary);
+    setSkills(merged.skills);
+    setExperienceYears(merged.experienceYears);
+    setExperienceEntries(merged.experienceEntries);
+    setLinks(merged.links);
+
+    toast.success(`Zaimportowano z CV: ${fieldsUpdated.join(", ")}.`, {
+      duration: 5000,
+    });
+  }, [fullName, title, location, summary, skills, experienceYears, seniority, links, experienceEntries]);
 
   const completeness = computeCompleteness({
     summary, skills, experience_entries: experienceEntries,
@@ -646,7 +688,7 @@ const MyProfile = () => {
                     <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
                     <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
                   </div>
-                  <CandidateCvUpload />
+                  <CandidateCvUpload onParsed={handleCvParsed} />
                 </div>
               </div>
             </AccordionSection>
