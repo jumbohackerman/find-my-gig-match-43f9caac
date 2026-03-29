@@ -298,7 +298,7 @@ const MyProfile = () => {
     });
   }, [fullName, title, location, summary, skills, experienceYears, seniority, links, experienceEntries]);
 
-
+  const completeness = computeCompleteness({
     summary, skills, experience_entries: experienceEntries,
     salary_min: salaryMin, links, title, location,
   });
