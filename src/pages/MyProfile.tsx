@@ -13,7 +13,7 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
-import { extractProfileFields, mergeWithExisting, countMappableFields, type ProfileFormFields } from "@/lib/cvProfileMapper";
+import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, type ProfileFormFields } from "@/lib/cvProfileMapper";
 
 interface ExperienceEntry {
   title: string;
@@ -159,7 +159,7 @@ const MyProfile = () => {
           availability,
           experienceEntries: experienceEntries as any,
           links: links as any,
-          experience: `${experienceYears} lat`,
+          experience: formatExperienceDisplay(experienceYears),
           cvUrl,
         });
       }
@@ -183,7 +183,7 @@ const MyProfile = () => {
   const removeSkill = (skill: string) => setSkills(skills.filter((s) => s !== skill));
 
   const addExperience = () => {
-    if (experienceEntries.length >= 3) return;
+    if (experienceEntries.length >= 5) return;
     setExperienceEntries([
       ...experienceEntries,
       { title: "", company: "", startDate: "", endDate: "", isCurrent: false, description: "", bullets: [""] },
@@ -444,23 +444,9 @@ const MyProfile = () => {
                 <Field label="Lokalizacja" value={location} onChange={setLocation} placeholder="Warszawa" />
                 <div className="flex gap-4 items-end">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-muted-foreground">Lata doświadczenia</label>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setExperienceYears(Math.max(0, experienceYears - 1))}
-                        className="w-9 h-9 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <div className="w-12 h-9 rounded-lg bg-secondary border border-border flex items-center justify-center text-sm font-semibold text-foreground">
-                        {experienceYears}
-                      </div>
-                      <button
-                        onClick={() => setExperienceYears(Math.min(40, experienceYears + 1))}
-                        className="w-9 h-9 rounded-lg bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
+                    <label className="text-xs font-medium text-muted-foreground">Doświadczenie</label>
+                    <div className="px-3 py-2 rounded-xl bg-secondary border border-border text-sm font-semibold text-foreground min-w-[120px] text-center">
+                      {formatExperienceDisplay(experienceYears)}
                     </div>
                   </div>
                   <div className="flex-1 space-y-1.5">
@@ -646,23 +632,24 @@ const MyProfile = () => {
                           {entry.bullets.map((bullet, bi) => (
                             <div key={bi} className="space-y-1.5">
                               <label className="text-xs font-medium text-muted-foreground">Punkt {bi + 1} ({bullet.length}/200)</label>
-                              <input value={bullet} onChange={(e) => { const bullets = [...entry.bullets]; bullets[bi] = e.target.value.slice(0, 200); updateExperience(idx, "bullets", bullets); }} placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników" className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                              <div className="flex gap-2">
+                                <input value={bullet} onChange={(e) => { const bullets = [...entry.bullets]; bullets[bi] = e.target.value.slice(0, 200); updateExperience(idx, "bullets", bullets); }} placeholder="Budowałem dashboard React używany przez 50 tys. użytkowników" className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                                {entry.bullets.length > 1 && (
+                                  <button onClick={() => { const bullets = entry.bullets.filter((_, i) => i !== bi); updateExperience(idx, "bullets", bullets); }} className="p-2 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"><X className="w-3.5 h-3.5" /></button>
+                                )}
+                              </div>
                             </div>
                           ))}
-                          {entry.bullets.length < 3 && (
+                          {entry.bullets.length < 5 && (
                             <button onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])} className="text-xs text-primary hover:underline flex items-center gap-1"><Plus className="w-3 h-3" /> Dodaj punkt</button>
                           )}
-                          <div className="space-y-1.5 pt-2 border-t border-border">
-                            <label className="text-xs font-medium text-muted-foreground">Opis stanowiska ({(entry.description || "").length}/500)</label>
-                            <textarea value={entry.description || ""} onChange={(e) => updateExperience(idx, "description", e.target.value.slice(0, 500))} placeholder="Opisz szczegółowo swoje obowiązki, osiągnięcia i wpływ na organizację..." rows={4} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
-                          </div>
                         </div>
                       )}
                     </div>
                   ))}
-                  {experienceEntries.length < 3 && (
+                  {experienceEntries.length < 5 && (
                     <button onClick={addExperience} className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2">
-                      <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/3)
+                      <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/5)
                     </button>
                   )}
                 </div>
@@ -708,7 +695,7 @@ const MyProfile = () => {
             avatar: "👤",
             title: title || "Brak stanowiska",
             location: location || "Brak lokalizacji",
-            experience: `${experienceYears} lat`,
+            experience: formatExperienceDisplay(experienceYears),
             skills: skills,
             summary: summary,
             seniority: seniority as any,
