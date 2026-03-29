@@ -30,7 +30,11 @@ function deriveCvState(cv: CvRecord | null, parsed: CvParsedRecord | null): CvSt
   return "ready_for_ai";
 }
 
-export default function CandidateCvUpload() {
+interface CandidateCvUploadProps {
+  onParsed?: (parsedJson: unknown) => void;
+}
+
+export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps = {}) {
   const { user } = useAuth();
   const [lastCv, setLastCv] = useState<CvRecord | null>(null);
   const [parsedData, setParsedData] = useState<CvParsedRecord | null>(null);
@@ -52,10 +56,12 @@ export default function CandidateCvUpload() {
         const parsed = await fetchParsedData(cv.id);
         setParsedData(parsed);
         // Normalize local state: if parsed_json exists, treat as parsed regardless of stored status
-        if (hasParsedJson(parsed) && cv.status !== "parsed") {
+      if (hasParsedJson(parsed) && cv.status !== "parsed") {
           setLastCv({ ...cv, status: "parsed", error_message: null });
+          onParsed?.(parsed.parsed_json);
         } else {
           setLastCv(cv);
+          if (hasParsedJson(parsed)) onParsed?.(parsed.parsed_json);
         }
       } else {
         setLastCv(null);
