@@ -257,7 +257,48 @@ const MyProfile = () => {
     }
   };
 
-  const completeness = computeCompleteness({
+  const handleCvParsed = useCallback((parsedJson: unknown) => {
+    const fromCv = extractProfileFields(parsedJson);
+    if (countMappableFields(fromCv) === 0) {
+      toast.info("AI przeanalizowało CV, ale nie znaleziono danych do zaimportowania.");
+      return;
+    }
+
+    const existing: ProfileFormFields = {
+      fullName,
+      title,
+      location,
+      summary,
+      skills,
+      experienceYears,
+      seniority,
+      links,
+      experienceEntries,
+    };
+
+    const { merged, fieldsUpdated } = mergeWithExisting(existing, fromCv);
+
+    if (fieldsUpdated.length === 0) {
+      toast.info("Wszystkie pola profilu są już uzupełnione — import z CV pominięty.");
+      return;
+    }
+
+    // Apply merged values to form state
+    setFullName(merged.fullName);
+    setTitle(merged.title);
+    setLocation(merged.location);
+    setSummary(merged.summary);
+    setSkills(merged.skills);
+    setExperienceYears(merged.experienceYears);
+    setExperienceEntries(merged.experienceEntries);
+    setLinks(merged.links);
+
+    toast.success(`Zaimportowano z CV: ${fieldsUpdated.join(", ")}.`, {
+      duration: 5000,
+    });
+  }, [fullName, title, location, summary, skills, experienceYears, seniority, links, experienceEntries]);
+
+
     summary, skills, experience_entries: experienceEntries,
     salary_min: salaryMin, links, title, location,
   });
