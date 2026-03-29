@@ -373,7 +373,7 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
           <div>
             <p className="text-sm font-medium text-foreground">AI przeanalizowało Twoje CV</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Dane z CV zostały odczytane i uporządkowane. W kolejnym kroku będziesz mógł sprawdzić wyniki i uzupełnić swój profil.
+              Dane z CV zostały zaimportowane do formularza profilu. Sprawdź uzupełnione pola i zapisz profil.
             </p>
           </div>
         </div>
