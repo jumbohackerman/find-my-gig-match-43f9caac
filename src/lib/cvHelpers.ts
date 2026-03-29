@@ -186,6 +186,15 @@ export async function startAiParsing(
 ): Promise<{ success: boolean; error?: string; parsedJson?: unknown }> {
   console.log("[cvHelpers] startAiParsing called", { cvUploadId, userId });
 
+  const {
+    data: { session: debugSession },
+    error: debugSessionError,
+  } = await supabase.auth.getSession();
+
+  console.log("[cvHelpers] DEBUG session:", debugSession);
+  console.log("[cvHelpers] DEBUG access token:", debugSession?.access_token);
+  console.log("[cvHelpers] DEBUG session error:", debugSessionError);
+
   // Verify parsed data with raw_text exists
   const existing = await fetchParsedData(cvUploadId);
   if (!existing || !existing.raw_text || existing.raw_text.length < 30) {
@@ -198,9 +207,30 @@ export async function startAiParsing(
     return { success: true, parsedJson: existing.parsed_json };
   }
 
-  // Call edge function
+  // Call edge function with the current user's access token
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError) {
+    console.error("[cvHelpers] getSession error:", sessionError);
+    return { success: false, error: sessionError.message || "Nie udało się pobrać sesji użytkownika." };
+  }
+
+  if (!session?.access_token) {
+    return { success: false, error: "Brak aktywnej sesji użytkownika. Zaloguj się ponownie." };
+  }
+
+  console.log("[cvHelpers] invoking function with token:", session?.access_token);
+
   const { data, error } = await supabase.functions.invoke("parse-cv-ai", {
     body: { cv_upload_id: cvUploadId },
+    headers: session?.access_token
+      ? {
+          Authorization: `Bearer ${session.access_token}`,
+        }
+      : {},
   });
 
   if (error) {

@@ -121,7 +121,7 @@ Rules:
 - For languages, include proficiency level if mentioned (e.g. "native", "B2", "fluent").
 - Keep summaries concise and factual.`;
 
-const MODEL_NAME = "google/gemini-2.5-flash";
+const MODEL_NAME = "gpt-4o-mini";
 
 Deno.serve(async (req: Request) => {
   console.log("[parse-cv-ai] Incoming request, method:", req.method);
@@ -169,7 +169,7 @@ Deno.serve(async (req: Request) => {
     // Fetch parsed data record
     const { data: parsedRecord, error: fetchErr } = await supabase
       .from("cv_parsed_data")
-      .select("id, raw_text, parsed_json, user_id")
+      .select("id, raw_text, parsed_json, user_id, model_name, parse_confidence")
       .eq("cv_upload_id", cv_upload_id)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -183,6 +183,26 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "Tekst CV jest zbyt krótki lub pusty. Spróbuj ponownie wgrać CV." }, 400);
     }
 
+    const existingParsedJson = parsedRecord.parsed_json;
+    if (
+      existingParsedJson &&
+      typeof existingParsedJson === "object" &&
+      Object.keys(existingParsedJson as Record<string, unknown>).length > 0
+    ) {
+      await supabase
+        .from("cv_uploads")
+        .update({ status: "parsed", error_message: null })
+        .eq("id", cv_upload_id)
+        .eq("user_id", user.id);
+
+      return jsonResponse({
+        success: true,
+        parsed_json: existingParsedJson,
+        model_name: parsedRecord.model_name ?? MODEL_NAME,
+        parse_confidence: parsedRecord.parse_confidence ?? 1,
+      });
+    }
+
     // Set cv_uploads status to processing
     await supabase
       .from("cv_uploads")
@@ -190,17 +210,17 @@ Deno.serve(async (req: Request) => {
       .eq("id", cv_upload_id)
       .eq("user_id", user.id);
 
-    // Call Lovable AI Gateway
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    // Call Open AI Gateway
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
     console.log("[parse-cv-ai] Calling AI gateway...");
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -218,10 +238,15 @@ Deno.serve(async (req: Request) => {
       const errText = await aiResponse.text();
       console.error("[parse-cv-ai] AI gateway error:", aiResponse.status, errText);
 
+      const lowerErrText = errText.toLowerCase();
       const statusMsg = aiResponse.status === 429
         ? "Zbyt wiele żądań AI. Spróbuj ponownie za chwilę."
         : aiResponse.status === 402
         ? "Brak dostępnych kredytów AI."
+        : aiResponse.status === 401 || aiResponse.status === 403
+        ? "Klucz OpenAI nie ma wymaganych uprawnień do wywołania modelu."
+        : lowerErrText.includes("invalid model")
+        ? "Ustawiony model OpenAI jest nieprawidłowy lub niedostępny dla tego klucza."
         : "Błąd usługi AI. Spróbuj ponownie.";
 
       await supabase
@@ -308,7 +333,12 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error("[parse-cv-ai] Unhandled error:", error);
     return jsonResponse(
-      { error: error instanceof Error ? error.message : "Internal server error" },
+      {
+        error:
+          error instanceof Error
+            ? `Nieoczekiwany błąd analizy CV: ${error.message}`
+            : "Nieoczekiwany błąd analizy CV.",
+      },
       500,
     );
   }
