@@ -186,28 +186,20 @@ export async function startAiParsing(
 ): Promise<{ success: boolean; error?: string; parsedJson?: unknown }> {
   console.log("[cvHelpers] startAiParsing called", { cvUploadId, userId });
 
-  const {
-    data: { session: debugSession },
-    error: debugSessionError,
-  } = await supabase.auth.getSession();
-
-  console.log("[cvHelpers] DEBUG session:", debugSession);
-  console.log("[cvHelpers] DEBUG access token:", debugSession?.access_token);
-  console.log("[cvHelpers] DEBUG session error:", debugSessionError);
-
-  // Verify parsed data with raw_text exists
+  // Guard: Verify parsed data with raw_text exists
   const existing = await fetchParsedData(cvUploadId);
   if (!existing || !existing.raw_text || existing.raw_text.length < 30) {
+    console.log("[cvHelpers] BLOCKED — no raw_text for cv_upload_id:", cvUploadId);
     return { success: false, error: "Brak tekstu z CV do analizy. Najpierw odczytaj tekst z PDF." };
   }
 
-  // If parsed_json already exists, don't re-parse
+  // Guard: If parsed_json already exists, return cached result (hard dedup)
   if (existing.parsed_json && typeof existing.parsed_json === "object" && Object.keys(existing.parsed_json as Record<string, unknown>).length > 0) {
-    console.log("[cvHelpers] parsed_json already exists, skipping AI call");
+    console.log("[cvHelpers] BLOCKED — parsed_json already exists, returning cached result for:", cvUploadId);
     return { success: true, parsedJson: existing.parsed_json };
   }
 
-  // Call edge function with the current user's access token
+  // Get session for edge function call
   const {
     data: { session },
     error: sessionError,
@@ -222,7 +214,7 @@ export async function startAiParsing(
     return { success: false, error: "Brak aktywnej sesji użytkownika. Zaloguj się ponownie." };
   }
 
-  console.log("[cvHelpers] invoking function with token:", session?.access_token);
+  console.log("[cvHelpers] AI request ACTUALLY FIRED for cv_upload_id:", cvUploadId);
 
   const { data, error } = await supabase.functions.invoke("parse-cv-ai", {
     body: { cv_upload_id: cvUploadId },
