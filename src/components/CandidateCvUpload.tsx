@@ -166,6 +166,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       setParsedData(existing);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
       toast.info("CV zostało już przeanalizowane przez AI.");
+      onParsed?.(existing!.parsed_json);
       return;
     }
 
@@ -187,7 +188,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
       setAiProcessing(false);
-      toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
+      toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
+      if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
       return;
     }
 
@@ -219,7 +221,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     setParsedData(refreshedParsed);
     setLastCv({ ...lastCv, status: "parsed", error_message: null });
     setAiProcessing(false);
-    toast.success("AI przeanalizowało Twoje CV! Dane gotowe do sprawdzenia.");
+    toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
+    if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
   };
 
   if (loadingRecord) {
