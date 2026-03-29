@@ -688,7 +688,7 @@ const MyProfile = () => {
                     <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
                     <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
                   </div>
-                  <CandidateCvUpload />
+                  <CandidateCvUpload onParsed={handleCvParsed} />
                 </div>
               </div>
             </AccordionSection>
