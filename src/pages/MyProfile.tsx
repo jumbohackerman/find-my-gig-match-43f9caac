@@ -13,6 +13,7 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
+import { extractProfileFields, mergeWithExisting, countMappableFields, type ProfileFormFields } from "@/lib/cvProfileMapper";
 
 interface ExperienceEntry {
   title: string;
