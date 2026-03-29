@@ -186,7 +186,7 @@ const MyProfile = () => {
     if (experienceEntries.length >= 5) return;
     setExperienceEntries([
       ...experienceEntries,
-      { title: "", company: "", startDate: "", endDate: "", isCurrent: false, description: "", bullets: [""] },
+      { title: "", company: "", startDate: "", endDate: "", isCurrent: false, description: "", bullets: ["", "", "", "", "", ""] },
     ]);
     setExpandedExp(experienceEntries.length);
   };
@@ -640,8 +640,8 @@ const MyProfile = () => {
                               </div>
                             </div>
                           ))}
-                          {entry.bullets.length < 5 && (
-                            <button onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])} className="text-xs text-primary hover:underline flex items-center gap-1"><Plus className="w-3 h-3" /> Dodaj punkt</button>
+                          {entry.bullets.length < 8 && (
+                            <button onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])} className="text-xs text-primary hover:underline flex items-center gap-1"><Plus className="w-3 h-3" /> Dodaj punkt ({entry.bullets.length}/8)</button>
                           )}
                         </div>
                       )}
