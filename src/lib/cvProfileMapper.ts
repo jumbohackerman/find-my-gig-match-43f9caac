@@ -343,11 +343,11 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
       let bullets: string[] = [""];
 
       if (isBulletList && extractedBullets.length > 0) {
-        // Each bullet goes to its own entry — up to 5
-        bullets = extractedBullets.slice(0, 5);
-        // If more than 5, keep remaining as description fallback
-        if (extractedBullets.length > 5) {
-          description = extractedBullets.slice(5).map(b => `• ${b}`).join("\n");
+        // Each bullet goes to its own entry — up to 8
+        bullets = extractedBullets.slice(0, 8);
+        // If more than 8, keep remaining as description fallback
+        if (extractedBullets.length > 8) {
+          description = extractedBullets.slice(8).map(b => `• ${b}`).join("\n");
         }
       } else if (plainText) {
         // Plain text → first bullet, no description field
