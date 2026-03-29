@@ -67,6 +67,7 @@ const CV_PARSE_SCHEMA = {
               start_date: { type: ["string", "null"] },
               end_date: { type: ["string", "null"] },
               description: { type: ["string", "null"] },
+              bullets: { type: "array", items: { type: "string" }, description: "Individual responsibilities or achievements as separate items" },
             },
             required: ["job_title", "company"],
           },
@@ -119,7 +120,8 @@ Rules:
 - Normalize dates to YYYY-MM or YYYY-MM-DD where possible. If unclear, use null.
 - For skills, extract individual skill names (e.g. "React", "Python", not "Frontend development").
 - For languages, include proficiency level if mentioned (e.g. "native", "B2", "fluent").
-- Keep summaries concise and factual.`;
+- Keep summaries concise and factual.
+- For experience entries: if the CV lists responsibilities or achievements as bullet points, return each one as a separate string in the "bullets" array. Do NOT concatenate them into a single "description" string. Use "description" only for a brief role summary or if no bullet points exist. Each bullet should be one distinct responsibility or achievement.`;
 
 const MODEL_NAME = "gpt-4o-mini";
 

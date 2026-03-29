@@ -13,7 +13,7 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
-import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, type ProfileFormFields } from "@/lib/cvProfileMapper";
+import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, padAndCapBullets, DEFAULT_BULLETS, MAX_BULLETS, normalizeExperienceBullets, type ProfileFormFields } from "@/lib/cvProfileMapper";
 
 interface ExperienceEntry {
   title: string;
@@ -125,7 +125,14 @@ const MyProfile = () => {
           setSalaryMin(candidate.salaryMin || 0);
           setSalaryMax(candidate.salaryMax || 0);
           setAvailability(candidate.availability || "Otwarty na oferty");
-          setExperienceEntries(candidate.experienceEntries as ExperienceEntry[] || []);
+          setExperienceEntries(
+            ((candidate.experienceEntries || []) as ExperienceEntry[]).map(entry => {
+              // Normalize bullets from saved data (handles old records without bullets)
+              const allBullets = normalizeExperienceBullets(entry.bullets, entry.description);
+              const { visible } = padAndCapBullets(allBullets);
+              return { ...entry, bullets: visible };
+            })
+          );
           setLinks(candidate.links as Links || {});
           setCvUrl(candidate.cvUrl || null);
           const expMatch = candidate.experience?.match(/(\d+)/);
@@ -183,10 +190,10 @@ const MyProfile = () => {
   const removeSkill = (skill: string) => setSkills(skills.filter((s) => s !== skill));
 
   const addExperience = () => {
-    if (experienceEntries.length >= 5) return;
+    if (experienceEntries.length >= 8) return;
     setExperienceEntries([
       ...experienceEntries,
-      { title: "", company: "", startDate: "", endDate: "", isCurrent: false, description: "", bullets: ["", "", "", "", "", ""] },
+      { title: "", company: "", startDate: "", endDate: "", isCurrent: false, description: "", bullets: Array(DEFAULT_BULLETS).fill("") },
     ]);
     setExpandedExp(experienceEntries.length);
   };
@@ -290,11 +297,11 @@ const MyProfile = () => {
     setSummary(merged.summary);
     setSkills(merged.skills);
     setExperienceYears(merged.experienceYears);
-    // Pad bullets to minimum 6 per entry
-    const paddedEntries = merged.experienceEntries.map(entry => ({
-      ...entry,
-      bullets: entry.bullets.length >= 6 ? entry.bullets : [...entry.bullets, ...Array(6 - entry.bullets.length).fill("")],
-    }));
+    // Pad bullets to minimum DEFAULT_BULLETS per entry using unified helper
+    const paddedEntries = merged.experienceEntries.map(entry => {
+      const { visible } = padAndCapBullets(entry.bullets.filter(Boolean), DEFAULT_BULLETS, MAX_BULLETS);
+      return { ...entry, bullets: visible };
+    });
     setExperienceEntries(paddedEntries);
     setLinks(merged.links);
 
@@ -645,16 +652,16 @@ const MyProfile = () => {
                               </div>
                             </div>
                           ))}
-                          {entry.bullets.length < 8 && (
-                            <button onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])} className="text-xs text-primary hover:underline flex items-center gap-1"><Plus className="w-3 h-3" /> Dodaj punkt ({entry.bullets.length}/8)</button>
+                          {entry.bullets.length < MAX_BULLETS && (
+                            <button onClick={() => updateExperience(idx, "bullets", [...entry.bullets, ""])} className="text-xs text-primary hover:underline flex items-center gap-1"><Plus className="w-3 h-3" /> Dodaj punkt ({entry.bullets.length}/{MAX_BULLETS})</button>
                           )}
                         </div>
                       )}
                     </div>
                   ))}
-                  {experienceEntries.length < 5 && (
+                  {experienceEntries.length < 8 && (
                     <button onClick={addExperience} className="w-full py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary transition-colors flex items-center justify-center gap-2">
-                      <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/5)
+                      <Plus className="w-4 h-4" /> Dodaj doświadczenie ({experienceEntries.length}/8)
                     </button>
                   )}
                 </div>
