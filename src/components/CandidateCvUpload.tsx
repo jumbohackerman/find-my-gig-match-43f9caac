@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Upload, FileText, Trash2, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -42,6 +42,10 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loadingRecord, setLoadingRecord] = useState(true);
   const [aiProcessing, setAiProcessing] = useState(false);
+  /** Hard ref-based guard: survives re-renders and prevents concurrent AI calls */
+  const aiRequestInFlight = useRef(false);
+  /** Tracks which cv_upload_id has already been successfully parsed */
+  const parsedCvIds = useRef<Set<string>>(new Set());
 
   const cvState = deriveCvState(lastCv, parsedData);
 
@@ -157,12 +161,34 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   };
 
   const handleStartAi = async () => {
-    if (!lastCv || !user || aiProcessing) return;
+    console.log("[CvUpload] handleStartAi clicked", { cvId: lastCv?.id, aiProcessing, inFlight: aiRequestInFlight.current });
 
-    // Check for existing parsed data — don't re-run AI if already parsed
+    if (!lastCv || !user) return;
+
+    // Guard 1: ref-based in-flight check (survives re-renders)
+    if (aiRequestInFlight.current) {
+      console.log("[CvUpload] BLOCKED — AI request already in flight");
+      return;
+    }
+
+    // Guard 2: state-based check
+    if (aiProcessing) {
+      console.log("[CvUpload] BLOCKED — aiProcessing state is true");
+      return;
+    }
+
+    // Guard 3: already parsed for this cv_upload_id (in-memory cache)
+    if (parsedCvIds.current.has(lastCv.id)) {
+      console.log("[CvUpload] BLOCKED — cv_upload_id already parsed (local cache)");
+      toast.info("CV zostało już przeanalizowane przez AI.");
+      return;
+    }
+
+    // Guard 4: check DB for existing parsed data
     const existing = await fetchParsedData(lastCv.id);
-    
     if (hasParsedJson(existing)) {
+      console.log("[CvUpload] BLOCKED — parsed_json already exists in DB");
+      parsedCvIds.current.add(lastCv.id);
       setParsedData(existing);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
       toast.info("CV zostało już przeanalizowane przez AI.");
@@ -170,59 +196,72 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       return;
     }
 
-    // If raw_text exists, skip extraction and go straight to AI parsing
-    if (existing?.raw_text && existing.raw_text.length > 0) {
-      setParsedData(existing);
-      setAiProcessing(true);
+    // Guard 5: check if status indicates processing in progress
+    if (lastCv.status === "ai_processing" || lastCv.status === "processing") {
+      console.log("[CvUpload] BLOCKED — CV is already being processed, status:", lastCv.status);
+      toast.info("Analiza CV jest już w toku.");
+      return;
+    }
+
+    // ── All guards passed — lock and start ──
+    aiRequestInFlight.current = true;
+    setAiProcessing(true);
+    console.log("[CvUpload] AI analysis STARTED for cv_upload_id:", lastCv.id);
+
+    try {
+      // If raw_text exists, skip extraction and go straight to AI parsing
+      if (existing?.raw_text && existing.raw_text.length > 0) {
+        setParsedData(existing);
+        setLastCv({ ...lastCv, status: "ai_processing" });
+
+        const parseResult = await startAiParsing(lastCv.id, user.id);
+        if (!parseResult.success) {
+          setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
+          toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
+          return;
+        }
+
+        const refreshedParsed = await fetchParsedData(lastCv.id);
+        parsedCvIds.current.add(lastCv.id);
+        setParsedData(refreshedParsed);
+        setLastCv({ ...lastCv, status: "parsed", error_message: null });
+        toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
+        if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
+        return;
+      }
+
+      // No raw_text yet — extract text first, then parse with AI
+      setLastCv({ ...lastCv, status: "processing" });
+
+      const extractResult = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
+      if (!extractResult.success) {
+        setLastCv({ ...lastCv, status: "failed", error_message: extractResult.error || "Nieznany błąd" });
+        toast.error("Nie udało się odczytać CV: " + (extractResult.error || "Nieznany błąd"));
+        return;
+      }
+
+      // Text extracted, now run AI parsing
       setLastCv({ ...lastCv, status: "ai_processing" });
 
       const parseResult = await startAiParsing(lastCv.id, user.id);
       if (!parseResult.success) {
         setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
-        setAiProcessing(false);
         toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
         return;
       }
 
+      // Refresh state
       const refreshedParsed = await fetchParsedData(lastCv.id);
+      parsedCvIds.current.add(lastCv.id);
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
-      setAiProcessing(false);
       toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
       if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
-      return;
-    }
-
-    // No raw_text yet — extract text first, then parse with AI
-    setAiProcessing(true);
-    setLastCv({ ...lastCv, status: "processing" });
-
-    const extractResult = await startAiPreparation(lastCv.id, user.id, lastCv.file_path);
-    if (!extractResult.success) {
-      setLastCv({ ...lastCv, status: "failed", error_message: extractResult.error || "Nieznany błąd" });
+    } finally {
+      aiRequestInFlight.current = false;
       setAiProcessing(false);
-      toast.error("Nie udało się odczytać CV: " + (extractResult.error || "Nieznany błąd"));
-      return;
+      console.log("[CvUpload] AI analysis FINISHED for cv_upload_id:", lastCv.id);
     }
-
-    // Text extracted, now run AI parsing
-    setLastCv({ ...lastCv, status: "ai_processing" });
-
-    const parseResult = await startAiParsing(lastCv.id, user.id);
-    if (!parseResult.success) {
-      setLastCv({ ...lastCv, status: "failed", error_message: parseResult.error || "Nieznany błąd" });
-      setAiProcessing(false);
-      toast.error("Analiza AI nie powiodła się: " + (parseResult.error || "Nieznany błąd"));
-      return;
-    }
-
-    // Refresh state — force parsed status locally
-    const refreshedParsed = await fetchParsedData(lastCv.id);
-    setParsedData(refreshedParsed);
-    setLastCv({ ...lastCv, status: "parsed", error_message: null });
-    setAiProcessing(false);
-    toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
-    if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
   };
 
   if (loadingRecord) {
