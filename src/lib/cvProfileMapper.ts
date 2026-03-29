@@ -84,6 +84,65 @@ export const UNMAPPED_FIELDS = [
   "preferred_job_titles", // not directly mapped
 ] as const;
 
+// ─── Polish experience display formatting ────────────────────────────────────
+
+/**
+ * Format total months of experience into a human-readable Polish string.
+ *
+ * Rules:
+ * - Below 24 months → show months only (e.g. "3 miesiące", "11 miesięcy")
+ * - 24+ months with remainder ≥ 6 → round up to full years
+ * - 24+ months with remainder 1-5 → "X lat Y miesięcy"
+ * - 24+ months with remainder 0 → "X lat"
+ */
+export function formatExperienceDisplay(totalMonths: number): string {
+  if (totalMonths <= 0) return "0 miesięcy";
+
+  if (totalMonths < 24) {
+    return `${totalMonths} ${pluralMonths(totalMonths)}`;
+  }
+
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+
+  if (months >= 6) {
+    const rounded = years + 1;
+    return `${rounded} ${pluralYears(rounded)}`;
+  }
+
+  if (months === 0) {
+    return `${years} ${pluralYears(years)}`;
+  }
+
+  return `${years} ${pluralYears(years)} ${months} ${pluralMonths(months)}`;
+}
+
+function pluralMonths(n: number): string {
+  if (n === 1) return "miesiąc";
+  if (n >= 2 && n <= 4) return "miesiące";
+  if (n >= 22 && n % 10 >= 2 && n % 10 <= 4) return "miesiące";
+  return "miesięcy";
+}
+
+function pluralYears(n: number): string {
+  if (n === 1) return "rok";
+  if (n >= 2 && n <= 4) return "lata";
+  if (n >= 22 && n % 10 >= 2 && n % 10 <= 4) return "lata";
+  return "lat";
+}
+
+/**
+ * Calculate total unique months and return both raw months and formatted string.
+ */
+export function getExperienceDisplay(
+  entries: Array<{ start_date?: string | null; end_date?: string | null }> | null | undefined
+): { totalMonths: number; display: string } | null {
+  const years = calculateTotalExperienceYears(entries);
+  if (years === null || years <= 0) return null;
+  const totalMonths = Math.round(years * 12);
+  return { totalMonths, display: formatExperienceDisplay(totalMonths) };
+}
+
 // ─── Date parsing & overlap-aware experience calculation ─────────────────────
 
 const CURRENT_MARKERS = ["present", "current", "now", "obecnie", "aktualnie", "do teraz", "bieżąca", ""];
@@ -272,9 +331,9 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
   }
   if (Object.values(cvLinks).some(Boolean)) result.links = cvLinks;
 
-  // experience entries (max 3) — with bullet point preservation
+  // experience entries (max 5) — with bullet point preservation
   if (p.experience && Array.isArray(p.experience) && p.experience.length > 0) {
-    result.experienceEntries = p.experience.slice(0, 3).map((exp) => {
+    result.experienceEntries = p.experience.slice(0, 5).map((exp) => {
       const isCurrent = isCurrentEndDate(exp.end_date);
 
       // Extract bullets from description
@@ -284,15 +343,15 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
       let bullets: string[] = [""];
 
       if (isBulletList && extractedBullets.length > 0) {
-        // Use first 3 bullet points as the structured bullets field
-        bullets = extractedBullets.slice(0, 3);
-        // If there are more than 3, put remaining in description
-        if (extractedBullets.length > 3) {
-          description = extractedBullets.slice(3).map(b => `• ${b}`).join("\n");
+        // Each bullet goes to its own entry — up to 5
+        bullets = extractedBullets.slice(0, 5);
+        // If more than 5, keep remaining as description fallback
+        if (extractedBullets.length > 5) {
+          description = extractedBullets.slice(5).map(b => `• ${b}`).join("\n");
         }
       } else if (plainText) {
-        description = plainText.slice(0, 500);
-        bullets = [""];
+        // Plain text → first bullet, no description field
+        bullets = [plainText.slice(0, 200)];
       }
 
       return {
