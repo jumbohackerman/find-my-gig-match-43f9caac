@@ -1,6 +1,10 @@
 /**
  * Maps parsed_json from cv_parsed_data to candidate profile form fields.
  * Safe merge: never overwrites existing non-empty values with empty/null.
+ *
+ * Source of truth for experience bullets:
+ *   1. experience[].bullets (from AI parser)
+ *   2. experience[].description (heuristic split fallback)
  */
 
 interface ParsedCvJson {
@@ -28,6 +32,7 @@ interface ParsedCvJson {
     start_date?: string | null;
     end_date?: string | null;
     description?: string | null;
+    bullets?: string[] | null;
   }> | null;
   languages?: Array<{ name: string; level?: string | null }> | null;
   education?: Array<{
@@ -71,49 +76,30 @@ export interface ProfileFormFields {
   }>;
 }
 
+/** Max bullet points per experience entry */
+export const MAX_BULLETS = 8;
+/** Default number of visible bullet fields */
+export const DEFAULT_BULLETS = 6;
+
 /** Fields from parsed_json that are NOT mapped to profile form (for transparency) */
 export const UNMAPPED_FIELDS = [
-  "email",        // no email field in candidate profile form
-  "phone",        // no phone field in candidate profile form
-  "date_of_birth",// not used
-  "country",      // profile uses single location field; city is mapped
-  "education",    // no education section in current form
-  "certifications",// no certifications section in current form
-  "projects",     // no projects section in current form
-  "languages",    // no languages section in current form
-  "preferred_job_titles", // not directly mapped
+  "email", "phone", "date_of_birth", "country",
+  "education", "certifications", "projects", "languages",
+  "preferred_job_titles",
 ] as const;
 
 // ─── Polish experience display formatting ────────────────────────────────────
 
-/**
- * Format total months of experience into a human-readable Polish string.
- *
- * Rules:
- * - Below 24 months → show months only (e.g. "3 miesiące", "11 miesięcy")
- * - 24+ months with remainder ≥ 6 → round up to full years
- * - 24+ months with remainder 1-5 → "X lat Y miesięcy"
- * - 24+ months with remainder 0 → "X lat"
- */
 export function formatExperienceDisplay(totalMonths: number): string {
   if (totalMonths <= 0) return "0 miesięcy";
-
-  if (totalMonths < 24) {
-    return `${totalMonths} ${pluralMonths(totalMonths)}`;
-  }
-
+  if (totalMonths < 24) return `${totalMonths} ${pluralMonths(totalMonths)}`;
   const years = Math.floor(totalMonths / 12);
   const months = totalMonths % 12;
-
   if (months >= 6) {
     const rounded = years + 1;
     return `${rounded} ${pluralYears(rounded)}`;
   }
-
-  if (months === 0) {
-    return `${years} ${pluralYears(years)}`;
-  }
-
+  if (months === 0) return `${years} ${pluralYears(years)}`;
   return `${years} ${pluralYears(years)} ${months} ${pluralMonths(months)}`;
 }
 
@@ -131,9 +117,6 @@ function pluralYears(n: number): string {
   return "lat";
 }
 
-/**
- * Calculate total unique months and return both raw months and formatted string.
- */
 export function getExperienceDisplay(
   entries: Array<{ start_date?: string | null; end_date?: string | null }> | null | undefined
 ): { totalMonths: number; display: string } | null {
@@ -147,35 +130,21 @@ export function getExperienceDisplay(
 
 const CURRENT_MARKERS = ["present", "current", "now", "obecnie", "aktualnie", "do teraz", "bieżąca", ""];
 
-/**
- * Parse a loose date string (e.g. "2020", "Jan 2020", "01/2020", "2020-03") into a Date
- * representing the 1st of the parsed month. Returns null if unparseable.
- */
 function parseFuzzyDate(raw: string | null | undefined): Date | null {
   if (!raw || !raw.trim()) return null;
   const s = raw.trim();
-
-  // "2020-03" or "2020-03-15"
   const isoMatch = s.match(/^(\d{4})-(\d{1,2})/);
   if (isoMatch) return new Date(+isoMatch[1], +isoMatch[2] - 1, 1);
-
-  // "03/2020" or "03.2020"
   const slashMatch = s.match(/^(\d{1,2})[\/.](\d{4})$/);
   if (slashMatch) return new Date(+slashMatch[2], +slashMatch[1] - 1, 1);
-
-  // "Jan 2020", "January 2020", "sty 2020", "styczeń 2020"
   const monthYearMatch = s.match(/^([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+)\s+(\d{4})$/);
   if (monthYearMatch) {
     const attempt = new Date(`${monthYearMatch[1]} 1, ${monthYearMatch[2]}`);
     if (!isNaN(attempt.getTime())) return new Date(attempt.getFullYear(), attempt.getMonth(), 1);
-    // Fallback: just use the year
     return new Date(+monthYearMatch[2], 0, 1);
   }
-
-  // Plain year "2020"
   const yearOnly = s.match(/^(\d{4})$/);
   if (yearOnly) return new Date(+yearOnly[1], 0, 1);
-
   return null;
 }
 
@@ -184,136 +153,158 @@ function isCurrentEndDate(endDate: string | null | undefined): boolean {
   return CURRENT_MARKERS.includes(endDate.trim().toLowerCase());
 }
 
-interface DateRange { start: number; end: number; } // months since epoch
+interface DateRange { start: number; end: number; }
 
 function dateToMonths(d: Date): number {
   return d.getFullYear() * 12 + d.getMonth();
 }
 
-/**
- * Calculate total unique months of experience from a list of experience entries,
- * merging overlapping periods. Returns fractional years.
- */
 export function calculateTotalExperienceYears(
   entries: Array<{ start_date?: string | null; end_date?: string | null }> | null | undefined
 ): number | null {
   if (!entries || entries.length === 0) return null;
-
   const now = new Date();
   const nowMonths = dateToMonths(now);
-
   const ranges: DateRange[] = [];
-
   for (const entry of entries) {
     const start = parseFuzzyDate(entry.start_date);
-    if (!start) continue; // skip entries with unparseable start dates
-
+    if (!start) continue;
     let endMonths: number;
     if (isCurrentEndDate(entry.end_date)) {
       endMonths = nowMonths;
     } else {
       const end = parseFuzzyDate(entry.end_date);
-      if (!end) {
-        endMonths = nowMonths; // fallback: treat as current
-      } else {
-        endMonths = dateToMonths(end);
-      }
+      endMonths = end ? dateToMonths(end) : nowMonths;
     }
-
     const startMonths = dateToMonths(start);
-    if (endMonths < startMonths) continue; // invalid range, skip
-
+    if (endMonths < startMonths) continue;
     ranges.push({ start: startMonths, end: endMonths });
   }
-
   if (ranges.length === 0) return null;
-
-  // Merge overlapping ranges
   ranges.sort((a, b) => a.start - b.start);
   const merged: DateRange[] = [ranges[0]];
-
   for (let i = 1; i < ranges.length; i++) {
     const last = merged[merged.length - 1];
     if (ranges[i].start <= last.end) {
-      // Overlap — extend the end
       last.end = Math.max(last.end, ranges[i].end);
     } else {
       merged.push({ ...ranges[i] });
     }
   }
-
-  // Sum unique months
   const totalMonths = merged.reduce((sum, r) => sum + (r.end - r.start), 0);
   return totalMonths / 12;
 }
 
-// ─── Bullet point detection & extraction ─────────────────────────────────────
+// ─── Bullet point extraction (unified source of truth) ──────────────────────
 
-const BULLET_PATTERN = /^[\s]*[-–—•*▪▸►◆]\s+|^[\s]*\d+[.)]\s+/;
+/** Pattern for lines that look like bullet points */
+const BULLET_LINE = /^[\s]*[-–—•*▪▸►◆]\s+|^[\s]*\d+[.)]\s+/;
 
 /**
- * Detect if a description string contains bullet-point-like lines.
- * Returns { isBulletList: true, bullets: string[] } or { isBulletList: false }.
+ * Unified bullet extraction: single source of truth for experience points.
+ *
+ * Priority:
+ *   1. `bullets` array from AI parser (already structured)
+ *   2. `description` string → heuristic split
+ *
+ * Returns an array of individual bullet strings (cleaned).
  */
-export function extractBullets(description: string | null | undefined): {
-  isBulletList: boolean;
-  bullets: string[];
-  plainText: string;
-} {
-  if (!description || !description.trim()) {
-    return { isBulletList: false, bullets: [], plainText: "" };
+export function normalizeExperienceBullets(
+  bullets: string[] | null | undefined,
+  description: string | null | undefined,
+): string[] {
+  // 1. Prefer structured bullets from AI parser
+  if (bullets && Array.isArray(bullets) && bullets.length > 0) {
+    const cleaned = bullets.map(b => (typeof b === "string" ? b.trim() : "")).filter(Boolean);
+    if (cleaned.length > 0) return cleaned;
   }
 
-  const lines = description.split(/\n/).map(l => l.trim()).filter(Boolean);
+  // 2. Fallback: extract from description
+  if (!description || !description.trim()) return [];
+  return splitDescriptionIntoBullets(description);
+}
 
-  if (lines.length <= 1) {
-    return { isBulletList: false, bullets: [], plainText: description.trim() };
+/**
+ * Split a raw description string into individual bullet points.
+ * Handles various separators: newlines, •, -, *, numbered lists, semicolons.
+ */
+function splitDescriptionIntoBullets(text: string): string[] {
+  const trimmed = text.trim();
+
+  // Try splitting by newlines first
+  const lines = trimmed.split(/\n/).map(l => l.trim()).filter(Boolean);
+  if (lines.length >= 2) {
+    const bulletCount = lines.filter(l => BULLET_LINE.test(l)).length;
+    // If majority look like bullets, clean the markers
+    if (bulletCount / lines.length >= 0.4) {
+      return lines.map(l => l.replace(BULLET_LINE, "").trim()).filter(Boolean);
+    }
+    // If lines are short-ish (avg < 120 chars), treat each line as a bullet
+    const avgLen = lines.reduce((sum, l) => sum + l.length, 0) / lines.length;
+    if (avgLen < 120) {
+      return lines;
+    }
   }
 
-  // Count how many lines match bullet patterns
-  const bulletLines = lines.filter(l => BULLET_PATTERN.test(l));
-  const ratio = bulletLines.length / lines.length;
+  // Try splitting by bullet markers within a single line
+  // e.g. "• task1 • task2 • task3"
+  const inlineBulletSplit = trimmed.split(/\s*[•▸►◆]\s+/).filter(Boolean);
+  if (inlineBulletSplit.length >= 2) return inlineBulletSplit.map(s => s.trim());
 
-  // If >=50% of lines look like bullets, treat as a bullet list
-  if (ratio >= 0.5 && bulletLines.length >= 2) {
-    const cleaned = lines.map(l => l.replace(BULLET_PATTERN, "").trim()).filter(Boolean);
-    return { isBulletList: true, bullets: cleaned, plainText: "" };
+  // Try splitting by semicolons (common in OCR'd CVs)
+  const semiSplit = trimmed.split(/;\s*/).filter(Boolean);
+  if (semiSplit.length >= 3 && semiSplit.every(s => s.length < 150)) {
+    return semiSplit.map(s => s.trim());
   }
 
-  return { isBulletList: false, bullets: [], plainText: description.trim() };
+  // Try splitting by " - " (dash separator within a line)
+  const dashSplit = trimmed.split(/\s+-\s+/).filter(Boolean);
+  if (dashSplit.length >= 3 && dashSplit.every(s => s.length < 150)) {
+    return dashSplit.map(s => s.trim());
+  }
+
+  // No structure detected → return as single item
+  return [trimmed];
+}
+
+/**
+ * Pad bullets array to have at least `min` entries, cap at `max`.
+ * Returns { visible: string[], overflow: string[] }
+ */
+export function padAndCapBullets(
+  bullets: string[],
+  min = DEFAULT_BULLETS,
+  max = MAX_BULLETS,
+): { visible: string[]; overflow: string[] } {
+  const overflow = bullets.length > max ? bullets.slice(max) : [];
+  const capped = bullets.slice(0, max);
+  const padded = capped.length >= min
+    ? capped
+    : [...capped, ...Array(min - capped.length).fill("")];
+  return { visible: padded, overflow };
 }
 
 // ─── Main extraction ─────────────────────────────────────────────────────────
 
-/**
- * Extract profile form fields from parsed_json.
- * Returns only fields that have meaningful values.
- */
 export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFields> {
   if (!parsedJson || typeof parsedJson !== "object") return {};
   const p = parsedJson as ParsedCvJson;
   const result: Partial<ProfileFormFields> = {};
 
-  // full_name
   const name = p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ");
   if (name?.trim()) result.fullName = name.trim();
 
-  // title <- headline or current_role
   const titleVal = p.headline || p.current_role;
   if (titleVal?.trim()) result.title = titleVal.trim();
 
-  // location <- city
   if (p.city?.trim()) result.location = p.city.trim();
 
-  // summary
   if (p.summary?.trim()) result.summary = p.summary.trim().slice(0, 300);
 
-  // skills
   if (p.skills && Array.isArray(p.skills) && p.skills.length > 0) {
     result.skills = p.skills.filter((s) => typeof s === "string" && s.trim()).map((s) => s.trim());
   }
 
-  // experience in months — prefer calculated from experience[], fallback to years_of_experience
   const calculatedYears = calculateTotalExperienceYears(p.experience);
   if (calculatedYears !== null && calculatedYears > 0) {
     result.experienceYears = Math.min(480, Math.round(calculatedYears * 12));
@@ -321,7 +312,6 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
     result.experienceYears = Math.min(480, Math.round(p.years_of_experience * 12));
   }
 
-  // links
   const cvLinks: ProfileFormFields["links"] = {};
   if (p.links?.linkedin_url?.trim()) cvLinks.linkedin = p.links.linkedin_url.trim();
   if (p.links?.github_url?.trim()) cvLinks.github = p.links.github_url.trim();
@@ -331,28 +321,19 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
   }
   if (Object.values(cvLinks).some(Boolean)) result.links = cvLinks;
 
-  // experience entries (max 5) — with bullet point preservation
+  // Experience entries — unified bullet source of truth
   if (p.experience && Array.isArray(p.experience) && p.experience.length > 0) {
-    result.experienceEntries = p.experience.slice(0, 5).map((exp) => {
+    result.experienceEntries = p.experience.slice(0, 8).map((exp) => {
       const isCurrent = isCurrentEndDate(exp.end_date);
 
-      // Extract bullets from description
-      const { isBulletList, bullets: extractedBullets, plainText } = extractBullets(exp.description);
+      // Unified bullet extraction
+      const allBullets = normalizeExperienceBullets(exp.bullets, exp.description);
+      const { visible, overflow } = padAndCapBullets(allBullets);
 
-      let description = "";
-      let bullets: string[] = [""];
-
-      if (isBulletList && extractedBullets.length > 0) {
-        // Each bullet goes to its own entry — up to 8
-        bullets = extractedBullets.slice(0, 8);
-        // If more than 8, keep remaining as description fallback
-        if (extractedBullets.length > 8) {
-          description = extractedBullets.slice(8).map(b => `• ${b}`).join("\n");
-        }
-      } else if (plainText) {
-        // Plain text → first bullet, no description field
-        bullets = [plainText.slice(0, 200)];
-      }
+      // If there's overflow, store in description so nothing is lost
+      const overflowText = overflow.length > 0
+        ? overflow.map(b => `• ${b}`).join("\n")
+        : "";
 
       return {
         title: exp.job_title?.trim() || "",
@@ -360,8 +341,8 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
         startDate: exp.start_date?.trim() || "",
         endDate: isCurrent ? "Obecnie" : (exp.end_date?.trim() || ""),
         isCurrent,
-        description,
-        bullets,
+        description: overflowText,
+        bullets: visible,
       };
     });
   }
@@ -371,7 +352,6 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
 
 /**
  * Safe merge: only fills empty/missing fields from CV data.
- * Never overwrites non-empty existing values.
  */
 export function mergeWithExisting(
   existing: ProfileFormFields,
@@ -411,34 +391,16 @@ export function mergeWithExisting(
   if (fromCv.links) {
     const mergedLinks = { ...existing.links };
     let linksChanged = false;
-    if (fromCv.links.linkedin && !existing.links.linkedin?.trim()) {
-      mergedLinks.linkedin = fromCv.links.linkedin;
-      linksChanged = true;
-    }
-    if (fromCv.links.github && !existing.links.github?.trim()) {
-      mergedLinks.github = fromCv.links.github;
-      linksChanged = true;
-    }
-    if (fromCv.links.portfolio && !existing.links.portfolio?.trim()) {
-      mergedLinks.portfolio = fromCv.links.portfolio;
-      linksChanged = true;
-    }
-    if (fromCv.links.website && !existing.links.website?.trim()) {
-      mergedLinks.website = fromCv.links.website;
-      linksChanged = true;
-    }
-    if (linksChanged) {
-      merged.links = mergedLinks;
-      fieldsUpdated.push("Linki");
-    }
+    if (fromCv.links.linkedin && !existing.links.linkedin?.trim()) { mergedLinks.linkedin = fromCv.links.linkedin; linksChanged = true; }
+    if (fromCv.links.github && !existing.links.github?.trim()) { mergedLinks.github = fromCv.links.github; linksChanged = true; }
+    if (fromCv.links.portfolio && !existing.links.portfolio?.trim()) { mergedLinks.portfolio = fromCv.links.portfolio; linksChanged = true; }
+    if (fromCv.links.website && !existing.links.website?.trim()) { mergedLinks.website = fromCv.links.website; linksChanged = true; }
+    if (linksChanged) { merged.links = mergedLinks; fieldsUpdated.push("Linki"); }
   }
 
   return { merged, fieldsUpdated };
 }
 
-/**
- * Count how many mappable fields have data in parsed_json.
- */
 export function countMappableFields(fromCv: Partial<ProfileFormFields>): number {
   let count = 0;
   if (fromCv.fullName) count++;

@@ -13,7 +13,7 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
-import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, type ProfileFormFields } from "@/lib/cvProfileMapper";
+import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, padAndCapBullets, DEFAULT_BULLETS, MAX_BULLETS, normalizeExperienceBullets, type ProfileFormFields } from "@/lib/cvProfileMapper";
 
 interface ExperienceEntry {
   title: string;
