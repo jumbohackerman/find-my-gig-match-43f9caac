@@ -84,6 +84,148 @@ export const UNMAPPED_FIELDS = [
   "preferred_job_titles", // not directly mapped
 ] as const;
 
+// ─── Date parsing & overlap-aware experience calculation ─────────────────────
+
+const CURRENT_MARKERS = ["present", "current", "now", "obecnie", "aktualnie", "do teraz", "bieżąca", ""];
+
+/**
+ * Parse a loose date string (e.g. "2020", "Jan 2020", "01/2020", "2020-03") into a Date
+ * representing the 1st of the parsed month. Returns null if unparseable.
+ */
+function parseFuzzyDate(raw: string | null | undefined): Date | null {
+  if (!raw || !raw.trim()) return null;
+  const s = raw.trim();
+
+  // "2020-03" or "2020-03-15"
+  const isoMatch = s.match(/^(\d{4})-(\d{1,2})/);
+  if (isoMatch) return new Date(+isoMatch[1], +isoMatch[2] - 1, 1);
+
+  // "03/2020" or "03.2020"
+  const slashMatch = s.match(/^(\d{1,2})[\/.](\d{4})$/);
+  if (slashMatch) return new Date(+slashMatch[2], +slashMatch[1] - 1, 1);
+
+  // "Jan 2020", "January 2020", "sty 2020", "styczeń 2020"
+  const monthYearMatch = s.match(/^([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+)\s+(\d{4})$/);
+  if (monthYearMatch) {
+    const attempt = new Date(`${monthYearMatch[1]} 1, ${monthYearMatch[2]}`);
+    if (!isNaN(attempt.getTime())) return new Date(attempt.getFullYear(), attempt.getMonth(), 1);
+    // Fallback: just use the year
+    return new Date(+monthYearMatch[2], 0, 1);
+  }
+
+  // Plain year "2020"
+  const yearOnly = s.match(/^(\d{4})$/);
+  if (yearOnly) return new Date(+yearOnly[1], 0, 1);
+
+  return null;
+}
+
+function isCurrentEndDate(endDate: string | null | undefined): boolean {
+  if (!endDate || !endDate.trim()) return true;
+  return CURRENT_MARKERS.includes(endDate.trim().toLowerCase());
+}
+
+interface DateRange { start: number; end: number; } // months since epoch
+
+function dateToMonths(d: Date): number {
+  return d.getFullYear() * 12 + d.getMonth();
+}
+
+/**
+ * Calculate total unique months of experience from a list of experience entries,
+ * merging overlapping periods. Returns fractional years.
+ */
+export function calculateTotalExperienceYears(
+  entries: Array<{ start_date?: string | null; end_date?: string | null }> | null | undefined
+): number | null {
+  if (!entries || entries.length === 0) return null;
+
+  const now = new Date();
+  const nowMonths = dateToMonths(now);
+
+  const ranges: DateRange[] = [];
+
+  for (const entry of entries) {
+    const start = parseFuzzyDate(entry.start_date);
+    if (!start) continue; // skip entries with unparseable start dates
+
+    let endMonths: number;
+    if (isCurrentEndDate(entry.end_date)) {
+      endMonths = nowMonths;
+    } else {
+      const end = parseFuzzyDate(entry.end_date);
+      if (!end) {
+        endMonths = nowMonths; // fallback: treat as current
+      } else {
+        endMonths = dateToMonths(end);
+      }
+    }
+
+    const startMonths = dateToMonths(start);
+    if (endMonths < startMonths) continue; // invalid range, skip
+
+    ranges.push({ start: startMonths, end: endMonths });
+  }
+
+  if (ranges.length === 0) return null;
+
+  // Merge overlapping ranges
+  ranges.sort((a, b) => a.start - b.start);
+  const merged: DateRange[] = [ranges[0]];
+
+  for (let i = 1; i < ranges.length; i++) {
+    const last = merged[merged.length - 1];
+    if (ranges[i].start <= last.end) {
+      // Overlap — extend the end
+      last.end = Math.max(last.end, ranges[i].end);
+    } else {
+      merged.push({ ...ranges[i] });
+    }
+  }
+
+  // Sum unique months
+  const totalMonths = merged.reduce((sum, r) => sum + (r.end - r.start), 0);
+  return totalMonths / 12;
+}
+
+// ─── Bullet point detection & extraction ─────────────────────────────────────
+
+const BULLET_PATTERN = /^[\s]*[-–—•*▪▸►◆]\s+|^[\s]*\d+[.)]\s+/;
+
+/**
+ * Detect if a description string contains bullet-point-like lines.
+ * Returns { isBulletList: true, bullets: string[] } or { isBulletList: false }.
+ */
+export function extractBullets(description: string | null | undefined): {
+  isBulletList: boolean;
+  bullets: string[];
+  plainText: string;
+} {
+  if (!description || !description.trim()) {
+    return { isBulletList: false, bullets: [], plainText: "" };
+  }
+
+  const lines = description.split(/\n/).map(l => l.trim()).filter(Boolean);
+
+  if (lines.length <= 1) {
+    return { isBulletList: false, bullets: [], plainText: description.trim() };
+  }
+
+  // Count how many lines match bullet patterns
+  const bulletLines = lines.filter(l => BULLET_PATTERN.test(l));
+  const ratio = bulletLines.length / lines.length;
+
+  // If >=50% of lines look like bullets, treat as a bullet list
+  if (ratio >= 0.5 && bulletLines.length >= 2) {
+    const cleaned = lines.map(l => l.replace(BULLET_PATTERN, "").trim()).filter(Boolean);
+    return { isBulletList: true, bullets: cleaned, plainText: "" };
+  }
+
+  return { isBulletList: false, bullets: [], plainText: description.trim() };
+}
+
+// ─── Main extraction ─────────────────────────────────────────────────────────
+
 /**
  * Extract profile form fields from parsed_json.
  * Returns only fields that have meaningful values.
@@ -112,8 +254,11 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
     result.skills = p.skills.filter((s) => typeof s === "string" && s.trim()).map((s) => s.trim());
   }
 
-  // years of experience
-  if (typeof p.years_of_experience === "number" && p.years_of_experience > 0) {
+  // years of experience — prefer calculated from experience[], fallback to years_of_experience
+  const calculatedYears = calculateTotalExperienceYears(p.experience);
+  if (calculatedYears !== null && calculatedYears > 0) {
+    result.experienceYears = Math.min(40, Math.round(calculatedYears));
+  } else if (typeof p.years_of_experience === "number" && p.years_of_experience > 0) {
     result.experienceYears = Math.min(40, Math.round(p.years_of_experience));
   }
 
@@ -122,24 +267,42 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
   if (p.links?.linkedin_url?.trim()) cvLinks.linkedin = p.links.linkedin_url.trim();
   if (p.links?.github_url?.trim()) cvLinks.github = p.links.github_url.trim();
   if (p.links?.portfolio_url?.trim()) cvLinks.portfolio = p.links.portfolio_url.trim();
-  // other_urls[0] -> website
   if (p.links?.other_urls && p.links.other_urls.length > 0 && p.links.other_urls[0]?.trim()) {
     cvLinks.website = p.links.other_urls[0].trim();
   }
   if (Object.values(cvLinks).some(Boolean)) result.links = cvLinks;
 
-  // experience entries (max 3)
+  // experience entries (max 3) — with bullet point preservation
   if (p.experience && Array.isArray(p.experience) && p.experience.length > 0) {
     result.experienceEntries = p.experience.slice(0, 3).map((exp) => {
-      const isCurrent = !exp.end_date || exp.end_date.toLowerCase() === "present" || exp.end_date.toLowerCase() === "obecnie";
+      const isCurrent = isCurrentEndDate(exp.end_date);
+
+      // Extract bullets from description
+      const { isBulletList, bullets: extractedBullets, plainText } = extractBullets(exp.description);
+
+      let description = "";
+      let bullets: string[] = [""];
+
+      if (isBulletList && extractedBullets.length > 0) {
+        // Use first 3 bullet points as the structured bullets field
+        bullets = extractedBullets.slice(0, 3);
+        // If there are more than 3, put remaining in description
+        if (extractedBullets.length > 3) {
+          description = extractedBullets.slice(3).map(b => `• ${b}`).join("\n");
+        }
+      } else if (plainText) {
+        description = plainText.slice(0, 500);
+        bullets = [""];
+      }
+
       return {
         title: exp.job_title?.trim() || "",
         company: exp.company?.trim() || "",
         startDate: exp.start_date?.trim() || "",
         endDate: isCurrent ? "Obecnie" : (exp.end_date?.trim() || ""),
         isCurrent,
-        description: exp.description?.trim() || "",
-        bullets: [""],
+        description,
+        bullets,
       };
     });
   }
