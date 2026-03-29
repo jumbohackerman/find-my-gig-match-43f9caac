@@ -290,7 +290,12 @@ const MyProfile = () => {
     setSummary(merged.summary);
     setSkills(merged.skills);
     setExperienceYears(merged.experienceYears);
-    setExperienceEntries(merged.experienceEntries);
+    // Pad bullets to minimum 6 per entry
+    const paddedEntries = merged.experienceEntries.map(entry => ({
+      ...entry,
+      bullets: entry.bullets.length >= 6 ? entry.bullets : [...entry.bullets, ...Array(6 - entry.bullets.length).fill("")],
+    }));
+    setExperienceEntries(paddedEntries);
     setLinks(merged.links);
 
     toast.success(`Zaimportowano z CV: ${fieldsUpdated.join(", ")}.`, {
