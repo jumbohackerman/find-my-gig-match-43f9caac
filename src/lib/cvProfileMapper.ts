@@ -313,12 +313,12 @@ export function extractProfileFields(parsedJson: unknown): Partial<ProfileFormFi
     result.skills = p.skills.filter((s) => typeof s === "string" && s.trim()).map((s) => s.trim());
   }
 
-  // years of experience — prefer calculated from experience[], fallback to years_of_experience
+  // experience in months — prefer calculated from experience[], fallback to years_of_experience
   const calculatedYears = calculateTotalExperienceYears(p.experience);
   if (calculatedYears !== null && calculatedYears > 0) {
-    result.experienceYears = Math.min(40, Math.round(calculatedYears));
+    result.experienceYears = Math.min(480, Math.round(calculatedYears * 12));
   } else if (typeof p.years_of_experience === "number" && p.years_of_experience > 0) {
-    result.experienceYears = Math.min(40, Math.round(p.years_of_experience));
+    result.experienceYears = Math.min(480, Math.round(p.years_of_experience * 12));
   }
 
   // links

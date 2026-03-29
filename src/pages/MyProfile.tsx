@@ -129,7 +129,7 @@ const MyProfile = () => {
           setLinks(candidate.links as Links || {});
           setCvUrl(candidate.cvUrl || null);
           const expMatch = candidate.experience?.match(/(\d+)/);
-          setExperienceYears(expMatch ? parseInt(expMatch[1]) : 0);
+          setExperienceYears(expMatch ? parseInt(expMatch[1]) * 12 : 0);
         }
       }
       setFullName(profile?.full_name || user.user_metadata?.full_name || "");
