@@ -108,7 +108,31 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* Skills */}
+          {/* Experience — before Skills */}
+          {candidate.experienceEntries && candidate.experienceEntries.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doświadczenie</h4>
+              <div className="space-y-3">
+                {candidate.experienceEntries.map((entry, idx) => (
+                  <div key={idx} className="pl-3 border-l-2 border-border">
+                    <p className="text-sm font-medium text-foreground">
+                      {entry.title}{entry.company ? ` — ${entry.company}` : ""}
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {entry.startDate} – {entry.endDate}
+                    </p>
+                    {entry.bullets?.filter(Boolean).map((b, bi) => (
+                      <p key={bi} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                        <span className="mt-0.5">•</span> {b}
+                      </p>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Skills — after Experience */}
           <div className="mb-4">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               Umiejętności
@@ -142,30 +166,6 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
               </div>
             )}
           </div>
-
-          {/* Experience */}
-          {candidate.experienceEntries && candidate.experienceEntries.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doświadczenie</h4>
-              <div className="space-y-3">
-                {candidate.experienceEntries.map((entry, idx) => (
-                  <div key={idx} className="pl-3 border-l-2 border-border">
-                    <p className="text-sm font-medium text-foreground">
-                      {entry.title}{entry.company ? ` — ${entry.company}` : ""}
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      {entry.startDate} – {entry.endDate}
-                    </p>
-                    {entry.bullets?.filter(Boolean).map((b, bi) => (
-                      <p key={bi} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                        <span className="mt-0.5">•</span> {b}
-                      </p>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Salary */}
           {candidate.salaryMin && candidate.salaryMin > 0 && (
