@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import * as Sentry from "@sentry/react";
+
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Briefcase, Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
@@ -257,16 +257,6 @@ const Auth = () => {
       </motion.div>
       </div>
 
-      {/* ── Temporary Sentry verification button — REMOVE AFTER TEST ── */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <button
-          onClick={() => { Sentry.captureException(new Error("Sentry manual test")); alert("Event sent to Sentry"); }}
-          className="px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-xs font-mono opacity-60 hover:opacity-100 transition-opacity"
-        >
-          🐛 Sentry Test
-        </button>
-      </div>
-      {/* ── END Sentry test ── */}
 
     </div>
   );
