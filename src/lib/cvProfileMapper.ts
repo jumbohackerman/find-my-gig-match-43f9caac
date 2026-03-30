@@ -226,45 +226,109 @@ export function normalizeExperienceBullets(
 
 /**
  * Split a raw description string into individual bullet points.
- * Handles various separators: newlines, •, -, *, numbered lists, semicolons.
+ * Handles: newlines, •/-/*/▸ markers, numbered lists, semicolons,
+ * dash separators, and sentence-level splitting for flattened PDF text.
  */
 function splitDescriptionIntoBullets(text: string): string[] {
   const trimmed = text.trim();
+  if (!trimmed) return [];
 
-  // Try splitting by newlines first
+  // 1. Try splitting by newlines first
   const lines = trimmed.split(/\n/).map(l => l.trim()).filter(Boolean);
   if (lines.length >= 2) {
     const bulletCount = lines.filter(l => BULLET_LINE.test(l)).length;
-    // If majority look like bullets, clean the markers
     if (bulletCount / lines.length >= 0.4) {
       return lines.map(l => l.replace(BULLET_LINE, "").trim()).filter(Boolean);
     }
-    // If lines are short-ish (avg < 120 chars), treat each line as a bullet
     const avgLen = lines.reduce((sum, l) => sum + l.length, 0) / lines.length;
     if (avgLen < 120) {
       return lines;
     }
+    // Multi-line but long lines: recursively split each line
+    const subResults = lines.flatMap(l => splitSingleLineBullets(l));
+    if (subResults.length > lines.length) return subResults;
+    return lines;
   }
 
-  // Try splitting by bullet markers within a single line
-  // e.g. "• task1 • task2 • task3"
+  // 2. Single line — use dedicated single-line splitter
+  return splitSingleLineBullets(trimmed);
+}
+
+/**
+ * Split a single line (no newlines) into bullet points using various heuristics.
+ * Handles inline markers, semicolons, dashes, and sentence-level splitting.
+ */
+function splitSingleLineBullets(text: string): string[] {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  // Inline bullet markers: "• task1 • task2"
   const inlineBulletSplit = trimmed.split(/\s*[•▸►◆]\s+/).filter(Boolean);
   if (inlineBulletSplit.length >= 2) return inlineBulletSplit.map(s => s.trim());
 
-  // Try splitting by semicolons (common in OCR'd CVs)
+  // Inline dash/em-dash markers: "– task1 – task2"  
+  const inlineDashMarker = trimmed.split(/\s*[–—]\s+/).filter(Boolean);
+  if (inlineDashMarker.length >= 3) return inlineDashMarker.map(s => s.trim());
+
+  // Numbered list in one line: "1. task1 2. task2 3. task3"
+  const numberedSplit = trimmed.split(/\s*\d+[.)]\s+/).filter(Boolean);
+  if (numberedSplit.length >= 2) return numberedSplit.map(s => s.trim());
+
+  // Semicolons: "task1; task2; task3"
   const semiSplit = trimmed.split(/;\s*/).filter(Boolean);
   if (semiSplit.length >= 3 && semiSplit.every(s => s.length < 150)) {
     return semiSplit.map(s => s.trim());
   }
 
-  // Try splitting by " - " (dash separator within a line)
+  // Dash separator: "task1 - task2 - task3"
   const dashSplit = trimmed.split(/\s+-\s+/).filter(Boolean);
   if (dashSplit.length >= 3 && dashSplit.every(s => s.length < 150)) {
     return dashSplit.map(s => s.trim());
   }
 
-  // No structure detected → return as single item
+  // Sentence-level splitting for flattened PDF text:
+  // "Designing models in Power BI. Integrating data from sources. Building reports."
+  // Split on ". " but preserve abbreviations and decimals
+  if (trimmed.length > 80) {
+    const sentences = splitBySentences(trimmed);
+    if (sentences.length >= 2) return sentences;
+  }
+
   return [trimmed];
+}
+
+/**
+ * Split text by sentence boundaries (". " followed by uppercase letter).
+ * Avoids splitting on abbreviations, decimals, URLs, etc.
+ */
+function splitBySentences(text: string): string[] {
+  // Split on period followed by space and uppercase letter (sentence boundary)
+  // Also handle period at end followed by space
+  const parts: string[] = [];
+  // Regex: period followed by 1+ spaces and an uppercase letter
+  const sentenceBreak = /\.\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ])/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = sentenceBreak.exec(text)) !== null) {
+    const segment = text.slice(lastIndex, match.index).trim();
+    if (segment) parts.push(cleanTrailingPeriod(segment));
+    lastIndex = match.index + match[0].length - 1; // keep the uppercase letter
+  }
+
+  // Remaining text
+  const remaining = text.slice(lastIndex).trim();
+  if (remaining) parts.push(cleanTrailingPeriod(remaining));
+
+  // Only return if we got meaningful splits (each part >= 15 chars)
+  if (parts.length >= 2 && parts.every(p => p.length >= 15)) {
+    return parts;
+  }
+  return [];
+}
+
+function cleanTrailingPeriod(s: string): string {
+  return s.replace(/\.\s*$/, "").trim();
 }
 
 /**
