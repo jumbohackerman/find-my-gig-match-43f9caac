@@ -13,7 +13,15 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
-import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, padAndCapBullets, DEFAULT_BULLETS, MAX_BULLETS, normalizeExperienceBullets, type ProfileFormFields } from "@/lib/cvProfileMapper";
+import { extractProfileFields, mergeWithExisting, countMappableFields, formatExperienceDisplay, calculateTotalExperienceYears, DEFAULT_BULLETS, MAX_BULLETS, type ProfileFormFields } from "@/lib/cvProfileMapper";
+import { fetchLatestCv, fetchParsedData } from "@/lib/cvHelpers";
+import {
+  assessLegacyExperienceRebuild,
+  hasParsedCvJson,
+  normalizeExperienceEntries,
+  rebuildExperienceEntriesFromParsedJson,
+  type ExperienceEntryDraft,
+} from "@/lib/experienceRebuild";
 
 interface ExperienceEntry {
   title: string;
@@ -97,6 +105,8 @@ const MyProfile = () => {
   const [expandedExp, setExpandedExp] = useState<number | null>(null);
 
   const [links, setLinks] = useState<Links>({});
+  const [latestParsedJson, setLatestParsedJson] = useState<unknown>(null);
+  const [latestCvUploadId, setLatestCvUploadId] = useState<string | null>(null);
 
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -114,6 +124,8 @@ const MyProfile = () => {
     const load = async () => {
       if (!isEmployer) {
         const candidate = await getProvider("candidates").getByUserId(user.id);
+
+        let savedEntries: ExperienceEntry[] = [];
         if (candidate) {
           setTitle(candidate.title || "");
           setLocation(candidate.location || "");
@@ -125,18 +137,35 @@ const MyProfile = () => {
           setSalaryMin(candidate.salaryMin || 0);
           setSalaryMax(candidate.salaryMax || 0);
           setAvailability(candidate.availability || "Otwarty na oferty");
-          setExperienceEntries(
-            ((candidate.experienceEntries || []) as ExperienceEntry[]).map(entry => {
-              // Normalize bullets from saved data (handles old records without bullets)
-              const allBullets = normalizeExperienceBullets(entry.bullets, entry.description);
-              const { visible } = padAndCapBullets(allBullets);
-              return { ...entry, bullets: visible };
-            })
-          );
+          savedEntries = normalizeExperienceEntries((candidate.experienceEntries || []) as ExperienceEntryDraft[]) as ExperienceEntry[];
+          setExperienceEntries(savedEntries);
           setLinks(candidate.links as Links || {});
           setCvUrl(candidate.cvUrl || null);
           const expMatch = candidate.experience?.match(/(\d+)/);
           setExperienceYears(expMatch ? parseInt(expMatch[1]) * 12 : 0);
+        }
+
+        const latestCv = await fetchLatestCv(user.id);
+        if (latestCv) {
+          const parsed = await fetchParsedData(latestCv.id);
+          if (hasParsedCvJson(parsed?.parsed_json)) {
+            setLatestParsedJson(parsed.parsed_json);
+            setLatestCvUploadId(latestCv.id);
+
+            const rebuiltEntries = rebuildExperienceEntriesFromParsedJson(parsed.parsed_json) as ExperienceEntry[];
+            const assessment = assessLegacyExperienceRebuild(savedEntries, rebuiltEntries);
+
+            if (assessment.shouldRebuild) {
+              setExperienceEntries(rebuiltEntries);
+              toast.info("Naprawiono zapisane doświadczenie na podstawie istniejącej analizy CV (bez ponownego AI).");
+            }
+          } else {
+            setLatestParsedJson(null);
+            setLatestCvUploadId(null);
+          }
+        } else {
+          setLatestParsedJson(null);
+          setLatestCvUploadId(null);
         }
       }
       setFullName(profile?.full_name || user.user_metadata?.full_name || "");
@@ -144,6 +173,46 @@ const MyProfile = () => {
     };
     load();
   }, [user, profile, authLoading, isEmployer]);
+
+  const handleRebuildExperienceFromCv = useCallback(async () => {
+    if (!user || isEmployer) return;
+
+    let parsedJson = latestParsedJson;
+    let sourceCvUploadId = latestCvUploadId;
+
+    if (!hasParsedCvJson(parsedJson)) {
+      const latestCv = await fetchLatestCv(user.id);
+      if (!latestCv) {
+        toast.info("Brak przesłanego CV do odświeżenia doświadczenia.");
+        return;
+      }
+
+      const parsed = await fetchParsedData(latestCv.id);
+      if (!hasParsedCvJson(parsed?.parsed_json)) {
+        toast.info("Brak istniejącej analizy CV. Najpierw uruchom analizę AI przyciskiem.");
+        return;
+      }
+
+      parsedJson = parsed.parsed_json;
+      sourceCvUploadId = latestCv.id;
+      setLatestParsedJson(parsedJson);
+      setLatestCvUploadId(latestCv.id);
+    }
+
+    const rebuiltEntries = rebuildExperienceEntriesFromParsedJson(parsedJson) as ExperienceEntry[];
+    if (rebuiltEntries.length === 0) {
+      toast.info("Nie znaleziono doświadczenia do odbudowy w zapisanym CV.");
+      return;
+    }
+
+    setExperienceEntries(rebuiltEntries);
+    setExpandedExp(null);
+    toast.success(
+      sourceCvUploadId
+        ? `Odświeżono doświadczenie z istniejącego CV (${sourceCvUploadId.slice(0, 8)}…).`
+        : "Odświeżono doświadczenie z istniejącego CV.",
+    );
+  }, [user, isEmployer, latestParsedJson, latestCvUploadId]);
 
   const handleSave = async () => {
     if (!user || saving) return;
@@ -265,6 +334,7 @@ const MyProfile = () => {
   };
 
   const handleCvParsed = useCallback((parsedJson: unknown) => {
+    setLatestParsedJson(parsedJson);
     const fromCv = extractProfileFields(parsedJson);
     if (countMappableFields(fromCv) === 0) {
       toast.info("AI przeanalizowało CV, ale nie znaleziono danych do zaimportowania.");
@@ -297,12 +367,7 @@ const MyProfile = () => {
     setSummary(merged.summary);
     setSkills(merged.skills);
     setExperienceYears(merged.experienceYears);
-    // Pad bullets to minimum DEFAULT_BULLETS per entry using unified helper
-    const paddedEntries = merged.experienceEntries.map(entry => {
-      const { visible } = padAndCapBullets(entry.bullets.filter(Boolean), DEFAULT_BULLETS, MAX_BULLETS);
-      return { ...entry, bullets: visible };
-    });
-    setExperienceEntries(paddedEntries);
+    setExperienceEntries(normalizeExperienceEntries(merged.experienceEntries as ExperienceEntryDraft[]) as ExperienceEntry[]);
     setLinks(merged.links);
 
     toast.success(`Zaimportowano z CV: ${fieldsUpdated.join(", ")}.`, {
@@ -688,6 +753,12 @@ const MyProfile = () => {
                     <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
                   </div>
                   <CandidateCvUpload onParsed={handleCvParsed} />
+                  <button
+                    onClick={handleRebuildExperienceFromCv}
+                    className="mt-3 w-full py-2 rounded-xl border border-border bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
+                  >
+                    Odśwież doświadczenie z istniejącego CV
+                  </button>
                 </div>
               </div>
             </AccordionSection>
