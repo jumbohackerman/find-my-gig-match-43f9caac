@@ -213,15 +213,82 @@ export function normalizeExperienceBullets(
   bullets: string[] | null | undefined,
   description: string | null | undefined,
 ): string[] {
-  // 1. Prefer structured bullets from AI parser
+  // 1. Prefer structured bullets from AI parser, but DON'T trust blindly.
+  //    Each bullet may itself contain multiple responsibilities concatenated.
   if (bullets && Array.isArray(bullets) && bullets.length > 0) {
     const cleaned = bullets.map(b => (typeof b === "string" ? b.trim() : "")).filter(Boolean);
-    if (cleaned.length > 0) return cleaned;
+    if (cleaned.length > 0) {
+      // Post-process: split any "fat" bullet that contains multiple responsibilities
+      const expanded = cleaned.flatMap(b => splitFatBullet(b));
+      if (expanded.length > 0) return expanded;
+      return cleaned;
+    }
   }
 
   // 2. Fallback: extract from description
   if (!description || !description.trim()) return [];
   return splitDescriptionIntoBullets(description);
+}
+
+/**
+ * Detect and split a single bullet string that actually contains multiple
+ * responsibilities glued together by the AI parser or PDF extraction.
+ *
+ * Heuristics (applied in order):
+ *  - Contains newlines → split by newlines then recurse
+ *  - Contains inline bullet markers (•, ▸, etc.)
+ *  - Contains multiple sentences (". " + uppercase) and total length > 60
+ *  - Contains semicolons that look like a list
+ *
+ * Short, clean bullets (≤80 chars, single sentence) pass through unchanged.
+ */
+function splitFatBullet(text: string): string[] {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  // Short bullet — almost certainly a single responsibility
+  if (trimmed.length <= 80 && !trimmed.includes("\n") && !/[;•▸►◆]/.test(trimmed)) {
+    return [trimmed];
+  }
+
+  // Delegate to the existing single-line splitter which handles all patterns
+  const parts = splitSingleLineBullets(trimmed);
+
+  // If splitter couldn't break it further but it's still long,
+  // try a more aggressive sentence split (lower threshold)
+  if (parts.length === 1 && trimmed.length > 100) {
+    const sentences = splitBySentencesAggressive(trimmed);
+    if (sentences.length >= 2) return sentences;
+  }
+
+  return parts;
+}
+
+/**
+ * More aggressive sentence splitting — also splits on ". " followed by
+ * any letter (not just uppercase), and on patterns like "(tech). Next"
+ * common in CV descriptions. Minimum segment length lowered to 10 chars.
+ */
+function splitBySentencesAggressive(text: string): string[] {
+  const parts: string[] = [];
+  // Split on ". " followed by any letter (upper or lower)
+  const sentenceBreak = /\.\s+(?=[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż])/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = sentenceBreak.exec(text)) !== null) {
+    const segment = text.slice(lastIndex, match.index).trim();
+    if (segment) parts.push(cleanTrailingPeriod(segment));
+    lastIndex = match.index + match[0].length - 1;
+  }
+
+  const remaining = text.slice(lastIndex).trim();
+  if (remaining) parts.push(cleanTrailingPeriod(remaining));
+
+  if (parts.length >= 2 && parts.every(p => p.length >= 10)) {
+    return parts;
+  }
+  return [];
 }
 
 /**
@@ -289,7 +356,7 @@ function splitSingleLineBullets(text: string): string[] {
   // Sentence-level splitting for flattened PDF text:
   // "Designing models in Power BI. Integrating data from sources. Building reports."
   // Split on ". " but preserve abbreviations and decimals
-  if (trimmed.length > 80) {
+  if (trimmed.length > 60) {
     const sentences = splitBySentences(trimmed);
     if (sentences.length >= 2) return sentences;
   }
