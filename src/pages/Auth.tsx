@@ -260,7 +260,7 @@ const Auth = () => {
       {/* ── Temporary Sentry verification button — REMOVE AFTER TEST ── */}
       <div className="fixed bottom-4 right-4 z-50">
         <button
-          onClick={() => { throw new Error("Sentry app test"); }}
+          onClick={() => { Sentry.captureException(new Error("Sentry manual test")); alert("Event sent to Sentry"); }}
           className="px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-xs font-mono opacity-60 hover:opacity-100 transition-opacity"
         >
           🐛 Sentry Test
