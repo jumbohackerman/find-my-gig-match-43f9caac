@@ -356,7 +356,7 @@ function splitSingleLineBullets(text: string): string[] {
   // Sentence-level splitting for flattened PDF text:
   // "Designing models in Power BI. Integrating data from sources. Building reports."
   // Split on ". " but preserve abbreviations and decimals
-  if (trimmed.length > 80) {
+  if (trimmed.length > 60) {
     const sentences = splitBySentences(trimmed);
     if (sentences.length >= 2) return sentences;
   }
