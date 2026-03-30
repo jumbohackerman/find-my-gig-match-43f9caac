@@ -1,6 +1,10 @@
 import * as Sentry from "@sentry/react";
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
+
+// ── Temporary diagnostic — REMOVE AFTER VERIFICATION ──
+console.log("Sentry DSN present:", Boolean(dsn));
+console.log("Sentry DSN value prefix:", dsn ? dsn.substring(0, 20) + "..." : "(empty)");
 const environment = import.meta.env.VITE_APP_ENV || "development";
 const isProduction = environment === "production";
 
