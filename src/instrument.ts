@@ -2,12 +2,15 @@ import * as Sentry from "@sentry/react";
 
 const dsn = import.meta.env.VITE_SENTRY_DSN;
 
-// Derive environment: prefer explicit env var, fall back to hostname detection
-const environment =
-  import.meta.env.VITE_APP_ENV ||
-  (typeof window !== "undefined" && window.location.hostname.endsWith(".lovable.app")
-    ? "production"
-    : "development");
+// Derive environment: explicit env var > hostname detection
+const deriveEnvironment = (): string => {
+  if (import.meta.env.VITE_APP_ENV) return import.meta.env.VITE_APP_ENV;
+  if (typeof window === "undefined") return "development";
+  const h = window.location.hostname;
+  if (h === "localhost" || h === "127.0.0.1") return "development";
+  return "production";
+};
+const environment = deriveEnvironment();
 const isProduction = environment === "production";
 
 Sentry.init({
