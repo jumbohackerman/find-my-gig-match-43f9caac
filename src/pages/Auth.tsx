@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import * as Sentry from "@sentry/react";
+
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Briefcase, Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";

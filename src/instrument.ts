@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 
-const dsn = "https://c9406722e09a44e817ed81441395274a@o4511134892687360.ingest.de.sentry.io/4511135499550800";
+const dsn = import.meta.env.VITE_SENTRY_DSN;
 const environment = import.meta.env.VITE_APP_ENV || "development";
 const isProduction = environment === "production";
 
