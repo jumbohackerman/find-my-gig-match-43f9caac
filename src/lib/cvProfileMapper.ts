@@ -226,7 +226,7 @@ export function normalizeExperienceBullets(
 
 /**
  * Split a raw description string into individual bullet points.
- * Handles: newlines, •/-/*/▸ markers, numbered lists, semicolons,
+ * Handles: newlines, bullet markers, numbered lists, semicolons,
  * dash separators, and sentence-level splitting for flattened PDF text.
  */
 function splitDescriptionIntoBullets(text: string): string[] {
