@@ -46,8 +46,12 @@ const RecentlyViewedList = ({ entries, onJobClick, onClear }: Props) => {
             className="card-gradient rounded-xl p-4 border border-border flex items-center gap-3 cursor-pointer hover:border-primary/30 transition-colors"
             onClick={() => onJobClick?.(entry.job)}
           >
-            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0">
-              {entry.job.logo}
+            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
+              {entry.job.logo?.startsWith("http") ? (
+                <img src={entry.job.logo} alt={entry.job.company} className="w-full h-full object-contain" />
+              ) : (
+                <span>{entry.job.logo}</span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="font-display text-sm font-semibold text-foreground truncate">{entry.job.title}</h4>
