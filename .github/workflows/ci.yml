@@ -26,6 +26,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Guard – no Lovable AI / leaked secrets
+        run: |
+          echo "Checking for forbidden patterns..."
+          FAIL=0
+          if grep -r "ai.gateway.lovable.dev" --include='*.ts' --include='*.js' --include='*.tsx' --include='*.jsx' .; then echo "❌ Found ai.gateway.lovable.dev"; FAIL=1; fi
+          if grep -r "LOVABLE_API_KEY" --include='*.ts' --include='*.js' --include='*.tsx' --include='*.jsx' .; then echo "❌ Found LOVABLE_API_KEY"; FAIL=1; fi
+          if grep -r "google/gemini" --include='*.ts' --include='*.js' --include='*.tsx' --include='*.jsx' .; then echo "❌ Found google/gemini"; FAIL=1; fi
+          if git ls-files --error-unmatch .env 2>/dev/null; then echo "❌ .env is tracked by git"; FAIL=1; fi
+          if [ "$FAIL" -eq 1 ]; then exit 1; fi
+          echo "✅ All guards passed"
+
       - name: Lint
         run: npm run lint
 
