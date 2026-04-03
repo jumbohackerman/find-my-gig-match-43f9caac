@@ -63,13 +63,13 @@ export const integrations: Record<string, IntegrationDefinition> = {
     notes: "Runs in edge functions only. Client just toggles UI visibility.",
   },
   ai: {
-    name: "AI Services (Lovable AI)",
+    name: "AI Services (OpenAI)",
     layer: "edge-function",
     status: "noop",
     providerKey: "ai",
-    requiredSecrets: ["LOVABLE_API_KEY"],
-    clientEnvVars: ["VITE_AI_ENABLED", "VITE_AI_DEFAULT_MODEL"],
-    notes: "Uses Lovable AI supported models — no external API key needed. LOVABLE_API_KEY is auto-provisioned.",
+    requiredSecrets: ["OPENAI_API_KEY"],
+    clientEnvVars: ["VITE_AI_ENABLED"],
+    notes: "Provider and model are locked server-side in supabase/functions/parse-cv-ai/index.ts. Do not configure AI provider/model in VITE env vars.",
   },
   storage: {
     name: "File Storage (Supabase Storage)",
