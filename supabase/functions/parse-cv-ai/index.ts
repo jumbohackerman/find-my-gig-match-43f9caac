@@ -121,9 +121,17 @@ Rules:
 - For skills, extract individual skill names (e.g. "React", "Python", not "Frontend development").
 - For languages, include proficiency level if mentioned (e.g. "native", "B2", "fluent").
 - Keep summaries concise and factual.
-- For experience entries: if the CV lists responsibilities or achievements as bullet points, return each one as a separate string in the "bullets" array. Do NOT concatenate them into a single "description" string. Use "description" only for a brief role summary or if no bullet points exist. Each bullet should be one distinct responsibility or achievement.`;
+- CRITICAL rules for experience entries:
+  - Extract ALL responsibilities and achievements for EACH job as SEPARATE strings in the "bullets" array.
+  - Return up to 8 bullets per job. Do NOT merge, summarize, or skip any bullet points.
+  - Each bullet must be one distinct responsibility or achievement — never concatenate multiple items.
+  - Do NOT copy bullets from one job to another. Each job's bullets must come only from that job's section in the CV.
+  - Do NOT invent or fabricate bullets that are not in the CV text.
+  - Preserve the original ordering of bullets as they appear in the CV.
+  - Use "description" only for a brief role summary or if no bullet points exist at all.
+  - If the CV text has responsibilities listed inline (separated by spaces or without clear markers), split them into individual bullets based on semantic meaning.`;
 
-const MODEL_NAME = "gpt-5.4-mini";
+const MODEL_NAME = "gpt-4o-mini";
 
 Deno.serve(async (req: Request) => {
   console.log("[parse-cv-ai] Incoming request, method:", req.method);

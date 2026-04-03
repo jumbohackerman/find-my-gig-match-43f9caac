@@ -515,7 +515,9 @@ export function mergeWithExisting(
     merged.experienceYears = fromCv.experienceYears;
     fieldsUpdated.push("Lata doświadczenia");
   }
-  if (fromCv.experienceEntries && fromCv.experienceEntries.length > 0 && existing.experienceEntries.length === 0) {
+  if (fromCv.experienceEntries && fromCv.experienceEntries.length > 0) {
+    // Always overwrite experience entries from CV parse — this is the primary data source.
+    // Old entries with stale/empty bullets should not block fresh AI results.
     merged.experienceEntries = fromCv.experienceEntries;
     fieldsUpdated.push("Doświadczenie zawodowe");
   }
