@@ -238,7 +238,7 @@ Deno.serve(async (req: Request) => {
 
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
-      console.error("[parse-cv-ai] AI gateway error:", aiResponse.status, errText);
+      console.error("[parse-cv-ai] OpenAI error:", aiResponse.status, errText);
 
       const lowerErrText = errText.toLowerCase();
       const statusMsg = aiResponse.status === 429
