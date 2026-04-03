@@ -123,7 +123,7 @@ Rules:
 - Keep summaries concise and factual.
 - For experience entries: if the CV lists responsibilities or achievements as bullet points, return each one as a separate string in the "bullets" array. Do NOT concatenate them into a single "description" string. Use "description" only for a brief role summary or if no bullet points exist. Each bullet should be one distinct responsibility or achievement.`;
 
-const MODEL_NAME = "google/gemini-2.5-flash";
+const MODEL_NAME = "gpt-5.4-mini";
 
 Deno.serve(async (req: Request) => {
   console.log("[parse-cv-ai] Incoming request, method:", req.method);
