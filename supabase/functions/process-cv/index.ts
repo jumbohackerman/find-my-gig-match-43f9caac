@@ -11,7 +11,7 @@
  *   4. Returns structured ParsedCV data
  *   5. Client updates candidate profile with parsed data
  *
- * Required secrets: none (uses Lovable AI — LOVABLE_API_KEY already configured)
+ * Required secrets: OPENAI_API_KEY (configured in backend secrets)
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
