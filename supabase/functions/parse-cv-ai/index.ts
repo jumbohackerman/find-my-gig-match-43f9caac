@@ -123,7 +123,7 @@ Rules:
 - Keep summaries concise and factual.
 - For experience entries: if the CV lists responsibilities or achievements as bullet points, return each one as a separate string in the "bullets" array. Do NOT concatenate them into a single "description" string. Use "description" only for a brief role summary or if no bullet points exist. Each bullet should be one distinct responsibility or achievement.`;
 
-const MODEL_NAME = "google/gemini-2.5-flash";
+const MODEL_NAME = "gpt-5.4-mini";
 
 Deno.serve(async (req: Request) => {
   console.log("[parse-cv-ai] Incoming request, method:", req.method);
@@ -212,17 +212,17 @@ Deno.serve(async (req: Request) => {
       .eq("id", cv_upload_id)
       .eq("user_id", user.id);
 
-    // Call Lovable AI Gateway
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    // Call OpenAI
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
-    console.log("[parse-cv-ai] Calling Lovable AI gateway...");
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    console.log("[parse-cv-ai] Calling OpenAI...");
+    const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -238,7 +238,7 @@ Deno.serve(async (req: Request) => {
 
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
-      console.error("[parse-cv-ai] AI gateway error:", aiResponse.status, errText);
+      console.error("[parse-cv-ai] OpenAI error:", aiResponse.status, errText);
 
       const lowerErrText = errText.toLowerCase();
       const statusMsg = aiResponse.status === 429

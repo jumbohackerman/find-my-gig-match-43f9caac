@@ -53,7 +53,7 @@ export const ai = {
   /** Whether AI features are enabled in the UI */
   enabled: () => env("VITE_AI_ENABLED") !== "false", // enabled by default
   /** Default model for general AI tasks */
-  defaultModel: () => env("VITE_AI_DEFAULT_MODEL") ?? "google/gemini-2.5-flash",
+  defaultModel: () => "OpenAI (server-controlled)",
 } as const;
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
