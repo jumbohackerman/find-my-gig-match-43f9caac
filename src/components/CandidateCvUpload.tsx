@@ -45,6 +45,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loadingRecord, setLoadingRecord] = useState(true);
   const [aiProcessing, setAiProcessing] = useState(false);
+  /** Tracks whether parsed data has been imported into the form in this session */
+  const [importState, setImportState] = useState<ImportState>("not_imported");
   /** Hard ref-based guard: survives re-renders and prevents concurrent AI calls */
   const aiRequestInFlight = useRef(false);
   /** Tracks which cv_upload_id has already been successfully parsed */
