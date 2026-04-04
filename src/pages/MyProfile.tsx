@@ -145,20 +145,14 @@ const MyProfile = () => {
           setExperienceYears(expMatch ? parseInt(expMatch[1]) * 12 : 0);
         }
 
+        // Load latest CV metadata for state display only — no auto-import or auto-rebuild.
+        // Import/rebuild only happens on explicit user action (button click or fresh AI parse).
         const latestCv = await fetchLatestCv(user.id);
         if (latestCv) {
           const parsed = await fetchParsedData(latestCv.id);
           if (hasParsedCvJson(parsed?.parsed_json)) {
             setLatestParsedJson(parsed.parsed_json);
             setLatestCvUploadId(latestCv.id);
-
-            const rebuiltEntries = rebuildExperienceEntriesFromParsedJson(parsed.parsed_json) as ExperienceEntry[];
-            const assessment = assessLegacyExperienceRebuild(savedEntries, rebuiltEntries);
-
-            if (assessment.shouldRebuild) {
-              setExperienceEntries(rebuiltEntries);
-              toast.info("Naprawiono zapisane doświadczenie na podstawie istniejącej analizy CV (bez ponownego AI).");
-            }
           } else {
             setLatestParsedJson(null);
             setLatestCvUploadId(null);

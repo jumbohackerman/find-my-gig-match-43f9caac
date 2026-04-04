@@ -28,8 +28,8 @@ function normalizeText(value: string | undefined | null): string {
   return (value || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-function roleSignature(entry: Pick<ExperienceEntryDraft, "title" | "company">): string {
-  return `${normalizeText(entry.title)}|${normalizeText(entry.company)}`;
+function roleSignature(entry: Pick<ExperienceEntryDraft, "title" | "company" | "startDate">): string {
+  return `${normalizeText(entry.title)}|${normalizeText(entry.company)}|${normalizeText(entry.startDate)}`;
 }
 
 function countMeaningfulBullets(entry: ExperienceEntryDraft): number {
@@ -40,19 +40,16 @@ function findSavedMatchIndex(
   savedEntries: ExperienceEntryDraft[],
   rebuiltEntry: ExperienceEntryDraft,
   used: Set<number>,
-  fallbackIndex: number,
 ): number {
   const rebuiltSig = roleSignature(rebuiltEntry);
-  if (rebuiltSig !== "|") {
+  // Only match by signature if we have meaningful data (not all empty)
+  if (rebuiltSig !== "||") {
     const exactIdx = savedEntries.findIndex((saved, idx) => !used.has(idx) && roleSignature(saved) === rebuiltSig);
     if (exactIdx >= 0) return exactIdx;
   }
 
-  if (fallbackIndex < savedEntries.length && !used.has(fallbackIndex)) {
-    return fallbackIndex;
-  }
-
-  return savedEntries.findIndex((_, idx) => !used.has(idx));
+  // No fallback by index — avoid cross-contamination of experience entries
+  return -1;
 }
 
 export function hasParsedCvJson(parsedJson: unknown): parsedJson is Record<string, unknown> {
@@ -128,7 +125,7 @@ export function assessLegacyExperienceRebuild(
 
   for (let idx = 0; idx < rebuilt.length; idx += 1) {
     const rebuiltEntry = rebuilt[idx];
-    const savedIdx = findSavedMatchIndex(saved, rebuiltEntry, usedSaved, idx);
+    const savedIdx = findSavedMatchIndex(saved, rebuiltEntry, usedSaved);
     if (savedIdx < 0) continue;
 
     usedSaved.add(savedIdx);

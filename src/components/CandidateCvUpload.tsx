@@ -59,13 +59,12 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       if (cv) {
         const parsed = await fetchParsedData(cv.id);
         setParsedData(parsed);
-        // Normalize local state: if parsed_json exists, treat as parsed regardless of stored status
-      if (hasParsedJson(parsed) && cv.status !== "parsed") {
+        // Normalize local state: if parsed_json exists, treat as parsed regardless of stored status.
+        // Do NOT call onParsed on mount — import only happens after explicit user action or fresh AI parse.
+        if (hasParsedJson(parsed) && cv.status !== "parsed") {
           setLastCv({ ...cv, status: "parsed", error_message: null });
-          onParsed?.(parsed.parsed_json);
         } else {
           setLastCv(cv);
-          if (hasParsedJson(parsed)) onParsed?.(parsed.parsed_json);
         }
       } else {
         setLastCv(null);
