@@ -263,8 +263,12 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       parsedCvIds.current.add(lastCv.id);
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
-      toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
-      if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
+      toast.success("AI przeanalizowało Twoje CV!");
+      // Auto-import after fresh AI parse (user explicitly clicked analyze)
+      if (hasParsedJson(refreshedParsed)) {
+        onParsed?.(refreshedParsed!.parsed_json);
+        setImportState("imported");
+      }
     } finally {
       aiRequestInFlight.current = false;
       setAiProcessing(false);
