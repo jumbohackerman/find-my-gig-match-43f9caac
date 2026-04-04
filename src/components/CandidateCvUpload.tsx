@@ -144,7 +144,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     setUploadProgress(100);
     setTimeout(() => {
       setLastCv(insertedRow as CvRecord);
-      setParsedData(null); // New CV, no parsed data yet
+      setParsedData(null);
+      setImportState("not_imported");
       setUploading(false);
       setUploadProgress(0);
       toast.success("CV przesłane pomyślnie!");
