@@ -125,7 +125,7 @@ export function assessLegacyExperienceRebuild(
 
   for (let idx = 0; idx < rebuilt.length; idx += 1) {
     const rebuiltEntry = rebuilt[idx];
-    const savedIdx = findSavedMatchIndex(saved, rebuiltEntry, usedSaved, idx);
+    const savedIdx = findSavedMatchIndex(saved, rebuiltEntry, usedSaved);
     if (savedIdx < 0) continue;
 
     usedSaved.add(savedIdx);
