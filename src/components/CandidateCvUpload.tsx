@@ -329,7 +329,22 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       )}
 
       {/* ── AI CTA section ── */}
-      {lastCv && !uploading && <AiSection state={cvState} onStart={handleStartAi} processing={aiProcessing} errorMessage={lastCv.error_message} />}
+      {lastCv && !uploading && (
+        <AiSection
+          state={cvState}
+          onStart={handleStartAi}
+          onImport={() => {
+            if (parsedData && hasParsedJson(parsedData)) {
+              onParsed?.(parsedData.parsed_json);
+              setImportState("imported");
+              toast.success("Dane z CV zostały zaimportowane do formularza.", { id: "cv-import-done" });
+            }
+          }}
+          processing={aiProcessing}
+          errorMessage={lastCv.error_message}
+          importState={importState}
+        />
+      )}
     </div>
   );
 }
