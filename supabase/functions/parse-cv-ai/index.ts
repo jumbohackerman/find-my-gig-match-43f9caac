@@ -121,15 +121,18 @@ Rules:
 - For skills, extract individual skill names (e.g. "React", "Python", not "Frontend development").
 - For languages, include proficiency level if mentioned (e.g. "native", "B2", "fluent").
 - Keep summaries concise and factual.
-- CRITICAL rules for experience entries:
-  - Extract ALL responsibilities and achievements for EACH job as SEPARATE strings in the "bullets" array.
-  - Return up to 8 bullets per job. Do NOT merge, summarize, or skip any bullet points.
-  - Each bullet must be one distinct responsibility or achievement — never concatenate multiple items.
-  - Do NOT copy bullets from one job to another. Each job's bullets must come only from that job's section in the CV.
-  - Do NOT invent or fabricate bullets that are not in the CV text.
-  - Preserve the original ordering of bullets as they appear in the CV.
-  - Use "description" only for a brief role summary or if no bullet points exist at all.
-  - If the CV text has responsibilities listed inline (separated by spaces or without clear markers), split them into individual bullets based on semantic meaning.`;
+
+CRITICAL — experience "bullets" array rules (MUST follow):
+1. You MUST populate the "bullets" array for every job. Never leave it empty if the CV mentions any duties.
+2. Each bullet = ONE distinct responsibility or achievement. Never concatenate multiple items into one string.
+3. Return up to 8 bullets per job. Do NOT merge, summarize, or skip any bullet points found in the CV.
+4. Do NOT copy bullets from one job to another. Each job's bullets come ONLY from that job's section.
+5. Do NOT invent or fabricate bullets not present in the CV text.
+6. Preserve the original ordering of bullets as they appear in the CV.
+7. The "description" field should be null or a brief role summary. Put ALL responsibilities in "bullets", not in "description".
+8. PDF-extracted text may list responsibilities BEFORE the job title/company. Carefully attribute each responsibility to the correct job by analyzing the full document structure (headers, dates, company names).
+9. If responsibilities are listed inline (separated by periods, semicolons, or spaces), split them into individual bullets based on semantic meaning.
+10. When in doubt whether a line belongs to job A or job B, use surrounding context (dates, company names, section headers) to determine the correct attribution.`;
 
 const MODEL_NAME = "gpt-4o-mini";
 

@@ -28,8 +28,8 @@ function normalizeText(value: string | undefined | null): string {
   return (value || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-function roleSignature(entry: Pick<ExperienceEntryDraft, "title" | "company">): string {
-  return `${normalizeText(entry.title)}|${normalizeText(entry.company)}`;
+function roleSignature(entry: Pick<ExperienceEntryDraft, "title" | "company" | "startDate">): string {
+  return `${normalizeText(entry.title)}|${normalizeText(entry.company)}|${normalizeText(entry.startDate)}`;
 }
 
 function countMeaningfulBullets(entry: ExperienceEntryDraft): number {
