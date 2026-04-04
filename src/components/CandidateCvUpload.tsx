@@ -15,6 +15,9 @@ import {
 
 type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "ai_parsing" | "parsed" | "failed";
 
+/** Whether the parsed data has already been imported into the profile form */
+type ImportState = "not_imported" | "imported";
+
 function hasParsedJson(parsed: CvParsedRecord | null): boolean {
   return !!(parsed?.parsed_json && typeof parsed.parsed_json === "object" && Object.keys(parsed.parsed_json as Record<string, unknown>).length > 0);
 }
