@@ -379,7 +379,7 @@ function FileCard({ cv, onUpload, onRemove }: { cv: CvRecord; onUpload: (e: Reac
   );
 }
 
-function AiSection({ state, onStart, processing, errorMessage }: { state: CvState; onStart: () => void; processing: boolean; errorMessage: string | null }) {
+function AiSection({ state, onStart, onImport, processing, errorMessage, importState }: { state: CvState; onStart: () => void; onImport: () => void; processing: boolean; errorMessage: string | null; importState: ImportState }) {
   if (state === "empty") return null;
 
   if (state === "processing") {
@@ -436,11 +436,26 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-foreground">AI przeanalizowało Twoje CV</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Dane z CV zostały zaimportowane do formularza profilu. Sprawdź uzupełnione pola i zapisz profil.
-            </p>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">CV zostało przeanalizowane przez AI</p>
+            {importState === "imported" ? (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Dane zostały zaimportowane do formularza. Sprawdź uzupełnione pola i zapisz profil.
+              </p>
+            ) : (
+              <>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Analiza zakończona. Kliknij poniżej, aby zaimportować dane do formularza profilu.
+                </p>
+                <button
+                  onClick={onImport}
+                  className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-accent-foreground text-sm font-medium hover:bg-accent/90 transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  Importuj dane do formularza
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
