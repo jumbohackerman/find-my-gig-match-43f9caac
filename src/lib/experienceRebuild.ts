@@ -40,19 +40,16 @@ function findSavedMatchIndex(
   savedEntries: ExperienceEntryDraft[],
   rebuiltEntry: ExperienceEntryDraft,
   used: Set<number>,
-  fallbackIndex: number,
 ): number {
   const rebuiltSig = roleSignature(rebuiltEntry);
-  if (rebuiltSig !== "|") {
+  // Only match by signature if we have meaningful data (not all empty)
+  if (rebuiltSig !== "||") {
     const exactIdx = savedEntries.findIndex((saved, idx) => !used.has(idx) && roleSignature(saved) === rebuiltSig);
     if (exactIdx >= 0) return exactIdx;
   }
 
-  if (fallbackIndex < savedEntries.length && !used.has(fallbackIndex)) {
-    return fallbackIndex;
-  }
-
-  return savedEntries.findIndex((_, idx) => !used.has(idx));
+  // No fallback by index — avoid cross-contamination of experience entries
+  return -1;
 }
 
 export function hasParsedCvJson(parsedJson: unknown): parsedJson is Record<string, unknown> {
