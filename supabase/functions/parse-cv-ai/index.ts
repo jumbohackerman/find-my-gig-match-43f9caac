@@ -66,10 +66,10 @@ const CV_PARSE_SCHEMA = {
               company: { type: ["string", "null"] },
               start_date: { type: ["string", "null"] },
               end_date: { type: ["string", "null"] },
-              description: { type: ["string", "null"] },
-              bullets: { type: "array", items: { type: "string" }, description: "Individual responsibilities or achievements as separate items" },
+              description: { type: ["string", "null"], description: "Brief role summary ONLY if no bullet points exist. Otherwise leave null." },
+              bullets: { type: "array", items: { type: "string" }, description: "REQUIRED: Each responsibility or achievement as a SEPARATE string. Up to 8 items. Never empty if the CV lists any duties for this role." },
             },
-            required: ["job_title", "company"],
+            required: ["job_title", "company", "bullets"],
           },
         },
         education: {
