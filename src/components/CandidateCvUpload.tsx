@@ -195,8 +195,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       parsedCvIds.current.add(lastCv.id);
       setParsedData(existing);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
-      toast.info("CV zostało już przeanalizowane przez AI.");
-      onParsed?.(existing!.parsed_json);
+      toast.info("CV zostało już przeanalizowane. Użyj przycisku „Importuj dane do formularza", aby je wczytać.", { id: "cv-already-parsed" });
+      // Do NOT call onParsed here — import must be explicit user action via import button
       return;
     }
 
