@@ -15,6 +15,9 @@ import {
 
 type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "ai_parsing" | "parsed" | "failed";
 
+/** Whether the parsed data has already been imported into the profile form */
+type ImportState = "not_imported" | "imported";
+
 function hasParsedJson(parsed: CvParsedRecord | null): boolean {
   return !!(parsed?.parsed_json && typeof parsed.parsed_json === "object" && Object.keys(parsed.parsed_json as Record<string, unknown>).length > 0);
 }
@@ -42,6 +45,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loadingRecord, setLoadingRecord] = useState(true);
   const [aiProcessing, setAiProcessing] = useState(false);
+  /** Tracks whether parsed data has been imported into the form in this session */
+  const [importState, setImportState] = useState<ImportState>("not_imported");
   /** Hard ref-based guard: survives re-renders and prevents concurrent AI calls */
   const aiRequestInFlight = useRef(false);
   /** Tracks which cv_upload_id has already been successfully parsed */
@@ -139,7 +144,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     setUploadProgress(100);
     setTimeout(() => {
       setLastCv(insertedRow as CvRecord);
-      setParsedData(null); // New CV, no parsed data yet
+      setParsedData(null);
+      setImportState("not_imported");
       setUploading(false);
       setUploadProgress(0);
       toast.success("CV przesłane pomyślnie!");
@@ -190,8 +196,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       parsedCvIds.current.add(lastCv.id);
       setParsedData(existing);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
-      toast.info("CV zostało już przeanalizowane przez AI.");
-      onParsed?.(existing!.parsed_json);
+      toast.info("CV zostało już przeanalizowane. Kliknij przycisk importu, aby wczytać dane do formularza.", { id: "cv-already-parsed" });
+      // Do NOT call onParsed here — import must be explicit user action via import button
       return;
     }
 
@@ -224,8 +230,12 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
         parsedCvIds.current.add(lastCv.id);
         setParsedData(refreshedParsed);
         setLastCv({ ...lastCv, status: "parsed", error_message: null });
-        toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
-        if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
+        toast.success("AI przeanalizowało Twoje CV!");
+        // Auto-import after fresh AI parse (user explicitly clicked analyze)
+        if (hasParsedJson(refreshedParsed)) {
+          onParsed?.(refreshedParsed!.parsed_json);
+          setImportState("imported");
+        }
         return;
       }
 
@@ -254,8 +264,12 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       parsedCvIds.current.add(lastCv.id);
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
-      toast.success("AI przeanalizowało Twoje CV! Dane zostały zaimportowane do profilu.");
-      if (hasParsedJson(refreshedParsed)) onParsed?.(refreshedParsed!.parsed_json);
+      toast.success("AI przeanalizowało Twoje CV!");
+      // Auto-import after fresh AI parse (user explicitly clicked analyze)
+      if (hasParsedJson(refreshedParsed)) {
+        onParsed?.(refreshedParsed!.parsed_json);
+        setImportState("imported");
+      }
     } finally {
       aiRequestInFlight.current = false;
       setAiProcessing(false);
@@ -316,7 +330,22 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       )}
 
       {/* ── AI CTA section ── */}
-      {lastCv && !uploading && <AiSection state={cvState} onStart={handleStartAi} processing={aiProcessing} errorMessage={lastCv.error_message} />}
+      {lastCv && !uploading && (
+        <AiSection
+          state={cvState}
+          onStart={handleStartAi}
+          onImport={() => {
+            if (parsedData && hasParsedJson(parsedData)) {
+              onParsed?.(parsedData.parsed_json);
+              setImportState("imported");
+              toast.success("Dane z CV zostały zaimportowane do formularza.", { id: "cv-import-done" });
+            }
+          }}
+          processing={aiProcessing}
+          errorMessage={lastCv.error_message}
+          importState={importState}
+        />
+      )}
     </div>
   );
 }
@@ -351,7 +380,7 @@ function FileCard({ cv, onUpload, onRemove }: { cv: CvRecord; onUpload: (e: Reac
   );
 }
 
-function AiSection({ state, onStart, processing, errorMessage }: { state: CvState; onStart: () => void; processing: boolean; errorMessage: string | null }) {
+function AiSection({ state, onStart, onImport, processing, errorMessage, importState }: { state: CvState; onStart: () => void; onImport: () => void; processing: boolean; errorMessage: string | null; importState: ImportState }) {
   if (state === "empty") return null;
 
   if (state === "processing") {
@@ -408,11 +437,26 @@ function AiSection({ state, onStart, processing, errorMessage }: { state: CvStat
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-foreground">AI przeanalizowało Twoje CV</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Dane z CV zostały zaimportowane do formularza profilu. Sprawdź uzupełnione pola i zapisz profil.
-            </p>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">CV zostało przeanalizowane przez AI</p>
+            {importState === "imported" ? (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Dane zostały zaimportowane do formularza. Sprawdź uzupełnione pola i zapisz profil.
+              </p>
+            ) : (
+              <>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Analiza zakończona. Kliknij poniżej, aby zaimportować dane do formularza profilu.
+                </p>
+                <button
+                  onClick={onImport}
+                  className="mt-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-accent-foreground text-sm font-medium hover:bg-accent/90 transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  Importuj dane do formularza
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
