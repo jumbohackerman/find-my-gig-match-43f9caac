@@ -710,7 +710,7 @@ function AnalysisCard({
         <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm shrink-0">{avatar}</div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">{name}</p>
-          <p className="text-xs text-muted-foreground">{app.candidate?.title || "–"} · {app.candidate?.experience || "–"}</p>
+          <p className="text-xs text-muted-foreground">{app.candidate?.title || "–"} · {app.candidate?.seniority || "–"}</p>
           <div className="flex items-center gap-2 mt-0.5">
             <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
             <StatusBadge status={app.status as ApplicationStatus} />
