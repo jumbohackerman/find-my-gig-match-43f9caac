@@ -13,6 +13,7 @@ import { useCandidateProfile } from "@/hooks/useCandidateProfile";
 import { useSavedJobs } from "@/hooks/useSavedJobs";
 import { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import { calculateMatch, type MatchResult } from "@/lib/matchScoring";
+import { toScoringCandidate } from "@/domain/models";
 import { toast } from "sonner";
 import type { Job } from "@/domain/models";
 
