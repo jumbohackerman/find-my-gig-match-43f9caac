@@ -19,9 +19,9 @@ const Profiles = () => {
     const q = search.toLowerCase();
     return candidates.filter(
       (c) =>
-        c.name.toLowerCase().includes(q) ||
+        c.fullName.toLowerCase().includes(q) ||
         c.title.toLowerCase().includes(q) ||
-        c.skills.some((sk) => sk.toLowerCase().includes(q)) ||
+        getAllSkills(c).some((sk) => sk.toLowerCase().includes(q)) ||
         c.location.toLowerCase().includes(q)
     );
   }, [search, candidates]);

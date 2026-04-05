@@ -51,7 +51,7 @@ export function useJobFeed() {
   const matchResults = useMemo(() => {
     const map: Record<string, MatchResult> = {};
     filteredJobs.forEach((job) => {
-      map[job.id] = calculateMatch(candidateProfile, job);
+      map[job.id] = calculateMatch(toScoringCandidate(candidateProfile), job);
     });
     return map;
   }, [filteredJobs, candidateProfile]);

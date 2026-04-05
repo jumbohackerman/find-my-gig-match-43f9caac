@@ -47,7 +47,7 @@ export function useEmployerDashboardData() {
     // Compute match scores (business logic — stays in hook)
     const appsWithScores = enrichedApps.map((app) => {
       if (app.candidate && app.job) {
-        return { ...app, matchResult: calculateMatch(app.candidate, app.job) };
+        return { ...app, matchResult: calculateMatch(toScoringCandidate(app.candidate), app.job) };
       }
       return app;
     });

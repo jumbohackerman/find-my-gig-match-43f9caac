@@ -75,18 +75,18 @@ const EmployerCandidateSwipe = ({
         >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center text-2xl">
-              {current.candidate.avatar}
+              👤
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground">{current.candidate.name}</p>
-              <p className="text-xs text-muted-foreground">{current.candidate.title} · {current.candidate.experience}</p>
+              <p className="text-sm font-semibold text-foreground">{current.candidate.fullName}</p>
+              <p className="text-xs text-muted-foreground">{current.candidate.title} · {current.candidate.seniority}</p>
               <p className="text-xs text-muted-foreground">{current.candidate.location}</p>
             </div>
             <MatchBadge result={current.match} compact />
           </div>
 
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {current.candidate.skills.slice(0, 4).map((skill) => {
+            {getAllSkills(current.candidate).slice(0, 4).map((skill) => {
               const matched = current.match.matchedSkills.includes(skill);
               return (
                 <span

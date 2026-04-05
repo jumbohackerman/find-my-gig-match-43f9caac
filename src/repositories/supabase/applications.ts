@@ -128,7 +128,7 @@ export const supabaseApplicationRepository: ApplicationRepository = {
       const dbCandidate = candidateMap[app.candidate_id];
       const job = domainJobs.find((j) => j.id === app.job_id);
       const candidate = dbCandidate
-        ? dbCandidateToCandidate(dbCandidate, profileMap[app.candidate_id])
+        ? dbCandidateToCandidate(dbCandidate)
         : undefined;
 
       return {
