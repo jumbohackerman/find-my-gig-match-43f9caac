@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Users } from "lucide-react";
 import type { Candidate, MatchResult } from "@/domain/models";
+import { getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import EmptyState from "./EmptyState";
 
