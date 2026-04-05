@@ -53,39 +53,23 @@ export interface Job {
   company: string;
   logo: string;
   location: string;
-  /** Display string, e.g. "18 000 zł - 25 000 zł". Kept for backward compat. */
   salary: string;
-  /** Structured salary — populated when parsing is possible. */
   salaryRange?: SalaryRange;
   type: JobType;
-  /** Legacy single-text description. New structured offers use aboutRole instead. */
   description: string;
   tags: string[];
   posted: string;
   status?: JobStatus;
   employerId?: string;
-
-  // ── Structured offer fields ────────────────────────────────────────────────
-  /** Short teaser shown on card, max ~300 chars */
   summary?: string;
-  /** "O roli" — longer role description */
   aboutRole?: string;
-  /** Bullet list: scope of work */
   responsibilities?: string[];
-  /** Bullet list: must-haves */
   requirements?: string[];
-  /** Bullet list: nice-to-haves */
   niceToHave?: string[];
-  /** Bullet list: perks */
   benefits?: string[];
-  /** "O firmie" section */
   aboutCompany?: string;
-  /** Recruitment process steps */
   recruitmentSteps?: string[];
-  /** Key highlights shown on card (max 3) */
   highlights?: string[];
-
-  // ── Meta fields ────────────────────────────────────────────────────────────
   teamSize?: string;
   seniority?: string;
   workMode?: string;
@@ -95,53 +79,95 @@ export interface Job {
 }
 
 // ─── Candidate ───────────────────────────────────────────────────────────────
-//
-// Canonical candidate model. Replaces legacy Seeker, ExtendedSeeker,
-// and CandidateProfile types. Contains both DB-backed fields and
-// display fields (name, avatar) that come from the profiles table.
+
+export interface SkillsByLevel {
+  advanced: string[];
+  intermediate: string[];
+  beginner: string[];
+}
+
+export interface ExperienceEntry {
+  job_title: string;
+  company_name: string;
+  start_date: string;
+  end_date: string;
+  is_current: boolean;
+  description_points: string[];
+}
+
+export interface CandidateLinks {
+  portfolio_url?: string;
+  github_url?: string;
+  linkedin_url?: string;
+  website_url?: string;
+}
+
+export interface Language {
+  name: string;
+  level: string;
+}
 
 export interface Candidate {
   id: string;
   userId: string;
-  /** Display name — from profiles.full_name */
-  name: string;
-  /** Avatar emoji or URL — from profiles.avatar */
-  avatar: string;
+  fullName: string;
   title: string;
   location: string;
-  bio: string;
   summary: string;
-  skills: string[];
   seniority: Seniority;
-  experience: string;
   workMode: WorkMode;
   employmentType: EmploymentType;
-  availability: string;
   salaryMin: number;
   salaryMax: number;
+  salaryCurrency: string;
+  availability: string;
+  skills: SkillsByLevel;
   experienceEntries: ExperienceEntry[];
   links: CandidateLinks;
+  languages: Language[];
+  primaryIndustry: string;
+  profileCompleteness: number;
   cvUrl: string | null;
   lastActive: string;
-  /** Future: pgvector embedding for semantic search */
-  embedding?: number[];
 }
 
-export interface ExperienceEntry {
-  title: string;
-  company: string;
-  startDate: string;
-  endDate: string;
-  isCurrent?: boolean;
-  description?: string;
-  bullets: string[];
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Flatten structured skills into a single array (for scoring, search, display) */
+export function getAllSkills(candidate: Candidate): string[] {
+  const s = candidate.skills;
+  return [...(s.advanced || []), ...(s.intermediate || []), ...(s.beginner || [])];
 }
 
-export interface CandidateLinks {
-  portfolio?: string;
-  github?: string;
-  linkedin?: string;
-  website?: string;
+/** Default empty skills object */
+export function emptySkills(): SkillsByLevel {
+  return { advanced: [], intermediate: [], beginner: [] };
+}
+
+/** Default empty links object */
+export function emptyLinks(): CandidateLinks {
+  return { portfolio_url: "", github_url: "", linkedin_url: "", website_url: "" };
+}
+
+/** Convert Candidate to ScoringCandidate for match scoring */
+export function toScoringCandidate(c: Candidate): {
+  skills: string[];
+  seniority: string;
+  salaryMin: number;
+  salaryMax: number;
+  workMode: string;
+  location: string;
+  availability?: string;
+} {
+  return {
+    skills: getAllSkills(c),
+    seniority: c.seniority,
+    salaryMin: c.salaryMin,
+    salaryMax: c.salaryMax,
+    workMode: c.workMode,
+    location: c.location,
+    availability: c.availability,
+  };
 }
 
 // ─── Application ─────────────────────────────────────────────────────────────
@@ -185,7 +211,6 @@ export interface Notification {
   body: string;
   read: boolean;
   createdAt: string;
-  /** Optional reference to the related entity */
   referenceId?: string;
 }
 
@@ -208,7 +233,7 @@ export interface EnrichedEmployerApplication extends Application {
   matchResult?: MatchResult;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Legacy helpers ──────────────────────────────────────────────────────────
 
 /** Parse a Polish salary string into a SalaryRange */
 export function parseSalaryString(salary: string): SalaryRange | null {
