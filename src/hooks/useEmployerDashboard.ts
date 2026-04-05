@@ -10,6 +10,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
 import { calculateMatch } from "@/lib/matchScoring";
+import { toScoringCandidate } from "@/domain/models";
 import type {
   Job,
   EnrichedEmployerApplication,
