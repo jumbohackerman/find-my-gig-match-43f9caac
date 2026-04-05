@@ -7,6 +7,7 @@ import SeekerCard from "@/components/SeekerCard";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import { useCandidates } from "@/hooks/useCandidates";
 import type { Candidate } from "@/domain/models";
+import { getAllSkills } from "@/domain/models";
 
 const Profiles = () => {
   const [search, setSearch] = useState("");
