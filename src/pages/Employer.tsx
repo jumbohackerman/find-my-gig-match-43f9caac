@@ -621,7 +621,7 @@ function CandidateCard({
         </div>
         <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1.5 shrink-0 pl-11 sm:pl-0">
           <div className="flex gap-1 flex-wrap">
-            {(candidate?.skills || []).slice(0, 2).map((skill) => (
+            {(candidate ? getAllSkills(candidate) : []).slice(0, 2).map((skill) => (
               <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
             ))}
           </div>
