@@ -35,11 +35,9 @@ export function useEmployerApplicationActions(refetch: () => void) {
 export function getCandidateDisplayName(app: EnrichedEmployerApplication): string {
   const c = app.candidate;
   if (!c) return "Kandydat";
-  return c.name || c.title || "Kandydat";
+  return c.fullName || c.title || "Kandydat";
 }
 
-export function getCandidateAvatar(app: EnrichedEmployerApplication): string {
-  const c = app.candidate;
-  if (!c) return "👤";
-  return c.avatar || "👤";
+export function getCandidateAvatar(_app: EnrichedEmployerApplication): string {
+  return "👤";
 }

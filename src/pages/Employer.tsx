@@ -7,7 +7,7 @@ import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
   BarChart3, Zap, Layers, UserCheck, ArrowLeftRight, EyeOff,
 } from "lucide-react";
-import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel } from "@/domain/models";
+import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import MatchScoreBreakdown from "@/components/MatchScoreBreakdown";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
@@ -604,7 +604,7 @@ function CandidateCard({
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground">{name}</p>
             <p className="text-xs text-muted-foreground">
-              {candidate?.title || "–"} · {candidate?.experience || "–"}
+              {candidate?.title || "–"} · {candidate?.seniority || "–"}
             </p>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
@@ -621,7 +621,7 @@ function CandidateCard({
         </div>
         <div className="flex items-center gap-2 sm:flex-col sm:items-end sm:gap-1.5 shrink-0 pl-11 sm:pl-0">
           <div className="flex gap-1 flex-wrap">
-            {(candidate?.skills || []).slice(0, 2).map((skill) => (
+            {(candidate ? getAllSkills(candidate) : []).slice(0, 2).map((skill) => (
               <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">{skill}</span>
             ))}
           </div>
@@ -710,7 +710,7 @@ function AnalysisCard({
         <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm shrink-0">{avatar}</div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">{name}</p>
-          <p className="text-xs text-muted-foreground">{app.candidate?.title || "–"} · {app.candidate?.experience || "–"}</p>
+          <p className="text-xs text-muted-foreground">{app.candidate?.title || "–"} · {app.candidate?.seniority || "–"}</p>
           <div className="flex items-center gap-2 mt-0.5">
             <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
             <StatusBadge status={app.status as ApplicationStatus} />

@@ -13,6 +13,7 @@ import { useCandidateProfile } from "@/hooks/useCandidateProfile";
 import { useSavedJobs } from "@/hooks/useSavedJobs";
 import { filterJobs, defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import { calculateMatch, type MatchResult } from "@/lib/matchScoring";
+import { toScoringCandidate } from "@/domain/models";
 import { toast } from "sonner";
 import type { Job } from "@/domain/models";
 
@@ -50,7 +51,7 @@ export function useJobFeed() {
   const matchResults = useMemo(() => {
     const map: Record<string, MatchResult> = {};
     filteredJobs.forEach((job) => {
-      map[job.id] = calculateMatch(candidateProfile, job);
+      map[job.id] = calculateMatch(toScoringCandidate(candidateProfile), job);
     });
     return map;
   }, [filteredJobs, candidateProfile]);

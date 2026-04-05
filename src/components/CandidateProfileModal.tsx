@@ -5,7 +5,7 @@ import {
   FileText, Briefcase,
 } from "lucide-react";
 import type { Candidate, MatchResult } from "@/domain/models";
-import { getActivityLabel } from "@/domain/models";
+import { getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
@@ -19,7 +19,6 @@ interface Props {
 const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  // ESC to close + auto-focus
   useEffect(() => {
     if (!candidate) return;
     requestAnimationFrame(() => closeRef.current?.focus());
@@ -31,14 +30,15 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
   if (!candidate) return null;
 
   const activity = getActivityLabel(candidate.lastActive);
-  const coreSkills = candidate.skills.slice(0, 5);
-  const additionalSkills = candidate.skills.slice(5);
+  const allSkills = getAllSkills(candidate);
+  const coreSkills = allSkills.slice(0, 5);
+  const additionalSkills = allSkills.slice(5);
   const links = candidate.links || {};
-  const hasLinks = links.portfolio || links.github || links.linkedin || links.website;
+  const hasLinks = links.portfolio_url || links.github_url || links.linkedin_url || links.website_url;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Profil kandydata: ${candidate.name}`}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Profil kandydata: ${candidate.fullName}`}>
         <LocalErrorBoundary label="Profil kandydata">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -48,7 +48,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-            <ReportButton targetType="profile" targetId={candidate.id} targetLabel={candidate.name} />
+            <ReportButton targetType="profile" targetId={candidate.id} targetLabel={candidate.fullName} />
             <button ref={closeRef} onClick={onClose} className="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1" aria-label="Zamknij">
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -57,24 +57,26 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
           {/* Hero */}
           <div className="flex items-center gap-4 mb-4">
             <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center text-4xl">
-              {candidate.avatar}
+              👤
             </div>
             <div className="flex-1">
-              <h3 className="font-display text-xl font-bold text-foreground">{candidate.name}</h3>
+              <h3 className="font-display text-xl font-bold text-foreground">{candidate.fullName}</h3>
               <p className="text-sm text-primary font-medium">{candidate.title}</p>
               <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> {candidate.location}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {candidate.experience}
-                </span>
+                {candidate.experienceEntries.length > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" /> {candidate.experienceEntries.length} pozycji
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
           {/* Badges */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
             <span className="px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">
               {candidate.availability}
             </span>
@@ -108,7 +110,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* Experience — before Skills */}
+          {/* Experience */}
           {candidate.experienceEntries && candidate.experienceEntries.length > 0 && (
             <div className="mb-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doświadczenie</h4>
@@ -116,12 +118,12 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
                 {candidate.experienceEntries.map((entry, idx) => (
                   <div key={idx} className="pl-3 border-l-2 border-border">
                     <p className="text-sm font-medium text-foreground">
-                      {entry.title}{entry.company ? ` — ${entry.company}` : ""}
+                      {entry.job_title}{entry.company_name ? ` — ${entry.company_name}` : ""}
                     </p>
                     <p className="text-xs text-muted-foreground mb-1">
-                      {entry.startDate} – {entry.endDate}
+                      {entry.start_date} – {entry.end_date}
                     </p>
-                    {entry.bullets?.filter(Boolean).map((b, bi) => (
+                    {entry.description_points?.filter(Boolean).map((b, bi) => (
                       <p key={bi} className="text-xs text-muted-foreground flex items-start gap-1.5">
                         <span className="mt-0.5">•</span> {b}
                       </p>
@@ -132,7 +134,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* Skills — after Experience */}
+          {/* Skills */}
           <div className="mb-4">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               Umiejętności
@@ -167,6 +169,20 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             )}
           </div>
 
+          {/* Languages */}
+          {candidate.languages && candidate.languages.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Języki</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {candidate.languages.map((lang, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-secondary text-secondary-foreground">
+                    {lang.name}{lang.level ? ` (${lang.level})` : ""}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Salary */}
           {candidate.salaryMin && candidate.salaryMin > 0 && (
             <div className="mb-4">
@@ -175,8 +191,8 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
               </h4>
               <p className="text-sm text-foreground">
                 {candidate.salaryMin > 1000
-                  ? `${(candidate.salaryMin / 1000).toFixed(0)} 000 zł – ${((candidate.salaryMax || candidate.salaryMin) / 1000).toFixed(0)} 000 zł brutto / mies.`
-                  : `${candidate.salaryMin} 000 zł – ${candidate.salaryMax || candidate.salaryMin} 000 zł brutto / mies.`
+                  ? `${(candidate.salaryMin / 1000).toFixed(0)} 000 – ${((candidate.salaryMax || candidate.salaryMin) / 1000).toFixed(0)} 000 ${candidate.salaryCurrency || "PLN"} brutto / mies.`
+                  : `${candidate.salaryMin} 000 – ${candidate.salaryMax || candidate.salaryMin} 000 ${candidate.salaryCurrency || "PLN"} brutto / mies.`
                 }
               </p>
             </div>
@@ -187,23 +203,23 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             <div className="mb-2">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Linki</h4>
               <div className="flex gap-2">
-                {links.portfolio && (
-                  <a href={links.portfolio} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
+                {links.portfolio_url && (
+                  <a href={links.portfolio_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
                     <Globe className="w-4 h-4 text-primary" />
                   </a>
                 )}
-                {links.github && (
-                  <a href={links.github} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
+                {links.github_url && (
+                  <a href={links.github_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
                     <Github className="w-4 h-4 text-primary" />
                   </a>
                 )}
-                {links.linkedin && (
-                  <a href={links.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
+                {links.linkedin_url && (
+                  <a href={links.linkedin_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
                     <Linkedin className="w-4 h-4 text-primary" />
                   </a>
                 )}
-                {links.website && (
-                  <a href={links.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
+                {links.website_url && (
+                  <a href={links.website_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-secondary hover:bg-muted transition-colors">
                     <ExternalLink className="w-4 h-4 text-primary" />
                   </a>
                 )}

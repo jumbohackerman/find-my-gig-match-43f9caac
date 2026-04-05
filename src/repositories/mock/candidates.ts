@@ -1,36 +1,45 @@
 /**
  * Mock candidate repository — backed by static seekers data.
- * Maps legacy Seeker shape to domain Candidate with name/avatar fields.
  */
 
 import type { CandidateRepository, CandidateFilters } from "@/repositories/interfaces";
 import type { Candidate, Seniority, WorkMode, EmploymentType } from "@/domain/models";
+import { getAllSkills, emptySkills, emptyLinks } from "@/domain/models";
 import { seekers } from "@/data/seekers";
 
 function seekerToDomain(s: typeof seekers[number]): Candidate {
   return {
     id: s.id,
-    userId: s.id, // mock: user_id === seeker id
-    name: s.name,
-    avatar: s.avatar,
+    userId: s.id,
+    fullName: s.name,
     title: s.title,
     location: s.location,
-    bio: s.bio,
     summary: s.summary || "",
-    skills: s.skills,
     seniority: (s.seniority || "Mid") as Seniority,
-    experience: s.experience,
     workMode: (s.work_mode || "Zdalnie") as WorkMode,
     employmentType: (s.employment_type || "Full-time") as EmploymentType,
     salaryMin: s.salary_min || 0,
     salaryMax: s.salary_max || 0,
+    salaryCurrency: "PLN",
     availability: s.availability,
+    skills: { advanced: s.skills || [], intermediate: [], beginner: [] },
     experienceEntries: (s.experience_entries || []).map((e) => ({
-      ...e,
-      isCurrent: false,
-      description: "",
+      job_title: e.title || "",
+      company_name: e.company || "",
+      start_date: e.startDate || "",
+      end_date: e.endDate || "",
+      is_current: false,
+      description_points: e.bullets || [],
     })),
-    links: s.links || {},
+    links: {
+      portfolio_url: (s.links as any)?.portfolio || "",
+      github_url: (s.links as any)?.github || "",
+      linkedin_url: (s.links as any)?.linkedin || "",
+      website_url: (s.links as any)?.website || "",
+    },
+    languages: [],
+    primaryIndustry: "",
+    profileCompleteness: 0,
     cvUrl: s.cv_url || null,
     lastActive: s.last_active || new Date().toISOString(),
   };
@@ -44,17 +53,16 @@ export const mockCandidateRepository: CandidateRepository = {
       const q = filters.search.toLowerCase();
       result = result.filter(
         (c) =>
-          c.name.toLowerCase().includes(q) ||
+          c.fullName.toLowerCase().includes(q) ||
           c.title.toLowerCase().includes(q) ||
-          c.bio.toLowerCase().includes(q) ||
-          c.skills.some((sk) => sk.toLowerCase().includes(q)) ||
+          getAllSkills(c).some((sk) => sk.toLowerCase().includes(q)) ||
           c.location.toLowerCase().includes(q),
       );
     }
     if (filters?.skills && filters.skills.length > 0) {
       const skillsLower = filters.skills.map((s) => s.toLowerCase());
       result = result.filter((c) =>
-        c.skills.some((s) => skillsLower.includes(s.toLowerCase())),
+        getAllSkills(c).some((s) => skillsLower.includes(s.toLowerCase())),
       );
     }
 
@@ -72,22 +80,23 @@ export const mockCandidateRepository: CandidateRepository = {
     const base = existing ? seekerToDomain(existing) : {
       id: userId,
       userId,
-      name: "Nowy kandydat",
-      avatar: "👤",
+      fullName: "Nowy kandydat",
       title: "",
       location: "",
-      bio: "",
       summary: "",
-      skills: [],
       seniority: "Mid" as Seniority,
-      experience: "0 lat",
       workMode: "Zdalnie" as WorkMode,
       employmentType: "Full-time" as EmploymentType,
       salaryMin: 0,
       salaryMax: 0,
-      availability: "Elastycznie",
+      salaryCurrency: "PLN",
+      availability: "Otwarty na oferty",
+      skills: emptySkills(),
       experienceEntries: [],
-      links: {},
+      links: emptyLinks(),
+      languages: [],
+      primaryIndustry: "",
+      profileCompleteness: 0,
       cvUrl: null,
       lastActive: new Date().toISOString(),
     };

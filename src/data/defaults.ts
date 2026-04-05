@@ -1,58 +1,56 @@
 /**
  * Default / fallback values for demo mode.
- * Only imported by mock repositories and hooks that need a fallback
- * when no real user profile is loaded.
- *
- * NEVER import this file from page components or UI components.
+ * Only imported by mock repositories and hooks that need a fallback.
  */
 
 import type { Candidate } from "@/domain/models";
+import { emptySkills, emptyLinks } from "@/domain/models";
 
-/** Default candidate profile used when no real profile is loaded (demo/anonymous) */
 export const DEFAULT_CANDIDATE: Candidate = {
   id: "demo",
   userId: "demo",
-  name: "Demo User",
-  avatar: "👤",
+  fullName: "Demo User",
   title: "Frontend Developer",
   location: "Warszawa",
-  bio: "",
   summary: "",
-  skills: ["React", "TypeScript", "Node.js", "GraphQL", "Tailwind CSS", "Next.js"],
   seniority: "Senior",
-  experience: "5 lat",
   workMode: "Zdalnie",
   employmentType: "Full-time",
-  availability: "Elastycznie",
+  availability: "Otwarty na oferty",
   salaryMin: 18000,
   salaryMax: 28000,
+  salaryCurrency: "PLN",
+  skills: { advanced: ["React", "TypeScript", "Node.js"], intermediate: ["GraphQL", "Tailwind CSS"], beginner: ["Next.js"] },
   experienceEntries: [],
-  links: {},
+  links: emptyLinks(),
+  languages: [],
+  primaryIndustry: "",
+  profileCompleteness: 0,
   cvUrl: null,
   lastActive: new Date().toISOString(),
 };
 
-/** Fallback candidate used when DB returns no candidate data */
 export function createFallbackCandidate(candidateId: string): Candidate {
   return {
     id: candidateId,
     userId: candidateId,
-    name: "Kandydat",
-    avatar: "👤",
+    fullName: "Kandydat",
     title: "",
     location: "",
-    bio: "",
     summary: "",
-    skills: [],
     seniority: "Mid",
-    experience: "",
     workMode: "Zdalnie",
     employmentType: "Full-time",
-    availability: "Elastycznie",
+    availability: "Otwarty na oferty",
     salaryMin: 0,
     salaryMax: 0,
+    salaryCurrency: "PLN",
+    skills: emptySkills(),
     experienceEntries: [],
-    links: {},
+    links: emptyLinks(),
+    languages: [],
+    primaryIndustry: "",
+    profileCompleteness: 0,
     cvUrl: null,
     lastActive: new Date().toISOString(),
   };

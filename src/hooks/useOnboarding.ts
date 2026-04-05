@@ -36,7 +36,7 @@ export function useOnboarding() {
     async (data: OnboardingData) => {
       updateProfile({
         title: data.title,
-        skills: data.skills,
+        skills: { advanced: data.skills, intermediate: [], beginner: [] },
         salaryMin: data.salaryMin,
         salaryMax: data.salaryMax,
         workMode: data.remotePreference as Candidate["workMode"],
