@@ -7,7 +7,7 @@ import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
   BarChart3, Zap, Layers, UserCheck, ArrowLeftRight, EyeOff,
 } from "lucide-react";
-import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel } from "@/domain/models";
+import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import MatchScoreBreakdown from "@/components/MatchScoreBreakdown";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
