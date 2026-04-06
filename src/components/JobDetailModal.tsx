@@ -86,6 +86,7 @@ const LEVEL_LABELS: Record<string, string> = {
 
 const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
   const { candidate } = useCandidateProfile();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
