@@ -57,7 +57,7 @@
 
 @media (min-width: 640px) {
   :root {
-    --browse-card-column: 23.5rem;
+    --browse-card-column: 26rem;
   }
 }
 
