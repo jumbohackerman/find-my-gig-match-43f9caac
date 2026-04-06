@@ -74,6 +74,43 @@ const Index = () => {
     handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
   } = useJobFeed();
 
+  // ── Deep-link: tab ────────────────────────────────────────────────────────
+  const tabParam = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabParam && VALID_TABS.includes(tabParam) ? tabParam : "swipe"
+  );
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
+
+  const handleSwipeWithRefetch = useCallback(async (direction: "left" | "right" | "save") => {
+    if (direction === "left") setButtonExitDir("left");
+    else if (direction === "right") setButtonExitDir("right");
+    else setButtonExitDir(null);
+    await handleSwipe(direction);
+    if (direction === "right") refetchApps();
+    setTimeout(() => setButtonExitDir(null), 650);
+  }, [handleSwipe, refetchApps]);
+
+  // ── Keyboard arrow controls ──────────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Only when on swipe tab, not finished, no modal open, and not in an input
+      if (activeTab !== "swipe" || isFinished || selectedJob) return;
+      if (actionPending) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleSwipeWithRefetch("left");
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleSwipeWithRefetch("right");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [activeTab, isFinished, selectedJob, actionPending, handleSwipeWithRefetch]);
+
   const hasActiveFilters =
     filters.location !== defaultFilters.location ||
     filters.type !== defaultFilters.type ||
@@ -99,12 +136,6 @@ const Index = () => {
     setSearchParams((prev) => filtersToParams(newFilters, prev), { replace: true });
   }, [updateFilters, setSearchParams]);
 
-  // ── Deep-link: tab ────────────────────────────────────────────────────────
-  const tabParam = searchParams.get("tab") as Tab | null;
-  const [activeTab, setActiveTab] = useState<Tab>(
-    tabParam && VALID_TABS.includes(tabParam) ? tabParam : "swipe"
-  );
-
   const changeTab = useCallback((tab: Tab) => {
     setActiveTab(tab);
     setSearchParams((prev) => {
@@ -116,9 +147,6 @@ const Index = () => {
   }, [setSearchParams]);
 
   // ── Deep-link: job detail modal ───────────────────────────────────────────
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
-
   const openJobModal = useCallback((job: Job | null) => {
     setSelectedJob(job);
     if (job) trackView(job);
@@ -147,15 +175,6 @@ const Index = () => {
       }
     }
   }, [jobsLoading, allJobs, searchParams, selectedJob, setSearchParams]);
-
-  const handleSwipeWithRefetch = async (direction: "left" | "right" | "save") => {
-    if (direction === "left") setButtonExitDir("left");
-    else if (direction === "right") setButtonExitDir("right");
-    else setButtonExitDir(null);
-    await handleSwipe(direction);
-    if (direction === "right") refetchApps();
-    setTimeout(() => setButtonExitDir(null), 650);
-  };
 
   const handleSavedApply = async (job: Job) => {
     await applyFromSaved(job);
@@ -386,6 +405,7 @@ const Index = () => {
                       </div>
                       <p className="text-center text-muted-foreground text-[10px] sm:text-xs pt-2">
                         {currentIndex + 1} / {filteredJobs.length}
+                        <span className="hidden sm:inline ml-2 opacity-60">← → klawisze strzałek</span>
                       </p>
                     </div>
                   </>

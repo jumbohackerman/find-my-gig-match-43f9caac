@@ -110,8 +110,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-base sm:text-lg font-bold text-foreground leading-tight truncate">{job.title}</h2>
-              <p className="text-sm text-primary font-medium truncate">{job.company}</p>
+              <h2 className="font-display text-base sm:text-xl font-bold text-foreground leading-tight truncate">{job.title}</h2>
+              <p className="text-sm sm:text-base text-primary font-medium truncate">{job.company}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isSaved && (
@@ -124,7 +124,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           {/* Salary */}
           <div>
             {hasSalary ? (
-              <span className="text-sm font-bold text-accent">{job.salary}</span>
+              <span className="text-sm sm:text-base font-bold text-accent">{job.salary}</span>
             ) : (
               <span className="text-xs text-muted-foreground italic">Wynagrodzenie nie podane</span>
             )}
@@ -149,7 +149,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </div>
 
           {/* Summary teaser (max 2 lines) */}
-          <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">{summaryText}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-2">{summaryText}</p>
 
           {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
@@ -214,7 +214,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
             {/* Tech stack tags */}
             <div className="flex flex-wrap gap-1.5">
-              {job.tags.slice(0, 6).map((tag) => {
+              {job.tags.slice(0, 8).map((tag) => {
                 const isMatched = matchResult?.matchedSkills.includes(tag);
                 const isMissing = matchResult?.missingSkills.includes(tag);
                 return (
@@ -232,9 +232,9 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                   </span>
                 );
               })}
-              {job.tags.length > 6 && (
+              {job.tags.length > 8 && (
                 <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground">
-                  +{job.tags.length - 6}
+                  +{job.tags.length - 8}
                 </span>
               )}
             </div>

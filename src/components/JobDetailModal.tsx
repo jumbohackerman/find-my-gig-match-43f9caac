@@ -5,12 +5,13 @@ import {
   CheckCircle2, ListChecks, Gift, Wifi, GraduationCap,
   Sparkles, ArrowRight, Heart,
 } from "lucide-react";
-import type { Job } from "@/domain/models";
+import type { Job, SkillsByLevel } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { timeAgo } from "@/lib/timeAgo";
+import { useCandidateProfile } from "@/hooks/useCandidateProfile";
 
 interface Props {
   job: Job | null;
@@ -67,7 +68,24 @@ const StepList = ({ items }: { items: string[] }) => (
 
 /* ── Main modal ────────────────────────────────────────────────────────────── */
 
+const SKILL_LEVEL_ORDER: Record<string, number> = { beginner: 1, intermediate: 2, advanced: 3 };
+
+function getCandidateSkillLevel(skill: string, candidateSkills: SkillsByLevel): string | null {
+  const s = skill.toLowerCase();
+  if (candidateSkills.advanced.some((sk) => sk.toLowerCase() === s)) return "advanced";
+  if (candidateSkills.intermediate.some((sk) => sk.toLowerCase() === s)) return "intermediate";
+  if (candidateSkills.beginner.some((sk) => sk.toLowerCase() === s)) return "beginner";
+  return null;
+}
+
+const LEVEL_LABELS: Record<string, string> = {
+  beginner: "Podstawowy",
+  intermediate: "Średniozaawansowany",
+  advanced: "Zaawansowany",
+};
+
 const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
+  const { candidate } = useCandidateProfile();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -289,25 +307,31 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
                     </div>
                   )}
 
-                  {/* Tech stack */}
+                  {/* Tech stack with skill level matching */}
                   <div className="p-4 rounded-xl bg-secondary/30 border border-border">
                     <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
-                      Tech Stack
+                      Tech Stack & Poziom
                     </h4>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-col gap-2">
                       {job.tags.map((tag) => {
-                        const isMatched = matchResult?.matchedSkills.includes(tag);
+                        const candidateLevel = getCandidateSkillLevel(tag, candidate.skills);
+                        const hasSkill = candidateLevel !== null;
                         return (
-                          <span
+                          <div
                             key={tag}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
-                              isMatched
-                                ? "bg-accent/15 text-accent border border-accent/30"
-                                : "bg-muted text-muted-foreground"
+                            className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium border ${
+                              hasSkill
+                                ? "bg-accent/10 text-accent border-accent/25"
+                                : "bg-[hsl(45_80%_55%/0.12)] text-[hsl(45_80%_45%)] border-[hsl(45_80%_55%/0.25)]"
                             }`}
                           >
-                            {tag}
-                          </span>
+                            <span>{tag}</span>
+                            <span className="text-[10px] opacity-80">
+                              {candidateLevel
+                                ? LEVEL_LABELS[candidateLevel]
+                                : "Brak w profilu"}
+                            </span>
+                          </div>
                         );
                       })}
                     </div>
