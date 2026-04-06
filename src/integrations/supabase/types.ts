@@ -88,14 +88,19 @@ export type Database = {
           employment_type: string
           experience: string
           experience_entries: Json
+          full_name: string
           id: string
+          languages: Json
           last_active: string
           links: Json
           location: string
+          primary_industry: string
+          profile_completeness: number
+          salary_currency: string
           salary_max: number
           salary_min: number
           seniority: string
-          skills: string[]
+          skills: Json
           summary: string
           title: string
           updated_at: string
@@ -110,14 +115,19 @@ export type Database = {
           employment_type?: string
           experience?: string
           experience_entries?: Json
+          full_name?: string
           id?: string
+          languages?: Json
           last_active?: string
           links?: Json
           location?: string
+          primary_industry?: string
+          profile_completeness?: number
+          salary_currency?: string
           salary_max?: number
           salary_min?: number
           seniority?: string
-          skills?: string[]
+          skills?: Json
           summary?: string
           title?: string
           updated_at?: string
@@ -132,14 +142,19 @@ export type Database = {
           employment_type?: string
           experience?: string
           experience_entries?: Json
+          full_name?: string
           id?: string
+          languages?: Json
           last_active?: string
           links?: Json
           location?: string
+          primary_industry?: string
+          profile_completeness?: number
+          salary_currency?: string
           salary_max?: number
           salary_min?: number
           seniority?: string
-          skills?: string[]
+          skills?: Json
           summary?: string
           title?: string
           updated_at?: string
