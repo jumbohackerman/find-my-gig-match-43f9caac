@@ -70,8 +70,24 @@ const StepList = ({ items }: { items: string[] }) => (
 
 /* ── Main modal ────────────────────────────────────────────────────────────── */
 
+const SKILL_LEVEL_ORDER: Record<string, number> = { beginner: 1, intermediate: 2, advanced: 3 };
+
+function getCandidateSkillLevel(skill: string, candidateSkills: SkillsByLevel): string | null {
+  const s = skill.toLowerCase();
+  if (candidateSkills.advanced.some((sk) => sk.toLowerCase() === s)) return "advanced";
+  if (candidateSkills.intermediate.some((sk) => sk.toLowerCase() === s)) return "intermediate";
+  if (candidateSkills.beginner.some((sk) => sk.toLowerCase() === s)) return "beginner";
+  return null;
+}
+
+const LEVEL_LABELS: Record<string, string> = {
+  beginner: "Podstawowy",
+  intermediate: "Średniozaawansowany",
+  advanced: "Zaawansowany",
+};
+
 const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const { candidate } = useCandidateProfile();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
