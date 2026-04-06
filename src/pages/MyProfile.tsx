@@ -272,9 +272,109 @@ const MyProfile = () => {
   };
 
   const handleCvParsed = useCallback((parsedJson: unknown) => {
-    // CV parsed data is available but we don't auto-import
-    // User should manually review and the form reflects DB state
-    toast.success("CV zostało przeanalizowane. Dane są dostępne do importu.");
+    if (!parsedJson || typeof parsedJson !== "object") {
+      toast.error("Brak danych z analizy CV.");
+      return;
+    }
+    const p = parsedJson as {
+      full_name?: string | null;
+      first_name?: string | null;
+      last_name?: string | null;
+      headline?: string | null;
+      current_role?: string | null;
+      city?: string | null;
+      country?: string | null;
+      summary?: string | null;
+      skills?: string[] | null;
+      languages?: Array<{ name: string; level?: string | null }> | null;
+      links?: {
+        linkedin_url?: string | null;
+        github_url?: string | null;
+        portfolio_url?: string | null;
+        other_urls?: string[] | null;
+      } | null;
+      experience?: Array<{
+        job_title?: string | null;
+        company?: string | null;
+        start_date?: string | null;
+        end_date?: string | null;
+        description?: string | null;
+        bullets?: string[] | null;
+      }> | null;
+      preferred_job_titles?: string[] | null;
+    };
+
+    // fullName
+    const name = p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ");
+    if (name?.trim()) setFullName(name.trim());
+
+    // title
+    const titleVal = p.current_role || p.headline || (p.preferred_job_titles && p.preferred_job_titles[0]);
+    if (titleVal?.trim()) setTitle(titleVal.trim());
+
+    // location
+    const loc = [p.city, p.country].filter(Boolean).join(", ");
+    if (loc.trim()) setLocation(loc.trim());
+
+    // summary
+    if (p.summary?.trim()) setSummary(p.summary.trim().slice(0, 300));
+
+    // skills → all to advanced
+    if (p.skills && Array.isArray(p.skills) && p.skills.length > 0) {
+      const unique = [...new Set(p.skills.filter(s => typeof s === "string" && s.trim()).map(s => s.trim()))];
+      if (unique.length > 0) {
+        setSkills({ advanced: unique, intermediate: [], beginner: [] });
+      }
+    }
+
+    // languages
+    if (p.languages && Array.isArray(p.languages) && p.languages.length > 0) {
+      const mapped = p.languages
+        .filter(l => l.name && l.name.trim())
+        .map(l => ({ name: l.name.trim(), level: l.level?.trim() || "" }));
+      if (mapped.length > 0) setLanguages(mapped);
+    }
+
+    // links
+    if (p.links) {
+      const newLinks: CandidateLinks = { ...emptyLinks() };
+      if (p.links.linkedin_url?.trim()) newLinks.linkedin_url = p.links.linkedin_url.trim();
+      if (p.links.github_url?.trim()) newLinks.github_url = p.links.github_url.trim();
+      if (p.links.portfolio_url?.trim()) newLinks.portfolio_url = p.links.portfolio_url.trim();
+      if (p.links.other_urls && p.links.other_urls.length > 0 && p.links.other_urls[0]?.trim()) {
+        newLinks.website_url = p.links.other_urls[0].trim();
+      }
+      if (Object.values(newLinks).some(Boolean)) setLinks(newLinks);
+    }
+
+    // experience entries
+    if (p.experience && Array.isArray(p.experience) && p.experience.length > 0) {
+      const entries: ExperienceEntry[] = p.experience.slice(0, 8).map(exp => {
+        const isCurrent = !exp.end_date || !exp.end_date.trim() || ["present", "current", "now", "obecnie", "aktualnie", "do teraz"].includes(exp.end_date.trim().toLowerCase());
+
+        let descPoints: string[];
+        if (exp.bullets && Array.isArray(exp.bullets) && exp.bullets.length > 0) {
+          descPoints = exp.bullets.filter(b => typeof b === "string" && b.trim()).map(b => b.trim());
+        } else if (exp.description?.trim()) {
+          descPoints = [exp.description.trim()];
+        } else {
+          descPoints = [""];
+        }
+        if (descPoints.length === 0) descPoints = [""];
+
+        return {
+          job_title: exp.job_title?.trim() || "",
+          company_name: exp.company?.trim() || "",
+          start_date: exp.start_date?.trim() || "",
+          end_date: isCurrent ? "Obecnie" : (exp.end_date?.trim() || ""),
+          is_current: isCurrent,
+          description_points: descPoints,
+        };
+      });
+      setExperienceEntries(entries);
+    }
+
+    toast.success("Dane z CV zostały zaimportowane do formularza.");
   }, []);
 
   const completeness = computeCompleteness({
