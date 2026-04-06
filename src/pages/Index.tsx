@@ -110,18 +110,6 @@ const Index = () => {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [activeTab, isFinished, selectedJob, actionPending, handleSwipeWithRefetch]);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { candidate } = useCandidateProfile();
-  const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
-  const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
-  const [hideSuggestion, setHideSuggestion] = useState(false);
-  const { recentEntries, trackView, clear: clearRecent, count: recentCount } = useRecentlyViewed();
-
-  const {
-    allJobs, filteredJobs, remainingJobs, savedJobs, savedJobIds,
-    currentIndex, isFinished, jobsLoading, filters, matchResults,
-    handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
-  } = useJobFeed();
 
   const hasActiveFilters =
     filters.location !== defaultFilters.location ||
@@ -148,12 +136,6 @@ const Index = () => {
     setSearchParams((prev) => filtersToParams(newFilters, prev), { replace: true });
   }, [updateFilters, setSearchParams]);
 
-  // ── Deep-link: tab ────────────────────────────────────────────────────────
-  const tabParam = searchParams.get("tab") as Tab | null;
-  const [activeTab, setActiveTab] = useState<Tab>(
-    tabParam && VALID_TABS.includes(tabParam) ? tabParam : "swipe"
-  );
-
   const changeTab = useCallback((tab: Tab) => {
     setActiveTab(tab);
     setSearchParams((prev) => {
@@ -165,9 +147,6 @@ const Index = () => {
   }, [setSearchParams]);
 
   // ── Deep-link: job detail modal ───────────────────────────────────────────
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
-
   const openJobModal = useCallback((job: Job | null) => {
     setSelectedJob(job);
     if (job) trackView(job);
@@ -196,15 +175,6 @@ const Index = () => {
       }
     }
   }, [jobsLoading, allJobs, searchParams, selectedJob, setSearchParams]);
-
-  const handleSwipeWithRefetch = async (direction: "left" | "right" | "save") => {
-    if (direction === "left") setButtonExitDir("left");
-    else if (direction === "right") setButtonExitDir("right");
-    else setButtonExitDir(null);
-    await handleSwipe(direction);
-    if (direction === "right") refetchApps();
-    setTimeout(() => setButtonExitDir(null), 650);
-  };
 
   const handleSavedApply = async (job: Job) => {
     await applyFromSaved(job);
