@@ -110,8 +110,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-base sm:text-lg font-bold text-foreground leading-tight truncate">{job.title}</h2>
-              <p className="text-sm text-primary font-medium truncate">{job.company}</p>
+              <h2 className="font-display text-base sm:text-xl font-bold text-foreground leading-tight truncate">{job.title}</h2>
+              <p className="text-sm sm:text-base text-primary font-medium truncate">{job.company}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isSaved && (
