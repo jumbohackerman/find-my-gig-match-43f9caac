@@ -124,7 +124,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           {/* Salary */}
           <div>
             {hasSalary ? (
-              <span className="text-sm font-bold text-accent">{job.salary}</span>
+              <span className="text-sm sm:text-base font-bold text-accent">{job.salary}</span>
             ) : (
               <span className="text-xs text-muted-foreground italic">Wynagrodzenie nie podane</span>
             )}
