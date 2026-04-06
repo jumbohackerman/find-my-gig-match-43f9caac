@@ -12,8 +12,6 @@ import ReportButton from "@/components/ReportButton";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { timeAgo } from "@/lib/timeAgo";
 import { useCandidateProfile } from "@/hooks/useCandidateProfile";
-import LocalErrorBoundary from "@/components/LocalErrorBoundary";
-import { timeAgo } from "@/lib/timeAgo";
 
 interface Props {
   job: Job | null;
