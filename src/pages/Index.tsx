@@ -74,6 +74,55 @@ const Index = () => {
     handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
   } = useJobFeed();
 
+  // ── Deep-link: tab ────────────────────────────────────────────────────────
+  const tabParam = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabParam && VALID_TABS.includes(tabParam) ? tabParam : "swipe"
+  );
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
+
+  const handleSwipeWithRefetch = useCallback(async (direction: "left" | "right" | "save") => {
+    if (direction === "left") setButtonExitDir("left");
+    else if (direction === "right") setButtonExitDir("right");
+    else setButtonExitDir(null);
+    await handleSwipe(direction);
+    if (direction === "right") refetchApps();
+    setTimeout(() => setButtonExitDir(null), 650);
+  }, [handleSwipe, refetchApps]);
+
+  // ── Keyboard arrow controls ──────────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Only when on swipe tab, not finished, no modal open, and not in an input
+      if (activeTab !== "swipe" || isFinished || selectedJob) return;
+      if (actionPending) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleSwipeWithRefetch("left");
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleSwipeWithRefetch("right");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [activeTab, isFinished, selectedJob, actionPending, handleSwipeWithRefetch]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { candidate } = useCandidateProfile();
+  const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
+  const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
+  const [hideSuggestion, setHideSuggestion] = useState(false);
+  const { recentEntries, trackView, clear: clearRecent, count: recentCount } = useRecentlyViewed();
+
+  const {
+    allJobs, filteredJobs, remainingJobs, savedJobs, savedJobIds,
+    currentIndex, isFinished, jobsLoading, filters, matchResults,
+    handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
+  } = useJobFeed();
+
   const hasActiveFilters =
     filters.location !== defaultFilters.location ||
     filters.type !== defaultFilters.type ||
