@@ -5,10 +5,13 @@ import {
   CheckCircle2, ListChecks, Gift, Wifi, GraduationCap,
   Sparkles, ArrowRight, Heart,
 } from "lucide-react";
-import type { Job } from "@/domain/models";
+import type { Job, SkillsByLevel } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
+import LocalErrorBoundary from "@/components/LocalErrorBoundary";
+import { timeAgo } from "@/lib/timeAgo";
+import { useCandidateProfile } from "@/hooks/useCandidateProfile";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { timeAgo } from "@/lib/timeAgo";
 
