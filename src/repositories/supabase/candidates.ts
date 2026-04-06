@@ -79,15 +79,24 @@ export const supabaseCandidateRepository: CandidateRepository = {
     if (data.cvUrl !== undefined) dbData.cv_url = data.cvUrl;
     dbData.last_active = new Date().toISOString();
 
-    const { error } = await (supabase as any)
-      .from("candidates")
-      .update(dbData)
-      .eq("user_id", userId);
-
-    if (error) throw new Error(`Failed to update candidate: ${error.message}`);
+    // Check if candidate record exists; if not, create it (lazy creation)
+    const existing = await this.getByUserId(userId);
+    if (!existing) {
+      const insertData = { user_id: userId, ...dbData };
+      const { error: insertError } = await (supabase as any)
+        .from("candidates")
+        .insert(insertData);
+      if (insertError) throw new Error(`Failed to create candidate: ${insertError.message}`);
+    } else {
+      const { error } = await (supabase as any)
+        .from("candidates")
+        .update(dbData)
+        .eq("user_id", userId);
+      if (error) throw new Error(`Failed to update candidate: ${error.message}`);
+    }
 
     const result = await this.getByUserId(userId);
-    if (!result) throw new Error("Candidate not found after update");
+    if (!result) throw new Error("Candidate not found after upsert");
     return result;
   },
 };
