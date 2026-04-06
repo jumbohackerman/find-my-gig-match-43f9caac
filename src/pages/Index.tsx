@@ -405,6 +405,7 @@ const Index = () => {
                       </div>
                       <p className="text-center text-muted-foreground text-[10px] sm:text-xs pt-2">
                         {currentIndex + 1} / {filteredJobs.length}
+                        <span className="hidden sm:inline ml-2 opacity-60">← → klawisze strzałek</span>
                       </p>
                     </div>
                   </>
