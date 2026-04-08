@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AuthContext["profile"]>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -37,27 +38,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
+      if (!session?.user) {
+        setLoading(false);
+      }
+      // if user exists, loading will be set to false after profile fetch
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch profile when user changes
+  // Fetch profile when user changes — keep loading=true until profile is resolved
   useEffect(() => {
     if (!user) {
       setProfile(null);
+      setProfileLoading(false);
+      setLoading(false);
       return;
     }
+    setProfileLoading(true);
+    let cancelled = false;
     const fetchProfile = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("role, full_name, avatar")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      setProfile(data);
+      // Retry a few times for newly created accounts (trigger may not have finished)
+      let attempts = 0;
+      let data = null;
+      while (attempts < 5) {
+        const res = await supabase
+          .from("profiles")
+          .select("role, full_name, avatar")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        data = res.data;
+        if (data) break;
+        attempts++;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      if (!cancelled) {
+        setProfile(data);
+        setProfileLoading(false);
+        setLoading(false);
+      }
     };
     fetchProfile();
+    return () => { cancelled = true; };
   }, [user]);
 
   const signOut = async () => {
