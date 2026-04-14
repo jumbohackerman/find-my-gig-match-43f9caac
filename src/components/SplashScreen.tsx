@@ -174,7 +174,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
               transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="text-4xl font-bold font-display tracking-tight text-foreground"
             >
-              {"JulyAPP".split("").map((char, i) => (
+              {"JobSwipe.pl".split("").map((char, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
