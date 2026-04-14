@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
+import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Profiles from "./pages/Profiles";
 import Employer from "./pages/Employer";
@@ -34,58 +36,64 @@ const HomeRedirect = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route path="/" element={<ProtectedRoute><HomeRedirect><Index /></HomeRedirect></ProtectedRoute>} />
-            <Route
-              path="/my-profile"
-              element={
-                <ProtectedRoute>
-                  <RoleGate role="candidate" redirectTo="/employer">
-                    <MyProfile />
-                  </RoleGate>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profiles"
-              element={
-                <ProtectedRoute>
-                  <RoleGate role="employer" redirectTo="/">
-                    <Profiles />
-                  </RoleGate>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/employer"
-              element={
-                <ProtectedRoute>
-                  <RoleGate role="employer" redirectTo="/">
-                    <Employer />
-                  </RoleGate>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/profile" element={<Navigate to="/my-profile" replace />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <CookieBanner />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [splashDone, setSplashDone] = useState(false);
+  const handleSplashFinish = useCallback(() => setSplashDone(true), []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route path="/" element={<ProtectedRoute><HomeRedirect><Index /></HomeRedirect></ProtectedRoute>} />
+              <Route
+                path="/my-profile"
+                element={
+                  <ProtectedRoute>
+                    <RoleGate role="candidate" redirectTo="/employer">
+                      <MyProfile />
+                    </RoleGate>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profiles"
+                element={
+                  <ProtectedRoute>
+                    <RoleGate role="employer" redirectTo="/">
+                      <Profiles />
+                    </RoleGate>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/employer"
+                element={
+                  <ProtectedRoute>
+                    <RoleGate role="employer" redirectTo="/">
+                      <Employer />
+                    </RoleGate>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/profile" element={<Navigate to="/my-profile" replace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <CookieBanner />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
