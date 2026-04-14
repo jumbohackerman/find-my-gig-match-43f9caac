@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
+import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Profiles from "./pages/Profiles";
 import Employer from "./pages/Employer";
