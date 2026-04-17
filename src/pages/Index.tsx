@@ -220,7 +220,7 @@ const Index = () => {
 
       <div className="shrink-0 px-4 sm:px-6 pt-3 pb-1">
         <div className="browse-shell overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
-          <div className="flex min-w-max gap-1">
+          <div className="flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft w-fit mx-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -229,20 +229,29 @@ const Index = () => {
                 aria-selected={activeTab === tab.key}
                 aria-controls={`panel-${tab.key}`}
                 data-testid={`tab-${tab.key}`}
-                className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   activeTab === tab.key
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-muted"
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tab.label}
-                {tab.count != null && tab.count > 0 && (
-                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeTab === tab.key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary text-primary-foreground"
-                  }`} aria-label={`${tab.count} elementów`}>
-                    {tab.count}
-                  </span>
+                {activeTab === tab.key && (
+                  <motion.span
+                    layoutId="active-tab-pill"
+                    className="absolute inset-0 btn-gradient rounded-xl shadow-glow"
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
                 )}
+                <span className="relative z-10 inline-flex items-center">
+                  {tab.label}
+                  {tab.count != null && tab.count > 0 && (
+                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                      activeTab === tab.key ? "bg-primary-foreground/25 text-primary-foreground" : "bg-primary/15 text-primary"
+                    }`} aria-label={`${tab.count} elementów`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </span>
               </button>
             ))}
           </div>
@@ -375,37 +384,45 @@ const Index = () => {
 
                     <div className="shrink-0 w-full">
                       <div className="flex items-center justify-center gap-4 sm:gap-5 pt-1" role="group" aria-label="Akcje swipe">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.08, rotate: -6 }}
+                          whileTap={{ scale: 0.92 }}
                           onClick={() => handleSwipeWithRefetch("left")}
                           disabled={actionPending}
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full glass-surface border border-border/60 flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/60 hover:shadow-[0_0_24px_-4px_hsl(var(--destructive)/0.5)] transition-all disabled:opacity-40 disabled:pointer-events-none"
                           title="Pomiń"
                           data-testid="swipe-skip"
                         >
                           <X className="w-5 h-5 sm:w-6 sm:h-6" />
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1, y: -2 }}
+                          whileTap={{ scale: 0.92 }}
                           onClick={() => handleSwipeWithRefetch("save")}
                           disabled={actionPending}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-surface border border-border/60 flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400/60 hover:shadow-[0_0_20px_-4px_hsl(48_95%_55%/0.5)] transition-all disabled:opacity-40 disabled:pointer-events-none"
                           title="Zapisz na później"
                           data-testid="swipe-save"
                         >
                           <Star className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.12, rotate: 6 }}
+                          whileTap={{ scale: 0.94 }}
                           onClick={() => handleSwipeWithRefetch("right")}
                           disabled={actionPending}
-                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow transition-transform sm:hover:scale-110 disabled:opacity-50 disabled:hover:scale-100"
+                          className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow animate-glow-pulse disabled:opacity-50"
                           title="Aplikuj"
                           data-testid="swipe-apply"
                         >
-                          {actionPending ? <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin" /> : <Check className="w-6 h-6 sm:w-7 sm:h-7" />}
-                        </button>
+                          <span className="absolute inset-0 rounded-full ring-2 ring-primary/30 ring-offset-2 ring-offset-background/20" />
+                          {actionPending ? <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin relative z-10" /> : <Check className="w-6 h-6 sm:w-7 sm:h-7 relative z-10" />}
+                        </motion.button>
                       </div>
-                      <p className="text-center text-muted-foreground text-[10px] sm:text-xs pt-2">
-                        {currentIndex + 1} / {filteredJobs.length}
-                        <span className="hidden sm:inline ml-2 opacity-60">← → klawisze strzałek</span>
+                      <p className="text-center text-muted-foreground text-[10px] sm:text-xs pt-2.5 tracking-wide">
+                        <span className="text-foreground/80 font-semibold">{currentIndex + 1}</span>
+                        <span className="opacity-50"> / {filteredJobs.length}</span>
+                        <span className="hidden sm:inline ml-3 opacity-50">← → klawisze strzałek</span>
                       </p>
                     </div>
                   </>
