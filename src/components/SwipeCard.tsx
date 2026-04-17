@@ -85,9 +85,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
       }}
     >
       <div
-        className="card-gradient rounded-2xl shadow-card border border-border cursor-grab active:cursor-grabbing h-full flex flex-col overflow-hidden"
+        className="card-gradient ring-highlight shimmer-overlay rounded-3xl shadow-card hover:shadow-card-hover border border-border/70 cursor-grab active:cursor-grabbing h-full flex flex-col overflow-hidden relative"
         data-testid="swipe-card"
       >
+        {/* Subtle top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent pointer-events-none" />
         {isTop && (
           <>
             <motion.div className="absolute top-6 right-6 z-20 swipe-indicator-right rotate-[-15deg]" style={{ opacity: rightOpacity }}>
