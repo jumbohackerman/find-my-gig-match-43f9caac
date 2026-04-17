@@ -68,12 +68,25 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
     <div className="w-full">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
+          hasActiveFilters
+            ? "btn-gradient text-primary-foreground border-transparent shadow-glow"
+            : "glass-surface text-secondary-foreground border-border/60 hover:border-primary/40 hover:shadow-soft"
+        }`}
       >
         <Filter className="w-4 h-4" />
         Filtry
         {hasActiveFilters && (
-          <span className="w-2 h-2 rounded-full bg-primary" />
+          <span className="px-1.5 py-0.5 rounded-full bg-primary-foreground/25 text-[10px] font-bold">
+            {[
+              filters.location !== "Wszystkie",
+              filters.type !== "Wszystkie",
+              filters.salaryMin > 0,
+              filters.remote !== "Wszystkie",
+              filters.seniority !== "Wszystkie",
+              filters.requiredSkills.length > 0,
+            ].filter(Boolean).length}
+          </span>
         )}
       </button>
 
@@ -85,7 +98,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden will-change-auto"
           >
-            <div className="mt-3 p-4 rounded-xl bg-secondary/50 border border-border space-y-4">
+            <div className="mt-3 p-4 rounded-2xl glass-surface ring-highlight shadow-elevated space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Location */}
                 <div className="space-y-1.5">
