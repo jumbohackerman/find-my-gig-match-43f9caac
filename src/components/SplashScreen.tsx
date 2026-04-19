@@ -147,7 +147,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                 y: 0,
               }}
               transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-[120px] h-[120px] rounded-[28px] flex items-center justify-center"
+              className="relative w-[120px] h-[120px] rounded-[28px] flex items-center justify-center overflow-hidden"
               style={{
                 background: "var(--gradient-primary)",
                 boxShadow:
@@ -155,17 +155,23 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                 transformPerspective: 900,
               }}
             >
-              {/* Specular sweep */}
+              {/* Specular sweep — soft diagonal shimmer, clipped inside tile */}
               <motion.div
-                initial={{ x: "-130%" }}
-                animate={{ x: showMark ? "150%" : "-130%" }}
-                transition={{ duration: 1.5, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 rounded-[28px] overflow-hidden"
+                initial={{ x: "-120%", opacity: 0 }}
+                animate={{
+                  x: showMark ? "120%" : "-120%",
+                  opacity: showMark ? [0, 0.7, 0] : 0,
+                }}
+                transition={{
+                  x: { duration: 1.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] },
+                  opacity: { duration: 1.8, delay: 0.55, ease: "easeInOut", times: [0, 0.5, 1] },
+                }}
+                className="absolute inset-y-0 left-0 w-full pointer-events-none"
                 style={{
                   background:
-                    "linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / 0.4) 50%, transparent 65%)",
+                    "linear-gradient(110deg, transparent 44%, hsl(0 0% 100% / 0.22) 50%, transparent 56%)",
                   mixBlendMode: "screen",
-                  width: "55%",
+                  filter: "blur(3px)",
                 }}
               />
 
