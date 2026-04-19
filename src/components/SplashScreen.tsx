@@ -277,7 +277,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       });
 
       const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
-      cg.addColorStop(0, `rgba(37,99,235,${0.08 + 0.04 * Math.sin(t * 0.018)})`);
+      cg.addColorStop(0, `rgba(245,130,70,${0.08 + 0.04 * Math.sin(t * 0.018)})`);
       cg.addColorStop(1, "transparent");
       ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI * 2);
       ctx.fillStyle = cg; ctx.fill();
@@ -288,9 +288,9 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       ctx.beginPath();
       // @ts-ignore
       ctx.roundRect(cx - cw / 2, cardY - ch / 2, cw, ch, cr);
-      ctx.fillStyle = `rgba(37,99,235,${cardAlpha})`;
+      ctx.fillStyle = `rgba(245,130,70,${cardAlpha})`;
       ctx.fill();
-      ctx.strokeStyle = `rgba(93,173,255,${cardAlpha * 3})`;
+      ctx.strokeStyle = `rgba(255,180,130,${cardAlpha * 3})`;
       ctx.lineWidth = 0.8; ctx.stroke();
     };
 
