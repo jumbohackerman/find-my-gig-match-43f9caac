@@ -110,7 +110,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         if (Math.random() < 0.3) {
           const cos = nodes.map((n, j) => ({ n, j })).filter((x) => x.n.type === "company");
           const co = cos[Math.floor(Math.random() * cos.length)];
-          if (co) edges.push({ from: i, to: co.j, phase: Math.random() * Math.PI * 2, speed: 0.005, activateAt: Math.random() * 500 + 120, pulsePos: 0, color: [139, 92, 246] });
+          if (co) edges.push({ from: i, to: co.j, phase: Math.random() * Math.PI * 2, speed: 0.005, activateAt: Math.random() * 500 + 120, pulsePos: 0, color: [255, 170, 100] });
         }
       }
     }
