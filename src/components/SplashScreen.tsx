@@ -429,7 +429,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           margin-top: 11px;
           font-size: 11px; font-weight: 300;
           letter-spacing: 0.28em; text-transform: uppercase;
-          color: rgba(255,210,180,0.32);
+          color: rgba(255,225,200,0.75);
           animation: spWordIn 0.7s ease 0.65s both;
         }
 
