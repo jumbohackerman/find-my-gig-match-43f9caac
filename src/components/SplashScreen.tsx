@@ -444,7 +444,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-progress-fill {
           height: 100%; width: 0%; border-radius: 999px;
-          background: linear-gradient(90deg, #1D4ED8, #3B82F6, #93C5FD);
+          background: linear-gradient(90deg, #C94A1F, #F26B3C, #FFD2B0);
           background-size: 200% 100%;
           animation:
             spProgGrow 2.6s cubic-bezier(0.4,0,0.2,1) 1s forwards,
