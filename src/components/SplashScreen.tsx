@@ -178,6 +178,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     const PHASE_DUR: Record<Phase, number> = {
       logo: 1500,
       wordmark: 1500,
+      reveal: 1200,
       burst: 600,
       out: 600,
     };
@@ -186,11 +187,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       const now = performance.now();
       const phase = phaseRef.current;
 
-      // On phase change: snapshot current positions as the new "from"
-      if (phase !== prevPhase) {
-        // capture current rendered positions by re-sampling from the previous animation
-        prevPhase = phase;
-      }
+      if (phase !== prevPhase) prevPhase = phase;
 
       ctx.clearRect(0, 0, STAGE_W, STAGE_H);
       ctx.globalCompositeOperation = "lighter";
@@ -200,11 +197,9 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        // Per-particle delay (0..0.4 of duration)
         const delayMs = p.delay * dur * 0.5;
         const localT = Math.max(0, Math.min(1, (elapsed - delayMs) / (dur - delayMs)));
 
-        // Determine from/to per phase
         let fx: number, fy: number, tx: number, ty: number, eased: number, alpha: number;
         if (phase === "logo") {
           fx = p.ox; fy = p.oy; tx = p.lx; ty = p.ly;
@@ -214,10 +209,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           fx = p.lx; fy = p.ly; tx = p.wx; ty = p.wy;
           eased = easeInOut(localT);
           alpha = 1;
+        } else if (phase === "reveal") {
+          // Particles drift slightly upward and fade out so the clean wordmark can read
+          fx = p.wx; fy = p.wy;
+          tx = p.wx + (Math.sin(p.wx * 0.13) * 6);
+          ty = p.wy - 14 - p.delay * 10;
+          eased = easeOut(localT);
+          alpha = 1 - easeInOut(localT);
         } else if (phase === "burst") {
           fx = p.wx; fy = p.wy; tx = p.bx; ty = p.by;
           eased = easeOut(localT);
-          alpha = 1 - localT;
+          alpha = 0; // already faded in reveal
         } else {
           fx = p.bx; fy = p.by; tx = p.bx; ty = p.by;
           eased = 1;
