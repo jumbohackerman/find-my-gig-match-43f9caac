@@ -475,8 +475,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         .sp-badge {
           position: absolute; z-index: 25;
-          background: rgba(16,24,48,0.75);
-          border: 1px solid rgba(59,130,246,0.35);
+          background: rgba(40,20,12,0.75);
+          border: 1px solid rgba(245,130,70,0.4);
           backdrop-filter: blur(10px);
           border-radius: 999px;
           padding: 6px 14px 6px 10px;
@@ -486,16 +486,16 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-badge-dot {
           width: 8px; height: 8px; border-radius: 50%;
-          background: #22C55E;
-          box-shadow: 0 0 8px 2px rgba(34,197,94,0.6);
+          background: #F26B3C;
+          box-shadow: 0 0 8px 2px rgba(242,107,60,0.7);
           animation: spBadgeDotPulse 2s ease-in-out infinite;
         }
         @keyframes spBadgeDotPulse {
           0%,100% { transform: scale(1); }
           50%     { transform: scale(1.3); }
         }
-        .sp-badge-text { font-size: 11px; font-weight: 600; color: rgba(200,220,255,0.85); letter-spacing: 0.02em; }
-        .sp-badge-pct  { font-size: 12px; font-weight: 800; color: #22C55E; }
+        .sp-badge-text { font-size: 11px; font-weight: 600; color: rgba(255,225,205,0.9); letter-spacing: 0.02em; }
+        .sp-badge-pct  { font-size: 12px; font-weight: 800; color: #FBA76A; }
 
         .sp-badge-1 { bottom: 30%; left: calc(50% - 240px); animation-delay: 2.2s; }
         .sp-badge-2 { bottom: 34%; right: calc(50% - 240px); animation-delay: 3.1s; }
