@@ -2,28 +2,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// JobSwipe.pl — premium splash screen
-// Cinematic minimal: mark draws itself with a luminous stroke, then the
-// wordmark resolves from blur to sharp with a subtle parallax and shimmer.
-// No noisy particles. Confident, brand-forward, world-class.
+// JobSwipe.pl — premium splash screen (v2)
+// World-class minimal: a luminous tile lands with depth, the mark draws itself,
+// the wordmark resolves from blur with kinetic letter-spacing, an accent line
+// snaps in, and the entire scene exhales before an iris-flash hand-off.
 // ─────────────────────────────────────────────────────────────────────────────
 
 type Phase = "intro" | "mark" | "wordmark" | "settle" | "out";
+
+// Per-letter wordmark for staggered reveal
+const LETTERS = [
+  { ch: "J", tone: "fg" as const },
+  { ch: "o", tone: "fg" as const },
+  { ch: "b", tone: "fg" as const },
+  { ch: "S", tone: "grad" as const },
+  { ch: "w", tone: "grad" as const },
+  { ch: "i", tone: "grad" as const },
+  { ch: "p", tone: "grad" as const },
+  { ch: "e", tone: "grad" as const },
+  { ch: ".", tone: "muted" as const },
+  { ch: "p", tone: "muted" as const },
+  { ch: "l", tone: "muted" as const },
+];
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const [phase, setPhase] = useState<Phase>("intro");
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("mark"), 120);
-    const t2 = setTimeout(() => setPhase("wordmark"), 1100);
-    const t3 = setTimeout(() => setPhase("settle"), 2100);
-    const t4 = setTimeout(() => setPhase("out"), 2800);
-    const t5 = setTimeout(onFinish, 3500);
+    const t1 = setTimeout(() => setPhase("mark"), 100);
+    const t2 = setTimeout(() => setPhase("wordmark"), 1050);
+    const t3 = setTimeout(() => setPhase("settle"), 2050);
+    const t4 = setTimeout(() => setPhase("out"), 2850);
+    const t5 = setTimeout(onFinish, 3550);
     return () => [t1, t2, t3, t4, t5].forEach(clearTimeout);
   }, [onFinish]);
 
   const showMark = phase !== "intro";
   const showWord = phase === "wordmark" || phase === "settle" || phase === "out";
+  const showAccent = phase === "settle" || phase === "out";
   const showTagline = phase === "settle" || phase === "out";
 
   return (
@@ -32,106 +48,139 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         key="splash"
         initial={{ opacity: 1 }}
         animate={{ opacity: phase === "out" ? 0 : 1 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
         className="fixed inset-0 z-[9999] flex items-center justify-center bg-background overflow-hidden"
       >
-        {/* ── Atmosphere: vignette + soft aurora ── */}
+        {/* ── Atmosphere ── */}
+        {/* Vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 75%)",
+              "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 78%)",
           }}
         />
+        {/* Primary aurora glow */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: phase === "out" ? 0 : 0.35, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.55 }}
+          animate={{
+            opacity: phase === "out" ? 0 : 0.4,
+            scale: phase === "settle" || phase === "out" ? 1.05 : 1,
+          }}
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[820px] h-[820px] rounded-full blur-[160px] pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[860px] h-[860px] rounded-full blur-[170px] pointer-events-none"
           style={{ background: "hsl(var(--primary) / 0.55)" }}
         />
+        {/* Accent glow offset */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: phase === "out" ? 0 : 0.18 }}
-          transition={{ duration: 2, delay: 0.3 }}
-          className="absolute top-[55%] left-[55%] -translate-x-1/2 -translate-y-1/2 w-[520px] h-[320px] rounded-full blur-[140px] pointer-events-none"
+          animate={{ opacity: phase === "out" ? 0 : 0.2 }}
+          transition={{ duration: 2.2, delay: 0.2 }}
+          className="absolute top-[58%] left-[58%] -translate-x-1/2 -translate-y-1/2 w-[540px] h-[340px] rounded-full blur-[140px] pointer-events-none"
           style={{ background: "hsl(var(--accent))" }}
         />
-
+        {/* Top light beam */}
+        <motion.div
+          initial={{ opacity: 0, scaleY: 0.3 }}
+          animate={{ opacity: showMark ? 0.18 : 0, scaleY: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[420px] h-[55%] pointer-events-none origin-top"
+          style={{
+            background:
+              "radial-gradient(ellipse at top, hsl(var(--primary) / 0.6) 0%, transparent 70%)",
+            filter: "blur(40px)",
+          }}
+        />
         {/* Subtle grid */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.035]"
+          className="absolute inset-0 pointer-events-none opacity-[0.04]"
           style={{
             backgroundImage:
               "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
+            backgroundSize: "76px 76px",
             maskImage:
-              "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+              "radial-gradient(ellipse at center, black 28%, transparent 72%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+              "radial-gradient(ellipse at center, black 28%, transparent 72%)",
           }}
         />
 
-        {/* ── Composition ── */}
-        <div className="relative flex flex-col items-center gap-10">
-          {/* Mark: luminous self-drawing checkmark inside a gradient tile */}
+        {/* ── Composition with subtle "breathing" lift in settle ── */}
+        <motion.div
+          animate={{
+            y: phase === "settle" ? -4 : phase === "out" ? -10 : 0,
+            scale: phase === "out" ? 1.04 : 1,
+          }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex flex-col items-center gap-12"
+        >
+          {/* ── Mark ── */}
           <div className="relative">
             {/* Pulsing halo ring */}
             <motion.div
               initial={{ scale: 0.6, opacity: 0 }}
               animate={{
-                scale: showMark ? [1, 1.18, 1] : 0.6,
-                opacity: showMark ? [0.6, 0, 0.6] : 0,
+                scale: showMark ? [1, 1.22, 1] : 0.6,
+                opacity: showMark ? [0.55, 0, 0.55] : 0,
               }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-[-18px] rounded-[28px] pointer-events-none"
-              style={{ border: "1.5px solid hsl(var(--primary) / 0.35)" }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-[-22px] rounded-[32px] pointer-events-none"
+              style={{ border: "1.5px solid hsl(var(--primary) / 0.4)" }}
+            />
+
+            {/* Outer soft glow */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: showMark ? 0.7 : 0, scale: showMark ? 1.4 : 0.7 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 rounded-[26px] pointer-events-none blur-2xl"
+              style={{ background: "var(--gradient-primary)" }}
             />
 
             {/* Tile */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.7, rotateX: -25, y: 12 }}
+              initial={{ opacity: 0, scale: 0.65, rotateX: -28, y: 16 }}
               animate={{
                 opacity: showMark ? 1 : 0,
-                scale: showMark ? (phase === "settle" || phase === "out" ? 1 : 1) : 0.7,
-                rotateX: 0,
+                scale: showMark ? 1 : 0.65,
+                rotateX: showMark ? 0 : -28,
                 y: 0,
               }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-[112px] h-[112px] rounded-[26px] flex items-center justify-center"
+              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-[120px] h-[120px] rounded-[28px] flex items-center justify-center"
               style={{
                 background: "var(--gradient-primary)",
                 boxShadow:
-                  "0 24px 60px -16px hsl(16 92% 62% / 0.55), 0 0 80px -20px hsl(355 88% 58% / 0.4), inset 0 1px 0 0 hsl(0 0% 100% / 0.18), inset 0 -2px 4px 0 hsl(0 0% 0% / 0.18)",
-                transformPerspective: 800,
+                  "0 30px 70px -16px hsl(16 92% 62% / 0.6), 0 0 90px -20px hsl(355 88% 58% / 0.45), inset 0 1.5px 0 0 hsl(0 0% 100% / 0.22), inset 0 -2px 6px 0 hsl(0 0% 0% / 0.22)",
+                transformPerspective: 900,
               }}
             >
-              {/* Specular highlight sweep */}
+              {/* Specular sweep */}
               <motion.div
-                initial={{ x: "-120%" }}
-                animate={{ x: showMark ? "140%" : "-120%" }}
-                transition={{ duration: 1.4, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 rounded-[26px] overflow-hidden"
+                initial={{ x: "-130%" }}
+                animate={{ x: showMark ? "150%" : "-130%" }}
+                transition={{ duration: 1.5, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 rounded-[28px] overflow-hidden"
                 style={{
                   background:
-                    "linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / 0.35) 50%, transparent 65%)",
+                    "linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / 0.4) 50%, transparent 65%)",
                   mixBlendMode: "screen",
-                  width: "60%",
+                  width: "55%",
                 }}
               />
 
               {/* Self-drawing checkmark */}
               <svg
-                width="56"
-                height="56"
+                width="60"
+                height="60"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="hsl(0 0% 100%)"
-                strokeWidth="2.4"
+                strokeWidth="2.6"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="relative z-10"
-                style={{ filter: "drop-shadow(0 2px 6px hsl(0 0% 0% / 0.25))" }}
+                style={{ filter: "drop-shadow(0 2px 8px hsl(0 0% 0% / 0.3))" }}
               >
                 <motion.path
                   d="M20 6 9 17l-5-5"
@@ -141,99 +190,112 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
                     opacity: showMark ? 1 : 0,
                   }}
                   transition={{
-                    pathLength: { duration: 0.7, delay: 0.35, ease: [0.65, 0, 0.35, 1] },
-                    opacity: { duration: 0.2, delay: 0.35 },
+                    pathLength: { duration: 0.65, delay: 0.4, ease: [0.65, 0, 0.35, 1] },
+                    opacity: { duration: 0.15, delay: 0.4 },
                   }}
                 />
               </svg>
+
+              {/* Pop flash on completion */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{
+                  opacity: showMark ? [0, 0.7, 0] : 0,
+                  scale: showMark ? [0.6, 1.4, 1.6] : 0.6,
+                }}
+                transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
+                className="absolute inset-0 rounded-[28px] pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(circle, hsl(0 0% 100% / 0.45) 0%, transparent 65%)",
+                }}
+              />
             </motion.div>
 
             {/* Ground reflection */}
             <motion.div
               initial={{ opacity: 0, scaleY: 0 }}
-              animate={{ opacity: showMark ? 0.35 : 0, scaleY: showMark ? 1 : 0 }}
-              transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[140px] h-[36px] rounded-[50%] pointer-events-none origin-top"
+              animate={{ opacity: showMark ? 0.4 : 0, scaleY: showMark ? 1 : 0 }}
+              transition={{ duration: 0.9, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-[150px] h-[40px] rounded-[50%] pointer-events-none origin-top"
               style={{
                 background:
-                  "radial-gradient(ellipse at center, hsl(16 92% 62% / 0.45) 0%, transparent 70%)",
-                filter: "blur(8px)",
+                  "radial-gradient(ellipse at center, hsl(16 92% 62% / 0.5) 0%, transparent 70%)",
+                filter: "blur(10px)",
               }}
             />
           </div>
 
-          {/* Wordmark */}
-          <div className="relative flex flex-col items-center gap-4 min-h-[90px]">
-            <motion.h1
-              initial={{ opacity: 0, y: 14, filter: "blur(14px)", letterSpacing: "0.18em" }}
-              animate={{
-                opacity: showWord ? 1 : 0,
-                y: showWord ? 0 : 14,
-                filter: showWord ? "blur(0px)" : "blur(14px)",
-                letterSpacing: showWord ? "-0.025em" : "0.18em",
-              }}
-              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display text-5xl md:text-6xl font-bold tracking-tight relative"
+          {/* ── Wordmark ── */}
+          <div className="relative flex flex-col items-center gap-5 min-h-[110px]">
+            <h1
+              className="font-display text-5xl md:text-6xl font-bold tracking-tight relative flex items-baseline"
+              style={{ letterSpacing: "-0.02em" }}
             >
-              <span className="text-foreground">Job</span>
-              <span className="text-gradient-primary relative">
-                Swipe
-                {/* Wordmark shimmer */}
+              {LETTERS.map((l, i) => (
                 <motion.span
-                  initial={{ x: "-120%", opacity: 0 }}
+                  key={i}
+                  initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
                   animate={{
-                    x: showWord ? "140%" : "-120%",
-                    opacity: showWord ? [0, 1, 0] : 0,
+                    opacity: showWord ? 1 : 0,
+                    y: showWord ? 0 : 22,
+                    filter: showWord ? "blur(0px)" : "blur(10px)",
                   }}
-                  transition={{ duration: 1.6, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(115deg, transparent 35%, hsl(0 0% 100% / 0.6) 50%, transparent 65%)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                    mixBlendMode: "screen",
+                  transition={{
+                    duration: 0.7,
+                    delay: showWord ? i * 0.045 : 0,
+                    ease: [0.16, 1, 0.3, 1],
                   }}
+                  className={
+                    l.tone === "grad"
+                      ? "text-gradient-primary"
+                      : l.tone === "muted"
+                        ? "text-muted-foreground/70"
+                        : "text-foreground"
+                  }
+                  style={
+                    l.tone === "grad"
+                      ? { filter: "drop-shadow(0 0 18px hsl(var(--primary) / 0.45))" }
+                      : undefined
+                  }
                 >
-                  Swipe
+                  {l.ch}
                 </motion.span>
-              </span>
-              <span className="text-muted-foreground/80">.pl</span>
-            </motion.h1>
+              ))}
+            </h1>
 
             {/* Underline accent */}
             <motion.div
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{
-                scaleX: showWord ? 1 : 0,
-                opacity: showWord ? 1 : 0,
+                scaleX: showAccent ? 1 : 0,
+                opacity: showAccent ? 1 : 0,
               }}
-              transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="h-[2px] w-24 rounded-full origin-center"
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="h-[2px] w-28 rounded-full origin-center"
               style={{
                 background:
                   "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
-                boxShadow: "0 0 12px hsl(var(--primary) / 0.6)",
+                boxShadow: "0 0 14px hsl(var(--primary) / 0.7)",
               }}
             />
 
             {/* Tagline */}
             <motion.p
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{
                 opacity: showTagline ? 1 : 0,
-                y: showTagline ? 0 : 6,
+                y: showTagline ? 0 : 8,
               }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[11px] text-muted-foreground tracking-[0.42em] uppercase"
+              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="text-xs text-muted-foreground tracking-[0.45em] uppercase"
             >
               Znajdź swoją idealną pracę
             </motion.p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* ── Bottom: refined progress indicator ── */}
+        {/* ── Bottom progress indicator ── */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{
@@ -257,16 +319,16 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           </div>
         </motion.div>
 
-        {/* Final reveal: subtle iris flash on exit */}
+        {/* Iris flash on exit */}
         {phase === "out" && (
           <motion.div
-            initial={{ scale: 0, opacity: 0.5 }}
-            animate={{ scale: 8, opacity: 0 }}
+            initial={{ scale: 0, opacity: 0.6 }}
+            animate={{ scale: 12, opacity: 0 }}
             transition={{ duration: 0.7, ease: [0.65, 0, 0.35, 1] }}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full pointer-events-none"
             style={{
               background:
-                "radial-gradient(circle, hsl(var(--primary) / 0.5) 0%, transparent 70%)",
+                "radial-gradient(circle, hsl(var(--primary) / 0.55) 0%, transparent 70%)",
             }}
           />
         )}
