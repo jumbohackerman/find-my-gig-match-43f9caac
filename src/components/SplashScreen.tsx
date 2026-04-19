@@ -33,7 +33,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     const t2 = setTimeout(() => setPhase("wordmark"), 1050);
     const t3 = setTimeout(() => setPhase("settle"), 2050);
     const t4 = setTimeout(() => setPhase("out"), 2850);
-    const t5 = setTimeout(onFinish, 3550);
+    const t5 = setTimeout(onFinish, 4300);
     return () => [t1, t2, t3, t4, t5].forEach(clearTimeout);
   }, [onFinish]);
 
@@ -48,7 +48,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         key="splash"
         initial={{ opacity: 1 }}
         animate={{ opacity: phase === "out" ? 0 : 1 }}
-        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 1.1, delay: phase === "out" ? 0.3 : 0, ease: [0.16, 1, 0.3, 1] }}
         className="fixed inset-0 z-[9999] flex items-center justify-center bg-background overflow-hidden"
       >
         {/* ── Atmosphere ── */}
