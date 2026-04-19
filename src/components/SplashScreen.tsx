@@ -564,7 +564,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             <span className="sp-w-swipe">Swipe</span>
             <span className="sp-w-tld">.pl</span>
           </div>
-          <p className="sp-tagline">Znajdź pracę, jednym gestem</p>
+          <p className="sp-tagline">Znajdź pracę, jednym ruchem</p>
 
           <div className="sp-progress-wrap">
             <div className="sp-progress-track">
