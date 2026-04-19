@@ -203,7 +203,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       });
 
       const gs = 52, ox = (t * 0.15) % gs, oy = (t * 0.15) % gs;
-      ctx.strokeStyle = "rgba(59,130,246,0.035)"; ctx.lineWidth = 0.5;
+      ctx.strokeStyle = "rgba(245,130,70,0.035)"; ctx.lineWidth = 0.5;
       for (let x = -gs + ox; x < W + gs; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
       for (let y = -oy; y < H + gs; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
