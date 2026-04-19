@@ -299,16 +299,34 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             style={{ width: STAGE_W, height: STAGE_H, display: "block" }}
           />
 
+          {/* Clean wordmark — appears as particles dissolve */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{
+              opacity: phase === "reveal" || phase === "burst" ? 1 : 0,
+              scale: phase === "reveal" || phase === "burst" ? 1 : 0.96,
+            }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: phase === "reveal" ? 0.35 : 0 }}
+            className="absolute left-0 right-0 flex justify-center"
+            style={{ top: 230 }}
+          >
+            <h1 className="font-display text-6xl font-bold tracking-tight">
+              <span className="text-foreground">Job</span>
+              <span className="text-gradient-primary">Swipe</span>
+              <span className="text-foreground">.pl</span>
+            </h1>
+          </motion.div>
+
           {/* Tagline */}
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{
-              opacity: phase === "wordmark" ? 1 : 0,
-              y: phase === "wordmark" ? 0 : 8,
+              opacity: phase === "reveal" || phase === "burst" ? 1 : 0,
+              y: phase === "reveal" || phase === "burst" ? 0 : 8,
             }}
-            transition={{ duration: 0.6, delay: phase === "wordmark" ? 0.9 : 0 }}
+            transition={{ duration: 0.5, delay: phase === "reveal" ? 0.7 : 0 }}
             className="absolute left-0 right-0 text-center text-xs tracking-[0.4em] uppercase text-muted-foreground"
-            style={{ top: 320 }}
+            style={{ top: 310 }}
           >
             Znajdź swoją idealną pracę
           </motion.p>
