@@ -1,363 +1,237 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// JobSwipe.pl — premium splash screen (v2)
-// World-class minimal: a luminous tile lands with depth, the mark draws itself,
-// the wordmark resolves from blur with kinetic letter-spacing, an accent line
-// snaps in, and the entire scene exhales before an iris-flash hand-off.
+// JobSwipe.pl — Splash Screen v3
+// Apple-level craftsmanship. Pure CSS animations. Zero JS-driven visuals.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Phase = "intro" | "mark" | "wordmark" | "settle" | "out";
-
-// Per-letter wordmark for staggered reveal
-const LETTERS = [
-  { ch: "J", tone: "fg" as const },
-  { ch: "o", tone: "fg" as const },
-  { ch: "b", tone: "fg" as const },
-  { ch: "S", tone: "grad" as const },
-  { ch: "w", tone: "grad" as const },
-  { ch: "i", tone: "grad" as const },
-  { ch: "p", tone: "grad" as const },
-  { ch: "e", tone: "grad" as const },
-  { ch: ".", tone: "muted" as const },
-  { ch: "p", tone: "muted" as const },
-  { ch: "l", tone: "muted" as const },
-];
+const SPLASH_DURATION = 2200;
+const EXIT_DURATION = 400;
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
-  const [phase, setPhase] = useState<Phase>("intro");
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("mark"), 100);
-    const t2 = setTimeout(() => setPhase("wordmark"), 1050);
-    const t3 = setTimeout(() => setPhase("settle"), 2050);
-    const t4 = setTimeout(() => setPhase("out"), 2850);
-    const t5 = setTimeout(onFinish, 4300);
-    return () => [t1, t2, t3, t4, t5].forEach(clearTimeout);
+    const exitTimer = setTimeout(() => setExiting(true), SPLASH_DURATION);
+    const finishTimer = setTimeout(onFinish, SPLASH_DURATION + EXIT_DURATION);
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(finishTimer);
+    };
   }, [onFinish]);
 
-  const showMark = phase !== "intro";
-  const showWord = phase === "wordmark" || phase === "settle" || phase === "out";
-  const showAccent = phase === "settle" || phase === "out";
-  const showTagline = phase === "settle" || phase === "out";
-
   return (
-    <AnimatePresence>
-      <motion.div
-        key="splash"
-        initial={{ opacity: 1 }}
-        animate={{ opacity: phase === "out" ? 0 : 1 }}
-        transition={{ duration: 1.1, delay: phase === "out" ? 0.3 : 0, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-background overflow-hidden"
-      >
-        {/* ── Atmosphere ── */}
-        {/* Vignette */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 78%)",
-          }}
-        />
-        {/* Primary aurora glow */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.55 }}
-          animate={{
-            opacity: phase === "out" ? 0 : 0.4,
-            scale: phase === "settle" || phase === "out" ? 1.05 : 1,
-          }}
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[860px] h-[860px] rounded-full blur-[170px] pointer-events-none"
-          style={{ background: "hsl(var(--primary) / 0.55)" }}
-        />
-        {/* Accent glow offset */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: phase === "out" ? 0 : 0.2 }}
-          transition={{ duration: 2.2, delay: 0.2 }}
-          className="absolute top-[58%] left-[58%] -translate-x-1/2 -translate-y-1/2 w-[540px] h-[340px] rounded-full blur-[140px] pointer-events-none"
-          style={{ background: "hsl(var(--accent))" }}
-        />
-        {/* Top light beam */}
-        <motion.div
-          initial={{ opacity: 0, scaleY: 0.3 }}
-          animate={{ opacity: showMark ? 0.18 : 0, scaleY: 1 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[420px] h-[55%] pointer-events-none origin-top"
-          style={{
-            background:
-              "radial-gradient(ellipse at top, hsl(var(--primary) / 0.6) 0%, transparent 70%)",
-            filter: "blur(40px)",
-          }}
-        />
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
-            backgroundSize: "76px 76px",
-            maskImage:
-              "radial-gradient(ellipse at center, black 28%, transparent 72%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse at center, black 28%, transparent 72%)",
-          }}
-        />
+    <>
+      <style>{`
+        :root {
+          --splash-bg: #0A0A0A;
+          --splash-brand: #FF5B35;
+          --splash-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+          --splash-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+          --splash-ease-in: cubic-bezier(0.4, 0, 1, 1);
+        }
 
-        {/* ── Composition with subtle "breathing" lift in settle ── */}
-        <motion.div
-          animate={{
-            y: phase === "settle" ? -4 : phase === "out" ? -10 : 0,
-            scale: phase === "out" ? 1.04 : 1,
-          }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative flex flex-col items-center gap-12"
-        >
-          {/* ── Mark ── */}
-          <div className="relative">
-            {/* Pulsing halo ring */}
-            <motion.div
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{
-                scale: showMark ? [1, 1.22, 1] : 0.6,
-                opacity: showMark ? [0.55, 0, 0.55] : 0,
-              }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-[-22px] rounded-[32px] pointer-events-none"
-              style={{ border: "1.5px solid hsl(var(--primary) / 0.4)" }}
-            />
+        .splash-root {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: var(--splash-bg);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          transition: opacity 400ms var(--splash-ease-in), transform 400ms var(--splash-ease-in);
+        }
+        .splash-root.is-exiting {
+          opacity: 0;
+          transform: scale(1.05);
+        }
 
-            {/* Outer soft glow */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.7 }}
-              animate={{ opacity: showMark ? 0.7 : 0, scale: showMark ? 1.4 : 0.7 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 rounded-[26px] pointer-events-none blur-2xl"
-              style={{ background: "var(--gradient-primary)" }}
-            />
+        /* Contained radial glow behind the icon — does not bleed to edges */
+        .splash-glow {
+          position: absolute;
+          top: 45%;
+          left: 50%;
+          width: 400px;
+          height: 300px;
+          transform: translate(-50%, -50%);
+          background: radial-gradient(
+            ellipse at center,
+            rgba(255, 91, 53, 0.18) 0%,
+            rgba(255, 91, 53, 0.06) 50%,
+            transparent 100%
+          );
+          pointer-events: none;
+        }
 
-            {/* Tile */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.65, rotateX: -28, y: 16 }}
-              animate={{
-                opacity: showMark ? 1 : 0,
-                scale: showMark ? 1 : 0.65,
-                rotateX: showMark ? 0 : -28,
-                y: 0,
-              }}
-              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-[120px] h-[120px] rounded-[28px] flex items-center justify-center overflow-hidden"
-              style={{
-                background: "var(--gradient-primary)",
-                boxShadow:
-                  "0 30px 70px -16px hsl(16 92% 62% / 0.6), 0 0 90px -20px hsl(355 88% 58% / 0.45), inset 0 1.5px 0 0 hsl(0 0% 100% / 0.22), inset 0 -2px 6px 0 hsl(0 0% 0% / 0.22)",
-                transformPerspective: 900,
-              }}
-            >
-              {/* Specular sweep — soft diagonal shimmer, clipped inside tile */}
-              <motion.div
-                initial={{ x: "-120%", opacity: 0 }}
-                animate={{
-                  x: showMark ? "120%" : "-120%",
-                  opacity: showMark ? [0, 0.7, 0] : 0,
-                }}
-                transition={{
-                  x: { duration: 1.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] },
-                  opacity: { duration: 1.8, delay: 0.55, ease: "easeInOut", times: [0, 0.5, 1] },
-                }}
-                className="absolute inset-y-0 left-0 w-full pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(110deg, transparent 44%, hsl(0 0% 100% / 0.22) 50%, transparent 56%)",
-                  mixBlendMode: "screen",
-                  filter: "blur(3px)",
-                }}
-              />
+        .splash-stack {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
 
-              {/* Self-drawing checkmark */}
-              <svg
-                width="60"
-                height="60"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="hsl(0 0% 100%)"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="relative z-10"
-                style={{ filter: "drop-shadow(0 2px 8px hsl(0 0% 0% / 0.3))" }}
-              >
-                <motion.path
-                  d="M20 6 9 17l-5-5"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{
-                    pathLength: showMark ? 1 : 0,
-                    opacity: showMark ? 1 : 0,
-                  }}
-                  transition={{
-                    pathLength: { duration: 0.65, delay: 0.4, ease: [0.65, 0, 0.35, 1] },
-                    opacity: { duration: 0.15, delay: 0.4 },
-                  }}
-                />
-              </svg>
+        /* ── Icon ── */
+        .splash-icon {
+          width: 88px;
+          height: 88px;
+          border-radius: 22px;
+          background: linear-gradient(135deg, #FF6B45 0%, #FF4520 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transform: scale(0.85);
+          animation:
+            splash-icon-in 600ms var(--splash-ease-spring) forwards,
+            splash-icon-breathe 2400ms ease-in-out 1100ms infinite;
+          box-shadow:
+            0 0 60px rgba(255, 91, 53, 0.35),
+            0 0 120px rgba(255, 91, 53, 0.12);
+        }
+        .splash-icon svg {
+          width: 44px;
+          height: 44px;
+          stroke: #fff;
+          stroke-width: 2.8;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          fill: none;
+        }
 
-              {/* Pop flash on completion */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{
-                  opacity: showMark ? [0, 0.7, 0] : 0,
-                  scale: showMark ? [0.6, 1.4, 1.6] : 0.6,
-                }}
-                transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
-                className="absolute inset-0 rounded-[28px] pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(circle, hsl(0 0% 100% / 0.45) 0%, transparent 65%)",
-                }}
-              />
-            </motion.div>
+        @keyframes splash-icon-in {
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @keyframes splash-icon-breathe {
+          0%, 100% {
+            box-shadow:
+              0 0 40px rgba(255, 91, 53, 0.30),
+              0 0 90px rgba(255, 91, 53, 0.10);
+          }
+          50% {
+            box-shadow:
+              0 0 70px rgba(255, 91, 53, 0.50),
+              0 0 130px rgba(255, 91, 53, 0.18);
+          }
+        }
 
-            {/* Ground reflection */}
-            <motion.div
-              initial={{ opacity: 0, scaleY: 0 }}
-              animate={{ opacity: showMark ? 0.4 : 0, scaleY: showMark ? 1 : 0 }}
-              transition={{ duration: 0.9, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute left-1/2 -translate-x-1/2 top-full mt-3 w-[150px] h-[40px] rounded-[50%] pointer-events-none origin-top"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, hsl(16 92% 62% / 0.5) 0%, transparent 70%)",
-                filter: "blur(10px)",
-              }}
-            />
+        /* ── Logo wordmark ── */
+        .splash-logo {
+          margin-top: 20px;
+          font-size: 32px;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          line-height: 1;
+          opacity: 0;
+          transform: translateY(8px);
+          animation: splash-rise 500ms var(--splash-ease-out) 300ms forwards;
+        }
+        .splash-logo .lg-job { color: #FFFFFF; font-weight: 700; }
+        .splash-logo .lg-swipe { color: var(--splash-brand); font-weight: 700; }
+        .splash-logo .lg-tld { color: rgba(255, 255, 255, 0.35); font-weight: 400; }
+
+        /* ── Tagline ── */
+        .splash-tagline {
+          margin-top: 12px;
+          font-size: 13px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.28);
+          opacity: 0;
+          transform: translateY(6px);
+          animation: splash-rise 400ms var(--splash-ease-out) 550ms forwards;
+        }
+
+        @keyframes splash-rise {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* ── Loading dots ── */
+        .splash-dots {
+          position: absolute;
+          bottom: 40px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 6px;
+          opacity: 0;
+          animation: splash-fade-in 400ms var(--splash-ease-out) 700ms forwards;
+        }
+        .splash-dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.15);
+          transition: background-color 150ms ease;
+          animation: splash-dot-cycle 1500ms steps(1, end) infinite;
+        }
+        .splash-dot:nth-child(1) { animation-delay: 0ms; }
+        .splash-dot:nth-child(2) { animation-delay: 300ms; }
+        .splash-dot:nth-child(3) { animation-delay: 600ms; }
+        .splash-dot:nth-child(4) { animation-delay: 900ms; }
+        .splash-dot:nth-child(5) { animation-delay: 1200ms; }
+
+        @keyframes splash-dot-cycle {
+          0%, 20% { background: var(--splash-brand); }
+          20.01%, 100% { background: rgba(255, 255, 255, 0.15); }
+        }
+        @keyframes splash-fade-in {
+          to { opacity: 1; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .splash-icon,
+          .splash-logo,
+          .splash-tagline,
+          .splash-dots,
+          .splash-dot {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
+          .splash-icon {
+            box-shadow:
+              0 0 60px rgba(255, 91, 53, 0.35),
+              0 0 120px rgba(255, 91, 53, 0.12);
+          }
+        }
+      `}</style>
+
+      <div className={`splash-root${exiting ? " is-exiting" : ""}`}>
+        <div className="splash-glow" aria-hidden="true" />
+
+        <div className="splash-stack">
+          <div className="splash-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
           </div>
 
-          {/* ── Wordmark ── */}
-          <div className="relative flex flex-col items-center gap-5 min-h-[110px]">
-            <h1
-              className="font-display text-5xl md:text-6xl font-bold tracking-tight relative flex items-baseline"
-              style={{ letterSpacing: "-0.02em" }}
-            >
-              {LETTERS.map((l, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
-                  animate={{
-                    opacity: showWord ? 1 : 0,
-                    y: showWord ? 0 : 22,
-                    filter: showWord ? "blur(0px)" : "blur(10px)",
-                  }}
-                  transition={{
-                    duration: 0.7,
-                    delay: showWord ? i * 0.045 : 0,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className={
-                    l.tone === "grad"
-                      ? "text-gradient-primary"
-                      : l.tone === "muted"
-                        ? "text-muted-foreground/70"
-                        : "text-foreground"
-                  }
-                  style={
-                    l.tone === "grad"
-                      ? { filter: "drop-shadow(0 0 18px hsl(var(--primary) / 0.45))" }
-                      : undefined
-                  }
-                >
-                  {l.ch}
-                </motion.span>
-              ))}
-            </h1>
+          <h1 className="splash-logo">
+            <span className="lg-job">Job</span>
+            <span className="lg-swipe">Swipe</span>
+            <span className="lg-tld">.pl</span>
+          </h1>
 
-            {/* Underline accent */}
-            <motion.div
-              initial={{ scaleX: 0, opacity: 0 }}
-              animate={{
-                scaleX: showAccent ? 1 : 0,
-                opacity: showAccent ? 1 : 0,
-              }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="h-[2px] w-28 rounded-full origin-center"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)",
-                boxShadow: "0 0 14px hsl(var(--primary) / 0.7)",
-              }}
-            />
+          <p className="splash-tagline">Znajdź pracę, jednym gestem.</p>
+        </div>
 
-            {/* Tagline */}
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{
-                opacity: showTagline ? 1 : 0,
-                y: showTagline ? 0 : 8,
-              }}
-              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="text-xs text-muted-foreground tracking-[0.45em] uppercase"
-            >
-              Znajdź swoją idealną pracę
-            </motion.p>
-          </div>
-        </motion.div>
-
-        {/* ── Bottom progress indicator ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{
-            opacity: phase === "out" ? 0 : 1,
-            y: phase === "out" ? 8 : 0,
-          }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="absolute bottom-12 flex items-center gap-3"
-        >
-          <span className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground/70">
-            Loading
-          </span>
-          <div className="w-24 h-[1.5px] rounded-full bg-foreground/10 overflow-hidden">
-            <motion.div
-              initial={{ x: "-100%" }}
-              animate={{ x: "100%" }}
-              transition={{ duration: 1.4, ease: "easeInOut", repeat: Infinity }}
-              className="h-full w-1/2 rounded-full"
-              style={{ background: "var(--gradient-primary)" }}
-            />
-          </div>
-        </motion.div>
-
-        {/* Expanding shockwave rings on exit — radiate from icon to corners */}
-        {phase === "out" && (
-          <>
-            {[0, 0.18, 0.36, 0.54].map((delay, i) => (
-              <motion.div
-                key={`ring-${i}`}
-                initial={{ scale: 0.05, opacity: 0.9 }}
-                animate={{ scale: 40, opacity: 0 }}
-                transition={{ duration: 1.6, delay, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full pointer-events-none"
-                style={{
-                  border: "2px solid hsl(var(--primary) / 0.75)",
-                  boxShadow:
-                    "0 0 60px hsl(var(--primary) / 0.6), 0 0 120px hsl(var(--primary) / 0.35), inset 0 0 40px hsl(var(--primary) / 0.3)",
-                }}
-              />
-            ))}
-            {/* Soft radial wash that follows the rings */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0.7 }}
-              animate={{ scale: 22, opacity: 0 }}
-              transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1] }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(circle, hsl(var(--primary) / 0.7) 0%, hsl(var(--accent) / 0.35) 30%, transparent 70%)",
-                filter: "blur(8px)",
-              }}
-            />
-          </>
-        )}
-      </motion.div>
-    </AnimatePresence>
+        <div className="splash-dots" aria-hidden="true">
+          <span className="splash-dot" />
+          <span className="splash-dot" />
+          <span className="splash-dot" />
+          <span className="splash-dot" />
+          <span className="splash-dot" />
+        </div>
+      </div>
+    </>
   );
 };
 
