@@ -407,11 +407,11 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-w-job {
           font-size: 44px; font-weight: 800;
-          letter-spacing: -0.04em; color: #EEF2FF; line-height: 1;
+          letter-spacing: -0.04em; color: #FFF4EC; line-height: 1;
         }
         .sp-w-swipe {
           font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
-          background: linear-gradient(130deg, #93C5FD 0%, #3B82F6 45%, #2563EB 100%);
+          background: linear-gradient(130deg, #FFD2B0 0%, #F26B3C 45%, #C94A1F 100%);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
           background-size: 200% 200%;
           animation: spGradShift 5s ease infinite;
@@ -422,7 +422,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-w-tld {
           font-size: 30px; font-weight: 300; font-style: italic;
-          color: rgba(200,215,255,0.18); letter-spacing: -0.02em;
+          color: rgba(255,210,180,0.22); letter-spacing: -0.02em;
         }
 
         .sp-tagline {
