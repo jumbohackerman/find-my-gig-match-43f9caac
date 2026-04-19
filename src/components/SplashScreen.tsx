@@ -461,7 +461,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         .sp-dots { display: flex; gap: 6px; justify-content: center; }
         .sp-dot {
           width: 5px; height: 5px; border-radius: 50%;
-          background: rgba(59,130,246,0.6);
+          background: rgba(245,130,70,0.7);
           animation: spDotP 1.6s ease-in-out infinite;
         }
         .sp-dot:nth-child(2) { animation-delay: .18s; }
