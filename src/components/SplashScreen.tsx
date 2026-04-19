@@ -104,7 +104,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             speed: Math.random() * 0.008 + 0.004,
             activateAt: Math.random() * 400 + 80,
             pulsePos: 0,
-            color: [59, 130, 246],
+            color: [245, 130, 70],
           });
         });
         if (Math.random() < 0.3) {
