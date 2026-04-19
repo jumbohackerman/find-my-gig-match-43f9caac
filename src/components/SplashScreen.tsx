@@ -122,13 +122,13 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       r: Math.random() * 1.3 + 0.3,
       op: Math.random() * 0.4 + 0.1,
       ph: Math.random() * Math.PI * 2,
-      hue: 210 + Math.random() * 40,
+      hue: 18 + Math.random() * 24,
     }));
 
     const auroraBlobs = [
-      { bx: 0.2, by: 0.3, r: 0.35, hue: 220, speed: 0.00015, ph: 0 },
-      { bx: 0.8, by: 0.65, r: 0.3, hue: 250, speed: 0.00012, ph: 2 },
-      { bx: 0.5, by: 0.1, r: 0.28, hue: 200, speed: 0.0002, ph: 4 },
+      { bx: 0.2, by: 0.3, r: 0.35, hue: 20, speed: 0.00015, ph: 0 },
+      { bx: 0.8, by: 0.65, r: 0.3, hue: 30, speed: 0.00012, ph: 2 },
+      { bx: 0.5, by: 0.1, r: 0.28, hue: 14, speed: 0.0002, ph: 4 },
     ];
 
     const getNodePos = (node: Node) => {
