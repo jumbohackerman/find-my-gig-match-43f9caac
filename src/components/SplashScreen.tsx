@@ -384,15 +384,15 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         .sp-halo {
           position: absolute; inset: -14px; border-radius: 50%;
-          border: 1.5px solid rgba(79,142,247,0.22);
+          border: 1.5px solid rgba(251,167,106,0.22);
           animation: spHaloSpin 9s linear infinite;
         }
         .sp-halo::before {
           content: ''; position: absolute;
           top: -3px; left: 50%;
           width: 6px; height: 6px; border-radius: 50%;
-          background: #4F8EF7;
-          box-shadow: 0 0 10px 3px rgba(79,142,247,0.8);
+          background: #FBA76A;
+          box-shadow: 0 0 10px 3px rgba(251,167,106,0.8);
           transform: translateX(-50%);
         }
         @keyframes spHaloSpin { to { transform: rotate(360deg); } }
