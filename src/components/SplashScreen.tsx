@@ -150,10 +150,11 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       setPhase(p);
     };
     const t1 = setTimeout(() => setP("wordmark"), 1700);
-    const t2 = setTimeout(() => setP("burst"), 3300);
-    const t3 = setTimeout(() => setP("out"), 3800);
-    const t4 = setTimeout(onFinish, 4400);
-    return () => [t1, t2, t3, t4].forEach(clearTimeout);
+    const t2 = setTimeout(() => setP("reveal"), 3200);
+    const t3 = setTimeout(() => setP("burst"), 4400);
+    const t4 = setTimeout(() => setP("out"), 4900);
+    const t5 = setTimeout(onFinish, 5500);
+    return () => [t1, t2, t3, t4, t5].forEach(clearTimeout);
   }, [onFinish]);
 
   // Render loop
