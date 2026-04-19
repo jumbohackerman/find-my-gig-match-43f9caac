@@ -141,8 +141,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     };
 
     const drawPersonIcon = (x: number, y: number, size: number, alpha: number) => {
-      ctx.strokeStyle = `rgba(147,197,253,${alpha})`;
-      ctx.fillStyle = `rgba(30,58,120,${alpha * 0.7})`;
+      ctx.strokeStyle = `rgba(253,186,140,${alpha})`;
+      ctx.fillStyle = `rgba(120,50,20,${alpha * 0.7})`;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.arc(x, y - size * 0.35, size * 0.3, 0, Math.PI * 2);
@@ -153,8 +153,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     };
 
     const drawBriefcase = (x: number, y: number, size: number, alpha: number) => {
-      ctx.strokeStyle = `rgba(134,239,172,${alpha})`;
-      ctx.fillStyle = `rgba(20,60,40,${alpha * 0.7})`;
+      ctx.strokeStyle = `rgba(255,210,170,${alpha})`;
+      ctx.fillStyle = `rgba(80,30,10,${alpha * 0.7})`;
       ctx.lineWidth = 1.2;
       const w = size * 1.1, h = size * 0.8;
       ctx.beginPath();
@@ -172,14 +172,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     };
 
     const drawBuilding = (x: number, y: number, size: number, alpha: number) => {
-      ctx.strokeStyle = `rgba(216,180,254,${alpha})`;
-      ctx.fillStyle = `rgba(60,20,100,${alpha * 0.6})`;
+      ctx.strokeStyle = `rgba(255,180,130,${alpha})`;
+      ctx.fillStyle = `rgba(100,40,15,${alpha * 0.6})`;
       ctx.lineWidth = 1.2;
       const w = size * 0.9, h = size * 1.1;
       ctx.beginPath();
       ctx.rect(x - w / 2, y - h / 2, w, h);
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle = `rgba(216,180,254,${alpha * 0.5})`;
+      ctx.fillStyle = `rgba(255,180,130,${alpha * 0.5})`;
       for (let r = 0; r < 2; r++) for (let col = 0; col < 2; col++) {
         ctx.fillRect(x - w * 0.28 + col * w * 0.38, y - h * 0.25 + r * h * 0.35, w * 0.18, h * 0.2);
       }
