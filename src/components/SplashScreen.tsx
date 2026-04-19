@@ -11,7 +11,7 @@ const STAGE_W = 720;
 const STAGE_H = 360;
 const PARTICLE_COUNT = 220;
 
-type Phase = "logo" | "wordmark" | "burst" | "out";
+type Phase = "logo" | "wordmark" | "reveal" | "burst" | "out";
 
 interface Particle {
   ox: number; oy: number;        // origin (off-screen)
@@ -150,10 +150,11 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       setPhase(p);
     };
     const t1 = setTimeout(() => setP("wordmark"), 1700);
-    const t2 = setTimeout(() => setP("burst"), 3300);
-    const t3 = setTimeout(() => setP("out"), 3800);
-    const t4 = setTimeout(onFinish, 4400);
-    return () => [t1, t2, t3, t4].forEach(clearTimeout);
+    const t2 = setTimeout(() => setP("reveal"), 3200);
+    const t3 = setTimeout(() => setP("burst"), 4400);
+    const t4 = setTimeout(() => setP("out"), 4900);
+    const t5 = setTimeout(onFinish, 5500);
+    return () => [t1, t2, t3, t4, t5].forEach(clearTimeout);
   }, [onFinish]);
 
   // Render loop
@@ -177,6 +178,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     const PHASE_DUR: Record<Phase, number> = {
       logo: 1500,
       wordmark: 1500,
+      reveal: 1200,
       burst: 600,
       out: 600,
     };
@@ -185,11 +187,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       const now = performance.now();
       const phase = phaseRef.current;
 
-      // On phase change: snapshot current positions as the new "from"
-      if (phase !== prevPhase) {
-        // capture current rendered positions by re-sampling from the previous animation
-        prevPhase = phase;
-      }
+      if (phase !== prevPhase) prevPhase = phase;
 
       ctx.clearRect(0, 0, STAGE_W, STAGE_H);
       ctx.globalCompositeOperation = "lighter";
@@ -199,11 +197,9 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        // Per-particle delay (0..0.4 of duration)
         const delayMs = p.delay * dur * 0.5;
         const localT = Math.max(0, Math.min(1, (elapsed - delayMs) / (dur - delayMs)));
 
-        // Determine from/to per phase
         let fx: number, fy: number, tx: number, ty: number, eased: number, alpha: number;
         if (phase === "logo") {
           fx = p.ox; fy = p.oy; tx = p.lx; ty = p.ly;
@@ -213,10 +209,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           fx = p.lx; fy = p.ly; tx = p.wx; ty = p.wy;
           eased = easeInOut(localT);
           alpha = 1;
+        } else if (phase === "reveal") {
+          // Particles drift slightly upward and fade out so the clean wordmark can read
+          fx = p.wx; fy = p.wy;
+          tx = p.wx + (Math.sin(p.wx * 0.13) * 6);
+          ty = p.wy - 14 - p.delay * 10;
+          eased = easeOut(localT);
+          alpha = 1 - easeInOut(localT);
         } else if (phase === "burst") {
           fx = p.wx; fy = p.wy; tx = p.bx; ty = p.by;
           eased = easeOut(localT);
-          alpha = 1 - localT;
+          alpha = 0; // already faded in reveal
         } else {
           fx = p.bx; fy = p.by; tx = p.bx; ty = p.by;
           eased = 1;
@@ -296,16 +299,34 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             style={{ width: STAGE_W, height: STAGE_H, display: "block" }}
           />
 
+          {/* Clean wordmark — appears as particles dissolve */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{
+              opacity: phase === "reveal" || phase === "burst" ? 1 : 0,
+              scale: phase === "reveal" || phase === "burst" ? 1 : 0.96,
+            }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: phase === "reveal" ? 0.35 : 0 }}
+            className="absolute left-0 right-0 flex justify-center"
+            style={{ top: 230 }}
+          >
+            <h1 className="font-display text-6xl font-bold tracking-tight">
+              <span className="text-foreground">Job</span>
+              <span className="text-gradient-primary">Swipe</span>
+              <span className="text-foreground">.pl</span>
+            </h1>
+          </motion.div>
+
           {/* Tagline */}
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{
-              opacity: phase === "wordmark" ? 1 : 0,
-              y: phase === "wordmark" ? 0 : 8,
+              opacity: phase === "reveal" || phase === "burst" ? 1 : 0,
+              y: phase === "reveal" || phase === "burst" ? 0 : 8,
             }}
-            transition={{ duration: 0.6, delay: phase === "wordmark" ? 0.9 : 0 }}
+            transition={{ duration: 0.5, delay: phase === "reveal" ? 0.7 : 0 }}
             className="absolute left-0 right-0 text-center text-xs tracking-[0.4em] uppercase text-muted-foreground"
-            style={{ top: 320 }}
+            style={{ top: 310 }}
           >
             Znajdź swoją idealną pracę
           </motion.p>
