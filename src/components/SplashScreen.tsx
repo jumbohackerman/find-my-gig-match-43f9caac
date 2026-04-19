@@ -262,9 +262,9 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         const glowR = sz * 2.2;
         const glowCol =
-          node.type === "person" ? "59,130,246" :
-          node.type === "job" ? "34,197,94" :
-          "168,85,247";
+          node.type === "person" ? "245,130,70" :
+          node.type === "job" ? "255,170,90" :
+          "255,140,60";
         const gl = ctx.createRadialGradient(x, y, 0, x, y, glowR);
         gl.addColorStop(0, `rgba(${glowCol},${0.18 * pf})`);
         gl.addColorStop(1, "transparent");
