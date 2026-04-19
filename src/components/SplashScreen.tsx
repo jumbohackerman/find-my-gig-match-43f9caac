@@ -11,7 +11,7 @@ const STAGE_W = 720;
 const STAGE_H = 360;
 const PARTICLE_COUNT = 220;
 
-type Phase = "logo" | "wordmark" | "burst" | "out";
+type Phase = "logo" | "wordmark" | "reveal" | "burst" | "out";
 
 interface Particle {
   ox: number; oy: number;        // origin (off-screen)
