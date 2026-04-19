@@ -104,13 +104,13 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             speed: Math.random() * 0.008 + 0.004,
             activateAt: Math.random() * 400 + 80,
             pulsePos: 0,
-            color: [59, 130, 246],
+            color: [245, 130, 70],
           });
         });
         if (Math.random() < 0.3) {
           const cos = nodes.map((n, j) => ({ n, j })).filter((x) => x.n.type === "company");
           const co = cos[Math.floor(Math.random() * cos.length)];
-          if (co) edges.push({ from: i, to: co.j, phase: Math.random() * Math.PI * 2, speed: 0.005, activateAt: Math.random() * 500 + 120, pulsePos: 0, color: [139, 92, 246] });
+          if (co) edges.push({ from: i, to: co.j, phase: Math.random() * Math.PI * 2, speed: 0.005, activateAt: Math.random() * 500 + 120, pulsePos: 0, color: [255, 170, 100] });
         }
       }
     }
@@ -122,13 +122,13 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       r: Math.random() * 1.3 + 0.3,
       op: Math.random() * 0.4 + 0.1,
       ph: Math.random() * Math.PI * 2,
-      hue: 210 + Math.random() * 40,
+      hue: 18 + Math.random() * 24,
     }));
 
     const auroraBlobs = [
-      { bx: 0.2, by: 0.3, r: 0.35, hue: 220, speed: 0.00015, ph: 0 },
-      { bx: 0.8, by: 0.65, r: 0.3, hue: 250, speed: 0.00012, ph: 2 },
-      { bx: 0.5, by: 0.1, r: 0.28, hue: 200, speed: 0.0002, ph: 4 },
+      { bx: 0.2, by: 0.3, r: 0.35, hue: 20, speed: 0.00015, ph: 0 },
+      { bx: 0.8, by: 0.65, r: 0.3, hue: 30, speed: 0.00012, ph: 2 },
+      { bx: 0.5, by: 0.1, r: 0.28, hue: 14, speed: 0.0002, ph: 4 },
     ];
 
     const getNodePos = (node: Node) => {
@@ -141,8 +141,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     };
 
     const drawPersonIcon = (x: number, y: number, size: number, alpha: number) => {
-      ctx.strokeStyle = `rgba(147,197,253,${alpha})`;
-      ctx.fillStyle = `rgba(30,58,120,${alpha * 0.7})`;
+      ctx.strokeStyle = `rgba(253,186,140,${alpha})`;
+      ctx.fillStyle = `rgba(120,50,20,${alpha * 0.7})`;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.arc(x, y - size * 0.35, size * 0.3, 0, Math.PI * 2);
@@ -153,8 +153,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     };
 
     const drawBriefcase = (x: number, y: number, size: number, alpha: number) => {
-      ctx.strokeStyle = `rgba(134,239,172,${alpha})`;
-      ctx.fillStyle = `rgba(20,60,40,${alpha * 0.7})`;
+      ctx.strokeStyle = `rgba(255,210,170,${alpha})`;
+      ctx.fillStyle = `rgba(80,30,10,${alpha * 0.7})`;
       ctx.lineWidth = 1.2;
       const w = size * 1.1, h = size * 0.8;
       ctx.beginPath();
@@ -172,14 +172,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     };
 
     const drawBuilding = (x: number, y: number, size: number, alpha: number) => {
-      ctx.strokeStyle = `rgba(216,180,254,${alpha})`;
-      ctx.fillStyle = `rgba(60,20,100,${alpha * 0.6})`;
+      ctx.strokeStyle = `rgba(255,180,130,${alpha})`;
+      ctx.fillStyle = `rgba(100,40,15,${alpha * 0.6})`;
       ctx.lineWidth = 1.2;
       const w = size * 0.9, h = size * 1.1;
       ctx.beginPath();
       ctx.rect(x - w / 2, y - h / 2, w, h);
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle = `rgba(216,180,254,${alpha * 0.5})`;
+      ctx.fillStyle = `rgba(255,180,130,${alpha * 0.5})`;
       for (let r = 0; r < 2; r++) for (let col = 0; col < 2; col++) {
         ctx.fillRect(x - w * 0.28 + col * w * 0.38, y - h * 0.25 + r * h * 0.35, w * 0.18, h * 0.2);
       }
@@ -203,7 +203,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       });
 
       const gs = 52, ox = (t * 0.15) % gs, oy = (t * 0.15) % gs;
-      ctx.strokeStyle = "rgba(59,130,246,0.035)"; ctx.lineWidth = 0.5;
+      ctx.strokeStyle = "rgba(245,130,70,0.035)"; ctx.lineWidth = 0.5;
       for (let x = -gs + ox; x < W + gs; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
       for (let y = -oy; y < H + gs; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
@@ -262,9 +262,9 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         const glowR = sz * 2.2;
         const glowCol =
-          node.type === "person" ? "59,130,246" :
-          node.type === "job" ? "34,197,94" :
-          "168,85,247";
+          node.type === "person" ? "245,130,70" :
+          node.type === "job" ? "255,170,90" :
+          "255,140,60";
         const gl = ctx.createRadialGradient(x, y, 0, x, y, glowR);
         gl.addColorStop(0, `rgba(${glowCol},${0.18 * pf})`);
         gl.addColorStop(1, "transparent");
@@ -277,7 +277,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       });
 
       const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
-      cg.addColorStop(0, `rgba(37,99,235,${0.08 + 0.04 * Math.sin(t * 0.018)})`);
+      cg.addColorStop(0, `rgba(245,130,70,${0.08 + 0.04 * Math.sin(t * 0.018)})`);
       cg.addColorStop(1, "transparent");
       ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI * 2);
       ctx.fillStyle = cg; ctx.fill();
@@ -288,9 +288,9 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       ctx.beginPath();
       // @ts-ignore
       ctx.roundRect(cx - cw / 2, cardY - ch / 2, cw, ch, cr);
-      ctx.fillStyle = `rgba(37,99,235,${cardAlpha})`;
+      ctx.fillStyle = `rgba(245,130,70,${cardAlpha})`;
       ctx.fill();
-      ctx.strokeStyle = `rgba(93,173,255,${cardAlpha * 3})`;
+      ctx.strokeStyle = `rgba(255,180,130,${cardAlpha * 3})`;
       ctx.lineWidth = 0.8; ctx.stroke();
     };
 
@@ -348,13 +348,13 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         .sp-icon-bg {
           width: 86px; height: 86px; border-radius: 24px;
-          background: linear-gradient(145deg, #4F8EF7 0%, #2563EB 50%, #1340C0 100%);
+          background: linear-gradient(145deg, #FBA76A 0%, #F26B3C 50%, #C94A1F 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
           box-shadow:
-            0 0 0 1px rgba(79,142,247,0.35),
-            0 8px 28px rgba(37,99,235,0.55),
-            0 20px 60px rgba(19,64,192,0.3);
+            0 0 0 1px rgba(251,167,106,0.35),
+            0 8px 28px rgba(242,107,60,0.55),
+            0 20px 60px rgba(201,74,31,0.3);
         }
         .sp-icon-bg::before {
           content: '';
@@ -384,15 +384,15 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         .sp-halo {
           position: absolute; inset: -14px; border-radius: 50%;
-          border: 1.5px solid rgba(79,142,247,0.22);
+          border: 1.5px solid rgba(251,167,106,0.22);
           animation: spHaloSpin 9s linear infinite;
         }
         .sp-halo::before {
           content: ''; position: absolute;
           top: -3px; left: 50%;
           width: 6px; height: 6px; border-radius: 50%;
-          background: #4F8EF7;
-          box-shadow: 0 0 10px 3px rgba(79,142,247,0.8);
+          background: #FBA76A;
+          box-shadow: 0 0 10px 3px rgba(251,167,106,0.8);
           transform: translateX(-50%);
         }
         @keyframes spHaloSpin { to { transform: rotate(360deg); } }
@@ -407,11 +407,11 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-w-job {
           font-size: 44px; font-weight: 800;
-          letter-spacing: -0.04em; color: #EEF2FF; line-height: 1;
+          letter-spacing: -0.04em; color: #FFF4EC; line-height: 1;
         }
         .sp-w-swipe {
           font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: 1;
-          background: linear-gradient(130deg, #93C5FD 0%, #3B82F6 45%, #2563EB 100%);
+          background: linear-gradient(130deg, #FFD2B0 0%, #F26B3C 45%, #C94A1F 100%);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
           background-size: 200% 200%;
           animation: spGradShift 5s ease infinite;
@@ -422,14 +422,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-w-tld {
           font-size: 30px; font-weight: 300; font-style: italic;
-          color: rgba(200,215,255,0.18); letter-spacing: -0.02em;
+          color: rgba(255,210,180,0.22); letter-spacing: -0.02em;
         }
 
         .sp-tagline {
           margin-top: 11px;
           font-size: 11px; font-weight: 300;
           letter-spacing: 0.28em; text-transform: uppercase;
-          color: rgba(180,200,255,0.28);
+          color: rgba(255,210,180,0.32);
           animation: spWordIn 0.7s ease 0.65s both;
         }
 
@@ -444,7 +444,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-progress-fill {
           height: 100%; width: 0%; border-radius: 999px;
-          background: linear-gradient(90deg, #1D4ED8, #3B82F6, #93C5FD);
+          background: linear-gradient(90deg, #C94A1F, #F26B3C, #FFD2B0);
           background-size: 200% 100%;
           animation:
             spProgGrow 2.6s cubic-bezier(0.4,0,0.2,1) 1s forwards,
@@ -461,7 +461,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         .sp-dots { display: flex; gap: 6px; justify-content: center; }
         .sp-dot {
           width: 5px; height: 5px; border-radius: 50%;
-          background: rgba(59,130,246,0.6);
+          background: rgba(245,130,70,0.7);
           animation: spDotP 1.6s ease-in-out infinite;
         }
         .sp-dot:nth-child(2) { animation-delay: .18s; }
@@ -475,8 +475,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         .sp-badge {
           position: absolute; z-index: 25;
-          background: rgba(16,24,48,0.75);
-          border: 1px solid rgba(59,130,246,0.35);
+          background: rgba(40,20,12,0.75);
+          border: 1px solid rgba(245,130,70,0.4);
           backdrop-filter: blur(10px);
           border-radius: 999px;
           padding: 6px 14px 6px 10px;
@@ -486,16 +486,16 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         }
         .sp-badge-dot {
           width: 8px; height: 8px; border-radius: 50%;
-          background: #22C55E;
-          box-shadow: 0 0 8px 2px rgba(34,197,94,0.6);
+          background: #F26B3C;
+          box-shadow: 0 0 8px 2px rgba(242,107,60,0.7);
           animation: spBadgeDotPulse 2s ease-in-out infinite;
         }
         @keyframes spBadgeDotPulse {
           0%,100% { transform: scale(1); }
           50%     { transform: scale(1.3); }
         }
-        .sp-badge-text { font-size: 11px; font-weight: 600; color: rgba(200,220,255,0.85); letter-spacing: 0.02em; }
-        .sp-badge-pct  { font-size: 12px; font-weight: 800; color: #22C55E; }
+        .sp-badge-text { font-size: 11px; font-weight: 600; color: rgba(255,225,205,0.9); letter-spacing: 0.02em; }
+        .sp-badge-pct  { font-size: 12px; font-weight: 800; color: #FBA76A; }
 
         .sp-badge-1 { bottom: 30%; left: calc(50% - 240px); animation-delay: 2.2s; }
         .sp-badge-2 { bottom: 34%; right: calc(50% - 240px); animation-delay: 3.1s; }
@@ -564,7 +564,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             <span className="sp-w-swipe">Swipe</span>
             <span className="sp-w-tld">.pl</span>
           </div>
-          <p className="sp-tagline">Znajdź pracę, jednym gestem</p>
+          <p className="sp-tagline">Znajdź pracę, jednym ruchem</p>
 
           <div className="sp-progress-wrap">
             <div className="sp-progress-track">
