@@ -26,7 +26,12 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let W = 0, H = 0, cx = 0, cy = 0, raf = 0, t = 0;
+    let W = 0,
+      H = 0,
+      cx = 0,
+      cy = 0,
+      raf = 0,
+      t = 0;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -44,11 +49,20 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     window.addEventListener("resize", resize);
 
     const nodeTypes = [
-      "person","person","person","person","person",
-      "job","job","job","job",
-      "company","company","company",
+      "person",
+      "person",
+      "person",
+      "person",
+      "person",
+      "job",
+      "job",
+      "job",
+      "job",
+      "company",
+      "company",
+      "company",
     ] as const;
-    type NodeType = typeof nodeTypes[number];
+    type NodeType = (typeof nodeTypes)[number];
 
     interface Node {
       baseAngle: number;
@@ -99,7 +113,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         const picks = jobs.sort(() => Math.random() - 0.5).slice(0, 1 + Math.floor(Math.random() * 2));
         picks.forEach((p) => {
           edges.push({
-            from: i, to: p.j,
+            from: i,
+            to: p.j,
             phase: Math.random() * Math.PI * 2,
             speed: Math.random() * 0.008 + 0.004,
             activateAt: Math.random() * 400 + 80,
@@ -110,35 +125,49 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         if (Math.random() < 0.3) {
           const cos = nodes.map((n, j) => ({ n, j })).filter((x) => x.n.type === "company");
           const co = cos[Math.floor(Math.random() * cos.length)];
-          if (co) edges.push({ from: i, to: co.j, phase: Math.random() * Math.PI * 2, speed: 0.005, activateAt: Math.random() * 500 + 120, pulsePos: 0, color: [255, 170, 100] });
+          if (co)
+            edges.push({
+              from: i,
+              to: co.j,
+              phase: Math.random() * Math.PI * 2,
+              speed: 0.005,
+              activateAt: Math.random() * 500 + 120,
+              pulsePos: 0,
+              color: [255, 170, 100],
+            });
         }
       }
     }
 
-    const floaters = Array.from({ length: 100 }, (_, i) => {
-      const isAccent = i % 5 === 0;
-      const isSpark = i % 10 === 0;
+    // ─────────────────────────────────────────────────────────────────────────
+    // FLOATERS — 80 kulek, stonowana widoczność żeby nie tworzyły efektu
+    // gwiazdozbioru. Bazowe bardzo subtelne, akcenty i iskry tylko lekko
+    // wyróżnione. Kulki bliżej centrum (vignetted przez canvas) są naturalnie
+    // jaśniejsze — te w tle zostają ciemne i dyskretne.
+    // ─────────────────────────────────────────────────────────────────────────
+    const floaters = Array.from({ length: 80 }, (_, i) => {
+      const isAccent = i % 5 === 0; // lekko jaśniejsza kulka
+      const isSpark = i % 10 === 0; // akcent iskry
       return {
         x: Math.random(),
         y: Math.random() + 0.05,
         vx: (Math.random() - 0.5) * 0.00018,
         vy: -(Math.random() * 0.00025 + 0.00008),
-        r: isSpark ? Math.random() * 1.2 + 2.2
-          : isAccent ? Math.random() * 1.0 + 1.6
-          : Math.random() * 1.0 + 0.8,
-        op: isSpark ? Math.random() * 0.25 + 0.55
-          : isAccent ? Math.random() * 0.20 + 0.45
-          : Math.random() * 0.25 + 0.25,
+        r: isSpark
+          ? Math.random() * 0.8 + 1.6 // iskry: 1.6–2.4 px
+          : isAccent
+            ? Math.random() * 0.7 + 1.1 // akcenty: 1.1–1.8 px
+            : Math.random() * 0.8 + 0.5, // bazowe: 0.5–1.3 px
+        op: isSpark
+          ? Math.random() * 0.12 + 0.22 // iskry: 0.22–0.34
+          : isAccent
+            ? Math.random() * 0.1 + 0.16 // akcenty: 0.16–0.26
+            : Math.random() * 0.1 + 0.08, // bazowe: 0.08–0.18
         ph: Math.random() * Math.PI * 2,
-        phSpeed: Math.random() * 0.008 + 0.006,
-        hue: isSpark ? 38 + Math.random() * 14
-          : isAccent ? 28 + Math.random() * 16
-          : 16 + Math.random() * 24,
-        sat: isSpark ? 40 + Math.random() * 20
-          : 70 + Math.random() * 20,
-        lit: isSpark ? 82 + Math.random() * 12
-          : isAccent ? 70 + Math.random() * 12
-          : 62 + Math.random() * 16,
+        phSpeed: Math.random() * 0.007 + 0.005,
+        hue: isSpark ? 38 + Math.random() * 14 : isAccent ? 28 + Math.random() * 16 : 16 + Math.random() * 24,
+        sat: isSpark ? 40 + Math.random() * 20 : 65 + Math.random() * 20,
+        lit: isSpark ? 78 + Math.random() * 10 : isAccent ? 66 + Math.random() * 10 : 58 + Math.random() * 14,
       };
     });
 
@@ -163,7 +192,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.arc(x, y - size * 0.35, size * 0.3, 0, Math.PI * 2);
-      ctx.fill(); ctx.stroke();
+      ctx.fill();
+      ctx.stroke();
       ctx.beginPath();
       ctx.arc(x, y + size * 0.35, size * 0.55, Math.PI, 0, false);
       ctx.stroke();
@@ -173,18 +203,22 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       ctx.strokeStyle = `rgba(255,210,170,${alpha})`;
       ctx.fillStyle = `rgba(80,30,10,${alpha * 0.7})`;
       ctx.lineWidth = 1.2;
-      const w = size * 1.1, h = size * 0.8;
+      const w = size * 1.1,
+        h = size * 0.8;
       ctx.beginPath();
       // @ts-ignore roundRect
       ctx.roundRect(x - w / 2, y - h / 2 + 2, w, h, 2);
-      ctx.fill(); ctx.stroke();
-      const hw = w * 0.45, hh = size * 0.3;
+      ctx.fill();
+      ctx.stroke();
+      const hw = w * 0.45,
+        hh = size * 0.3;
       ctx.beginPath();
       // @ts-ignore
       ctx.roundRect(x - hw / 2, y - h / 2 - hh + 2, hw, hh, 2);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(x - w / 2, y + 1); ctx.lineTo(x + w / 2, y + 1);
+      ctx.moveTo(x - w / 2, y + 1);
+      ctx.lineTo(x + w / 2, y + 1);
       ctx.stroke();
     };
 
@@ -192,14 +226,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       ctx.strokeStyle = `rgba(255,180,130,${alpha})`;
       ctx.fillStyle = `rgba(100,40,15,${alpha * 0.6})`;
       ctx.lineWidth = 1.2;
-      const w = size * 0.9, h = size * 1.1;
+      const w = size * 0.9,
+        h = size * 1.1;
       ctx.beginPath();
       ctx.rect(x - w / 2, y - h / 2, w, h);
-      ctx.fill(); ctx.stroke();
+      ctx.fill();
+      ctx.stroke();
       ctx.fillStyle = `rgba(255,180,130,${alpha * 0.5})`;
-      for (let r = 0; r < 2; r++) for (let col = 0; col < 2; col++) {
-        ctx.fillRect(x - w * 0.28 + col * w * 0.38, y - h * 0.25 + r * h * 0.35, w * 0.18, h * 0.2);
-      }
+      for (let r = 0; r < 2; r++)
+        for (let col = 0; col < 2; col++) {
+          ctx.fillRect(x - w * 0.28 + col * w * 0.38, y - h * 0.25 + r * h * 0.35, w * 0.18, h * 0.2);
+        }
     };
 
     const draw = () => {
@@ -207,7 +244,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       t++;
       ctx.clearRect(0, 0, W, H);
 
-      ctx.fillStyle = "#06080F"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#06080F";
+      ctx.fillRect(0, 0, W, H);
 
       auroraBlobs.forEach((b) => {
         const bx = (b.bx + Math.sin(t * b.speed * Math.PI * 2 + b.ph) * 0.07) * W;
@@ -215,22 +253,45 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         const g = ctx.createRadialGradient(bx, by, 0, bx, by, b.r * W);
         g.addColorStop(0, `hsla(${b.hue},80%,55%,${0.09 + 0.03 * Math.sin(t * 0.003 + b.ph)})`);
         g.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(bx, by, b.r * W, 0, Math.PI * 2);
-        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath();
+        ctx.arc(bx, by, b.r * W, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
       });
 
-      const gs = 52, ox = (t * 0.15) % gs, oy = (t * 0.15) % gs;
-      ctx.strokeStyle = "rgba(245,130,70,0.035)"; ctx.lineWidth = 0.5;
-      for (let x = -gs + ox; x < W + gs; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-      for (let y = -oy; y < H + gs; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+      const gs = 52,
+        ox = (t * 0.15) % gs,
+        oy = (t * 0.15) % gs;
+      ctx.strokeStyle = "rgba(245,130,70,0.035)";
+      ctx.lineWidth = 0.5;
+      for (let x = -gs + ox; x < W + gs; x += gs) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let y = -oy; y < H + gs; y += gs) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
 
       const vig = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.65);
-      vig.addColorStop(0, "transparent"); vig.addColorStop(1, "rgba(6,8,15,.9)");
-      ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
+      vig.addColorStop(0, "transparent");
+      vig.addColorStop(1, "rgba(6,8,15,.9)");
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, W, H);
 
+      // ── FLOATERS ─────────────────────────────────────────────────────────
       floaters.forEach((p) => {
-        p.x += p.vx; p.y += p.vy; p.ph += p.phSpeed;
-        if (p.y < -0.03) { p.y = 1.04; p.x = Math.random(); }
+        p.x += p.vx;
+        p.y += p.vy;
+        p.ph += p.phSpeed;
+        if (p.y < -0.03) {
+          p.y = 1.04;
+          p.x = Math.random();
+        }
         if (p.x < -0.02) p.x = 1.02;
         if (p.x > 1.02) p.x = -0.02;
         const pulse = 0.55 + 0.45 * Math.sin(p.ph);
@@ -246,31 +307,42 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       edges.forEach((e) => {
         if (t < e.activateAt) return;
         e.pulsePos = ((t - e.activateAt) * e.speed) % 1;
-        const p0 = positions[e.from], p1 = positions[e.to];
-        const dx = p1.x - p0.x, dy = p1.y - p0.y;
+        const p0 = positions[e.from],
+          p1 = positions[e.to];
+        const dx = p1.x - p0.x,
+          dy = p1.y - p0.y;
         const alpha = 0.12 + 0.06 * Math.sin(t * 0.008 + e.phase);
         const g = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
         g.addColorStop(0, `rgba(${e.color[0]},${e.color[1]},${e.color[2]},.05)`);
         g.addColorStop(0.5, `rgba(${e.color[0]},${e.color[1]},${e.color[2]},${alpha})`);
         g.addColorStop(1, `rgba(${e.color[0]},${e.color[1]},${e.color[2]},.05)`);
-        ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y);
-        ctx.strokeStyle = g; ctx.lineWidth = 0.8; ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
 
         const pp = e.pulsePos;
-        const px = p0.x + dx * pp, py = p0.y + dy * pp;
+        const px = p0.x + dx * pp,
+          py = p0.y + dy * pp;
         const pg = ctx.createRadialGradient(px, py, 0, px, py, 6);
         pg.addColorStop(0, `rgba(${e.color[0]},${e.color[1]},${e.color[2]},1)`);
         pg.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2);
-        ctx.fillStyle = pg; ctx.fill();
+        ctx.beginPath();
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
+        ctx.fillStyle = pg;
+        ctx.fill();
 
         if (pp > 0.85) {
           const fl = (pp - 0.85) / 0.15;
           const r2 = ctx.createRadialGradient(p1.x, p1.y, 0, p1.x, p1.y, 22 * (1 - fl));
           r2.addColorStop(0, `rgba(${e.color[0]},${e.color[1]},${e.color[2]},${0.5 * fl})`);
           r2.addColorStop(1, "transparent");
-          ctx.beginPath(); ctx.arc(p1.x, p1.y, 22 * (1 - fl), 0, Math.PI * 2);
-          ctx.fillStyle = r2; ctx.fill();
+          ctx.beginPath();
+          ctx.arc(p1.x, p1.y, 22 * (1 - fl), 0, Math.PI * 2);
+          ctx.fillStyle = r2;
+          ctx.fill();
         }
       });
 
@@ -282,15 +354,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         const alpha = node.opacity * pf;
 
         const glowR = sz * 2.2;
-        const glowCol =
-          node.type === "person" ? "245,130,70" :
-          node.type === "job" ? "255,170,90" :
-          "255,140,60";
+        const glowCol = node.type === "person" ? "245,130,70" : node.type === "job" ? "255,170,90" : "255,140,60";
         const gl = ctx.createRadialGradient(x, y, 0, x, y, glowR);
         gl.addColorStop(0, `rgba(${glowCol},${0.18 * pf})`);
         gl.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(x, y, glowR, 0, Math.PI * 2);
-        ctx.fillStyle = gl; ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y, glowR, 0, Math.PI * 2);
+        ctx.fillStyle = gl;
+        ctx.fill();
 
         if (node.type === "person") drawPersonIcon(x, y, sz, alpha);
         else if (node.type === "job") drawBriefcase(x, y, sz, alpha);
@@ -300,10 +371,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
       cg.addColorStop(0, `rgba(245,130,70,${0.08 + 0.04 * Math.sin(t * 0.018)})`);
       cg.addColorStop(1, "transparent");
-      ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI * 2);
-      ctx.fillStyle = cg; ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 80, 0, Math.PI * 2);
+      ctx.fillStyle = cg;
+      ctx.fill();
 
-      const cw = 120, ch = 160, cr = 12;
+      const cw = 120,
+        ch = 160,
+        cr = 12;
       const cardY = cy - 70 + 5 * Math.sin(t * 0.016);
       const cardAlpha = 0.04 + 0.02 * Math.sin(t * 0.02);
       ctx.beginPath();
@@ -312,7 +387,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       ctx.fillStyle = `rgba(245,130,70,${cardAlpha})`;
       ctx.fill();
       ctx.strokeStyle = `rgba(255,180,130,${cardAlpha * 3})`;
-      ctx.lineWidth = 0.8; ctx.stroke();
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
     };
 
     if (!reduce) draw();
@@ -553,17 +629,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         <canvas ref={canvasRef} className="sp-canvas" />
 
         <div className="sp-badge sp-badge-1">
-          <span className="sp-badge-dot" />
+          <div className="sp-badge-dot" />
           <span className="sp-badge-text">UX Designer · Warszawa</span>
           <span className="sp-badge-pct">94%</span>
         </div>
         <div className="sp-badge sp-badge-2">
-          <span className="sp-badge-dot" />
+          <div className="sp-badge-dot" />
           <span className="sp-badge-text">Frontend Dev · Remote</span>
           <span className="sp-badge-pct">89%</span>
         </div>
         <div className="sp-badge sp-badge-3">
-          <span className="sp-badge-dot" />
+          <div className="sp-badge-dot" />
           <span className="sp-badge-text">Product Manager · Kraków</span>
           <span className="sp-badge-pct">97%</span>
         </div>
@@ -572,10 +648,10 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           <div className="sp-icon-wrap">
             <div className="sp-halo" />
             <div className="sp-icon-bg">
-              <svg viewBox="0 0 24 24">
-                <rect className="draw" x="3" y="7" width="18" height="13" rx="2" />
-                <path className="draw" d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                <path className="draw" d="M3 13h18" />
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect className="draw" x="2" y="7" width="20" height="14" rx="2" />
+                <path className="draw" d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                <path className="draw" d="M2 12h20" />
               </svg>
             </div>
           </div>
@@ -585,7 +661,6 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             <span className="sp-w-swipe">Swipe</span>
             <span className="sp-w-tld">.pl</span>
           </div>
-
           <p className="sp-tagline">Znajdź pracę, jednym ruchem</p>
 
           <div className="sp-progress-wrap">
@@ -593,11 +668,11 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
               <div className="sp-progress-fill" />
             </div>
             <div className="sp-dots">
-              <span className="sp-dot" />
-              <span className="sp-dot" />
-              <span className="sp-dot" />
-              <span className="sp-dot" />
-              <span className="sp-dot" />
+              <div className="sp-dot" />
+              <div className="sp-dot" />
+              <div className="sp-dot" />
+              <div className="sp-dot" />
+              <div className="sp-dot" />
             </div>
           </div>
         </div>
