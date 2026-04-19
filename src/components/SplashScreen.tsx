@@ -328,29 +328,30 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         {/* Expanding shockwave rings on exit — radiate from icon to corners */}
         {phase === "out" && (
           <>
-            {[0, 0.12, 0.24].map((delay, i) => (
+            {[0, 0.18, 0.36, 0.54].map((delay, i) => (
               <motion.div
                 key={`ring-${i}`}
-                initial={{ scale: 0.05, opacity: 0.7 }}
-                animate={{ scale: 28, opacity: 0 }}
-                transition={{ duration: 1.1, delay, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ scale: 0.05, opacity: 0.9 }}
+                animate={{ scale: 40, opacity: 0 }}
+                transition={{ duration: 1.6, delay, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full pointer-events-none"
                 style={{
-                  border: "1.5px solid hsl(var(--primary) / 0.55)",
+                  border: "2px solid hsl(var(--primary) / 0.75)",
                   boxShadow:
-                    "0 0 40px hsl(var(--primary) / 0.45), inset 0 0 30px hsl(var(--primary) / 0.25)",
+                    "0 0 60px hsl(var(--primary) / 0.6), 0 0 120px hsl(var(--primary) / 0.35), inset 0 0 40px hsl(var(--primary) / 0.3)",
                 }}
               />
             ))}
             {/* Soft radial wash that follows the rings */}
             <motion.div
-              initial={{ scale: 0, opacity: 0.5 }}
-              animate={{ scale: 14, opacity: 0 }}
-              transition={{ duration: 0.9, ease: [0.65, 0, 0.35, 1] }}
+              initial={{ scale: 0, opacity: 0.7 }}
+              animate={{ scale: 22, opacity: 0 }}
+              transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1] }}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full pointer-events-none"
               style={{
                 background:
-                  "radial-gradient(circle, hsl(var(--primary) / 0.55) 0%, hsl(var(--accent) / 0.25) 35%, transparent 70%)",
+                  "radial-gradient(circle, hsl(var(--primary) / 0.7) 0%, hsl(var(--accent) / 0.35) 30%, transparent 70%)",
+                filter: "blur(8px)",
               }}
             />
           </>
