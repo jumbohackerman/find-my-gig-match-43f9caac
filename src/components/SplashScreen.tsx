@@ -457,19 +457,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           width: 100%; height: 100%; object-fit: contain;
           position: relative; z-index: 1;
         }
-        .sp-icon-bg::before {
-          content: '';
-          position: absolute; top: -40%; left: -20%;
-          width: 55%; height: 80%;
-          background: rgba(255,255,255,0.2);
-          transform: rotate(-25deg); border-radius: 6px;
-          animation: spSheen 4.5s ease-in-out 1.8s infinite;
-        }
-        @keyframes spSheen {
-          0%,100% { opacity: 0; left: -20%; }
-          25%     { opacity: 1; }
-          55%     { opacity: 0; left: 110%; }
-        }
+        /* sheen overlay removed — was producing a white tile floating over the icon */
         .sp-icon-bg svg {
           width: 42px; height: 42px;
           stroke: rgba(255,255,255,0.95); fill: none;
