@@ -331,7 +331,7 @@ const Employer = () => {
                             isAnalyzed ? "bg-primary text-primary-foreground" : "bg-accent/15 text-accent hover:bg-accent/25"
                           }`}
                         >
-                          <BarChart3 className="w-3.5 h-3.5" /> Analiza
+                          <BarChart3 className="w-3.5 h-3.5" /> Ranking
                         </button>
                         <button
                           onClick={() => {
