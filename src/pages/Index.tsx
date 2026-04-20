@@ -237,8 +237,12 @@ const Index = () => {
                   Podgląd
                 </div>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0">
-                    {demoJob.logo}
+                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                    {demoJob.logo && /^https?:\/\//.test(demoJob.logo) ? (
+                      <img src={demoJob.logo} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{demoJob.logo || "💼"}</span>
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-foreground text-sm truncate">{demoJob.title}</p>
