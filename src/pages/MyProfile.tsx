@@ -429,9 +429,9 @@ const MyProfile = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col px-4 py-6 max-w-lg mx-auto w-full">
+      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-6xl mx-auto lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8"}`}>
         <LocalErrorBoundary label="Formularz profilu">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="min-w-0">
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
             {isEmployer ? "Profil pracodawcy" : "Mój profil"}
           </h2>
@@ -441,9 +441,9 @@ const MyProfile = () => {
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
 
-          {/* Completeness */}
+          {/* Completeness — mobile only (desktop shows it in sticky right column) */}
           {!isEmployer && (
-            <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border">
+            <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border lg:hidden">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-muted-foreground">Kompletność profilu</span>
                 <span className={`text-sm font-bold ${completeness.score >= 80 ? "text-accent" : completeness.score >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
