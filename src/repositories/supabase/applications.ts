@@ -102,7 +102,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
 
     const candidateIds = [...new Set(appsData.map((a: any) => a.candidate_id))];
     const candidateMap: Record<string, any> = {};
-    const profileMap: Record<string, { full_name: string; avatar: string | null }> = {};
 
     if (candidateIds.length > 0) {
       const { data: candidatesData } = await supabase
@@ -112,15 +111,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
 
       (candidatesData || []).forEach((c: any) => {
         candidateMap[c.user_id] = c;
-      });
-
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar")
-        .in("user_id", candidateIds);
-
-      (profilesData || []).forEach((p: any) => {
-        profileMap[p.user_id] = { full_name: p.full_name, avatar: p.avatar };
       });
     }
 
