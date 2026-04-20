@@ -80,12 +80,13 @@ export const supabaseApplicationRepository: ApplicationRepository = {
   },
 
   async listForEmployer(employerId: string): Promise<EnrichedEmployerApplication[]> {
+    // SECURITY: only fetch jobs owned by this employer.
+    // Previously included demo/system jobs (employer_id = 0000…), which leaked
+    // applications from other employers' candidates into this employer's view.
     const { data: jobsData } = await supabase
       .from("jobs")
       .select("*")
-      .or(
-        `employer_id.eq.${employerId},employer_id.eq.00000000-0000-0000-0000-000000000000`,
-      );
+      .eq("employer_id", employerId);
 
     if (!jobsData || jobsData.length === 0) return [];
 
