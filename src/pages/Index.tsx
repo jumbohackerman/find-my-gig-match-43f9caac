@@ -21,7 +21,8 @@ import { useCandidateApplications } from "@/hooks/useApplications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 type Tab = "swipe" | "applied" | "saved" | "recent";
 const VALID_TABS: Tab[] = ["swipe", "applied", "saved", "recent"];
