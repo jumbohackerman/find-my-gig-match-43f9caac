@@ -54,7 +54,7 @@ const App = () => {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/cookies" element={<Cookies />} />
-              <Route path="/" element={<ProtectedRoute><HomeRedirect><Index /></HomeRedirect></ProtectedRoute>} />
+              <Route path="/" element={<HomeRedirect><Index /></HomeRedirect>} />
               <Route
                 path="/my-profile"
                 element={

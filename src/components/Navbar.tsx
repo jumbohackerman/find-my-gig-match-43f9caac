@@ -49,27 +49,17 @@ const Navbar = () => {
             </h1>
           </Link>
 
-          {/* ── Guest CTAs ── */}
+          {/* ── Guest CTA ── */}
           {isGuest && (
-            <>
-              <Link
-                to="/auth"
-                className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label="Przeglądaj oferty"
-              >
-                <Search className="w-4 h-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Przeglądaj oferty</span>
-              </Link>
-              <Link
-                to="/auth"
-                state={{ defaultRole: "employer" }}
-                className="p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label="Dla firm"
-              >
-                <Building2 className="w-4 h-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Dla firm</span>
-              </Link>
-            </>
+            <Link
+              to="/auth"
+              className="px-4 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Zaloguj się"
+              data-testid="nav-login"
+            >
+              <User className="w-4 h-4" aria-hidden="true" />
+              <span>Zaloguj się</span>
+            </Link>
           )}
 
           {/* ── Candidate CTAs ── */}
