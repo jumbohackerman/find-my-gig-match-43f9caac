@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Search, Users } from "lucide-react";
+import { Briefcase, Search, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { CardSkeleton, EmptyView } from "@/components/StateViews";
 import SeekerCard from "@/components/SeekerCard";
