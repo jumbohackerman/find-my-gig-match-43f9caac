@@ -507,6 +507,10 @@ function AiSection({ state, onStart, onImport, processing, errorMessage, importS
               <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
               Przed zapisaniem sprawdzisz i poprawisz wszystko ręcznie
             </li>
+            <li className="flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
+              CV służy tylko do uzupełnienia profilu — pracodawcy go nie zobaczą
+            </li>
           </ul>
           <button
             onClick={onStart}

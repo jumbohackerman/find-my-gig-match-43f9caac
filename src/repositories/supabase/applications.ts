@@ -102,7 +102,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
 
     const candidateIds = [...new Set(appsData.map((a: any) => a.candidate_id))];
     const candidateMap: Record<string, any> = {};
-    const profileMap: Record<string, { full_name: string; avatar: string | null }> = {};
 
     if (candidateIds.length > 0) {
       const { data: candidatesData } = await supabase
@@ -113,15 +112,6 @@ export const supabaseApplicationRepository: ApplicationRepository = {
       (candidatesData || []).forEach((c: any) => {
         candidateMap[c.user_id] = c;
       });
-
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar")
-        .in("user_id", candidateIds);
-
-      (profilesData || []).forEach((p: any) => {
-        profileMap[p.user_id] = { full_name: p.full_name, avatar: p.avatar };
-      });
     }
 
     const SHORTLISTED: ApplicationStatus[] = ["shortlisted", "interview", "hired"];
@@ -131,16 +121,31 @@ export const supabaseApplicationRepository: ApplicationRepository = {
       const job = domainJobs.find((j) => j.id === app.job_id);
       let candidate = dbCandidate ? dbCandidateToCandidate(dbCandidate) : undefined;
 
-      // PRE-SHORTLIST PRIVACY: mask PII before it reaches UI
+      // PRE-SHORTLIST PRIVACY: applicant_preview only.
+      // Strip PII, contact details, full experience, languages, salary expectations
+      // and trim skills to a short keyword preview.
       const status = app.status as ApplicationStatus;
       if (candidate && !SHORTLISTED.includes(status)) {
-        const profile = profileMap[app.candidate_id];
+        const allSkills = [
+          ...(candidate.skills?.advanced || []),
+          ...(candidate.skills?.intermediate || []),
+          ...(candidate.skills?.beginner || []),
+        ];
+        const previewSkills = allSkills.slice(0, 5);
         candidate = {
           ...candidate,
-          fullName: profile?.full_name ? profile.full_name.split(" ")[0] : "",
+          // Anonymize: do not expose any name in preview (modal shows "Kandydat")
+          fullName: "",
+          // Generalize location to first segment only (e.g. "Warszawa" instead of "Warszawa, Mokotów")
+          location: (candidate.location || "").split(",")[0]?.trim() || "",
           summary: "",
           experienceEntries: [],
+          languages: [],
+          salaryMin: 0,
+          salaryMax: 0,
           links: { portfolio_url: "", github_url: "", linkedin_url: "", website_url: "" },
+          // Skills shown as flat preview list under "advanced" bucket; others empty
+          skills: { advanced: previewSkills, intermediate: [], beginner: [] },
           cvUrl: null,
         };
       }

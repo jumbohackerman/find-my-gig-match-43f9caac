@@ -9,7 +9,7 @@ const SourceLabel = ({ source }: Props) => {
   if (source === "ai") {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-semibold">
-        <Zap className="w-3 h-3" /> AI Shortlista
+        <Zap className="w-3 h-3" /> Auto-shortlista
       </span>
     );
   }
