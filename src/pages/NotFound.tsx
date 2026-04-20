@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Briefcase, ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
+import logo from "@/assets/jobswipe-logo.png";
 
 const NotFound = () => {
   const location = useLocation();
@@ -9,9 +10,7 @@ const NotFound = () => {
       {/* Navbar-style header */}
       <header className="px-6 py-4 border-b border-border flex items-center gap-2">
         <Link to="/" className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg" aria-label="JobSwipe — strona główna">
-          <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center" aria-hidden="true">
-            <Briefcase className="w-4 h-4 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="" className="w-8 h-8 object-contain" aria-hidden="true" />
           <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
         </Link>
       </header>

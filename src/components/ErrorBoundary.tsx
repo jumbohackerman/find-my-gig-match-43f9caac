@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { Briefcase, RefreshCw, ArrowLeft } from "lucide-react";
+import { RefreshCw, ArrowLeft } from "lucide-react";
+import logo from "@/assets/jobswipe-logo.png";
 
 interface Props {
   children: ReactNode;
@@ -41,9 +42,7 @@ class ErrorBoundary extends Component<Props, State> {
       <div className="min-h-screen bg-background flex flex-col">
         <header className="px-6 py-4 border-b border-border flex items-center gap-2">
           <a href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg btn-gradient flex items-center justify-center">
-              <Briefcase className="w-4 h-4 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="" className="w-8 h-8 object-contain" />
             <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
           </a>
         </header>
