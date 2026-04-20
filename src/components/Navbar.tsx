@@ -78,24 +78,14 @@ const Navbar = () => {
 
           {/* ── Employer CTAs ── */}
           {isEmployer && (
-            <>
-              <Link
-                to="/employer"
-                className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label="Panel pracodawcy"
-              >
-                <Building2 className="w-4 h-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Panel pracodawcy</span>
-              </Link>
-              <Link
-                to="/profiles"
-                className="p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label="Znajdź talent"
-              >
-                <Users className="w-4 h-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Znajdź talent</span>
-              </Link>
-            </>
+            <Link
+              to="/employer"
+              className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Panel pracodawcy"
+            >
+              <Building2 className="w-4 h-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Panel pracodawcy</span>
+            </Link>
           )}
 
           {/* ── Notifications (authenticated only) ── */}

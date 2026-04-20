@@ -9,7 +9,6 @@ import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
 import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
-import Profiles from "./pages/Profiles";
 import Employer from "./pages/Employer";
 import MyProfile from "./pages/MyProfile";
 import Auth from "./pages/Auth";
@@ -61,16 +60,6 @@ const App = () => {
                   <ProtectedRoute>
                     <RoleGate role="candidate" redirectTo="/employer">
                       <MyProfile />
-                    </RoleGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profiles"
-                element={
-                  <ProtectedRoute>
-                    <RoleGate role="employer" redirectTo="/">
-                      <Profiles />
                     </RoleGate>
                   </ProtectedRoute>
                 }
