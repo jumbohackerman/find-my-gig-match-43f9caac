@@ -42,7 +42,7 @@ const Employer = () => {
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult } | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
 
   // Old form state removed — using JobPostForm component instead
 
@@ -69,7 +69,7 @@ const Employer = () => {
     if (shouldAdvance) {
       appActions.advanceStatus(app.id, "viewed");
     }
-    setSelectedCandidate({ candidate, match: app.matchResult! });
+    setSelectedCandidate({ candidate, match: app.matchResult!, applicationStatus: app.status as ApplicationStatus });
   };
 
   const handleStructuredSubmit = async (formData: StructuredJobFormData) => {
@@ -492,6 +492,7 @@ const Employer = () => {
       <CandidateProfileModal
         candidate={selectedCandidate?.candidate || null}
         match={selectedCandidate?.match}
+        applicationStatus={selectedCandidate?.applicationStatus}
         onClose={() => setSelectedCandidate(null)}
       />
     </div>
@@ -681,6 +682,7 @@ function CandidateCard({
         isUnlocked={isChatOpen || chatMessages.length > 0}
         onUnlock={onUnlockChat}
         currentUserId={currentUserId}
+        applicationStatus={app.status as ApplicationStatus}
       />
     </div>
   );

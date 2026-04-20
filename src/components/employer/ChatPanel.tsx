@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Send, MessageSquare, Loader2, AlertCircle } from "lucide-react";
+import { Send, MessageSquare, Loader2, AlertCircle, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { timeAgo } from "@/lib/timeAgo";
 import EmptyState from "./EmptyState";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
+import type { ApplicationStatus } from "@/domain/models";
 
 export interface ChatMessage {
   id: string;
@@ -22,13 +23,20 @@ interface Props {
   isUnlocked: boolean;
   onUnlock: () => void;
   currentUserId?: string;
+  /** Application status — chat is only available after shortlist */
+  applicationStatus?: ApplicationStatus;
 }
 
-const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, currentUserId }: Props) => {
+// Chat is only unlocked once the candidate has been shortlisted
+const CHAT_ALLOWED_STATUSES: ApplicationStatus[] = ["shortlisted", "interview", "hired"];
+
+const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, currentUserId, applicationStatus }: Props) => {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [lastFailedText, setLastFailedText] = useState<string | null>(null);
+
+  const chatAllowed = applicationStatus === undefined || CHAT_ALLOWED_STATUSES.includes(applicationStatus);
 
   const handleSend = async (content?: string) => {
     const msg = (content ?? text).trim();
@@ -47,6 +55,20 @@ const ChatPanel = ({ messages, onSend, candidateName, isUnlocked, onUnlock, curr
       setSending(false);
     }
   };
+
+  if (!chatAllowed) {
+    return (
+      <div className="p-3 border-t border-border">
+        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-secondary/50 border border-border/60">
+          <Lock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+          <div className="text-[11px] text-muted-foreground leading-relaxed">
+            <p className="font-medium text-foreground mb-0.5">Kontakt po shortliście</p>
+            <p>Napiszesz do kandydata dopiero po dodaniu go do shortlisty.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isUnlocked) {
     return (

@@ -203,6 +203,75 @@ const Index = () => {
     { key: "recent", label: "Ostatnie", count: recentCount > 0 ? recentCount : undefined },
   ];
 
+  // ── Guest landing: simplified public view, no private tabs ────────────────
+  if (isGuest) {
+    const demoJob = allJobs[0];
+    return (
+      <div className="min-h-screen-dynamic bg-background flex flex-col safe-bottom">
+        <Navbar />
+        <main className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-md w-full"
+          >
+            <div className="w-20 h-20 rounded-2xl btn-gradient flex items-center justify-center mx-auto mb-5 shadow-glow text-4xl">
+              💼
+            </div>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3 leading-tight">
+              Znajdź pracę swipując
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base mb-8 leading-relaxed">
+              JobSwipe dopasowuje oferty do Twojego profilu. Zaloguj się, aby zobaczyć spersonalizowane dopasowania, zapisywać oferty i śledzić swoje aplikacje.
+            </p>
+
+            {demoJob && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15 }}
+                className="card-gradient rounded-2xl border border-border p-4 mb-6 text-left relative overflow-hidden"
+              >
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-secondary text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  Podgląd
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0">
+                    {demoJob.logo}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground text-sm truncate">{demoJob.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">{demoJob.company} · {demoJob.location}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{demoJob.summary || demoJob.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {demoJob.tags.slice(0, 3).map((t) => (
+                    <span key={t} className="px-2 py-0.5 rounded-full bg-secondary text-[10px] text-muted-foreground">{t}</span>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => navigate("/auth")}
+                className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground text-sm font-semibold shadow-glow hover:scale-[1.02] transition-transform"
+              >
+                Zaloguj się / Zarejestruj
+              </button>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Bezpłatnie · Tylko zweryfikowani pracodawcy
+              </p>
+            </div>
+          </motion.div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (jobsLoading) {
     return (
       <div className="min-h-screen-dynamic bg-background flex flex-col">
