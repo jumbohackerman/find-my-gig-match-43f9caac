@@ -447,14 +447,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         .sp-icon-bg {
           width: 86px; height: 86px; border-radius: 24px;
           display: flex; align-items: center; justify-content: center;
-          position: relative; overflow: hidden;
-          box-shadow:
-            0 0 0 1px rgba(251,167,106,0.35),
-            0 8px 28px rgba(242,107,60,0.55),
-            0 20px 60px rgba(201,74,31,0.3);
+          position: relative; overflow: visible;
+          background: transparent;
+          filter:
+            drop-shadow(0 8px 28px rgba(242,107,60,0.55))
+            drop-shadow(0 20px 60px rgba(201,74,31,0.3));
         }
         .sp-icon-img {
-          width: 100%; height: 100%; object-fit: cover;
+          width: 100%; height: 100%; object-fit: contain;
           position: relative; z-index: 1;
         }
         .sp-icon-bg::before {

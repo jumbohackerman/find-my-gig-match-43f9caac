@@ -42,8 +42,8 @@ const Navbar = () => {
         <nav aria-label="Nawigacja główna" className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end w-full">
           {/* Logo */}
           <Link to={isGuest ? "/auth" : "/"} className="group flex items-center gap-2.5 shrink-0 mr-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg" aria-label="JobSwipe — strona główna" data-testid="nav-logo">
-            <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center shadow-glow group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300" aria-hidden="true">
-              <img src={logo} alt="" className="w-full h-full object-cover" />
+            <div className="w-9 h-9 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300" aria-hidden="true">
+              <img src={logo} alt="" className="w-full h-full object-contain" />
             </div>
             <h1 className="font-display text-xl font-bold text-foreground tracking-tight">
               Job<span className="text-gradient-primary">Swipe</span>
