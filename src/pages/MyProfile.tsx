@@ -742,10 +742,13 @@ const MyProfile = () => {
                 <LinkField icon={<Linkedin className="w-4 h-4 text-primary" />} label="LinkedIn" value={links.linkedin_url || ""} onChange={(v) => setLinks({ ...links, linkedin_url: v })} placeholder="https://linkedin.com/in/username" />
                 <LinkField icon={<ExternalLink className="w-4 h-4 text-primary" />} label="Strona osobista" value={links.website_url || ""} onChange={(v) => setLinks({ ...links, website_url: v })} placeholder="https://mojastrona.pl" />
                 <div className="pt-2 border-t border-border mt-4">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
                     <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
                   </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-3 px-3 py-2 rounded-lg bg-secondary/40 border border-border/50">
+                    🔒 CV służy wyłącznie do automatycznego uzupełnienia profilu. Nie jest udostępniane pracodawcom — widzą oni tylko Twój profil.
+                  </p>
                   <CandidateCvUpload onParsed={handleCvParsed} />
                 </div>
               </div>

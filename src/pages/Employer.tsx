@@ -22,6 +22,7 @@ import SourceLabel from "@/components/employer/SourceLabel";
 import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
+import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
@@ -193,6 +194,9 @@ const Employer = () => {
           );
         })()}
 
+        {/* Wzorcowe oferty — inspiracja dla pracodawcy */}
+        <SampleJobsPanel />
+
         {/* Post Job Form */}
         <AnimatePresence>
           {showForm && (
@@ -265,7 +269,7 @@ const Employer = () => {
                       {/* Contextual Suggestion UX */}
                       {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
                         <div className="mb-3 p-2.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-xs text-yellow-500 font-medium">
-                          Wskazówka: Dodaj tagi i dłuższy opis, aby poprawić jakość dopasowań AI.
+                          Wskazówka: Dodaj tagi i dłuższy opis, aby poprawić jakość dopasowania kandydatów.
                         </div>
                       )}
                       <div className="flex items-center gap-3 mb-2">
