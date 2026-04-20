@@ -22,6 +22,7 @@ import SourceLabel from "@/components/employer/SourceLabel";
 import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
+import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
@@ -192,6 +193,9 @@ const Employer = () => {
             </motion.div>
           );
         })()}
+
+        {/* Wzorcowe oferty — inspiracja dla pracodawcy */}
+        <SampleJobsPanel />
 
         {/* Post Job Form */}
         <AnimatePresence>
