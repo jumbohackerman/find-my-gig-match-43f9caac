@@ -21,7 +21,8 @@ import { useCandidateApplications } from "@/hooks/useApplications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 type Tab = "swipe" | "applied" | "saved" | "recent";
 const VALID_TABS: Tab[] = ["swipe", "applied", "saved", "recent"];
@@ -60,7 +61,9 @@ function filtersToParams(f: JobFiltersState, sp: URLSearchParams): URLSearchPara
 }
 
 const Index = () => {
-  useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const isGuest = !user;
   const [searchParams, setSearchParams] = useSearchParams();
   const { candidate } = useCandidateProfile();
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
@@ -82,14 +85,26 @@ const Index = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
 
+  const requireAuth = useCallback((): boolean => {
+    if (isGuest) {
+      toast.info("Zaloguj się, aby znaleźć wymarzoną pracę", {
+        action: { label: "Zaloguj się", onClick: () => navigate("/auth") },
+        duration: 4000,
+      });
+      return false;
+    }
+    return true;
+  }, [isGuest, navigate]);
+
   const handleSwipeWithRefetch = useCallback(async (direction: "left" | "right" | "save") => {
+    if (!requireAuth()) return;
     if (direction === "left") setButtonExitDir("left");
     else if (direction === "right") setButtonExitDir("right");
     else setButtonExitDir(null);
     await handleSwipe(direction);
     if (direction === "right") refetchApps();
     setTimeout(() => setButtonExitDir(null), 650);
-  }, [handleSwipe, refetchApps]);
+  }, [handleSwipe, refetchApps, requireAuth]);
 
   // ── Keyboard arrow controls ──────────────────────────────────────────────
   useEffect(() => {
