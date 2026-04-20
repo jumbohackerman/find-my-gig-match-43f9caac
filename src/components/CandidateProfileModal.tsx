@@ -1,10 +1,10 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, MapPin, Clock, Globe, Github, Linkedin, ExternalLink,
-  FileText, Briefcase,
+  Lock,
 } from "lucide-react";
-import type { Candidate, MatchResult } from "@/domain/models";
+import type { Candidate, MatchResult, ApplicationStatus } from "@/domain/models";
 import { getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
 import ReportButton from "@/components/ReportButton";
@@ -14,9 +14,18 @@ interface Props {
   candidate: Candidate | null;
   match?: MatchResult;
   onClose: () => void;
+  /**
+   * Application status controls data disclosure:
+   * - Before shortlist (`applied`, `viewed`): minimal applicant_preview only
+   * - After shortlist (`shortlisted`, `interview`, `hired`): full shortlisted_profile (still no CV)
+   */
+  applicationStatus?: ApplicationStatus;
 }
 
-const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
+// Statuses that unlock the shortlisted_profile view
+const SHORTLISTED_STATUSES: ApplicationStatus[] = ["shortlisted", "interview", "hired"];
+
+const CandidateProfileModal = ({ candidate, match, onClose, applicationStatus }: Props) => {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -29,6 +38,10 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
 
   if (!candidate) return null;
 
+  // If applicationStatus is not provided, default to unlocked (candidate self-view, etc.)
+  // In employer flow, status is always passed — so this safely defaults to "full" only when not in employer context.
+  const isShortlisted = applicationStatus === undefined || SHORTLISTED_STATUSES.includes(applicationStatus);
+
   const activity = getActivityLabel(candidate.lastActive);
   const allSkills = getAllSkills(candidate);
   const coreSkills = allSkills.slice(0, 5);
@@ -36,9 +49,15 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
   const links = candidate.links || {};
   const hasLinks = links.portfolio_url || links.github_url || links.linkedin_url || links.website_url;
 
+  // Anonymize display when preview-only
+  const displayName = isShortlisted ? candidate.fullName : "Kandydat";
+  const displayLocation = isShortlisted
+    ? candidate.location
+    : (candidate.location?.split(",")[0]?.trim() || "—");
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Profil kandydata: ${candidate.fullName}`}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4" onClick={onClose} role="dialog" aria-modal="true" aria-label={`Profil kandydata: ${displayName}`}>
         <LocalErrorBoundary label="Profil kandydata">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -48,7 +67,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-            <ReportButton targetType="profile" targetId={candidate.id} targetLabel={candidate.fullName} />
+            <ReportButton targetType="profile" targetId={candidate.id} targetLabel={displayName} />
             <button ref={closeRef} onClick={onClose} className="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1" aria-label="Zamknij">
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -60,13 +79,13 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
               👤
             </div>
             <div className="flex-1">
-              <h3 className="font-display text-xl font-bold text-foreground">{candidate.fullName}</h3>
+              <h3 className="font-display text-xl font-bold text-foreground">{displayName}</h3>
               <p className="text-sm text-primary font-medium">{candidate.title}</p>
               <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> {candidate.location}
+                  <MapPin className="w-3 h-3" /> {displayLocation}
                 </span>
-                {candidate.experienceEntries.length > 0 && (
+                {isShortlisted && candidate.experienceEntries.length > 0 && (
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" /> {candidate.experienceEntries.length} pozycji
                   </span>
@@ -90,9 +109,11 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
                 {candidate.workMode}
               </span>
             )}
-            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${activity.color} bg-secondary`}>
-              {activity.label}
-            </span>
+            {isShortlisted && (
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${activity.color} bg-secondary`}>
+                {activity.label}
+              </span>
+            )}
           </div>
 
           {/* Match */}
@@ -102,16 +123,27 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* Summary */}
-          {candidate.summary && (
+          {/* Preview-mode notice */}
+          {!isShortlisted && (
+            <div className="mb-4 p-3 rounded-xl bg-secondary/40 border border-border/60 flex items-start gap-2">
+              <Lock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="text-xs text-muted-foreground leading-relaxed">
+                <p className="font-medium text-foreground mb-0.5">Podgląd aplikacji</p>
+                <p>Pełny profil kandydata (doświadczenie, dane kontaktowe, linki) odsłoni się dopiero po dodaniu do shortlisty.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Summary — shortlisted only */}
+          {isShortlisted && candidate.summary && (
             <div className="mb-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Podsumowanie</h4>
               <p className="text-sm text-foreground leading-relaxed">{candidate.summary}</p>
             </div>
           )}
 
-          {/* Experience */}
-          {candidate.experienceEntries && candidate.experienceEntries.length > 0 && (
+          {/* Experience — shortlisted only */}
+          {isShortlisted && candidate.experienceEntries && candidate.experienceEntries.length > 0 && (
             <div className="mb-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doświadczenie</h4>
               <div className="space-y-3">
@@ -137,7 +169,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
           {/* Skills */}
           <div className="mb-4">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Umiejętności
+              {isShortlisted ? "Umiejętności" : "Kluczowe umiejętności"}
             </h4>
             {coreSkills.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-1.5">
@@ -158,7 +190,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
                 })}
               </div>
             )}
-            {additionalSkills.length > 0 && (
+            {isShortlisted && additionalSkills.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {additionalSkills.map((s) => (
                   <span key={s} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-muted text-muted-foreground">
@@ -169,8 +201,8 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             )}
           </div>
 
-          {/* Languages */}
-          {candidate.languages && candidate.languages.length > 0 && (
+          {/* Languages — shortlisted only */}
+          {isShortlisted && candidate.languages && candidate.languages.length > 0 && (
             <div className="mb-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Języki</h4>
               <div className="flex flex-wrap gap-1.5">
@@ -183,8 +215,8 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* Salary */}
-          {candidate.salaryMin && candidate.salaryMin > 0 && (
+          {/* Salary — shortlisted only */}
+          {isShortlisted && candidate.salaryMin && candidate.salaryMin > 0 && (
             <div className="mb-4">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                 Oczekiwania finansowe
@@ -198,8 +230,8 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* Links */}
-          {hasLinks && (
+          {/* Links — shortlisted only */}
+          {isShortlisted && hasLinks && (
             <div className="mb-2">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Linki</h4>
               <div className="flex gap-2">
@@ -227,14 +259,7 @@ const CandidateProfileModal = ({ candidate, match, onClose }: Props) => {
             </div>
           )}
 
-          {/* CV */}
-          {candidate.cvUrl && (
-            <div className="pt-2 border-t border-border">
-              <span className="flex items-center gap-1.5 text-xs text-accent">
-                <FileText className="w-3.5 h-3.5" /> CV dostępne
-              </span>
-            </div>
-          )}
+          {/* CV — never shown to employers per product rules */}
         </motion.div>
         </LocalErrorBoundary>
       </div>
