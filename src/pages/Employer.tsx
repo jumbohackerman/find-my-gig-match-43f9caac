@@ -492,6 +492,7 @@ const Employer = () => {
       <CandidateProfileModal
         candidate={selectedCandidate?.candidate || null}
         match={selectedCandidate?.match}
+        applicationStatus={selectedCandidate?.applicationStatus}
         onClose={() => setSelectedCandidate(null)}
       />
     </div>
@@ -681,6 +682,7 @@ function CandidateCard({
         isUnlocked={isChatOpen || chatMessages.length > 0}
         onUnlock={onUnlockChat}
         currentUserId={currentUserId}
+        applicationStatus={app.status as ApplicationStatus}
       />
     </div>
   );
