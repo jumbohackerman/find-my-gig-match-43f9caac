@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can view active jobs" ON public.jobs FOR SELECT TO anon USING (status = 'active');
