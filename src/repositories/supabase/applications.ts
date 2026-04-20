@@ -124,18 +124,32 @@ export const supabaseApplicationRepository: ApplicationRepository = {
       });
     }
 
+    const SHORTLISTED: ApplicationStatus[] = ["shortlisted", "interview", "hired"];
+
     return appsData.map((app: any) => {
       const dbCandidate = candidateMap[app.candidate_id];
       const job = domainJobs.find((j) => j.id === app.job_id);
-      const candidate = dbCandidate
-        ? dbCandidateToCandidate(dbCandidate)
-        : undefined;
+      let candidate = dbCandidate ? dbCandidateToCandidate(dbCandidate) : undefined;
+
+      // PRE-SHORTLIST PRIVACY: mask PII before it reaches UI
+      const status = app.status as ApplicationStatus;
+      if (candidate && !SHORTLISTED.includes(status)) {
+        const profile = profileMap[app.candidate_id];
+        candidate = {
+          ...candidate,
+          fullName: profile?.full_name ? profile.full_name.split(" ")[0] : "",
+          summary: "",
+          experienceEntries: [],
+          links: { portfolio_url: "", github_url: "", linkedin_url: "", website_url: "" },
+          cvUrl: null,
+        };
+      }
 
       return {
         id: app.id,
         jobId: app.job_id,
         candidateId: app.candidate_id,
-        status: app.status as ApplicationStatus,
+        status,
         source: app.source as ApplicationSource,
         appliedAt: app.applied_at,
         candidate,
