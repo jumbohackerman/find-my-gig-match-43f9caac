@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import logo from "@/assets/jobswipe-logo.png";
 
 const SPLASH_DURATION = 4200;
 const EXIT_DURATION = 500;
@@ -445,13 +446,16 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
         .sp-icon-bg {
           width: 86px; height: 86px; border-radius: 24px;
-          background: linear-gradient(145deg, #FBA76A 0%, #F26B3C 50%, #C94A1F 100%);
           display: flex; align-items: center; justify-content: center;
           position: relative; overflow: hidden;
           box-shadow:
             0 0 0 1px rgba(251,167,106,0.35),
             0 8px 28px rgba(242,107,60,0.55),
             0 20px 60px rgba(201,74,31,0.3);
+        }
+        .sp-icon-img {
+          width: 100%; height: 100%; object-fit: cover;
+          position: relative; z-index: 1;
         }
         .sp-icon-bg::before {
           content: '';
@@ -648,11 +652,7 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           <div className="sp-icon-wrap">
             <div className="sp-halo" />
             <div className="sp-icon-bg">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect className="draw" x="2" y="7" width="20" height="14" rx="2" />
-                <path className="draw" d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
-                <path className="draw" d="M2 12h20" />
-              </svg>
+              <img src={logo} alt="JobSwipe" className="sp-icon-img" />
             </div>
           </div>
 
