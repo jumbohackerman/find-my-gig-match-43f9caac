@@ -39,7 +39,7 @@ export function useEmployerShortlist(refetch: () => void) {
         return;
       }
       await getProvider("applications").updateStatus(appId, "shortlisted", source);
-      toast.success(source === "ai" ? "Dodano do shortlisty (AI)" : "Dodano do shortlisty");
+      toast.success(source === "ai" ? "Dodano do shortlisty (auto)" : "Dodano do shortlisty");
       refetch();
     },
     [refetch],
@@ -79,7 +79,7 @@ export function useEmployerShortlist(refetch: () => void) {
       for (const app of toShortlist) {
         await getProvider("applications").updateStatus(app.id, "shortlisted", "ai");
       }
-      toast.success(`AI dodał ${toShortlist.length} kandydatów do shortlisty`);
+      toast.success(`Dodano ${toShortlist.length} kandydatów na podstawie dopasowania`);
       refetch();
     },
     [refetch],
