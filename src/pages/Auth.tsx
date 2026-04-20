@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Briefcase, Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import logo from "@/assets/jobswipe-logo.png";
 
 type Mode = "login" | "signup" | "forgot";
 type Role = "candidate" | "employer";
@@ -92,9 +93,7 @@ const Auth = () => {
         className="w-full max-w-sm"
       >
         <div className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="" className="w-10 h-10 object-contain" />
           <h1 className="font-display text-2xl font-bold text-foreground">JobSwipe</h1>
         </div>
 

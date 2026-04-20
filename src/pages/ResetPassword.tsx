@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Briefcase, Lock, ArrowRight } from "lucide-react";
+import { Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import logo from "@/assets/jobswipe-logo.png";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -59,9 +60,7 @@ const ResetPassword = () => {
           className="w-full max-w-sm text-center"
         >
           <div className="flex items-center gap-2 justify-center mb-8">
-            <div className="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="" className="w-10 h-10 object-contain" />
             <h1 className="font-display text-2xl font-bold text-foreground">JobSwipe</h1>
           </div>
           <div className="card-gradient rounded-2xl border border-border p-6">
@@ -88,9 +87,7 @@ const ResetPassword = () => {
         className="w-full max-w-sm"
       >
         <div className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="" className="w-10 h-10 object-contain" />
           <h1 className="font-display text-2xl font-bold text-foreground">JobSwipe</h1>
         </div>
 
