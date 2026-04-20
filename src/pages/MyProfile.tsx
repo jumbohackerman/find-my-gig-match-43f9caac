@@ -758,6 +758,53 @@ const MyProfile = () => {
           </div>
         </motion.div>
         </LocalErrorBoundary>
+
+        {/* Right sticky panel — desktop only, candidate only */}
+        {!isEmployer && (
+          <aside className="hidden lg:block">
+            <div className="sticky top-6 space-y-4">
+              <div className="p-4 rounded-2xl bg-secondary/50 border border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-muted-foreground">Kompletność profilu</span>
+                  <span className={`text-sm font-bold ${completeness.score >= 80 ? "text-accent" : completeness.score >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
+                    {completeness.score}%
+                  </span>
+                </div>
+                <Progress value={completeness.score} className="h-2 mb-3" />
+                <button
+                  onClick={() => setShowPreview(true)}
+                  className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium border border-border hover:bg-muted transition-colors"
+                >
+                  <Eye className="w-4 h-4" /> Podgląd profilu
+                </button>
+              </div>
+
+              {completeness.missing.length > 0 && (
+                <div className="p-4 rounded-2xl bg-secondary/30 border border-border">
+                  <p className="text-[11px] font-semibold text-foreground uppercase tracking-wider mb-2.5">Brakujące sekcje</p>
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    {completeness.missing.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <div className="w-1 h-1 rounded-full bg-primary mt-1.5 shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
+                <p className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-2">💡 Wskazówki</p>
+                <ul className="text-xs text-muted-foreground space-y-1.5 leading-relaxed">
+                  <li>• Dodaj 5-10 umiejętności, aby zwiększyć dopasowanie.</li>
+                  <li>• Opisz każde stanowisko 3-5 punktami.</li>
+                  <li>• Ustaw realistyczne widełki — kluczowe dla scoringu.</li>
+                  <li>• Konkretny tytuł zawodowy &gt; ogólny.</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+        )}
       </main>
 
       {showPreview && (
