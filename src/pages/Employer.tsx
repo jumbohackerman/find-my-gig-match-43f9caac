@@ -69,7 +69,7 @@ const Employer = () => {
     if (shouldAdvance) {
       appActions.advanceStatus(app.id, "viewed");
     }
-    setSelectedCandidate({ candidate, match: app.matchResult! });
+    setSelectedCandidate({ candidate, match: app.matchResult!, applicationStatus: app.status as ApplicationStatus });
   };
 
   const handleStructuredSubmit = async (formData: StructuredJobFormData) => {
