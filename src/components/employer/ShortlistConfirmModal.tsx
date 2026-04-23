@@ -3,6 +3,7 @@
  * Shows job name, slots remaining, active package size, and the cost (1 slot).
  */
 
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Layers, AlertTriangle } from "lucide-react";
 import type { ShortlistJobBalance } from "@/domain/shortlist";
@@ -24,10 +25,10 @@ export default function ShortlistConfirmModal({
   if (!open) return null;
   const noSlots = balance.remainingSlots <= 0;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
         onClick={() => !busy && onCancel()}
         role="dialog"
         aria-modal="true"
@@ -36,7 +37,7 @@ export default function ShortlistConfirmModal({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="w-full max-w-md card-gradient rounded-2xl border border-border p-5 relative"
+          className="w-full max-w-md card-gradient rounded-2xl border border-border p-5 relative max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -103,6 +104,7 @@ export default function ShortlistConfirmModal({
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
