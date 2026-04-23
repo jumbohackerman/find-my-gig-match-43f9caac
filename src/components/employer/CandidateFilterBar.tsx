@@ -47,7 +47,7 @@ const Select = ({
     aria-label={ariaLabel}
     value={value}
     onChange={(e) => onChange(e.target.value)}
-    className="h-7 rounded-md bg-secondary border border-border text-[11px] text-foreground px-2 focus:outline-none focus:ring-1 focus:ring-primary"
+    className="h-7 rounded-md bg-secondary border border-border text-[11px] text-foreground px-2 pr-6 py-0 max-w-[160px] truncate focus:outline-none focus:ring-1 focus:ring-primary"
   >
     {options.map((o) => (
       <option key={o.value} value={o.value}>{o.label}</option>
@@ -61,14 +61,14 @@ const CandidateFilterBar = ({ filters, onChange, total, visible }: Props) => {
 
   return (
     <div className="flex flex-wrap items-center gap-2 py-2 px-3 rounded-lg bg-background/40 border border-border/60 mb-3">
-      <FilterIcon className="w-3.5 h-3.5 text-muted-foreground" />
+      <FilterIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
 
       <Select
         ariaLabel="Filtr statusu"
         value={filters.status}
         onChange={(v) => set("status", v as any)}
         options={[
-          { value: "all", label: "Wszystkie statusy" },
+          { value: "all", label: "Status: wszystkie" },
           { value: "applied", label: "Aplikowano" },
           { value: "viewed", label: "Wyświetlono" },
           { value: "shortlisted", label: "Shortlista" },
@@ -95,10 +95,10 @@ const CandidateFilterBar = ({ filters, onChange, total, visible }: Props) => {
         value={filters.source}
         onChange={(v) => set("source", v as any)}
         options={[
-          { value: "all", label: "Każde źródło" },
-          { value: "candidate", label: "Aplikacja kandydata" },
-          { value: "ai", label: "Rekomendacja AI" },
-          { value: "employer", label: "Wybór pracodawcy" },
+          { value: "all", label: "Źródło: każde" },
+          { value: "candidate", label: "Aplikacja" },
+          { value: "ai", label: "Rekom. AI" },
+          { value: "employer", label: "Pracodawca" },
         ]}
       />
 
