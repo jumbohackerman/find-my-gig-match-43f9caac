@@ -411,50 +411,6 @@ const Employer = () => {
   );
 };
 
-// ── Shortlist chip ────────────────────────────────────────────────────────────
-
-function ShortlistChip({
-  app,
-  onRemove,
-}: {
-  app: EnrichedEmployerApplication;
-  onRemove: () => void;
-}) {
-  const name = getCandidateDisplayName(app);
-  const avatar = getCandidateAvatar(app);
-  const isAi = app.source === "ai";
-
-  return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-accent/30 bg-accent/5 text-xs">
-      <span className="text-sm">{avatar}</span>
-      <span className="font-medium text-foreground max-w-[120px] truncate">{name}</span>
-      {app.matchResult && (
-        <span className={`text-[10px] font-bold ${
-          app.matchResult.score >= 75 ? "text-accent" : app.matchResult.score >= 50 ? "text-yellow-400" : "text-muted-foreground"
-        }`}>
-          {app.matchResult.score}%
-        </span>
-      )}
-      {isAi ? (
-        <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-semibold flex items-center gap-0.5">
-          <Zap className="w-2.5 h-2.5" /> AI
-        </span>
-      ) : (
-        <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold flex items-center gap-0.5">
-          <UserCheck className="w-2.5 h-2.5" /> Ręcznie
-        </span>
-      )}
-      <button
-        onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="text-muted-foreground hover:text-destructive ml-0.5"
-        title="Cofnij do statusu Aplikowano (slot nie jest zwracany)"
-      >
-        ×
-      </button>
-    </div>
-  );
-}
-
 // ── Candidate card ────────────────────────────────────────────────────────────
 
 function CandidateCard({
