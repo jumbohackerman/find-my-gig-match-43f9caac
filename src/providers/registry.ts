@@ -15,6 +15,10 @@ import type {
   ShortlistRepository,
   CandidateNotesRepository,
 } from "@/repositories/interfaces";
+import {
+  publicJobListingRepository,
+  type PublicJobListingRepository,
+} from "@/repositories/supabase/publicJobListings";
 
 import type {
   AnalyticsService,
@@ -60,6 +64,7 @@ interface ProviderMap {
   swipeEvents: SwipeEventRepository;
   shortlist: ShortlistRepository;
   candidateNotes: CandidateNotesRepository;
+  publicJobListings: PublicJobListingRepository;
   analytics: AnalyticsService;
   errorTracking: ErrorTrackingService;
   email: EmailService;
@@ -85,6 +90,9 @@ const providers: ProviderMap = {
   // Monetization & recruiter tools
   shortlist: supabaseShortlistRepository,
   candidateNotes: candidateNotesRepository,
+
+  // Read-only public market research feed (employer panel)
+  publicJobListings: publicJobListingRepository,
 
   // External services
   analytics: noopAnalytics,
