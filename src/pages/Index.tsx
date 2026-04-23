@@ -98,13 +98,16 @@ const Index = () => {
 
   const handleSwipeWithRefetch = useCallback(async (direction: "left" | "right" | "save") => {
     if (!requireAuth()) return;
+    // Track current top card as "viewed" — every swipe (left/right/save) counts.
+    const currentJob = filteredJobs[currentIndex];
+    if (currentJob) trackView(currentJob);
     if (direction === "left") setButtonExitDir("left");
     else if (direction === "right") setButtonExitDir("right");
     else setButtonExitDir(null);
     await handleSwipe(direction);
     if (direction === "right") refetchApps();
     setTimeout(() => setButtonExitDir(null), 650);
-  }, [handleSwipe, refetchApps, requireAuth]);
+  }, [handleSwipe, refetchApps, requireAuth, filteredJobs, currentIndex, trackView]);
 
   // ── Keyboard arrow controls ──────────────────────────────────────────────
   useEffect(() => {
