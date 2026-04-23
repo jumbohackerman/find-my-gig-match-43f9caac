@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, EyeOff,
+  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -28,6 +28,7 @@ import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
 import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
+import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +51,7 @@ const Employer = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
   const [pendingShortlist, setPendingShortlist] = useState<{ app: EnrichedEmployerApplication; jobId: string; jobTitle: string } | null>(null);
   const [shortlistBusy, setShortlistBusy] = useState(false);
+  const [activeView, setActiveView] = useState<"my-jobs" | "market">("my-jobs");
 
   const requestShortlist = (app: EnrichedEmployerApplication, jobId: string, jobTitle: string) => {
     setPendingShortlist({ app, jobId, jobTitle });
