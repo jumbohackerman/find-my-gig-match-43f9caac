@@ -46,7 +46,6 @@ const Employer = () => {
   const messaging = useEmployerMessages(user?.id);
 
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
-  const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
   const [pendingShortlist, setPendingShortlist] = useState<{ app: EnrichedEmployerApplication; jobId: string; jobTitle: string } | null>(null);
