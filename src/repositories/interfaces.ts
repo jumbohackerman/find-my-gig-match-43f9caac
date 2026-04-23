@@ -163,3 +163,49 @@ export interface PreferencesRepository {
   /** Delete a preference */
   delete(userId: string, key: string): Promise<void>;
 }
+
+// ─── Shortlist (paid monetization) ───────────────────────────────────────────
+
+export interface ShortlistRepository {
+  /** Per-job slot balances for an employer */
+  getBalances(employerId: string): Promise<Record<string, ShortlistJobBalance>>;
+  /** Buy a 5/10/20 slot package for a job */
+  purchasePackage(jobId: string, size: PackageSize): Promise<string>;
+  /** Atomic shortlist (consumes 1 slot, snapshots, audits). Idempotent. */
+  shortlistCandidate(applicationId: string): Promise<{
+    event_id: string;
+    status: "shortlisted" | "already_shortlisted";
+    slot_consumed: boolean;
+    slots_after?: number;
+    package_size?: number;
+  }>;
+  /** Audit trail for a job */
+  listEventsForJob(jobId: string): Promise<ShortlistEvent[]>;
+  /** Set of application IDs already shortlisted for a job */
+  listShortlistedApplicationIds(jobId: string): Promise<Set<string>>;
+}
+
+// ─── Candidate notes (employer-internal) ─────────────────────────────────────
+
+export interface CandidateNote {
+  id: string;
+  employerId: string;
+  applicationId: string;
+  candidateId: string;
+  jobId: string;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CandidateNotesRepository {
+  listForApplication(applicationId: string): Promise<CandidateNote[]>;
+  create(params: {
+    employerId: string;
+    applicationId: string;
+    candidateId: string;
+    jobId: string;
+    note: string;
+  }): Promise<CandidateNote>;
+  delete(noteId: string): Promise<void>;
+}
