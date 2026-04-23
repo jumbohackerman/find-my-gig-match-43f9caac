@@ -16,6 +16,11 @@ import type {
   Message,
   Notification,
 } from "@/domain/models";
+import type {
+  ShortlistJobBalance,
+  ShortlistEvent,
+  PackageSize,
+} from "@/domain/shortlist";
 
 // ─── Jobs ────────────────────────────────────────────────────────────────────
 
