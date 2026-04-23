@@ -136,23 +136,62 @@ const Employer = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full" data-testid="employer-dashboard">
+      <main
+        className={`flex-1 flex flex-col px-4 py-6 mx-auto w-full ${activeView === "market" ? "max-w-5xl" : "max-w-2xl"}`}
+        data-testid="employer-dashboard"
+      >
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">Panel pracodawcy</h2>
               <p className="text-muted-foreground text-sm mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
             </div>
+            {activeView === "my-jobs" && (
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
+                data-testid="employer-add-job"
+              >
+                <Plus className="w-4 h-4" /> Dodaj ogłoszenie
+              </button>
+            )}
+          </div>
+
+          {/* View tabs — clearly separates own management from read-only market research */}
+          <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-4 rounded-xl bg-secondary/40 border border-border">
             <button
-              onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
-              data-testid="employer-add-job"
+              role="tab"
+              aria-selected={activeView === "my-jobs"}
+              onClick={() => setActiveView("my-jobs")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                activeView === "my-jobs"
+                  ? "bg-background text-foreground shadow-soft"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <Plus className="w-4 h-4" /> Dodaj ogłoszenie
+              <Briefcase className="w-3.5 h-3.5" /> Moje ogłoszenia
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeView === "market"}
+              onClick={() => setActiveView("market")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                activeView === "market"
+                  ? "bg-background text-foreground shadow-soft"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" /> Przegląd rynku
             </button>
           </div>
         </motion.div>
 
+        {activeView === "market" ? (
+          <MarketResearchPanel />
+        ) : (
+          <>
+        </>
+        )}
         {/* Employer Setup Completion */}
         {(() => {
           let score = 0;
