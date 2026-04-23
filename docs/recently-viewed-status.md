@@ -4,20 +4,22 @@
 
 | Component | Description | File |
 |---|---|---|
-| **Hook** | `useRecentlyViewed()` — tracks up to 20 jobs, newest first, deduplicated | `src/hooks/useRecentlyViewed.ts` |
+| **Hook** | `useRecentlyViewed()` — tracks up to 10 jobs, newest first, deduplicated | `src/hooks/useRecentlyViewed.ts` |
 | **List component** | `RecentlyViewedList` — shows viewed jobs with relative timestamps, clear button | `src/components/RecentlyViewedList.tsx` |
 | **Tab** | "Ostatnie" tab in candidate view with count badge | `src/pages/Index.tsx` |
-| **Tracking** | Views are recorded when job detail modal opens (`openJobModal`) | `src/pages/Index.tsx` |
+| **Tracking** | Recorded on (a) opening job detail modal, (b) every swipe — left/right/save — on the top card | `src/pages/Index.tsx` |
 | **Deep-link** | `/?tab=recent` works like other tabs | `src/pages/Index.tsx` |
 
 ## How it works
 
-- **Storage**: `sessionStorage` under key `recently_viewed_jobs`
-- **Format**: Array of `{ job: Job, viewedAt: ISO string }`, capped at 20
-- **Trigger**: Opening a job detail modal (tap on card, click from any list)
-- **Dedup**: Re-viewing a job moves it to the top instead of creating duplicates
+- **Storage**: `localStorage` under key `recently_viewed_jobs` (persists across sessions on the same device)
+- **Format**: Array of `{ job: Job, viewedAt: ISO string }`, capped at 10
+- **Triggers**:
+  - Opening a job detail modal (tap on card, click from any list)
+  - Swiping the top card in any direction (skip / apply / save)
+- **Dedup**: Re-viewing or re-swiping a job moves it to the top instead of creating duplicates
 - **Clear**: "Wyczyść historię" button appears when >3 entries
-- **Difference from Saved**: Saved is intentional (star action); Recent is passive (any view)
+- **Difference from Saved**: Saved is intentional (star action); Recent is passive (any view or swipe)
 
 ## ⏳ What changes with live persistence
 

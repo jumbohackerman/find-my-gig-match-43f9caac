@@ -8,7 +8,7 @@ import { useState, useCallback } from "react";
 import type { Job } from "@/domain/models";
 
 const STORAGE_KEY = "recently_viewed_jobs";
-const MAX_ITEMS = 20;
+const MAX_ITEMS = 10;
 
 interface ViewedEntry {
   job: Job;
@@ -17,7 +17,7 @@ interface ViewedEntry {
 
 function loadEntries(): ViewedEntry[] {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -25,13 +25,18 @@ function loadEntries(): ViewedEntry[] {
 }
 
 function saveEntries(entries: ViewedEntry[]) {
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ITEMS)));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ITEMS)));
+  } catch {
+    // quota exceeded — ignore
+  }
 }
 
 export function useRecentlyViewed() {
   const [entries, setEntries] = useState<ViewedEntry[]>(loadEntries);
 
   const trackView = useCallback((job: Job) => {
+    if (!job?.id) return;
     setEntries((prev) => {
       const filtered = prev.filter((e) => e.job.id !== job.id);
       const next = [{ job, viewedAt: new Date().toISOString() }, ...filtered].slice(0, MAX_ITEMS);
@@ -41,7 +46,7 @@ export function useRecentlyViewed() {
   }, []);
 
   const clear = useCallback(() => {
-    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
     setEntries([]);
   }, []);
 
