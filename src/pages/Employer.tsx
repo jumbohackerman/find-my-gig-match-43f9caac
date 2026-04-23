@@ -30,6 +30,7 @@ import ChatPanel from "@/components/employer/ChatPanel";
 import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
+import Footer from "@/components/Footer";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 import { hideJob, unhideJob } from "@/lib/moderation";
@@ -442,6 +443,8 @@ const Employer = () => {
           onCancel={() => setPendingShortlist(null)}
         />
       )}
+
+      <Footer />
     </div>
   );
 };
