@@ -48,6 +48,20 @@ const Employer = () => {
   const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
+  const [pendingShortlist, setPendingShortlist] = useState<{ app: EnrichedEmployerApplication; jobId: string; jobTitle: string } | null>(null);
+  const [shortlistBusy, setShortlistBusy] = useState(false);
+
+  const requestShortlist = (app: EnrichedEmployerApplication, jobId: string, jobTitle: string) => {
+    setPendingShortlist({ app, jobId, jobTitle });
+  };
+
+  const confirmShortlist = async () => {
+    if (!pendingShortlist) return;
+    setShortlistBusy(true);
+    const ok = await shortlist.shortlistCandidate(pendingShortlist.app.id, pendingShortlist.jobId);
+    setShortlistBusy(false);
+    if (ok) setPendingShortlist(null);
+  };
 
   // Old form state removed — using JobPostForm component instead
 
@@ -401,13 +415,14 @@ const Employer = () => {
                               <div className="space-y-2">
                                 {jobApps.map((app) => (
                                   <CandidateCard
-                                     key={app.id}
+                                    key={app.id}
                                     app={app}
                                     jobId={job.id}
+                                    employerId={user?.id}
                                     onView={() => handleViewCandidate(app)}
                                     onAdvanceStatus={handleAdvanceStatus}
-                                    onShortlist={() => shortlist.shortlistCandidate(app.id, "employer", jobApps, job.id)}
-                                    shortlistFull={shortlistFull}
+                                    onShortlist={() => requestShortlist(app, job.id, job.title)}
+                                    canShortlist={balance.remainingSlots > 0}
                                     chatMessages={messaging.getMessages(app.id)}
                                     onSendMessage={(content) => messaging.sendMessage(app.id, content)}
                                     isChatOpen={messaging.isChatOpen(app.id)}
