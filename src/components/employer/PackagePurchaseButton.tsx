@@ -140,10 +140,12 @@ export default function PackagePurchaseButton({ balance, onPurchase }: Props) {
               <p className="mt-4 text-[10px] text-muted-foreground/70 text-center">
                 Tryb testowy — nie pobieramy realnych płatności. Każdy zakup tworzy zdarzenie billing dla audytu.
               </p>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </>
   );
 }
