@@ -8,7 +8,7 @@ import { useState, useCallback } from "react";
 import type { Job } from "@/domain/models";
 
 const STORAGE_KEY = "recently_viewed_jobs";
-const MAX_ITEMS = 20;
+const MAX_ITEMS = 10;
 
 interface ViewedEntry {
   job: Job;
