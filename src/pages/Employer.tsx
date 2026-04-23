@@ -420,6 +420,8 @@ const Employer = () => {
           </div>
           </LocalErrorBoundary>
         )}
+        </>
+        )}
       </main>
 
       <CandidateProfileModal
