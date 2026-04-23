@@ -14,7 +14,8 @@ import CandidateProfileModal from "@/components/CandidateProfileModal";
 import { useEmployerDashboardData } from "@/hooks/useEmployerDashboard";
 import { useEmployerJobs, type JobFormData } from "@/hooks/useEmployerJobs";
 import { JobPostForm, type StructuredJobFormData } from "@/components/employer/JobPostForm";
-import { useEmployerShortlist, MAX_SHORTLIST } from "@/hooks/useEmployerShortlist";
+import { useEmployerShortlist } from "@/hooks/useEmployerShortlist";
+import { PACKAGE_PRICING, formatPrice, type PackageSize } from "@/domain/shortlist";
 import { useEmployerApplicationActions, getCandidateDisplayName, getCandidateAvatar } from "@/hooks/useEmployerApplications";
 import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
 import StatusBadge from "@/components/employer/StatusBadge";
@@ -36,7 +37,7 @@ const Employer = () => {
   const { user, profile } = useAuth();
   const { jobs: domainJobs, applicationsByJob, loading, refetch } = useEmployerDashboardData();
   const { createJob, createStructuredJob, deleteJob, submitting, EMPTY_FORM } = useEmployerJobs();
-  const shortlist = useEmployerShortlist(refetch);
+  const shortlist = useEmployerShortlist(user?.id, refetch);
   const appActions = useEmployerApplicationActions(refetch);
   const messaging = useEmployerMessages(user?.id);
 
@@ -227,13 +228,14 @@ const Employer = () => {
             <AnimatePresence>
               {domainJobs.map((job, i) => {
                 const jobApps = applicationsByJob[job.id] || [];
-                const shortlisted = shortlist.getShortlisted(jobApps);
-                const aiCount = shortlisted.filter((a) => a.source === "ai").length;
-                const employerPickCount = shortlisted.filter((a) => a.source === "employer").length;
+                const shortlisted = jobApps.filter((a) => a.status === "shortlisted");
+                const aiCount = jobApps.filter((a) => a.matchResult && a.matchResult.score >= 75 && a.status !== "shortlisted").length;
                 const isExpanded = expandedJob === job.id;
                 const isAnalyzed = analyzedJob === job.id;
                 const avgScore = getAvgMatchScore(job.id);
-                const shortlistFull = shortlisted.length >= MAX_SHORTLIST;
+                const balance = shortlist.getBalance(job.id);
+                const noSlots = balance.totalSlots === 0;
+                const slotsExhausted = balance.totalSlots > 0 && balance.remainingSlots === 0;
 
                 return (
                   <motion.div
@@ -247,12 +249,14 @@ const Employer = () => {
                     {/* Metrics bar */}
                     <div className="px-4 pt-3 flex gap-3 text-[11px] text-muted-foreground flex-wrap">
                       <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
-                      <span className={`flex items-center gap-1 ${shortlistFull ? "text-accent font-semibold" : ""}`}>
-                        <Layers className="w-3 h-3" /> {shortlisted.length}/{MAX_SHORTLIST} shortlista
+                      <span className={`flex items-center gap-1 ${slotsExhausted ? "text-destructive font-semibold" : balance.remainingSlots > 0 ? "text-accent font-semibold" : ""}`}>
+                        <Layers className="w-3 h-3" />
+                        {noSlots
+                          ? "0 slotów (kup pakiet)"
+                          : `${balance.usedSlots}/${balance.totalSlots} shortlista · ${balance.remainingSlots} wolnych`}
                       </span>
-                      <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> {aiCount} auto</span>
-                      <span className="flex items-center gap-1"><UserCheck className="w-3 h-3" /> {employerPickCount} ręcznie</span>
-                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% średnia</span>
+                      <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> {aiCount} rekomendacji AI</span>
+                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr. match</span>
                       {jobApps.length > 0 && (() => {
                         const newest = jobApps.reduce((latest, a) =>
                           new Date(a.appliedAt) > new Date(latest.appliedAt) ? a : latest
@@ -315,13 +319,11 @@ const Employer = () => {
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <button
-                          onClick={() => shortlist.generateShortlist(job.id, jobApps)}
-                          disabled={shortlistFull}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <Zap className="w-3.5 h-3.5" /> AI Shortlista {shortlistFull && "(pełna)"}
-                        </button>
+                        <PackagePurchaseButton
+                          jobId={job.id}
+                          balance={balance}
+                          onPurchase={(size) => shortlist.purchasePackage(job.id, size)}
+                        />
                         <button
                           onClick={() => {
                             setAnalyzedJob(isAnalyzed ? null : job.id);
@@ -331,7 +333,7 @@ const Employer = () => {
                             isAnalyzed ? "bg-primary text-primary-foreground" : "bg-accent/15 text-accent hover:bg-accent/25"
                           }`}
                         >
-                          <BarChart3 className="w-3.5 h-3.5" /> Ranking
+                          <BarChart3 className="w-3.5 h-3.5" /> Rekomendacje AI
                         </button>
                         <button
                           onClick={() => {
@@ -347,11 +349,11 @@ const Employer = () => {
                       </div>
                     </div>
 
-                    {/* Shortlist section */}
+                    {/* Shortlist section (paid) */}
                     {(shortlisted.length > 0 || (isExpanded && jobApps.length > 0)) && (
                       <div className="px-4 pb-3 border-t border-border pt-3">
                         <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                          <Layers className="w-3.5 h-3.5" /> Shortlista ({shortlisted.length}/{MAX_SHORTLIST})
+                          <Layers className="w-3.5 h-3.5" /> Shortlista ({shortlisted.length}{balance.totalSlots > 0 ? `/${balance.totalSlots}` : ""})
                         </h5>
                         {shortlisted.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
@@ -360,8 +362,6 @@ const Employer = () => {
                                 key={app.id}
                                 app={app}
                                 onRemove={() => handleAdvanceStatus(app.id, "applied")}
-                                isReplaceTarget={shortlist.replacingFor?.jobId === job.id}
-                                onReplace={() => shortlist.replaceShortlisted(app.id)}
                               />
                             ))}
                           </div>
@@ -370,50 +370,14 @@ const Employer = () => {
                             <EmptyState
                               icon={<Layers className="w-4 h-4 text-muted-foreground" />}
                               title="Pusta shortlista"
-                              description="Wybierz kandydatów ręcznie z listy poniżej lub wygeneruj shortlistę na podstawie dopasowania."
-                              action={
-                                <button
-                                  onClick={() => shortlist.generateShortlist(job.id, jobApps)}
-                                  className="px-4 py-2 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors flex items-center gap-1.5"
-                                >
-                                  <Zap className="w-3.5 h-3.5" /> Wygeneruj shortlistę
-                                </button>
-                              }
+                              description={noSlots
+                                ? "Aby shortlistować kandydatów dla tej oferty, kup pakiet 5, 10 lub 20 slotów."
+                                : "Kliknij „Dodaj do shortlisty” przy kandydacie, aby zużyć 1 slot."}
                             />
                           </div>
                         )}
                       </div>
                     )}
-
-                    {/* Replace modal inline */}
-                    <AnimatePresence>
-                      {shortlist.replacingFor?.jobId === job.id && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-4 pb-3 bg-destructive/5 border-t border-destructive/20 pt-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <ArrowLeftRight className="w-4 h-4 text-destructive" />
-                              <p className="text-xs font-semibold text-destructive">
-                                Shortlista pełna — wybierz kandydata do zamiany
-                              </p>
-                            </div>
-                            <p className="text-[10px] text-muted-foreground mb-2">
-                              Kliknij na kandydata w shortliście powyżej, aby go zamienić.
-                            </p>
-                            <button
-                              onClick={() => shortlist.setReplacingFor(null)}
-                              className="text-[10px] px-3 py-1 rounded bg-secondary text-secondary-foreground hover:bg-muted"
-                            >
-                              Anuluj
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
 
                     {/* Regular applicant list */}
                     <AnimatePresence>

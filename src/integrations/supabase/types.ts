@@ -79,6 +79,72 @@ export type Database = {
         }
         Relationships: []
       }
+      candidate_activity_log: {
+        Row: {
+          action: string
+          application_id: string
+          candidate_id: string
+          created_at: string
+          employer_id: string
+          id: string
+          job_id: string
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          application_id: string
+          candidate_id: string
+          created_at?: string
+          employer_id: string
+          id?: string
+          job_id: string
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          application_id?: string
+          candidate_id?: string
+          created_at?: string
+          employer_id?: string
+          id?: string
+          job_id?: string
+          metadata?: Json
+        }
+        Relationships: []
+      }
+      candidate_notes: {
+        Row: {
+          application_id: string
+          candidate_id: string
+          created_at: string
+          employer_id: string
+          id: string
+          job_id: string
+          note: string
+          updated_at: string
+        }
+        Insert: {
+          application_id: string
+          candidate_id: string
+          created_at?: string
+          employer_id: string
+          id?: string
+          job_id: string
+          note: string
+          updated_at?: string
+        }
+        Update: {
+          application_id?: string
+          candidate_id?: string
+          created_at?: string
+          employer_id?: string
+          id?: string
+          job_id?: string
+          note?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       candidates: {
         Row: {
           availability: string
@@ -94,8 +160,10 @@ export type Database = {
           last_active: string
           links: Json
           location: string
+          normalized_title: string
           primary_industry: string
           profile_completeness: number
+          relocation_openness: boolean
           salary_currency: string
           salary_max: number
           salary_min: number
@@ -106,6 +174,7 @@ export type Database = {
           updated_at: string
           user_id: string
           work_mode: string
+          years_of_experience: number
         }
         Insert: {
           availability?: string
@@ -121,8 +190,10 @@ export type Database = {
           last_active?: string
           links?: Json
           location?: string
+          normalized_title?: string
           primary_industry?: string
           profile_completeness?: number
+          relocation_openness?: boolean
           salary_currency?: string
           salary_max?: number
           salary_min?: number
@@ -133,6 +204,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           work_mode?: string
+          years_of_experience?: number
         }
         Update: {
           availability?: string
@@ -148,8 +220,10 @@ export type Database = {
           last_active?: string
           links?: Json
           location?: string
+          normalized_title?: string
           primary_industry?: string
           profile_completeness?: number
+          relocation_openness?: boolean
           salary_currency?: string
           salary_max?: number
           salary_min?: number
@@ -160,6 +234,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           work_mode?: string
+          years_of_experience?: number
         }
         Relationships: []
       }
@@ -502,6 +577,160 @@ export type Database = {
           },
         ]
       }
+      shortlist_events: {
+        Row: {
+          actor_id: string
+          application_id: string | null
+          candidate_id: string | null
+          created_at: string
+          employer_id: string
+          event_type: string
+          id: string
+          idempotency_key: string | null
+          job_id: string
+          metadata: Json
+          package_id: string | null
+          package_size: number | null
+          price_amount: number | null
+          price_currency: string | null
+          slots_after: number | null
+          slots_before: number | null
+        }
+        Insert: {
+          actor_id: string
+          application_id?: string | null
+          candidate_id?: string | null
+          created_at?: string
+          employer_id: string
+          event_type: string
+          id?: string
+          idempotency_key?: string | null
+          job_id: string
+          metadata?: Json
+          package_id?: string | null
+          package_size?: number | null
+          price_amount?: number | null
+          price_currency?: string | null
+          slots_after?: number | null
+          slots_before?: number | null
+        }
+        Update: {
+          actor_id?: string
+          application_id?: string | null
+          candidate_id?: string | null
+          created_at?: string
+          employer_id?: string
+          event_type?: string
+          id?: string
+          idempotency_key?: string | null
+          job_id?: string
+          metadata?: Json
+          package_id?: string | null
+          package_size?: number | null
+          price_amount?: number | null
+          price_currency?: string | null
+          slots_after?: number | null
+          slots_before?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shortlist_events_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "shortlist_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shortlist_packages: {
+        Row: {
+          employer_id: string
+          exhausted_at: string | null
+          id: string
+          job_id: string
+          package_size: number
+          price_amount: number
+          price_currency: string
+          purchased_at: string
+          slots_total: number
+          slots_used: number
+          status: string
+        }
+        Insert: {
+          employer_id: string
+          exhausted_at?: string | null
+          id?: string
+          job_id: string
+          package_size: number
+          price_amount: number
+          price_currency?: string
+          purchased_at?: string
+          slots_total: number
+          slots_used?: number
+          status?: string
+        }
+        Update: {
+          employer_id?: string
+          exhausted_at?: string | null
+          id?: string
+          job_id?: string
+          package_size?: number
+          price_amount?: number
+          price_currency?: string
+          purchased_at?: string
+          slots_total?: number
+          slots_used?: number
+          status?: string
+        }
+        Relationships: []
+      }
+      shortlist_snapshots: {
+        Row: {
+          application_id: string
+          candidate_id: string
+          candidate_snapshot: Json
+          created_at: string
+          employer_id: string
+          id: string
+          job_id: string
+          job_snapshot: Json
+          match_score: number | null
+          shortlist_event_id: string
+        }
+        Insert: {
+          application_id: string
+          candidate_id: string
+          candidate_snapshot: Json
+          created_at?: string
+          employer_id: string
+          id?: string
+          job_id: string
+          job_snapshot: Json
+          match_score?: number | null
+          shortlist_event_id: string
+        }
+        Update: {
+          application_id?: string
+          candidate_id?: string
+          candidate_snapshot?: Json
+          created_at?: string
+          employer_id?: string
+          id?: string
+          job_id?: string
+          job_snapshot?: Json
+          match_score?: number | null
+          shortlist_event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shortlist_snapshots_shortlist_event_id_fkey"
+            columns: ["shortlist_event_id"]
+            isOneToOne: false
+            referencedRelation: "shortlist_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       swipe_events: {
         Row: {
           created_at: string
@@ -577,8 +806,22 @@ export type Database = {
         }
         Returns: string
       }
+      compute_profile_completeness: {
+        Args: { _user_id: string }
+        Returns: number
+      }
+      get_remaining_slots: { Args: { _job_id: string }; Returns: number }
       get_user_role: { Args: { _user_id: string }; Returns: string }
       hide_job: { Args: { _job_id: string }; Returns: undefined }
+      is_candidate_shortlisted: {
+        Args: { _application_id: string; _employer_id: string }
+        Returns: boolean
+      }
+      purchase_shortlist_package: {
+        Args: { _job_id: string; _package_size: number }
+        Returns: string
+      }
+      shortlist_candidate: { Args: { _application_id: string }; Returns: Json }
       unhide_job: { Args: { _job_id: string }; Returns: undefined }
     }
     Enums: {
