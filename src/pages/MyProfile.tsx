@@ -393,8 +393,10 @@ const MyProfile = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center gap-2">
-          <img src={logo} alt="" className="w-8 h-8 object-contain" />
-          <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
+          <Link to="/" aria-label="JobSwipe — wróć do przeglądania ofert" className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
+            <img src={logo} alt="" className="w-8 h-8 object-contain" />
+            <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
+          </Link>
         </header>
         <main className="flex-1 px-4 py-6 max-w-lg mx-auto w-full">
           <ProfileSkeleton />
