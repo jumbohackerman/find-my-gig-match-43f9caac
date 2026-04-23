@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { supabaseShortlistRepository } from "@/repositories/supabase/shortlist";
+import { getProvider } from "@/providers/registry";
 import type { ShortlistJobBalance, PackageSize } from "@/domain/shortlist";
 import { toast } from "sonner";
 
