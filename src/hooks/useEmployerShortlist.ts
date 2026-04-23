@@ -1,97 +1,133 @@
 /**
- * Employer-side hook for shortlist management.
- * Encapsulates shortlist business rules (max 5, AI generation, replace logic).
- * Uses repository layer for persistence.
+ * Employer-side hook for shortlist management — DB-backed billing.
+ *
+ * NEW BUSINESS RULES:
+ * - No hard-coded limit (5). Limit comes from active package(s).
+ * - Each shortlist consumes exactly 1 slot via DB function `shortlist_candidate`.
+ * - Idempotent: clicking twice on the same application does NOT double-charge.
+ * - AI recommendations DO NOT trigger billing — they are non-paid suggestions.
+ * - Removing a candidate does NOT refund a slot (per spec).
  */
 
-import { useState, useCallback } from "react";
-import { getProvider } from "@/providers/registry";
-import type { ApplicationSource, EnrichedEmployerApplication } from "@/domain/models";
+import { useState, useEffect, useCallback } from "react";
+import { supabaseShortlistRepository } from "@/repositories/supabase/shortlist";
+import type { ShortlistJobBalance, PackageSize } from "@/domain/shortlist";
 import { toast } from "sonner";
 
-export const MAX_SHORTLIST = 5;
+export function useEmployerShortlist(employerId: string | undefined, refetch: () => void) {
+  const [balances, setBalances] = useState<Record<string, ShortlistJobBalance>>({});
+  const [shortlistedAppIds, setShortlistedAppIds] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(false);
+  const [busyAppId, setBusyAppId] = useState<string | null>(null);
 
-export interface ReplaceTarget {
-  jobId: string;
-  appId: string;
-  source: ApplicationSource;
-}
+  const reload = useCallback(async () => {
+    if (!employerId) return;
+    setLoading(true);
+    try {
+      const map = await supabaseShortlistRepository.getBalances(employerId);
+      setBalances(map);
+    } finally {
+      setLoading(false);
+    }
+  }, [employerId]);
 
-export function useEmployerShortlist(refetch: () => void) {
-  const [replacingFor, setReplacingFor] = useState<ReplaceTarget | null>(null);
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
-  const getShortlisted = useCallback(
-    (apps: EnrichedEmployerApplication[]) =>
-      apps.filter((a) => a.status === "shortlisted"),
-    [],
+  /** Bulk-load shortlisted application IDs for given jobs */
+  const loadShortlistedIds = useCallback(async (jobIds: string[]) => {
+    const all = new Set<string>();
+    for (const jid of jobIds) {
+      const ids = await supabaseShortlistRepository.listShortlistedApplicationIds(jid);
+      ids.forEach((id) => all.add(id));
+    }
+    setShortlistedAppIds(all);
+  }, []);
+
+  /** Returns balance for a job (zeros if no package). */
+  const getBalance = useCallback(
+    (jobId: string): ShortlistJobBalance => {
+      return (
+        balances[jobId] || {
+          jobId,
+          totalSlots: 0,
+          usedSlots: 0,
+          remainingSlots: 0,
+          activePackage: null,
+          allPackages: [],
+        }
+      );
+    },
+    [balances],
   );
 
+  const isShortlisted = useCallback(
+    (appId: string) => shortlistedAppIds.has(appId),
+    [shortlistedAppIds],
+  );
+
+  /** Buy a package — mock billing for now (no real payment). */
+  const purchasePackage = useCallback(
+    async (jobId: string, size: PackageSize) => {
+      try {
+        await supabaseShortlistRepository.purchasePackage(jobId, size);
+        toast.success(`Aktywowano pakiet ${size} slotów shortlisty`);
+        await reload();
+        return true;
+      } catch (e: any) {
+        toast.error(`Nie udało się aktywować pakietu: ${e?.message || "błąd"}`);
+        return false;
+      }
+    },
+    [reload],
+  );
+
+  /** Atomic shortlist: consume 1 slot, snapshot, audit. Idempotent. */
   const shortlistCandidate = useCallback(
-    async (
-      appId: string,
-      source: ApplicationSource,
-      allApps: EnrichedEmployerApplication[],
-      jobId: string,
-    ) => {
-      const shortlisted = allApps.filter((a) => a.status === "shortlisted");
-      if (shortlisted.length >= MAX_SHORTLIST) {
-        setReplacingFor({ jobId, appId, source });
-        return;
+    async (applicationId: string, jobId: string): Promise<boolean> => {
+      if (busyAppId === applicationId) return false; // re-entry guard
+      const balance = getBalance(jobId);
+      if (balance.remainingSlots <= 0) {
+        toast.error("Brak wolnych slotów. Kup pakiet, aby shortlistować.");
+        return false;
       }
-      await getProvider("applications").updateStatus(appId, "shortlisted", source);
-      toast.success(source === "ai" ? "Dodano do shortlisty (auto)" : "Dodano do shortlisty");
-      refetch();
+      setBusyAppId(applicationId);
+      try {
+        const result = await supabaseShortlistRepository.shortlistCandidate(applicationId);
+        if (result.status === "already_shortlisted") {
+          toast.info("Kandydat jest już na shortliście");
+        } else {
+          toast.success(`Dodano do shortlisty (zostało ${result.slots_after !== undefined ? balance.remainingSlots - 1 : "?"} slotów)`);
+        }
+        await reload();
+        await loadShortlistedIds([jobId]);
+        refetch();
+        return true;
+      } catch (e: any) {
+        const msg = String(e?.message || "");
+        if (msg.includes("NO_SLOTS_AVAILABLE")) {
+          toast.error("Brak wolnych slotów. Kup nowy pakiet.");
+        } else {
+          toast.error(`Nie udało się dodać do shortlisty: ${msg}`);
+        }
+        return false;
+      } finally {
+        setBusyAppId(null);
+      }
     },
-    [refetch],
-  );
-
-  const replaceShortlisted = useCallback(
-    async (removeAppId: string) => {
-      if (!replacingFor) return;
-      await getProvider("applications").updateStatus(removeAppId, "applied", "candidate");
-      await getProvider("applications").updateStatus(replacingFor.appId, "shortlisted", replacingFor.source);
-      toast.success("Zamieniono kandydata na shortliście");
-      setReplacingFor(null);
-      refetch();
-    },
-    [replacingFor, refetch],
-  );
-
-  const generateShortlist = useCallback(
-    async (jobId: string, jobApps: EnrichedEmployerApplication[]) => {
-      const shortlisted = jobApps.filter((a) => a.status === "shortlisted");
-      const slotsAvailable = MAX_SHORTLIST - shortlisted.length;
-      if (slotsAvailable <= 0) {
-        toast.error("Shortlista pełna (5/5). Zamień kandydata ręcznie.");
-        return;
-      }
-
-      const toShortlist = jobApps
-        .filter((a) => a.status !== "shortlisted" && a.matchResult)
-        .sort((a, b) => (b.matchResult?.score || 0) - (a.matchResult?.score || 0))
-        .slice(0, slotsAvailable);
-
-      if (toShortlist.length === 0) {
-        toast.info("Brak nowych kandydatów do dodania");
-        return;
-      }
-
-      for (const app of toShortlist) {
-        await getProvider("applications").updateStatus(app.id, "shortlisted", "ai");
-      }
-      toast.success(`Dodano ${toShortlist.length} kandydatów na podstawie dopasowania`);
-      refetch();
-    },
-    [refetch],
+    [busyAppId, getBalance, reload, loadShortlistedIds, refetch],
   );
 
   return {
-    replacingFor,
-    setReplacingFor,
-    getShortlisted,
+    balances,
+    loading,
+    busyAppId,
+    getBalance,
+    isShortlisted,
+    purchasePackage,
     shortlistCandidate,
-    replaceShortlisted,
-    generateShortlist,
-    MAX_SHORTLIST,
+    loadShortlistedIds,
+    reload,
   };
 }
