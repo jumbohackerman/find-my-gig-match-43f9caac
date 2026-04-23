@@ -189,9 +189,8 @@ const Employer = () => {
         {activeView === "market" ? (
           <MarketResearchPanel />
         ) : (
-          <>
-        </>
-        )}
+        <>
+
         {/* Employer Setup Completion */}
         {(() => {
           let score = 0;
