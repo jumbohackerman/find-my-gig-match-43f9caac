@@ -408,10 +408,10 @@ const MyProfile = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 shrink-0">
+        <Link to="/" aria-label="JobSwipe — wróć do przeglądania ofert" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
           <img src={logo} alt="" className="w-8 h-8 object-contain" />
           <h1 className="font-display text-xl font-bold text-foreground">JobSwipe</h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           <Link to="/" className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors">
             <span className="hidden sm:inline">Przeglądaj oferty</span>
