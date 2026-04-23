@@ -534,10 +534,11 @@ function ShortlistChip({
 function CandidateCard({
   app,
   jobId,
+  employerId,
   onView,
   onAdvanceStatus,
   onShortlist,
-  shortlistFull,
+  canShortlist,
   chatMessages,
   onSendMessage,
   isChatOpen,
@@ -546,10 +547,11 @@ function CandidateCard({
 }: {
   app: EnrichedEmployerApplication;
   jobId: string;
+  employerId?: string;
   onView: () => void;
   onAdvanceStatus: (appId: string, status: ApplicationStatus) => void;
   onShortlist: () => void;
-  shortlistFull: boolean;
+  canShortlist: boolean;
   chatMessages: ChatMessage[];
   onSendMessage: (content: string) => void;
   isChatOpen: boolean;
@@ -561,7 +563,10 @@ function CandidateCard({
   const candidate = app.candidate;
   const matchResult = app.matchResult;
   const activity = getActivityLabel(candidate?.lastActive);
-  const isShortlisted = app.status === "shortlisted";
+  const SHORTLISTED_STATES: ApplicationStatus[] = ["shortlisted", "interview", "hired"];
+  const isShortlisted = SHORTLISTED_STATES.includes(app.status as ApplicationStatus);
+  const isAiRecommendation =
+    !isShortlisted && matchResult !== undefined && matchResult.score >= 75;
 
   return (
     <div className={`rounded-lg border overflow-hidden ${
@@ -581,6 +586,11 @@ function CandidateCard({
               <span className={`text-[10px] font-medium ${activity.color}`}>{activity.label}</span>
               <StatusBadge status={app.status as ApplicationStatus} />
               {app.source !== "candidate" && <SourceLabel source={app.source as any} />}
+              {isAiRecommendation && (
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-semibold flex items-center gap-0.5">
+                  <Zap className="w-2.5 h-2.5" /> Rekomendacja AI
+                </span>
+              )}
               {chatMessages.length > 0 && (
                 <span className="text-[10px] text-muted-foreground/60 flex items-center gap-0.5">
                   💬 {chatMessages.length}
@@ -600,14 +610,18 @@ function CandidateCard({
             {(app.status === "applied" || app.status === "viewed") && (
               <button
                 onClick={(e) => { e.stopPropagation(); onShortlist(); }}
-                className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent hover:bg-accent/25 flex items-center gap-0.5"
-                title={shortlistFull ? "Shortlista pełna — wybierz kandydata do zamiany" : "Dodaj do shortlisty"}
+                className={`text-[10px] px-2 py-0.5 rounded flex items-center gap-0.5 ${
+                  canShortlist
+                    ? "bg-accent/15 text-accent hover:bg-accent/25"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+                title={canShortlist ? "Dodaj do shortlisty (1 slot)" : "Brak slotów — kliknij, aby kupić pakiet"}
               >
                 <UserCheck className="w-3 h-3" />
-                {shortlistFull ? "Zamień na shortliście" : "Shortlista"}
+                {canShortlist ? "Shortlista" : "Brak slotów"}
               </button>
             )}
-            {(app.status === "shortlisted" || app.status === "viewed") && (
+            {app.status === "shortlisted" && (
               <button
                 onClick={(e) => { e.stopPropagation(); onAdvanceStatus(app.id, "interview"); }}
                 className="text-[10px] px-2 py-0.5 rounded bg-primary/15 text-primary hover:bg-primary/25"
@@ -654,6 +668,16 @@ function CandidateCard({
         currentUserId={currentUserId}
         applicationStatus={app.status as ApplicationStatus}
       />
+
+      {/* Internal recruiter notes — only after shortlist */}
+      {isShortlisted && employerId && (
+        <CandidateNotesPanel
+          applicationId={app.id}
+          candidateId={app.candidateId}
+          jobId={jobId}
+          employerId={employerId}
+        />
+      )}
     </div>
   );
 }
