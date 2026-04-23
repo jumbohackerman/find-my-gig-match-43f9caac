@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, ArrowLeftRight, EyeOff,
+  BarChart3, Zap, Layers, UserCheck, EyeOff,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -20,6 +20,7 @@ import { useEmployerApplicationActions, getCandidateDisplayName, getCandidateAva
 import PackagePurchaseButton from "@/components/employer/PackagePurchaseButton";
 import ShortlistConfirmModal from "@/components/employer/ShortlistConfirmModal";
 import CandidateNotesPanel from "@/components/employer/CandidateNotesPanel";
+import JobPanel from "@/components/employer/JobPanel";
 import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
 import StatusBadge from "@/components/employer/StatusBadge";
 import SourceLabel from "@/components/employer/SourceLabel";
