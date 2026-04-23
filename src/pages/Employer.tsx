@@ -481,6 +481,18 @@ const Employer = () => {
         applicationStatus={selectedCandidate?.applicationStatus}
         onClose={() => setSelectedCandidate(null)}
       />
+
+      {pendingShortlist && (
+        <ShortlistConfirmModal
+          open={!!pendingShortlist}
+          jobTitle={pendingShortlist.jobTitle}
+          candidateLabel={getCandidateDisplayName(pendingShortlist.app)}
+          balance={shortlist.getBalance(pendingShortlist.jobId)}
+          busy={shortlistBusy}
+          onConfirm={confirmShortlist}
+          onCancel={() => setPendingShortlist(null)}
+        />
+      )}
     </div>
   );
 };
