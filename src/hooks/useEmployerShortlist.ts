@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { supabaseShortlistRepository } from "@/repositories/supabase/shortlist";
+import { getProvider } from "@/providers/registry";
 import type { ShortlistJobBalance, PackageSize } from "@/domain/shortlist";
 import { toast } from "sonner";
 
@@ -24,7 +24,7 @@ export function useEmployerShortlist(employerId: string | undefined, refetch: ()
     if (!employerId) return;
     setLoading(true);
     try {
-      const map = await supabaseShortlistRepository.getBalances(employerId);
+      const map = await getProvider("shortlist").getBalances(employerId);
       setBalances(map);
     } finally {
       setLoading(false);
@@ -39,7 +39,7 @@ export function useEmployerShortlist(employerId: string | undefined, refetch: ()
   const loadShortlistedIds = useCallback(async (jobIds: string[]) => {
     const all = new Set<string>();
     for (const jid of jobIds) {
-      const ids = await supabaseShortlistRepository.listShortlistedApplicationIds(jid);
+      const ids = await getProvider("shortlist").listShortlistedApplicationIds(jid);
       ids.forEach((id) => all.add(id));
     }
     setShortlistedAppIds(all);
@@ -71,7 +71,7 @@ export function useEmployerShortlist(employerId: string | undefined, refetch: ()
   const purchasePackage = useCallback(
     async (jobId: string, size: PackageSize) => {
       try {
-        await supabaseShortlistRepository.purchasePackage(jobId, size);
+        await getProvider("shortlist").purchasePackage(jobId, size);
         toast.success(`Aktywowano pakiet ${size} slotów shortlisty`);
         await reload();
         return true;
@@ -94,7 +94,7 @@ export function useEmployerShortlist(employerId: string | undefined, refetch: ()
       }
       setBusyAppId(applicationId);
       try {
-        const result = await supabaseShortlistRepository.shortlistCandidate(applicationId);
+        const result = await getProvider("shortlist").shortlistCandidate(applicationId);
         if (result.status === "already_shortlisted") {
           toast.info("Kandydat jest już na shortliście");
         } else {

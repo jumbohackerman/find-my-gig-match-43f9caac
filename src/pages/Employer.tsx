@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, ArrowLeftRight, EyeOff,
+  BarChart3, Zap, Layers, UserCheck, EyeOff,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -20,6 +20,7 @@ import { useEmployerApplicationActions, getCandidateDisplayName, getCandidateAva
 import PackagePurchaseButton from "@/components/employer/PackagePurchaseButton";
 import ShortlistConfirmModal from "@/components/employer/ShortlistConfirmModal";
 import CandidateNotesPanel from "@/components/employer/CandidateNotesPanel";
+import JobPanel from "@/components/employer/JobPanel";
 import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
 import StatusBadge from "@/components/employer/StatusBadge";
 import SourceLabel from "@/components/employer/SourceLabel";
@@ -45,7 +46,6 @@ const Employer = () => {
   const messaging = useEmployerMessages(user?.id);
 
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
-  const [analyzedJob, setAnalyzedJob] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
   const [pendingShortlist, setPendingShortlist] = useState<{ app: EnrichedEmployerApplication; jobId: string; jobTitle: string } | null>(null);
@@ -103,13 +103,6 @@ const Employer = () => {
   const handleDelete = async (id: string) => {
     await deleteJob(id);
     refetch();
-  };
-
-  const getAvgMatchScore = (jobId: string) => {
-    const apps = applicationsByJob[jobId] || [];
-    if (apps.length === 0) return 0;
-    const total = apps.reduce((sum, a) => sum + (a.matchResult?.score || 0), 0);
-    return Math.round(total / apps.length);
   };
 
   if (loading) {
@@ -245,11 +238,7 @@ const Employer = () => {
             <AnimatePresence>
               {domainJobs.map((job, i) => {
                 const jobApps = applicationsByJob[job.id] || [];
-                const shortlisted = jobApps.filter((a) => a.status === "shortlisted");
-                const aiCount = jobApps.filter((a) => a.matchResult && a.matchResult.score >= 75 && a.status !== "shortlisted").length;
                 const isExpanded = expandedJob === job.id;
-                const isAnalyzed = analyzedJob === job.id;
-                const avgScore = getAvgMatchScore(job.id);
                 const balance = shortlist.getBalance(job.id);
                 const noSlots = balance.totalSlots === 0;
                 const slotsExhausted = balance.totalSlots > 0 && balance.remainingSlots === 0;
@@ -263,7 +252,7 @@ const Employer = () => {
                     transition={{ delay: i * 0.03 }}
                     className="card-gradient rounded-xl border border-border overflow-hidden"
                   >
-                    {/* Metrics bar */}
+                    {/* Top metrics strip — quick at-a-glance numbers */}
                     <div className="px-4 pt-3 flex gap-3 text-[11px] text-muted-foreground flex-wrap">
                       <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
                       <span className={`flex items-center gap-1 ${slotsExhausted ? "text-destructive font-semibold" : balance.remainingSlots > 0 ? "text-accent font-semibold" : ""}`}>
@@ -272,8 +261,6 @@ const Employer = () => {
                           ? "0 slotów (kup pakiet)"
                           : `${balance.usedSlots}/${balance.totalSlots} shortlista · ${balance.remainingSlots} wolnych`}
                       </span>
-                      <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> {aiCount} rekomendacji AI</span>
-                      <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {avgScore}% śr. match</span>
                       {jobApps.length > 0 && (() => {
                         const newest = jobApps.reduce((latest, a) =>
                           new Date(a.appliedAt) > new Date(latest.appliedAt) ? a : latest
@@ -342,22 +329,10 @@ const Employer = () => {
                           onPurchase={(size) => shortlist.purchasePackage(job.id, size)}
                         />
                         <button
-                          onClick={() => {
-                            setAnalyzedJob(isAnalyzed ? null : job.id);
-                            setExpandedJob(null);
-                          }}
-                          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            isAnalyzed ? "bg-primary text-primary-foreground" : "bg-accent/15 text-accent hover:bg-accent/25"
-                          }`}
-                        >
-                          <BarChart3 className="w-3.5 h-3.5" /> Rekomendacje AI
-                        </button>
-                        <button
-                          onClick={() => {
-                            setExpandedJob(isExpanded ? null : job.id);
-                            setAnalyzedJob(null);
-                          }}
+                          onClick={() => setExpandedJob(isExpanded ? null : job.id)}
                           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
+                          aria-expanded={isExpanded}
+                          aria-label={isExpanded ? "Zwiń panel oferty" : "Rozwiń panel oferty"}
                         >
                           <Eye className="w-3.5 h-3.5" />
                           {jobApps.length}
@@ -366,103 +341,35 @@ const Employer = () => {
                       </div>
                     </div>
 
-                    {/* Shortlist section (paid) */}
-                    {(shortlisted.length > 0 || (isExpanded && jobApps.length > 0)) && (
-                      <div className="px-4 pb-3 border-t border-border pt-3">
-                        <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                          <Layers className="w-3.5 h-3.5" /> Shortlista ({shortlisted.length}{balance.totalSlots > 0 ? `/${balance.totalSlots}` : ""})
-                        </h5>
-                        {shortlisted.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {shortlisted.map((app) => (
-                              <ShortlistChip
-                                key={app.id}
-                                app={app}
-                                onRemove={() => handleAdvanceStatus(app.id, "applied")}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="py-2">
-                            <EmptyState
-                              icon={<Layers className="w-4 h-4 text-muted-foreground" />}
-                              title="Pusta shortlista"
-                              description={noSlots
-                                ? "Aby shortlistować kandydatów dla tej oferty, kup pakiet 5, 10 lub 20 slotów."
-                                : "Kliknij „Dodaj do shortlisty” przy kandydacie, aby zużyć 1 slot."}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Regular applicant list */}
+                    {/* Expanded panel: analytics + tabs (Aplikacje / AI / Shortlista / Pipeline) */}
                     <AnimatePresence>
                       {isExpanded && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                          <div className="px-4 pb-4 border-t border-border pt-3">
-                            <div className="flex items-center justify-between mb-3">
-                              <h5 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                Kandydaci ({jobApps.length}) — wg dopasowania
-                              </h5>
-                            </div>
-                            {jobApps.length === 0 ? (
-                              <EmptyState
-                                title="Brak kandydatów"
-                                description="Ogłoszenie jest aktywne, ale nikt jeszcze nie zaaplikował. Upewnij się, że opis i tagi są zachęcające."
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <JobPanel
+                            jobApps={jobApps}
+                            balance={balance}
+                            renderCandidate={(app) => (
+                              <CandidateCard
+                                app={app}
+                                jobId={job.id}
+                                employerId={user?.id}
+                                onView={() => handleViewCandidate(app)}
+                                onAdvanceStatus={handleAdvanceStatus}
+                                onShortlist={() => requestShortlist(app, job.id, job.title)}
+                                canShortlist={balance.remainingSlots > 0}
+                                chatMessages={messaging.getMessages(app.id)}
+                                onSendMessage={(content) => messaging.sendMessage(app.id, content)}
+                                isChatOpen={messaging.isChatOpen(app.id)}
+                                onUnlockChat={() => messaging.unlockChat(app.id)}
+                                currentUserId={user?.id}
                               />
-                            ) : (
-                              <div className="space-y-2">
-                                {jobApps.map((app) => (
-                                  <CandidateCard
-                                    key={app.id}
-                                    app={app}
-                                    jobId={job.id}
-                                    employerId={user?.id}
-                                    onView={() => handleViewCandidate(app)}
-                                    onAdvanceStatus={handleAdvanceStatus}
-                                    onShortlist={() => requestShortlist(app, job.id, job.title)}
-                                    canShortlist={balance.remainingSlots > 0}
-                                    chatMessages={messaging.getMessages(app.id)}
-                                    onSendMessage={(content) => messaging.sendMessage(app.id, content)}
-                                    isChatOpen={messaging.isChatOpen(app.id)}
-                                    onUnlockChat={() => messaging.unlockChat(app.id)}
-                                    currentUserId={user?.id}
-                                  />
-                                ))}
-                              </div>
                             )}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* AI Analysis view */}
-                    <AnimatePresence>
-                      {isAnalyzed && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                          <div className="px-4 pb-4 border-t border-border pt-3">
-                            <h5 className="text-xs font-semibold text-accent uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                              <BarChart3 className="w-3.5 h-3.5" /> Ranking dopasowania
-                            </h5>
-                            {jobApps.length === 0 ? (
-                              <EmptyState 
-                                title="Brak kandydatów" 
-                                description="Poczekaj na pierwsze aplikacje, aby zobaczyć ranking dopasowania." 
-                              />
-                            ) : (
-                              <div className="space-y-3">
-                                {jobApps.map((app, idx) => (
-                                  <AnalysisCard
-                                    key={app.id}
-                                    app={app}
-                                    rank={idx + 1}
-                                    onViewProfile={() => handleViewCandidate(app)}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                          />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -496,50 +403,6 @@ const Employer = () => {
     </div>
   );
 };
-
-// ── Shortlist chip ────────────────────────────────────────────────────────────
-
-function ShortlistChip({
-  app,
-  onRemove,
-}: {
-  app: EnrichedEmployerApplication;
-  onRemove: () => void;
-}) {
-  const name = getCandidateDisplayName(app);
-  const avatar = getCandidateAvatar(app);
-  const isAi = app.source === "ai";
-
-  return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-accent/30 bg-accent/5 text-xs">
-      <span className="text-sm">{avatar}</span>
-      <span className="font-medium text-foreground max-w-[120px] truncate">{name}</span>
-      {app.matchResult && (
-        <span className={`text-[10px] font-bold ${
-          app.matchResult.score >= 75 ? "text-accent" : app.matchResult.score >= 50 ? "text-yellow-400" : "text-muted-foreground"
-        }`}>
-          {app.matchResult.score}%
-        </span>
-      )}
-      {isAi ? (
-        <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent/10 text-accent font-semibold flex items-center gap-0.5">
-          <Zap className="w-2.5 h-2.5" /> AI
-        </span>
-      ) : (
-        <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold flex items-center gap-0.5">
-          <UserCheck className="w-2.5 h-2.5" /> Ręcznie
-        </span>
-      )}
-      <button
-        onClick={(e) => { e.stopPropagation(); onRemove(); }}
-        className="text-muted-foreground hover:text-destructive ml-0.5"
-        title="Cofnij do statusu Aplikowano (slot nie jest zwracany)"
-      >
-        ×
-      </button>
-    </div>
-  );
-}
 
 // ── Candidate card ────────────────────────────────────────────────────────────
 

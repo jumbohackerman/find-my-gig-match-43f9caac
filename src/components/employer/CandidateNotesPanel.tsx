@@ -5,7 +5,8 @@
 
 import { useEffect, useState } from "react";
 import { StickyNote, Trash2, Plus } from "lucide-react";
-import { candidateNotesRepository, type CandidateNote } from "@/repositories/supabase/candidateNotes";
+import { getProvider } from "@/providers/registry";
+import type { CandidateNote } from "@/repositories/interfaces";
 import { toast } from "sonner";
 import { timeAgo } from "@/lib/timeAgo";
 
@@ -25,7 +26,7 @@ export default function CandidateNotesPanel({ applicationId, candidateId, jobId,
 
   const reload = async () => {
     setLoading(true);
-    const list = await candidateNotesRepository.listForApplication(applicationId);
+    const list = await getProvider("candidateNotes").listForApplication(applicationId);
     setNotes(list);
     setLoading(false);
   };
@@ -40,7 +41,7 @@ export default function CandidateNotesPanel({ applicationId, candidateId, jobId,
     if (!text || busy) return;
     setBusy(true);
     try {
-      const note = await candidateNotesRepository.create({
+      const note = await getProvider("candidateNotes").create({
         employerId, applicationId, candidateId, jobId, note: text,
       });
       setNotes((prev) => [note, ...prev]);
@@ -57,7 +58,7 @@ export default function CandidateNotesPanel({ applicationId, candidateId, jobId,
     if (busy) return;
     setBusy(true);
     try {
-      await candidateNotesRepository.delete(id);
+      await getProvider("candidateNotes").delete(id);
       setNotes((prev) => prev.filter((n) => n.id !== id));
     } catch {
       toast.error("Nie udało się usunąć notatki");
