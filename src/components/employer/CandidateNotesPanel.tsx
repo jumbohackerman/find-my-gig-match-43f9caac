@@ -5,7 +5,8 @@
 
 import { useEffect, useState } from "react";
 import { StickyNote, Trash2, Plus } from "lucide-react";
-import { candidateNotesRepository, type CandidateNote } from "@/repositories/supabase/candidateNotes";
+import { getProvider } from "@/providers/registry";
+import type { CandidateNote } from "@/repositories/interfaces";
 import { toast } from "sonner";
 import { timeAgo } from "@/lib/timeAgo";
 
