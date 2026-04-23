@@ -105,13 +105,6 @@ const Employer = () => {
     refetch();
   };
 
-  const getAvgMatchScore = (jobId: string) => {
-    const apps = applicationsByJob[jobId] || [];
-    if (apps.length === 0) return 0;
-    const total = apps.reduce((sum, a) => sum + (a.matchResult?.score || 0), 0);
-    return Math.round(total / apps.length);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
