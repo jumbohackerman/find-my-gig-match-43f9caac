@@ -12,6 +12,8 @@ import type {
   PreferencesRepository,
   SavedJobRepository,
   SwipeEventRepository,
+  ShortlistRepository,
+  CandidateNotesRepository,
 } from "@/repositories/interfaces";
 
 import type {
@@ -32,6 +34,8 @@ import { supabaseSavedJobRepository } from "@/repositories/supabase/savedJobs";
 import { supabaseSwipeEventRepository } from "@/repositories/supabase/swipeEvents";
 import { supabaseNotificationRepository } from "@/repositories/supabase/notifications";
 import { supabasePreferencesRepository } from "@/repositories/supabase/preferences";
+import { supabaseShortlistRepository } from "@/repositories/supabase/shortlist";
+import { candidateNotesRepository } from "@/repositories/supabase/candidateNotes";
 import { supabaseStorageService } from "@/services/supabaseStorage";
 
 // ── Import noop services (pending external integration) ──────────────────────
@@ -54,6 +58,8 @@ interface ProviderMap {
   preferences: PreferencesRepository;
   savedJobs: SavedJobRepository;
   swipeEvents: SwipeEventRepository;
+  shortlist: ShortlistRepository;
+  candidateNotes: CandidateNotesRepository;
   analytics: AnalyticsService;
   errorTracking: ErrorTrackingService;
   email: EmailService;
@@ -75,6 +81,10 @@ const providers: ProviderMap = {
   swipeEvents: supabaseSwipeEventRepository,
   notifications: supabaseNotificationRepository,
   preferences: supabasePreferencesRepository,
+
+  // Monetization & recruiter tools
+  shortlist: supabaseShortlistRepository,
+  candidateNotes: candidateNotesRepository,
 
   // External services
   analytics: noopAnalytics,
