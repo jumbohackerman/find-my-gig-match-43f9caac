@@ -7,6 +7,7 @@
  */
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Layers, X, Check } from "lucide-react";
 import { PACKAGE_PRICING, formatPrice, pricePerSlot, type PackageSize, type ShortlistJobBalance } from "@/domain/shortlist";
@@ -56,21 +57,22 @@ export default function PackagePurchaseButton({ balance, onPurchase }: Props) {
         {buttonLabel}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
-            onClick={() => !busy && setOpen(false)}
-            role="dialog"
-            aria-modal="true"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-md card-gradient rounded-2xl border border-border p-5 relative"
-              onClick={(e) => e.stopPropagation()}
+      {createPortal(
+        <AnimatePresence>
+          {open && (
+            <div
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
+              onClick={() => !busy && setOpen(false)}
+              role="dialog"
+              aria-modal="true"
             >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="w-full max-w-md card-gradient rounded-2xl border border-border p-5 relative max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
               <button
                 onClick={() => !busy && setOpen(false)}
                 className="absolute top-4 right-4 text-muted-foreground hover:text-foreground rounded-lg p-1"
