@@ -47,7 +47,8 @@ const Select = ({
     aria-label={ariaLabel}
     value={value}
     onChange={(e) => onChange(e.target.value)}
-    className="h-7 rounded-md bg-secondary border border-border text-[11px] text-foreground px-2 pr-6 py-0 max-w-[160px] truncate focus:outline-none focus:ring-1 focus:ring-primary"
+    style={{ padding: "2px 22px 2px 8px", fontSize: 11, height: 28, lineHeight: "24px" }}
+    className="rounded-md bg-secondary border border-border text-foreground max-w-[170px] truncate focus:outline-none focus:ring-1 focus:ring-primary"
   >
     {options.map((o) => (
       <option key={o.value} value={o.value}>{o.label}</option>
