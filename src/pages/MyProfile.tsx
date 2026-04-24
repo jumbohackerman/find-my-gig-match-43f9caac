@@ -808,8 +808,84 @@ const MyProfile = () => {
                 </div>
               </div>
             </AccordionSection>
-            </>
-          )}
+
+            {/* CONSENTS — Block 4 */}
+            <AccordionSection
+              id="consents"
+              label="Zgody"
+              icon="🛡️"
+              isOpen={activeSection === "consents"}
+              onToggle={() => toggleSection("consents")}
+              badge={consentLoading ? undefined : hasConsent ? "Aktywna" : hasDecided ? "Wycofana" : "Nie udzielono"}
+            >
+              <div className="space-y-4">
+                <div className={`p-4 rounded-xl border ${hasConsent ? "bg-accent/10 border-accent/30" : "bg-secondary/40 border-border"}`}>
+                  <div className="flex items-start gap-3">
+                    {hasConsent ? (
+                      <ShieldCheck className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    ) : (
+                      <ShieldOff className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground">
+                        Zgoda na analizę profilu przez AI
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        {hasConsent
+                          ? `Zgoda aktywna od ${consent?.consented_at ? new Date(consent.consented_at).toLocaleDateString("pl-PL") : "—"}. Twój profil może być analizowany przez AI w procesie shortlistowania.`
+                          : "Bez zgody nie możesz aplikować na nowe oferty. Możesz przeglądać oferty bez aplikowania."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {hasConsent ? (
+                  showWithdrawWarning ? (
+                    <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/30 space-y-3">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">Wycofać zgodę?</p>
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                            Wycofanie zgody uniemożliwi składanie nowych aplikacji. Twoje istniejące aplikacje pozostają bez zmian.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setShowWithdrawWarning(false)}
+                          disabled={consentBusy}
+                          className="flex-1 px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors disabled:opacity-50"
+                        >
+                          Anuluj
+                        </button>
+                        <button
+                          onClick={handleWithdrawConsent}
+                          disabled={consentBusy}
+                          className="flex-1 px-3 py-2 rounded-xl bg-destructive text-destructive-foreground text-xs font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50"
+                        >
+                          {consentBusy ? "Wycofuję…" : "Tak, wycofaj"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowWithdrawWarning(true)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                    >
+                      <ShieldOff className="w-4 h-4" /> Wycofaj zgodę
+                    </button>
+                  )
+                ) : (
+                  <button
+                    onClick={() => setShowConsentModal(true)}
+                    className="w-full px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-semibold shadow-glow hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" /> Udziel zgody
+                  </button>
+                )}
+              </div>
+            </AccordionSection>
           </div>
         </motion.div>
         </LocalErrorBoundary>
