@@ -17,6 +17,7 @@ export interface JobFiltersState {
   salaryMin: number;
   remote: string;
   seniority: string;
+  contractType: string;
   requiredSkills: string[];
 }
 
@@ -29,6 +30,7 @@ const locations = ["Wszystkie", "Warszawa", "Kraków", "Wrocław", "Gdańsk", "P
 const jobTypes = ["Wszystkie", "Full-time", "Part-time", "Contract", "Remote"];
 const remoteOptions = ["Wszystkie", "Zdalnie", "Hybrydowo", "Stacjonarnie"];
 const seniorityOptions = ["Wszystkie", "Junior", "Mid", "Senior", "Lead"];
+const contractOptions = ["Wszystkie", "B2B", "UoP", "Contract", "Part-time"];
 const skillOptions = [
   "React", "TypeScript", "JavaScript", "Node.js", "Python", "Go",
   "GraphQL", "PostgreSQL", "AWS", "Docker", "Figma", "UI/UX",
@@ -41,6 +43,7 @@ export const defaultFilters: JobFiltersState = {
   salaryMin: 0,
   remote: "Wszystkie",
   seniority: "Wszystkie",
+  contractType: "Wszystkie",
   requiredSkills: [],
 };
 
