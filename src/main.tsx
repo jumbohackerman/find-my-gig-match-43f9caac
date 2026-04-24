@@ -4,6 +4,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import App from "./App.tsx";
 import "./index.css";
 import { initPostHog } from "./services/posthog";
+import "./hooks/useTheme"; // applies persisted theme synchronously to avoid FOUC
 
 // Initialize PostHog (no-op if VITE_POSTHOG_KEY not set)
 initPostHog();
