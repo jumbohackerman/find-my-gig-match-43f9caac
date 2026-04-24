@@ -29,6 +29,7 @@ export function useJobFeed() {
   const { jobs: allJobs, loading: jobsLoading } = useJobs();
   const { candidate: candidateProfile } = useCandidateProfile();
   const { savedJobIds, saveJob, removeJob: unsaveJob } = useSavedJobs();
+  const { hasConsent, loading: consentLoading } = useConsent();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [swipedJobIds, setSwipedJobIds] = useState<Set<string>>(new Set());
