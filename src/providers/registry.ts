@@ -49,6 +49,11 @@ import {
   noopEmail,
   noopAI,
 } from "@/services/noop";
+import { posthogAnalytics } from "@/services/posthog";
+import { sentryErrorTracking } from "@/services/sentry";
+
+const POSTHOG_ON = Boolean(import.meta.env.VITE_POSTHOG_KEY);
+const SENTRY_ON = Boolean(import.meta.env.VITE_SENTRY_DSN);
 
 // ── Provider map ─────────────────────────────────────────────────────────────
 
@@ -95,8 +100,8 @@ const providers: ProviderMap = {
   publicJobListings: publicJobListingRepository,
 
   // External services
-  analytics: noopAnalytics,
-  errorTracking: noopErrorTracking,
+  analytics: POSTHOG_ON ? posthogAnalytics : noopAnalytics,
+  errorTracking: SENTRY_ON ? sentryErrorTracking : noopErrorTracking,
   email: noopEmail,
   ai: noopAI,
 };
