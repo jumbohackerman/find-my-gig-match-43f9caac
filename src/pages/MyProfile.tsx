@@ -81,6 +81,8 @@ const MyProfile = () => {
   const isEmployer = profile?.role === "employer";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  /** Block 11: True after AI pre-fills profile from CV; cleared after successful save. */
+  const [aiPrefilled, setAiPrefilled] = useState(false);
 
   // Basic info
   const [fullName, setFullName] = useState("");
@@ -202,6 +204,7 @@ const MyProfile = () => {
       }
 
       toast.success("Profil zapisany");
+      setAiPrefilled(false);
 
       // Block 4: After first profile save, gate access with the AI consent modal.
       if (!isEmployer && !hasDecided && !consentLoading) {
@@ -333,6 +336,19 @@ const MyProfile = () => {
       return;
     }
     const p = parsedJson as {
+      // Spec (Block 11) shape
+      job_title?: string | null;
+      level?: string | null;
+      salary_min?: number | null;
+      salary_max?: number | null;
+      education?: Array<{
+        degree?: string | null;
+        school?: string | null;
+        field?: string | null;
+        start_date?: string | null;
+        end_date?: string | null;
+      }> | null;
+      // Legacy/parse-cv-ai shape
       full_name?: string | null;
       first_name?: string | null;
       last_name?: string | null;
@@ -340,16 +356,28 @@ const MyProfile = () => {
       current_role?: string | null;
       city?: string | null;
       country?: string | null;
+      location?: string | null;
       summary?: string | null;
-      skills?: string[] | null;
+      // Skills can be either string[] (legacy) or { advanced/intermediate/basic } (spec)
+      skills?: string[] | { advanced?: string[]; intermediate?: string[]; basic?: string[]; beginner?: string[] } | null;
       languages?: Array<{ name: string; level?: string | null }> | null;
+      // Links can be the spec flat shape or legacy *_url shape
       links?: {
+        linkedin?: string | null;
+        github?: string | null;
+        portfolio?: string | null;
+        website?: string | null;
         linkedin_url?: string | null;
         github_url?: string | null;
         portfolio_url?: string | null;
         other_urls?: string[] | null;
       } | null;
       experience?: Array<{
+        // Spec
+        title?: string | null;
+        is_current?: boolean | null;
+        responsibilities?: string[] | null;
+        // Legacy
         job_title?: string | null;
         company?: string | null;
         start_date?: string | null;
@@ -364,22 +392,42 @@ const MyProfile = () => {
     const name = p.full_name || [p.first_name, p.last_name].filter(Boolean).join(" ");
     if (name?.trim()) setFullName(name.trim());
 
-    // title
-    const titleVal = p.current_role || p.headline || (p.preferred_job_titles && p.preferred_job_titles[0]);
+    // title (job_title from spec, falls back to legacy fields)
+    const titleVal = p.job_title || p.current_role || p.headline || (p.preferred_job_titles && p.preferred_job_titles[0]);
     if (titleVal?.trim()) setTitle(titleVal.trim());
 
-    // location
-    const loc = [p.city, p.country].filter(Boolean).join(", ");
+    // level / seniority
+    if (p.level && typeof p.level === "string" && SENIORITY_OPTIONS.includes(p.level)) {
+      setSeniority(p.level);
+    }
+
+    // location (spec: top-level "location"; legacy: city + country)
+    const loc = p.location?.trim() || [p.city, p.country].filter(Boolean).join(", ");
     if (loc.trim()) setLocation(loc.trim());
 
     // summary
     if (p.summary?.trim()) setSummary(p.summary.trim().slice(0, 300));
 
-    // skills → all to advanced
-    if (p.skills && Array.isArray(p.skills) && p.skills.length > 0) {
-      const unique = [...new Set(p.skills.filter(s => typeof s === "string" && s.trim()).map(s => s.trim()))];
-      if (unique.length > 0) {
-        setSkills({ advanced: unique, intermediate: [], beginner: [] });
+    // salary expectations
+    if (typeof p.salary_min === "number" && p.salary_min > 0) setSalaryMin(p.salary_min);
+    if (typeof p.salary_max === "number" && p.salary_max > 0) setSalaryMax(p.salary_max);
+
+    // skills — spec shape ({advanced, intermediate, basic}) OR legacy flat string[]
+    if (p.skills) {
+      if (Array.isArray(p.skills)) {
+        const unique = [...new Set(p.skills.filter(s => typeof s === "string" && s.trim()).map(s => s.trim()))];
+        if (unique.length > 0) setSkills({ advanced: unique, intermediate: [], beginner: [] });
+      } else if (typeof p.skills === "object") {
+        const next: SkillsByLevel = {
+          advanced: Array.isArray(p.skills.advanced) ? p.skills.advanced.filter(Boolean) : [],
+          intermediate: Array.isArray(p.skills.intermediate) ? p.skills.intermediate.filter(Boolean) : [],
+          beginner: Array.isArray(p.skills.basic)
+            ? p.skills.basic.filter(Boolean)
+            : Array.isArray(p.skills.beginner) ? p.skills.beginner.filter(Boolean) : [],
+        };
+        if (next.advanced.length || next.intermediate.length || next.beginner.length) {
+          setSkills(next);
+        }
       }
     }
 
@@ -391,26 +439,34 @@ const MyProfile = () => {
       if (mapped.length > 0) setLanguages(mapped);
     }
 
-    // links
+    // links — accept both spec (flat) and legacy (*_url) shapes
     if (p.links) {
       const newLinks: CandidateLinks = { ...emptyLinks() };
-      if (p.links.linkedin_url?.trim()) newLinks.linkedin_url = p.links.linkedin_url.trim();
-      if (p.links.github_url?.trim()) newLinks.github_url = p.links.github_url.trim();
-      if (p.links.portfolio_url?.trim()) newLinks.portfolio_url = p.links.portfolio_url.trim();
-      if (p.links.other_urls && p.links.other_urls.length > 0 && p.links.other_urls[0]?.trim()) {
-        newLinks.website_url = p.links.other_urls[0].trim();
-      }
+      const li = p.links.linkedin || p.links.linkedin_url;
+      const gh = p.links.github || p.links.github_url;
+      const pf = p.links.portfolio || p.links.portfolio_url;
+      const ws = p.links.website || (p.links.other_urls && p.links.other_urls[0]);
+      if (li?.trim()) newLinks.linkedin_url = li.trim();
+      if (gh?.trim()) newLinks.github_url = gh.trim();
+      if (pf?.trim()) newLinks.portfolio_url = pf.trim();
+      if (ws?.trim()) newLinks.website_url = ws.trim();
       if (Object.values(newLinks).some(Boolean)) setLinks(newLinks);
     }
 
-    // experience entries
+    // experience entries — spec uses "title"/"responsibilities", legacy uses "job_title"/"bullets"
     if (p.experience && Array.isArray(p.experience) && p.experience.length > 0) {
       const entries: ExperienceEntry[] = p.experience.slice(0, 8).map(exp => {
-        const isCurrent = !exp.end_date || !exp.end_date.trim() || ["present", "current", "now", "obecnie", "aktualnie", "do teraz"].includes(exp.end_date.trim().toLowerCase());
+        const isCurrent = exp.is_current === true
+          || !exp.end_date
+          || !exp.end_date.trim()
+          || ["present", "current", "now", "obecnie", "aktualnie", "do teraz"].includes(exp.end_date.trim().toLowerCase());
 
         let descPoints: string[];
-        if (exp.bullets && Array.isArray(exp.bullets) && exp.bullets.length > 0) {
-          descPoints = exp.bullets.filter(b => typeof b === "string" && b.trim()).map(b => b.trim());
+        const bulletSource = (Array.isArray(exp.responsibilities) && exp.responsibilities.length > 0)
+          ? exp.responsibilities
+          : (Array.isArray(exp.bullets) && exp.bullets.length > 0 ? exp.bullets : null);
+        if (bulletSource) {
+          descPoints = bulletSource.filter(b => typeof b === "string" && b.trim()).map(b => b.trim());
         } else if (exp.description?.trim()) {
           descPoints = [exp.description.trim()];
         } else {
@@ -419,7 +475,7 @@ const MyProfile = () => {
         if (descPoints.length === 0) descPoints = [""];
 
         return {
-          job_title: exp.job_title?.trim() || "",
+          job_title: (exp.title || exp.job_title)?.trim() || "",
           company_name: exp.company?.trim() || "",
           start_date: exp.start_date?.trim() || "",
           end_date: isCurrent ? "Obecnie" : (exp.end_date?.trim() || ""),
@@ -430,7 +486,8 @@ const MyProfile = () => {
       setExperienceEntries(entries);
     }
 
-    toast.success("Dane z CV zostały zaimportowane do formularza.");
+    setAiPrefilled(true);
+    toast.success("Dane z CV zostały wstępnie uzupełnione. Sprawdź każdą sekcję przed zapisaniem.");
   }, []);
 
   const completeness = computeCompleteness({
@@ -491,7 +548,9 @@ const MyProfile = () => {
           <button onClick={handleSave} disabled={saving} aria-busy={saving} data-testid="profile-save"
             className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50 disabled:pointer-events-none">
             <Save className="w-4 h-4" />
-            <span className="hidden sm:inline">{saving ? "Zapisuję…" : "Zapisz profil"}</span>
+            <span className="hidden sm:inline">
+              {saving ? "Zapisuję…" : (aiPrefilled ? "Zatwierdź i zapisz profil" : "Zapisz profil")}
+            </span>
           </button>
         </div>
       </header>
@@ -507,6 +566,18 @@ const MyProfile = () => {
               ? "Uzupełnij dane firmy, aby kandydaci mogli Cię lepiej poznać."
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
+
+          {/* Block 11: AI prefill banner */}
+          {!isEmployer && aiPrefilled && (
+            <div className="mb-6 p-4 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 flex items-start gap-3" role="status" aria-live="polite">
+              <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-sm text-foreground">
+                <span aria-hidden="true">⚠️ </span>
+                Dane zostały wstępnie uzupełnione przez AI na podstawie Twojego CV.
+                Sprawdź każdą sekcję i popraw błędy przed zapisaniem.
+              </p>
+            </div>
+          )}
 
           {/* Completeness — mobile only (desktop shows it in sticky right column) */}
           {!isEmployer && (
