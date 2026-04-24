@@ -17,6 +17,7 @@ export interface JobFiltersState {
   salaryMin: number;
   remote: string;
   seniority: string;
+  contractType: string;
   requiredSkills: string[];
 }
 
@@ -29,6 +30,7 @@ const locations = ["Wszystkie", "Warszawa", "Kraków", "Wrocław", "Gdańsk", "P
 const jobTypes = ["Wszystkie", "Full-time", "Part-time", "Contract", "Remote"];
 const remoteOptions = ["Wszystkie", "Zdalnie", "Hybrydowo", "Stacjonarnie"];
 const seniorityOptions = ["Wszystkie", "Junior", "Mid", "Senior", "Lead"];
+const contractOptions = ["Wszystkie", "B2B", "UoP", "Contract", "Part-time"];
 const skillOptions = [
   "React", "TypeScript", "JavaScript", "Node.js", "Python", "Go",
   "GraphQL", "PostgreSQL", "AWS", "Docker", "Figma", "UI/UX",
@@ -41,6 +43,7 @@ export const defaultFilters: JobFiltersState = {
   salaryMin: 0,
   remote: "Wszystkie",
   seniority: "Wszystkie",
+  contractType: "Wszystkie",
   requiredSkills: [],
 };
 
@@ -53,6 +56,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
     filters.salaryMin > 0 ||
     filters.remote !== "Wszystkie" ||
     filters.seniority !== "Wszystkie" ||
+    filters.contractType !== "Wszystkie" ||
     filters.requiredSkills.length > 0;
 
   const clearFilters = () => onChange({ ...defaultFilters });
@@ -84,6 +88,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
               filters.salaryMin > 0,
               filters.remote !== "Wszystkie",
               filters.seniority !== "Wszystkie",
+              filters.contractType !== "Wszystkie",
               filters.requiredSkills.length > 0,
             ].filter(Boolean).length}
           </span>
@@ -143,6 +148,17 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Contract type */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Forma współpracy</label>
+                  <Select value={filters.contractType} onValueChange={(v) => onChange({ ...filters, contractType: v })}>
+                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {contractOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* Salary */}
@@ -153,7 +169,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
                 <Slider
                   value={[filters.salaryMin]}
                   onValueChange={([v]) => onChange({ ...filters, salaryMin: v })}
-                  max={35}
+                  max={50}
                   step={1}
                 />
               </div>
@@ -217,6 +233,10 @@ export function filterJobs(jobs: Job[], filters: JobFiltersState): Job[] {
       if (sen === "senior" && !title.includes("senior") && !title.includes("sr")) return false;
       if (sen === "junior" && !title.includes("junior") && !title.includes("jr")) return false;
       if (sen === "lead" && !title.includes("lead") && !title.includes("principal")) return false;
+    }
+    if (filters.contractType !== "Wszystkie") {
+      const ct = (job.contractType || job.type || "").toLowerCase();
+      if (!ct.includes(filters.contractType.toLowerCase())) return false;
     }
     if (filters.requiredSkills.length > 0) {
       const jobTags = job.tags.map((t) => t.toLowerCase());

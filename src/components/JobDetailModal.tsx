@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, MapPin, Briefcase, Clock, DollarSign, Users, Building2,
@@ -18,6 +18,8 @@ interface Props {
   matchResult?: MatchResult;
   onClose: () => void;
   onApply?: (job: Job) => void;
+  allJobs?: Job[];
+  onSelectJob?: (job: Job) => void;
 }
 
 /* ── Section component ─────────────────────────────────────────────────────── */
@@ -84,10 +86,29 @@ const LEVEL_LABELS: Record<string, string> = {
   advanced: "Zaawansowany",
 };
 
-const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
+const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJob }: Props) => {
   const { candidate } = useCandidateProfile();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  const similarJobs = useMemo<Job[]>(() => {
+    if (!job || !allJobs?.length) return [];
+    const myTags = new Set((job.tags || []).map((t) => t.toLowerCase()));
+    if (myTags.size === 0) return [];
+    return allJobs
+      .filter((j) => j.id !== job.id)
+      .map((j) => {
+        const overlap = (j.tags || []).reduce(
+          (acc, t) => (myTags.has(t.toLowerCase()) ? acc + 1 : acc),
+          0,
+        );
+        return { job: j, overlap };
+      })
+      .filter((x) => x.overlap > 0)
+      .sort((a, b) => b.overlap - a.overlap)
+      .slice(0, 3)
+      .map((x) => x.job);
+  }, [job, allJobs]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") { onClose(); return; }
@@ -336,6 +357,45 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
                       })}
                     </div>
                   </div>
+
+                  {/* Podobne oferty */}
+                  {similarJobs.length > 0 && (
+                    <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" /> Podobne oferty
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {similarJobs.map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => onSelectJob?.(s)}
+                            className="text-left p-3 rounded-lg bg-background border border-border hover:border-primary/40 hover:shadow-soft transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center text-xs shrink-0 overflow-hidden">
+                                {s.logo && (s.logo.startsWith("http") || s.logo.startsWith("/")) ? (
+                                  <img src={s.logo} alt="" className="w-full h-full object-contain" />
+                                ) : (
+                                  <span>{s.logo || s.company?.slice(0, 2).toUpperCase()}</span>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-xs font-semibold text-foreground truncate">{s.title}</div>
+                                <div className="text-[11px] text-muted-foreground truncate">{s.company}</div>
+                              </div>
+                            </div>
+                            <div className="text-[10px] text-muted-foreground truncate">{s.location}</div>
+                            <div className="mt-1.5 flex flex-wrap gap-1">
+                              {s.tags.slice(0, 3).map((t) => (
+                                <span key={t} className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground text-[10px]">{t}</span>
+                              ))}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* About company */}
                   {job.aboutCompany && (

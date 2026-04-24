@@ -29,7 +29,7 @@ const VALID_TABS: Tab[] = ["swipe", "applied", "saved", "recent"];
 
 // ── Filter ↔ URL helpers ────────────────────────────────────────────────────
 
-const FILTER_PARAMS = ["loc", "type", "salary", "remote", "seniority", "skills"] as const;
+const FILTER_PARAMS = ["loc", "type", "salary", "remote", "seniority", "contract", "skills"] as const;
 
 function filtersFromParams(sp: URLSearchParams): Partial<JobFiltersState> {
   const f: Partial<JobFiltersState> = {};
@@ -43,6 +43,8 @@ function filtersFromParams(sp: URLSearchParams): Partial<JobFiltersState> {
   if (remote) f.remote = remote;
   const seniority = sp.get("seniority");
   if (seniority) f.seniority = seniority;
+  const contract = sp.get("contract");
+  if (contract) f.contractType = contract;
   const skills = sp.get("skills");
   if (skills) f.requiredSkills = skills.split(",").filter(Boolean);
   return f;
@@ -56,6 +58,7 @@ function filtersToParams(f: JobFiltersState, sp: URLSearchParams): URLSearchPara
   if (f.salaryMin > 0) next.set("salary", String(f.salaryMin));
   if (f.remote !== defaultFilters.remote) next.set("remote", f.remote);
   if (f.seniority !== defaultFilters.seniority) next.set("seniority", f.seniority);
+  if (f.contractType !== defaultFilters.contractType) next.set("contract", f.contractType);
   if (f.requiredSkills.length > 0) next.set("skills", f.requiredSkills.join(","));
   return next;
 }
@@ -135,6 +138,7 @@ const Index = () => {
     filters.salaryMin > 0 ||
     filters.remote !== defaultFilters.remote ||
     filters.seniority !== defaultFilters.seniority ||
+    filters.contractType !== defaultFilters.contractType ||
     filters.requiredSkills.length > 0;
 
   // ── Restore filters from URL on mount ─────────────────────────────────────
@@ -531,6 +535,8 @@ const Index = () => {
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
         onClose={closeJobModal}
         onApply={(job) => { handleSwipeWithRefetch("right"); }}
+        allJobs={allJobs}
+        onSelectJob={(j) => setSelectedJob(j)}
       />
       <Footer />
     </div>

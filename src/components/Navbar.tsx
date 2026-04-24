@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Building2, User, LogOut, Bell, MessageSquare, Sparkles, Mail, CheckCircle, XCircle, Lock, Bell as BellIcon } from "lucide-react";
+import { Building2, User, LogOut, Bell, MessageSquare, Sparkles, Mail, CheckCircle, XCircle, Lock, Bell as BellIcon, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 import { timeAgo } from "@/lib/timeAgo";
 import logo from "@/assets/jobswipe-logo.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -48,6 +49,7 @@ function notificationTarget(
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
   const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -88,6 +90,18 @@ const Navbar = () => {
               Job<span className="text-gradient-primary">Swipe</span>
             </h1>
           </Link>
+
+          {/* ── Theme toggle ── */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Włącz jasny motyw" : "Włącz ciemny motyw"}
+            title={theme === "dark" ? "Jasny motyw" : "Ciemny motyw"}
+            className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            data-testid="nav-theme-toggle"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
+          </button>
 
           {/* ── Guest CTA ── */}
           {isGuest && (
