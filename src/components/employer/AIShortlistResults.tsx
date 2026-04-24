@@ -133,7 +133,7 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
 
                   <div className="flex flex-wrap gap-2 mt-3">
                     <button
-                      onClick={() => sendInvite(snap)}
+                      onClick={() => setInviteTarget(snap)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent text-accent-foreground hover:opacity-90"
                     >
                       <Mail className="w-3.5 h-3.5" /> Wyślij zaproszenie
