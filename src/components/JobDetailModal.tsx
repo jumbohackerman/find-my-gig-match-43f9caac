@@ -91,6 +91,25 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
+  const similarJobs = useMemo<Job[]>(() => {
+    if (!job || !allJobs?.length) return [];
+    const myTags = new Set((job.tags || []).map((t) => t.toLowerCase()));
+    if (myTags.size === 0) return [];
+    return allJobs
+      .filter((j) => j.id !== job.id)
+      .map((j) => {
+        const overlap = (j.tags || []).reduce(
+          (acc, t) => (myTags.has(t.toLowerCase()) ? acc + 1 : acc),
+          0,
+        );
+        return { job: j, overlap };
+      })
+      .filter((x) => x.overlap > 0)
+      .sort((a, b) => b.overlap - a.overlap)
+      .slice(0, 3)
+      .map((x) => x.job);
+  }, [job, allJobs]);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") { onClose(); return; }
     if (e.key !== "Tab" || !dialogRef.current) return;
