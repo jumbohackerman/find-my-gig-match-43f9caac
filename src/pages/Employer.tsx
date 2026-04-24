@@ -76,6 +76,22 @@ const Employer = () => {
 
   const [hidePending, setHidePending] = useState<string | null>(null);
   const [statusPending, setStatusPending] = useState<string | null>(null);
+  const [closingJob, setClosingJob] = useState<{ id: string; title: string; company: string } | null>(null);
+
+  const handleCloseJob = async (reason: ClosureReason) => {
+    if (!closingJob) return;
+    try {
+      await closeJob({
+        job_id: closingJob.id,
+        reason,
+        job_title: closingJob.title,
+        company_name: closingJob.company,
+      });
+      refetch();
+    } catch (e: any) {
+      toast.error(`Nie udało się zamknąć: ${e?.message || "błąd"}`);
+    }
+  };
 
   const handleAdvanceStatus = async (appId: string, newStatus: ApplicationStatus) => {
     if (statusPending) return;
