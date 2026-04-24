@@ -73,9 +73,9 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
   return (
     <motion.div
       className="absolute inset-0"
-      style={{ x, rotate, zIndex: isTop ? 2 : 1, pointerEvents: isTop ? "auto" : "none", willChange: "transform" }}
-      drag={isTop ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
+      style={{ x, y, rotate, zIndex: isTop ? 2 : 1, pointerEvents: isTop ? "auto" : "none", willChange: "transform" }}
+      drag={isTop ? true : false}
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.18}
       dragMomentum={false}
       onDragStart={handleDragStart}
@@ -102,11 +102,36 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent pointer-events-none" />
         {isTop && (
           <>
+            {/* Tint overlays */}
+            <motion.div
+              className="absolute inset-0 z-10 pointer-events-none rounded-3xl"
+              style={{ opacity: rightOpacity, background: "hsl(var(--accent) / 0.18)" }}
+            />
+            <motion.div
+              className="absolute inset-0 z-10 pointer-events-none rounded-3xl"
+              style={{ opacity: leftOpacity, background: "hsl(var(--destructive) / 0.18)" }}
+            />
+            <motion.div
+              className="absolute inset-0 z-10 pointer-events-none rounded-3xl"
+              style={{ opacity: upOpacity, background: "hsl(45 90% 55% / 0.18)" }}
+            />
+
             <motion.div className="absolute top-6 right-6 z-20 swipe-indicator-right rotate-[-15deg]" style={{ opacity: rightOpacity }}>
               APLIKUJ ✓
             </motion.div>
             <motion.div className="absolute top-6 left-6 z-20 swipe-indicator-left rotate-[15deg]" style={{ opacity: leftOpacity }}>
               POMIŃ ✗
+            </motion.div>
+            <motion.div
+              className="absolute top-6 left-1/2 -translate-x-1/2 z-20 border-2 rounded-xl px-4 py-2 font-bold text-lg uppercase tracking-wider"
+              style={{
+                opacity: upOpacity,
+                borderColor: "hsl(45 90% 55%)",
+                color: "hsl(45 90% 55%)",
+                background: "hsl(45 90% 55% / 0.10)",
+              }}
+            >
+              ZAPISZ ★
             </motion.div>
           </>
         )}
