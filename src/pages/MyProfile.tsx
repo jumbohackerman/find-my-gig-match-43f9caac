@@ -821,6 +821,17 @@ const MyProfile = () => {
               </div>
             </AccordionSection>
 
+            {/* CONTACT INVITATIONS — Block 7B */}
+            <AccordionSection
+              id="invitations"
+              label="Zaproszenia do kontaktu"
+              icon="✉️"
+              isOpen={activeSection === "invitations"}
+              onToggle={() => toggleSection("invitations")}
+            >
+              <ContactInvitationsList />
+            </AccordionSection>
+
             {/* CONSENTS — Block 4 */}
             <AccordionSection
               id="consents"
