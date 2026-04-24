@@ -567,6 +567,18 @@ const MyProfile = () => {
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
 
+          {/* Block 11: AI prefill banner */}
+          {!isEmployer && aiPrefilled && (
+            <div className="mb-6 p-4 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 flex items-start gap-3" role="status" aria-live="polite">
+              <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-sm text-foreground">
+                <span aria-hidden="true">⚠️ </span>
+                Dane zostały wstępnie uzupełnione przez AI na podstawie Twojego CV.
+                Sprawdź każdą sekcję i popraw błędy przed zapisaniem.
+              </p>
+            </div>
+          )}
+
           {/* Completeness — mobile only (desktop shows it in sticky right column) */}
           {!isEmployer && (
             <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border lg:hidden">
