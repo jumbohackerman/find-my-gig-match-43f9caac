@@ -147,8 +147,8 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-base sm:text-xl font-bold text-foreground leading-tight truncate">{job.title}</h2>
-              <p className="text-sm sm:text-base text-primary font-medium truncate">{job.company}</p>
+              <h2 className="font-display text-base sm:text-xl font-bold text-foreground leading-tight line-clamp-2 break-words">{job.title}</h2>
+              <p className="text-sm sm:text-base text-primary font-medium line-clamp-1 break-words">{job.company}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isSaved && (
@@ -186,7 +186,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </div>
 
           {/* Summary teaser (max 2 lines) */}
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-2">{summaryText}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-3 break-words">{summaryText}</p>
 
           {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
