@@ -886,6 +886,8 @@ const MyProfile = () => {
                 )}
               </div>
             </AccordionSection>
+            </>
+          )}
           </div>
         </motion.div>
         </LocalErrorBoundary>
