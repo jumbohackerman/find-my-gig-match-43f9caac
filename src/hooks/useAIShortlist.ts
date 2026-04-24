@@ -55,10 +55,10 @@ export function useAIShortlist(jobId: string | undefined) {
     setShortlist((sl as any) ?? null);
 
     if (sl) {
-      const { data: snaps } = await supabase
+      const { data: snaps } = await (supabase as any)
         .from("ai_shortlist_snapshots")
         .select("*")
-        .eq("shortlist_id" as any, (sl as any).id)
+        .eq("shortlist_id", (sl as any).id)
         .order("rank", { ascending: true });
       setSnapshots((snaps as any) ?? []);
     } else {
