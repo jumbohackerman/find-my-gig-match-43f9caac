@@ -91,6 +91,18 @@ const Navbar = () => {
             </h1>
           </Link>
 
+          {/* ── Theme toggle ── */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Włącz jasny motyw" : "Włącz ciemny motyw"}
+            title={theme === "dark" ? "Jasny motyw" : "Ciemny motyw"}
+            className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            data-testid="nav-theme-toggle"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
+          </button>
+
           {/* ── Guest CTA ── */}
           {isGuest && (
             <Link
