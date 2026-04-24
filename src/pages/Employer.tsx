@@ -37,6 +37,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { hideJob, unhideJob } from "@/lib/moderation";
 import { toast } from "sonner";
 import { timeAgo } from "@/lib/timeAgo";
+import CloseJobModal, { type ClosureReason } from "@/components/employer/CloseJobModal";
+import { closeJob } from "@/hooks/useContactInvitations";
+import { Lock } from "lucide-react";
 
 import { Progress } from "@/components/ui/progress";
 
