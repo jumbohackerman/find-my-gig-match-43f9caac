@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom";
-import { Building2, Users, User, LogOut, Bell, Search } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Building2, User, LogOut, Bell, MessageSquare, Sparkles, Mail, CheckCircle, XCircle, Lock, Bell as BellIcon } from "lucide-react";
 import { timeAgo } from "@/lib/timeAgo";
 import logo from "@/assets/jobswipe-logo.png";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
+import type { NotificationType } from "@/domain/models";
 
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
