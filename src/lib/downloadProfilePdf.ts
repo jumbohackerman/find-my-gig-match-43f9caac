@@ -10,6 +10,7 @@
 import { getProvider } from "@/providers/registry";
 import { toast } from "sonner";
 import type { Candidate } from "@/domain/models";
+import jobswipeLogo from "@/assets/jobswipe-logo.png";
 
 const PRINT_AREA_ID = "cv-print-area";
 const PRINT_STYLE_ID = "cv-print-styles";
