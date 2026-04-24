@@ -65,16 +65,23 @@ export function useJobFeed() {
   const applyToJob = useCallback(
     async (job: Job) => {
       if (!user) return;
+      // Block 4: hard guard — no application without recorded AI consent.
+      if (!consentLoading && !hasConsent) {
+        toast.error("Aby aplikować, udziel zgody na analizę profilu przez AI w ustawieniach profilu.");
+        throw new Error("AI_CONSENT_REQUIRED");
+      }
       try {
         await getProvider("applications").apply(job, user.id);
         toast.success(`Zaaplikowano na: ${job.title}`);
       } catch (err: any) {
-        console.error("Apply error:", err);
-        toast.error("Nie udało się zaaplikować. Spróbuj ponownie.");
+        if (err?.message !== "AI_CONSENT_REQUIRED") {
+          console.error("Apply error:", err);
+          toast.error("Nie udało się zaaplikować. Spróbuj ponownie.");
+        }
         throw err;
       }
     },
-    [user],
+    [user, hasConsent, consentLoading],
   );
 
   // ── Undo last skip/save ──────────────────────────────────────────────────
