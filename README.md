@@ -107,3 +107,38 @@ See [`.env.example`](.env.example) for the full template. Key groups:
 ## License
 
 Private — all rights reserved.
+
+## Self-hosting
+
+JobSwipe is a standard React + Vite + Supabase application. You can run your own instance on your own Supabase project and any static host.
+
+### Prerequisites
+- Node.js 18+
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (`npm install -g supabase`)
+- Your own [Supabase project](https://supabase.com/dashboard)
+
+### Setup
+1. Clone the repo
+2. `cp .env.example .env` and fill in all values
+3. `npm install`
+4. `supabase login`
+5. `supabase link --project-ref YOUR_PROJECT_ID`
+6. `supabase db push` (applies all migrations in `supabase/migrations/`)
+7. `supabase functions deploy` (deploys all edge functions in `supabase/functions/`)
+8. Set edge function secrets:
+   ```bash
+   supabase secrets set \
+     AI_API_KEY=... \
+     AI_MODEL=... \
+     AI_API_URL=... \
+     RESEND_API_KEY=... \
+     RESEND_FROM_EMAIL=... \
+     ALLOWED_ORIGIN=https://your-domain.com
+   ```
+9. `npm run dev` (local) or `npm run build` then deploy `dist/` to Cloudflare Pages / Vercel / Netlify.
+
+### Switching AI provider
+The platform is provider-agnostic. Change `AI_API_KEY`, `AI_MODEL`, and `AI_API_URL` secrets in Supabase to point at any OpenAI-compatible endpoint (Anthropic, OpenAI, OpenRouter, Groq, etc.). The prompts are defined as top-level constants at the top of each edge function file (`supabase/functions/run-shortlist/index.ts`, `supabase/functions/process-cv/index.ts`) — edit them in place.
+
+### Switching email provider
+Edge function `supabase/functions/send-email/index.ts` uses Resend by default. Replace the fetch call and headers to use SendGrid, Postmark, AWS SES, or any HTTP email API. Templates are defined as constants at the top of the file.
