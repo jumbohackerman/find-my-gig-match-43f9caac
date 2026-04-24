@@ -8,6 +8,43 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationType } from "@/domain/models";
 
+function notificationIcon(type: NotificationType) {
+  switch (type) {
+    case "shortlisted": return Sparkles;
+    case "contact_invitation": return Mail;
+    case "invitation_accepted": return CheckCircle;
+    case "invitation_rejected": return XCircle;
+    case "position_closed": return Lock;
+    case "new_message": return MessageSquare;
+    case "interview_scheduled": return Bell;
+    case "hired": return CheckCircle;
+    default: return BellIcon;
+  }
+}
+
+function notificationTarget(
+  type: NotificationType,
+  role: string | undefined,
+  refId: string | undefined,
+): string | null {
+  if (role === "employer") return "/employer";
+  // candidate
+  switch (type) {
+    case "contact_invitation":
+    case "invitation_accepted":
+    case "invitation_rejected":
+    case "shortlisted":
+    case "status_change":
+    case "position_closed":
+    case "new_message":
+    case "interview_scheduled":
+    case "hired":
+      return "/my-profile";
+    default:
+      return refId ? `/my-profile` : "/my-profile";
+  }
+}
+
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
   const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
