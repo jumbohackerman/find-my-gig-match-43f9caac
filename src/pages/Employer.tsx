@@ -377,6 +377,15 @@ const Employer = () => {
                             >
                               {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                             </button>
+                            {job.status !== "closed" && (
+                              <button
+                                onClick={() => setClosingJob({ id: job.id, title: job.title, company: job.company })}
+                                className="p-1.5 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
+                                title="Zakończ rekrutację"
+                              >
+                                <Lock className="w-4 h-4" />
+                              </button>
+                            )}
                             <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors">
                               <Trash2 className="w-4 h-4" />
                             </button>
