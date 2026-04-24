@@ -56,6 +56,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
     filters.salaryMin > 0 ||
     filters.remote !== "Wszystkie" ||
     filters.seniority !== "Wszystkie" ||
+    filters.contractType !== "Wszystkie" ||
     filters.requiredSkills.length > 0;
 
   const clearFilters = () => onChange({ ...defaultFilters });
