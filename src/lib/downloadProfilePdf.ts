@@ -86,12 +86,14 @@ function ensurePrintStyles() {
       }
     }
 
-    /* CV layout — applies in both screen (when forced visible) and print */
+    /* CV layout — applies in both screen (when forced visible) and print.
+       The gradient background guarantees the dark sidebar column extends
+       across every printed page, even if main-column content overflows. */
     #${PRINT_AREA_ID} {
       width: 210mm;
       min-height: 297mm;
       margin: 0 auto;
-      background: #ffffff;
+      background: linear-gradient(to right, #1a1a2e 0%, #1a1a2e 32%, #ffffff 32%, #ffffff 100%);
       color: #1a1a2e;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 10.5pt;
@@ -99,6 +101,7 @@ function ensurePrintStyles() {
       display: flex;
       flex-direction: row;
       box-sizing: border-box;
+      position: relative;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
