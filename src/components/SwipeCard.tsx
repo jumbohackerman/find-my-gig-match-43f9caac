@@ -19,11 +19,15 @@ interface SwipeCardProps {
 const EXIT_SPRING = { type: "spring" as const, stiffness: 68, damping: 16, mass: 0.95 };
 const EXIT_DISTANCE = 900;
 
+const SWIPE_THRESHOLD = 80;
+
 const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
   const x = useMotionValue(0);
+  const y = useMotionValue(0);
   const rotate = useTransform(x, [-320, 320], [-14, 14]);
   const rightOpacity = useTransform(x, [20, 120], [0, 1]);
   const leftOpacity = useTransform(x, [-120, -20], [1, 0]);
+  const upOpacity = useTransform(y, [-120, -20], [1, 0]);
 
   const [exitDirection, setExitDirection] = useState<"left" | "right">("right");
   const didDrag = useRef(false);
@@ -34,8 +38,14 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
   const handleDrag = () => { didDrag.current = true; };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
-    if (Math.abs(info.offset.x) > 100) {
-      const dir = info.offset.x > 0 ? "right" : "left";
+    const { x: dx, y: dy } = info.offset;
+    // Vertical swipe up dominates if y is more pronounced
+    if (-dy > SWIPE_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
+      onSwipe("save");
+      return;
+    }
+    if (Math.abs(dx) > SWIPE_THRESHOLD) {
+      const dir = dx > 0 ? "right" : "left";
       setExitDirection(dir);
       onSwipe(dir);
     }
