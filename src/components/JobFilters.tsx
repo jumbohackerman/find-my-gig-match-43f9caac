@@ -148,6 +148,17 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Contract type */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Forma współpracy</label>
+                  <Select value={filters.contractType} onValueChange={(v) => onChange({ ...filters, contractType: v })}>
+                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {contractOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* Salary */}
@@ -158,7 +169,7 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
                 <Slider
                   value={[filters.salaryMin]}
                   onValueChange={([v]) => onChange({ ...filters, salaryMin: v })}
-                  max={35}
+                  max={50}
                   step={1}
                 />
               </div>
