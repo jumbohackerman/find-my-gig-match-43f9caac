@@ -18,6 +18,8 @@ interface Props {
   matchResult?: MatchResult;
   onClose: () => void;
   onApply?: (job: Job) => void;
+  allJobs?: Job[];
+  onSelectJob?: (job: Job) => void;
 }
 
 /* ── Section component ─────────────────────────────────────────────────────── */
