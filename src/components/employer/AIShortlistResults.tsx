@@ -3,9 +3,10 @@
  * Renders top 5 ranked candidates after shortlist completion.
  */
 import { useState } from "react";
-import { Trophy, ChevronDown, ChevronUp, Mail, Download, MapPin, Briefcase, DollarSign, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Mail, Download, MapPin, Briefcase, DollarSign, Sparkles } from "lucide-react";
 import type { ShortlistRecord, ShortlistSnapshot } from "@/hooks/useAIShortlist";
-import { supabase } from "@/integrations/supabase/client";
+import { useContactInvitations } from "@/hooks/useContactInvitations";
+import ContactInvitationModal from "./ContactInvitationModal";
 import { toast } from "sonner";
 
 interface Props {
