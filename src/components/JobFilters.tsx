@@ -233,8 +233,10 @@ export function filterJobs(jobs: Job[], filters: JobFiltersState): Job[] {
       if (sen === "senior" && !title.includes("senior") && !title.includes("sr")) return false;
       if (sen === "junior" && !title.includes("junior") && !title.includes("jr")) return false;
       if (sen === "lead" && !title.includes("lead") && !title.includes("principal")) return false;
+    if (filters.contractType !== "Wszystkie") {
+      const ct = (job.contractType || job.type || "").toLowerCase();
+      if (!ct.includes(filters.contractType.toLowerCase())) return false;
     }
-    if (filters.requiredSkills.length > 0) {
       const jobTags = job.tags.map((t) => t.toLowerCase());
       const hasAll = filters.requiredSkills.every((s) => jobTags.includes(s.toLowerCase()));
       if (!hasAll) return false;
