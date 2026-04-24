@@ -138,6 +138,7 @@ const Index = () => {
     filters.salaryMin > 0 ||
     filters.remote !== defaultFilters.remote ||
     filters.seniority !== defaultFilters.seniority ||
+    filters.contractType !== defaultFilters.contractType ||
     filters.requiredSkills.length > 0;
 
   // ── Restore filters from URL on mount ─────────────────────────────────────
