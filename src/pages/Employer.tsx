@@ -21,6 +21,7 @@ import PackagePurchaseButton from "@/components/employer/PackagePurchaseButton";
 import ShortlistConfirmModal from "@/components/employer/ShortlistConfirmModal";
 import CandidateNotesPanel from "@/components/employer/CandidateNotesPanel";
 import JobPanel from "@/components/employer/JobPanel";
+import AIShortlistSection from "@/components/employer/AIShortlistSection";
 import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
 import StatusBadge from "@/components/employer/StatusBadge";
 import SourceLabel from "@/components/employer/SourceLabel";
