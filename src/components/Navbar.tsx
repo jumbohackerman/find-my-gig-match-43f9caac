@@ -94,10 +94,7 @@ const Navbar = () => {
           {user && (
             <div className="relative" ref={notifRef}>
               <button
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  markAllRead();
-                }}
+                onClick={() => setShowNotifications((v) => !v)}
                 className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 data-testid="nav-notifications"
                 aria-label={`Powiadomienia${unreadCount > 0 ? ` (${unreadCount} nieprzeczytanych)` : ""}`}
@@ -106,8 +103,8 @@ const Navbar = () => {
               >
                 <Bell className="w-4 h-4" aria-hidden="true" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-accent-foreground text-[9px] font-bold flex items-center justify-center" aria-hidden="true">
-                    {unreadCount}
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center" aria-hidden="true">
+                    {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
               </button>
@@ -118,37 +115,60 @@ const Navbar = () => {
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="absolute right-0 top-12 w-72 card-gradient rounded-xl border border-border shadow-lg z-50 overflow-hidden"
+                    className="absolute right-0 top-12 w-80 card-gradient rounded-xl border border-border shadow-lg z-50 overflow-hidden"
                     role="region"
                     aria-label="Panel powiadomień"
                   >
-                    <div className="p-3 border-b border-border">
+                    <div className="p-3 border-b border-border flex items-center justify-between gap-2">
                       <p className="text-xs font-semibold text-foreground">Powiadomienia</p>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={() => markAllRead()}
+                          className="text-[10px] text-accent hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded"
+                        >
+                          Oznacz wszystkie jako przeczytane
+                        </button>
+                      )}
                     </div>
                     {notifications.length === 0 ? (
                       <div className="p-4 text-center text-xs text-muted-foreground">
                         Brak powiadomień
                       </div>
                     ) : (
-                      <div className="max-h-60 overflow-y-auto" role="list">
-                        {notifications.map((n) => (
-                          <div
-                            key={n.id}
-                            role="listitem"
-                            className={`p-3 border-b border-border last:border-0 ${n.read ? "" : "bg-accent/5"}`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="text-xs font-medium text-foreground">{n.title}</p>
-                              {!n.read && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" aria-label="Nieprzeczytane" />
-                              )}
-                            </div>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">{n.body}</p>
-                            {n.createdAt && (
-                              <p className="text-[9px] text-muted-foreground/60 mt-1">{timeAgo(n.createdAt)}</p>
-                            )}
-                          </div>
-                        ))}
+                      <div className="max-h-80 overflow-y-auto" role="list">
+                        {notifications.map((n) => {
+                          const Icon = notificationIcon(n.type);
+                          const target = notificationTarget(n.type, profile?.role, n.referenceId);
+                          return (
+                            <button
+                              key={n.id}
+                              type="button"
+                              role="listitem"
+                              onClick={async () => {
+                                if (!n.read) await markRead(n.id);
+                                setShowNotifications(false);
+                                if (target) navigate(target);
+                              }}
+                              className={`w-full text-left p-3 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors flex gap-3 ${n.read ? "" : "bg-accent/5"}`}
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                <Icon className="w-4 h-4 text-foreground" aria-hidden="true" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="text-xs font-medium text-foreground truncate">{n.title}</p>
+                                  {!n.read && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" aria-label="Nieprzeczytane" />
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{n.body}</p>
+                                {n.createdAt && (
+                                  <p className="text-[9px] text-muted-foreground/60 mt-1">{timeAgo(n.createdAt)}</p>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </motion.div>
