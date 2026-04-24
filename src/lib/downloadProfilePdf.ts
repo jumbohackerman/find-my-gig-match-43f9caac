@@ -333,8 +333,9 @@ function ensurePrintStyles() {
     /* ── Main (right, white) ─────────────────────────────── */
     #${PRINT_AREA_ID} .cv-main {
       width: 68%;
-      background: #ffffff;
-      padding: 32px 34px;
+      flex: 1;
+      background: transparent;
+      padding: 32px 36px;
       color: #1a1a2e;
       display: flex;
       flex-direction: column;
