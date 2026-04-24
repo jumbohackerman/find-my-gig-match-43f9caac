@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_shortlist_snapshots: {
+        Row: {
+          ai_justification: string
+          ai_shortlist_id: string
+          candidate_id: string
+          created_at: string
+          id: string
+          job_id: string
+          rank: number
+          shortlist_score: number
+          snapshot_education: Json | null
+          snapshot_experience: Json | null
+          snapshot_full_name: string | null
+          snapshot_job_title: string | null
+          snapshot_languages: Json | null
+          snapshot_level: string | null
+          snapshot_links: Json | null
+          snapshot_location: string | null
+          snapshot_salary_max: number | null
+          snapshot_salary_min: number | null
+          snapshot_skills: Json | null
+          snapshot_summary: string | null
+        }
+        Insert: {
+          ai_justification: string
+          ai_shortlist_id: string
+          candidate_id: string
+          created_at?: string
+          id?: string
+          job_id: string
+          rank: number
+          shortlist_score: number
+          snapshot_education?: Json | null
+          snapshot_experience?: Json | null
+          snapshot_full_name?: string | null
+          snapshot_job_title?: string | null
+          snapshot_languages?: Json | null
+          snapshot_level?: string | null
+          snapshot_links?: Json | null
+          snapshot_location?: string | null
+          snapshot_salary_max?: number | null
+          snapshot_salary_min?: number | null
+          snapshot_skills?: Json | null
+          snapshot_summary?: string | null
+        }
+        Update: {
+          ai_justification?: string
+          ai_shortlist_id?: string
+          candidate_id?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          rank?: number
+          shortlist_score?: number
+          snapshot_education?: Json | null
+          snapshot_experience?: Json | null
+          snapshot_full_name?: string | null
+          snapshot_job_title?: string | null
+          snapshot_languages?: Json | null
+          snapshot_level?: string | null
+          snapshot_links?: Json | null
+          snapshot_location?: string | null
+          snapshot_salary_max?: number | null
+          snapshot_salary_min?: number | null
+          snapshot_skills?: Json | null
+          snapshot_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_shortlist_snapshots_ai_shortlist_id_fkey"
+            columns: ["ai_shortlist_id"]
+            isOneToOne: false
+            referencedRelation: "ai_shortlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_shortlists: {
+        Row: {
+          ai_model_used: string | null
+          completed_at: string | null
+          created_at: string
+          employer_id: string
+          error_message: string | null
+          id: string
+          job_id: string
+          status: string
+          total_candidates_analyzed: number | null
+          triggered_at: string
+        }
+        Insert: {
+          ai_model_used?: string | null
+          completed_at?: string | null
+          created_at?: string
+          employer_id: string
+          error_message?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          total_candidates_analyzed?: number | null
+          triggered_at?: string
+        }
+        Update: {
+          ai_model_used?: string | null
+          completed_at?: string | null
+          created_at?: string
+          employer_id?: string
+          error_message?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          total_candidates_analyzed?: number | null
+          triggered_at?: string
+        }
+        Relationships: []
+      }
       applications: {
         Row: {
           applied_at: string
@@ -109,6 +225,36 @@ export type Database = {
           id?: string
           job_id?: string
           metadata?: Json
+        }
+        Relationships: []
+      }
+      candidate_consents: {
+        Row: {
+          ai_processing_consent: boolean
+          candidate_id: string
+          consented_at: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_processing_consent?: boolean
+          candidate_id: string
+          consented_at?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_processing_consent?: boolean
+          candidate_id?: string
+          consented_at?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -238,6 +384,50 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_invitations: {
+        Row: {
+          ai_shortlist_snapshot_id: string
+          candidate_id: string
+          created_at: string
+          employer_id: string
+          employer_message: string | null
+          id: string
+          job_id: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          ai_shortlist_snapshot_id: string
+          candidate_id: string
+          created_at?: string
+          employer_id: string
+          employer_message?: string | null
+          id?: string
+          job_id: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          ai_shortlist_snapshot_id?: string
+          candidate_id?: string
+          created_at?: string
+          employer_id?: string
+          employer_message?: string | null
+          id?: string
+          job_id?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_invitations_ai_shortlist_snapshot_id_fkey"
+            columns: ["ai_shortlist_snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "ai_shortlist_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cv_parsed_data: {
         Row: {
           created_at: string
@@ -319,8 +509,11 @@ export type Database = {
         Row: {
           about_company: string
           about_role: string
+          ai_shortlist_id: string | null
           apply_url: string
           benefits: string[]
+          closed_at: string | null
+          closure_reason: string | null
           company: string
           contract_type: string
           created_at: string
@@ -352,8 +545,11 @@ export type Database = {
         Insert: {
           about_company?: string
           about_role?: string
+          ai_shortlist_id?: string | null
           apply_url?: string
           benefits?: string[]
+          closed_at?: string | null
+          closure_reason?: string | null
           company: string
           contract_type?: string
           created_at?: string
@@ -385,8 +581,11 @@ export type Database = {
         Update: {
           about_company?: string
           about_role?: string
+          ai_shortlist_id?: string | null
           apply_url?: string
           benefits?: string[]
+          closed_at?: string | null
+          closure_reason?: string | null
           company?: string
           contract_type?: string
           created_at?: string
@@ -415,7 +614,15 @@ export type Database = {
           updated_at?: string
           work_mode?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "jobs_ai_shortlist_id_fkey"
+            columns: ["ai_shortlist_id"]
+            isOneToOne: false
+            referencedRelation: "ai_shortlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
