@@ -83,6 +83,71 @@
     --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  /* ── Light theme overrides (data-theme="light" on <html>) ── */
+  :root[data-theme="light"] {
+    --background: 210 25% 98%;
+    --foreground: 230 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 230 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 30% 12%;
+
+    --primary: 16 92% 52%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 24 95% 60%;
+
+    --secondary: 220 16% 94%;
+    --secondary-foreground: 230 30% 18%;
+
+    --muted: 220 16% 92%;
+    --muted-foreground: 220 10% 40%;
+
+    --accent: 162 70% 38%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 168 75% 45%;
+
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 16% 86%;
+    --input: 220 16% 90%;
+    --ring: 16 92% 52%;
+
+    --swipe-right: 16 92% 52%;
+    --swipe-left: 220 10% 50%;
+
+    --gradient-card: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 20% 98%) 60%, hsl(220 18% 96%) 100%);
+    --gradient-card-hover: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 22% 99%) 60%, hsl(220 18% 97%) 100%);
+    --gradient-mesh: linear-gradient(125deg, hsl(210 25% 98%) 0%, hsl(220 24% 96%) 50%, hsl(215 22% 97%) 100%);
+    --gradient-aurora: radial-gradient(at 20% 10%, hsl(16 92% 62% / 0.10) 0%, transparent 50%),
+                       radial-gradient(at 80% 20%, hsl(280 70% 60% / 0.07) 0%, transparent 50%),
+                       radial-gradient(at 50% 80%, hsl(162 70% 50% / 0.06) 0%, transparent 50%);
+
+    --shadow-card: 0 12px 40px -12px hsl(220 30% 30% / 0.18),
+                   0 2px 8px -2px hsl(220 30% 30% / 0.08);
+    --shadow-card-hover: 0 24px 60px -16px hsl(220 30% 30% / 0.25),
+                         0 4px 12px -2px hsl(16 92% 52% / 0.18);
+    --shadow-glow: 0 0 40px -8px hsl(16 92% 52% / 0.30);
+    --shadow-soft: 0 4px 20px -4px hsl(220 30% 30% / 0.10);
+    --shadow-elevated: 0 20px 50px -16px hsl(220 30% 30% / 0.18);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 230 30% 12%;
+    --sidebar-primary: 16 92% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 16% 94%;
+    --sidebar-accent-foreground: 230 30% 18%;
+    --sidebar-border: 220 16% 86%;
+    --sidebar-ring: 16 92% 52%;
+  }
+
+  :root[data-theme="light"] .glass-surface {
+    background: linear-gradient(155deg, hsl(0 0% 100% / 0.85), hsl(220 20% 98% / 0.85));
+    border: 1px solid hsl(220 16% 86%);
+  }
 }
 
 @media (min-width: 640px) {
