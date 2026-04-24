@@ -121,6 +121,12 @@ const MyProfile = () => {
   const [activeSection, setActiveSection] = useState<string>("basic");
   const [showPreview, setShowPreview] = useState(false);
 
+  // ── AI processing consent (Block 4) ───────────────────────────────────────
+  const { consent, hasConsent, hasDecided, grantConsent, withdrawConsent, loading: consentLoading } = useConsent();
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [consentBusy, setConsentBusy] = useState(false);
+  const [showWithdrawWarning, setShowWithdrawWarning] = useState(false);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
