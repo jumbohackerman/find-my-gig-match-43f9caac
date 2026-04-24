@@ -200,11 +200,55 @@ const MyProfile = () => {
       }
 
       toast.success("Profil zapisany");
+
+      // Block 4: After first profile save, gate access with the AI consent modal.
+      if (!isEmployer && !hasDecided && !consentLoading) {
+        setShowConsentModal(true);
+      }
     } catch (error) {
       toast.error("Nie udało się zapisać profilu");
     }
 
     setSaving(false);
+  };
+
+  const handleAcceptConsent = async () => {
+    setConsentBusy(true);
+    try {
+      await grantConsent();
+      toast.success("Zgoda zapisana — możesz teraz aplikować na oferty.");
+      setShowConsentModal(false);
+    } catch {
+      toast.error("Nie udało się zapisać zgody.");
+    } finally {
+      setConsentBusy(false);
+    }
+  };
+
+  const handleDeclineConsent = async () => {
+    setConsentBusy(true);
+    try {
+      await withdrawConsent();
+      toast.info("Bez zgody nie możesz aplikować. Możesz przeglądać oferty bez aplikowania.");
+      setShowConsentModal(false);
+    } catch {
+      toast.error("Nie udało się zapisać decyzji.");
+    } finally {
+      setConsentBusy(false);
+    }
+  };
+
+  const handleWithdrawConsent = async () => {
+    setConsentBusy(true);
+    try {
+      await withdrawConsent();
+      toast.success("Zgoda wycofana. Nie możesz już aplikować na nowe oferty.");
+      setShowWithdrawWarning(false);
+    } catch {
+      toast.error("Nie udało się wycofać zgody.");
+    } finally {
+      setConsentBusy(false);
+    }
   };
 
   // Skills helpers
