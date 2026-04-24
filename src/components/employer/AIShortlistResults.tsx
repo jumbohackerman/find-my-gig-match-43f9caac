@@ -157,6 +157,15 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
           Pozostałych <strong className="text-foreground">{rejectedCount}</strong> kandydatów zostało odrzuconych i otrzymało automatyczny feedback.
         </p>
       )}
+
+      {inviteTarget && (
+        <ContactInvitationModal
+          open={!!inviteTarget}
+          candidateName={inviteTarget.snapshot_full_name || "Kandydat"}
+          onClose={() => setInviteTarget(null)}
+          onSubmit={handleSendInvite}
+        />
+      )}
     </div>
   );
 }
