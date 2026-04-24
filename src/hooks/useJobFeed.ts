@@ -215,5 +215,6 @@ export function useJobFeed() {
     applyToJob,
     resetFeed,
     updateFilters,
+    hasConsent,
   };
 }
