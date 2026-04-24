@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Building2, User, LogOut, Bell, MessageSquare, Sparkles, Mail, CheckCircle, XCircle, Lock, Bell as BellIcon } from "lucide-react";
+import { Building2, User, LogOut, Bell, MessageSquare, Sparkles, Mail, CheckCircle, XCircle, Lock, Bell as BellIcon, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 import { timeAgo } from "@/lib/timeAgo";
 import logo from "@/assets/jobswipe-logo.png";
 import { AnimatePresence, motion } from "framer-motion";
