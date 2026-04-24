@@ -624,7 +624,11 @@ function buildHtml(c: Candidate): string {
       ${expectBlock}
 
       <div class="cv-side-footer">
-        Wygenerowane przez <span class="cv-mark">JobSwipe.pl</span>
+        <div class="cv-footer-brand">
+          <span class="cv-footer-mark">J</span>
+          <span class="cv-footer-name">JobSwipe</span>
+        </div>
+        <div class="cv-footer-url">jobswipe.pl</div>
       </div>
     </aside>
 
