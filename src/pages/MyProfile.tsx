@@ -968,6 +968,13 @@ const MyProfile = () => {
           onClose={() => setShowPreview(false)}
         />
       )}
+
+      <AIConsentModal
+        open={showConsentModal}
+        onAccept={handleAcceptConsent}
+        onDecline={handleDeclineConsent}
+        busy={consentBusy}
+      />
     </div>
   );
 };
