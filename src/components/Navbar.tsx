@@ -10,7 +10,8 @@ import type { NotificationType } from "@/domain/models";
 
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
-  const { notifications, unreadCount, markAllRead } = useNotifications();
+  const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
