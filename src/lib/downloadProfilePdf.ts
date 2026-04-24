@@ -10,6 +10,7 @@
 import { getProvider } from "@/providers/registry";
 import { toast } from "sonner";
 import type { Candidate } from "@/domain/models";
+import jobswipeLogo from "@/assets/jobswipe-logo.png";
 
 const PRINT_AREA_ID = "cv-print-area";
 const PRINT_STYLE_ID = "cv-print-styles";
@@ -87,13 +88,14 @@ function ensurePrintStyles() {
     }
 
     /* CV layout — applies in both screen (when forced visible) and print.
-       The gradient background guarantees the dark sidebar column extends
-       across every printed page, even if main-column content overflows. */
+       The gradient background on the wrapper guarantees the dark sidebar
+       column extends across every printed page, regardless of content
+       length. The .cv-sidebar div is transparent and sits on top. */
     #${PRINT_AREA_ID} {
       width: 210mm;
-      min-height: 297mm;
+      height: auto;
       margin: 0 auto;
-      background: linear-gradient(to right, #1a1a2e 0%, #1a1a2e 32%, #ffffff 32%, #ffffff 100%);
+      background: linear-gradient(to right, #1a1a2e 0, #1a1a2e 67.2mm, #ffffff 67.2mm, #ffffff 100%);
       color: #1a1a2e;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 10.5pt;
@@ -107,19 +109,16 @@ function ensurePrintStyles() {
     }
     #${PRINT_AREA_ID} * { box-sizing: border-box; }
 
-    /* ── Sidebar (left, dark) ───────────────────────────── */
+    /* ── Sidebar (left, transparent — wrapper gradient draws color) ── */
     #${PRINT_AREA_ID} .cv-sidebar {
       width: 32%;
-      background: #1a1a2e;
+      background: transparent;
       color: #ffffff;
       padding: 32px 24px 24px;
       display: flex;
       flex-direction: column;
       gap: 22px;
       position: relative;
-      min-height: 100%;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
     }
     /* Subtle vertical orange accent on the sidebar's right edge */
     #${PRINT_AREA_ID} .cv-sidebar::after {
@@ -304,38 +303,38 @@ function ensurePrintStyles() {
       gap: 8px;
       margin-bottom: 4px;
     }
-    #${PRINT_AREA_ID} .cv-footer-mark {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 10pt;
-      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.4);
+    #${PRINT_AREA_ID} .cv-footer-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: inline-block;
     }
     #${PRINT_AREA_ID} .cv-footer-name {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       color: #ffffff;
-      font-size: 10pt;
+      font-size: 11pt;
       letter-spacing: 0.5px;
+    }
+    #${PRINT_AREA_ID} .cv-footer-tag {
+      font-size: 7.5pt;
+      color: #94a3b8;
+      letter-spacing: 0.6px;
+      margin-top: 2px;
     }
     #${PRINT_AREA_ID} .cv-footer-url {
       font-size: 8pt;
-      color: #94a3b8;
+      color: #cbd5e1;
       letter-spacing: 0.6px;
+      margin-top: 1px;
     }
 
     /* ── Main (right, white) ─────────────────────────────── */
     #${PRINT_AREA_ID} .cv-main {
       width: 68%;
-      background: #ffffff;
-      padding: 32px 34px;
+      flex: 1;
+      background: transparent;
+      padding: 32px 36px;
       color: #1a1a2e;
       display: flex;
       flex-direction: column;
@@ -626,9 +625,10 @@ function buildHtml(c: Candidate): string {
 
       <div class="cv-side-footer">
         <div class="cv-footer-brand">
-          <span class="cv-footer-mark">J</span>
-          <span class="cv-footer-name">JobSwipe</span>
+          <img src="${jobswipeLogo}" alt="JobSwipe" class="cv-footer-logo" />
+          <span class="cv-footer-name">JobSwipe.pl</span>
         </div>
+        <div class="cv-footer-tag">Wygenerowane przez JobSwipe.pl</div>
         <div class="cv-footer-url">jobswipe.pl</div>
       </div>
     </aside>
