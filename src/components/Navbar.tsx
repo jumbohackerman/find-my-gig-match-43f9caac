@@ -49,6 +49,7 @@ function notificationTarget(
 const Navbar = () => {
   const { user, profile, signOut } = useAuth();
   const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
