@@ -30,6 +30,8 @@ function formatSalary(min?: number | null, max?: number | null) {
 
 export default function AIShortlistResults({ shortlist, snapshots, totalApplied }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [inviteTarget, setInviteTarget] = useState<ShortlistSnapshot | null>(null);
+  const { sendInvitation } = useContactInvitations(shortlist.job_id);
   const rejectedCount = Math.max(0, totalApplied - snapshots.length);
 
   const toggle = (id: string) => {
@@ -40,18 +42,18 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
     });
   };
 
-  const sendInvite = async (snap: ShortlistSnapshot) => {
+  const handleSendInvite = async (message: string) => {
+    if (!inviteTarget) return;
     try {
-      const { error } = await supabase.from("contact_invitations").insert({
-        candidate_id: snap.candidate_id,
+      await sendInvitation({
+        candidate_id: inviteTarget.candidate_id,
         employer_id: shortlist.employer_id,
         job_id: shortlist.job_id,
-        ai_shortlist_snapshot_id: snap.id,
-        status: "pending",
-        employer_message: "Zapraszamy do kontaktu w sprawie oferty.",
+        ai_shortlist_snapshot_id: inviteTarget.id,
+        message,
+        job_title: (shortlist as any).job_title || "Oferta",
+        company_name: (shortlist as any).company_name || "Firma",
       });
-      if (error) throw error;
-      toast.success("Zaproszenie do kontaktu wysłane");
     } catch (e: any) {
       toast.error(`Błąd: ${e?.message || "nie udało się wysłać"}`);
     }
