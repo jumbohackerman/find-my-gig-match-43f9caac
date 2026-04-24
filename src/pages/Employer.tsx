@@ -454,6 +454,15 @@ const Employer = () => {
         />
       )}
 
+      {closingJob && (
+        <CloseJobModal
+          open={!!closingJob}
+          jobTitle={closingJob.title}
+          onClose={() => setClosingJob(null)}
+          onConfirm={handleCloseJob}
+        />
+      )}
+
       <Footer />
     </div>
   );
