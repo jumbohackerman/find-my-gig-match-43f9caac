@@ -112,10 +112,25 @@ function ensurePrintStyles() {
       width: 32%;
       background: #1a1a2e;
       color: #ffffff;
-      padding: 28px 22px;
+      padding: 32px 24px 24px;
       display: flex;
       flex-direction: column;
       gap: 22px;
+      position: relative;
+      min-height: 100%;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    /* Subtle vertical orange accent on the sidebar's right edge */
+    #${PRINT_AREA_ID} .cv-sidebar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 100%;
+      background: #f97316;
+      opacity: 0.6;
     }
     #${PRINT_AREA_ID} .cv-avatar {
       width: 110px;
@@ -130,8 +145,11 @@ function ensurePrintStyles() {
       font-weight: 700;
       font-size: 38pt;
       letter-spacing: 1px;
-      margin: 0 auto 4px;
-      box-shadow: 0 8px 22px rgba(249, 115, 22, 0.35);
+      margin: 0 auto 10px;
+      box-shadow:
+        0 0 0 3px rgba(249, 115, 22, 0.30),
+        0 0 0 6px rgba(249, 115, 22, 0.10),
+        0 8px 22px rgba(249, 115, 22, 0.35);
     }
     #${PRINT_AREA_ID} .cv-side-name {
       font-family: 'Outfit', sans-serif;
@@ -154,7 +172,7 @@ function ensurePrintStyles() {
       width: 48px;
       background: linear-gradient(90deg, #f97316, #ea580c);
       border-radius: 2px;
-      margin: 4px auto;
+      margin: 8px auto 0;
     }
     #${PRINT_AREA_ID} .cv-side-section {
       display: flex;
@@ -170,7 +188,22 @@ function ensurePrintStyles() {
       color: #f97316;
       margin: 0;
       padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-image: linear-gradient(90deg, rgba(249,115,22,0.7), rgba(249,115,22,0));
+      background-repeat: no-repeat;
+      background-position: 0 100%;
+      background-size: 100% 1.5px;
+    }
+    #${PRINT_AREA_ID} .cv-side-heading::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #f97316;
+      border-radius: 1px;
+      flex-shrink: 0;
     }
     #${PRINT_AREA_ID} .cv-contact-item {
       display: flex;
@@ -213,16 +246,17 @@ function ensurePrintStyles() {
     #${PRINT_AREA_ID} .cv-pill-advanced {
       background: #f97316;
       color: #ffffff;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.35);
     }
     #${PRINT_AREA_ID} .cv-pill-intermediate {
       background: transparent;
       color: #f97316;
-      border: 1px solid #f97316;
+      border: 1.5px solid #f97316;
     }
     #${PRINT_AREA_ID} .cv-pill-basic {
-      background: rgba(255, 255, 255, 0.08);
-      color: #cbd5e1;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #2a2a3e;
+      color: #9ca3af;
+      border: 0;
     }
     #${PRINT_AREA_ID} .cv-lang-row {
       display: flex;
@@ -255,20 +289,46 @@ function ensurePrintStyles() {
       letter-spacing: 0.4px;
       margin-bottom: 1px;
     }
+    /* Pinned branded footer */
     #${PRINT_AREA_ID} .cv-side-footer {
       margin-top: auto;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 14px;
+      border-top: 1px solid rgba(249, 115, 22, 0.35);
       text-align: center;
-      font-size: 7.5pt;
-      color: #94a3b8;
-      letter-spacing: 0.6px;
+      color: #cbd5e1;
     }
-    #${PRINT_AREA_ID} .cv-side-footer .cv-mark {
-      color: #f97316;
+    #${PRINT_AREA_ID} .cv-footer-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    #${PRINT_AREA_ID} .cv-footer-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 10pt;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.4);
+    }
+    #${PRINT_AREA_ID} .cv-footer-name {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
-      letter-spacing: 1px;
+      color: #ffffff;
+      font-size: 10pt;
+      letter-spacing: 0.5px;
+    }
+    #${PRINT_AREA_ID} .cv-footer-url {
+      font-size: 8pt;
+      color: #94a3b8;
+      letter-spacing: 0.6px;
     }
 
     /* ── Main (right, white) ─────────────────────────────── */
@@ -332,18 +392,18 @@ function ensurePrintStyles() {
     #${PRINT_AREA_ID} .cv-main-section {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     #${PRINT_AREA_ID} .cv-main-heading {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       font-size: 11pt;
-      letter-spacing: 2.5px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #1a1a2e;
       margin: 0;
-      padding-bottom: 6px;
-      border-bottom: 1.5px solid #1a1a2e;
+      padding: 2px 0 2px 10px;
+      border-left: 3px solid #f97316;
     }
     #${PRINT_AREA_ID} .cv-summary {
       color: #374151;
@@ -351,16 +411,16 @@ function ensurePrintStyles() {
       line-height: 1.6;
       margin: 0;
     }
+    /* Airy spacing between experience entries — no divider line */
     #${PRINT_AREA_ID} .cv-exp-entry {
-      padding-bottom: 14px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid #e5e7eb;
+      margin: 16px 0;
+      padding: 0;
+      border: 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
-    #${PRINT_AREA_ID} .cv-exp-entry:last-child {
-      border-bottom: 0;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
+    #${PRINT_AREA_ID} .cv-exp-entry:first-child { margin-top: 4px; }
+    #${PRINT_AREA_ID} .cv-exp-entry:last-child { margin-bottom: 0; }
     #${PRINT_AREA_ID} .cv-exp-row {
       display: flex;
       justify-content: space-between;
@@ -369,16 +429,18 @@ function ensurePrintStyles() {
       margin-bottom: 2px;
     }
     #${PRINT_AREA_ID} .cv-exp-company {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
       font-size: 11.5pt;
       color: #1a1a2e;
     }
     #${PRINT_AREA_ID} .cv-exp-dates {
       font-size: 9pt;
-      color: #6b7280;
-      font-weight: 500;
+      color: #9ca3af;
+      font-style: italic;
+      font-weight: 400;
       white-space: nowrap;
+      text-align: right;
     }
     #${PRINT_AREA_ID} .cv-exp-job {
       color: #f97316;
@@ -400,38 +462,47 @@ function ensurePrintStyles() {
       line-height: 1.5;
     }
     #${PRINT_AREA_ID} .cv-exp-bullet::before {
-      content: "";
+      content: "■";
       position: absolute;
       left: 0;
-      top: 7px;
-      width: 6px;
-      height: 6px;
-      background: #f97316;
-      border-radius: 1px;
+      top: 0;
+      line-height: 1.5;
+      font-size: 8px;
+      color: #f97316;
+      transform: translateY(6px);
     }
     #${PRINT_AREA_ID} .cv-edu-entry {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid #f3f4f6;
+      padding: 8px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
-    #${PRINT_AREA_ID} .cv-edu-entry:last-child { border-bottom: 0; }
     #${PRINT_AREA_ID} .cv-edu-degree {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       color: #1a1a2e;
       font-size: 10.5pt;
     }
+    #${PRINT_AREA_ID} .cv-edu-field {
+      color: #f97316;
+      font-weight: 600;
+      font-size: 10pt;
+      margin-top: 1px;
+    }
     #${PRINT_AREA_ID} .cv-edu-school {
       color: #6b7280;
       font-size: 9.5pt;
+      margin-top: 1px;
     }
     #${PRINT_AREA_ID} .cv-edu-dates {
       font-size: 9pt;
-      color: #6b7280;
+      color: #9ca3af;
+      font-style: italic;
       white-space: nowrap;
+      text-align: right;
     }
   `;
   document.head.appendChild(style);
