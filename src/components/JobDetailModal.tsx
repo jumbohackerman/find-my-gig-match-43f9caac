@@ -86,7 +86,7 @@ const LEVEL_LABELS: Record<string, string> = {
   advanced: "Zaawansowany",
 };
 
-const JobDetailModal = ({ job, matchResult, onClose, onApply }: Props) => {
+const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJob }: Props) => {
   const { candidate } = useCandidateProfile();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
