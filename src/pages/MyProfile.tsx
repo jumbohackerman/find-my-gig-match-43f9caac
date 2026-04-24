@@ -3,11 +3,14 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Briefcase, Save, Plus, X, Upload, FileText,
-  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2, Eye, Languages
+  Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2, Eye, Languages,
+  Sparkles, ShieldCheck, ShieldOff, AlertTriangle
 } from "lucide-react";
 import logo from "@/assets/jobswipe-logo.png";
 import { getProvider } from "@/providers/registry";
 import { useAuth } from "@/hooks/useAuth";
+import { useConsent } from "@/hooks/useConsent";
+import AIConsentModal from "@/components/AIConsentModal";
 import { Progress } from "@/components/ui/progress";
 import { ProfileSkeleton } from "@/components/StateViews";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
