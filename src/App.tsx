@@ -9,6 +9,7 @@ import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
 import SplashScreen from "@/components/SplashScreen";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Employer from "./pages/Employer";
 import MyProfile from "./pages/MyProfile";
 import Auth from "./pages/Auth";
@@ -27,10 +28,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-/** Redirect employer away from candidate home to /employer */
+/** Show Landing to guests, redirect employer to /employer, candidates see Index */
 const HomeRedirect = ({ children }: { children: React.ReactNode }) => {
-  const { profile, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   if (loading) return null;
+  if (!user) return <Landing />;
   if (profile?.role === "employer") return <Navigate to="/employer" replace />;
   return <>{children}</>;
 };
