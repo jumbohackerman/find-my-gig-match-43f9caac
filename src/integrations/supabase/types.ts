@@ -23,6 +23,7 @@ export type Database = {
           id: string
           job_id: string
           rank: number
+          shortlist_id: string | null
           shortlist_score: number
           snapshot_education: Json | null
           snapshot_experience: Json | null
@@ -45,6 +46,7 @@ export type Database = {
           id?: string
           job_id: string
           rank: number
+          shortlist_id?: string | null
           shortlist_score: number
           snapshot_education?: Json | null
           snapshot_experience?: Json | null
@@ -67,6 +69,7 @@ export type Database = {
           id?: string
           job_id?: string
           rank?: number
+          shortlist_id?: string | null
           shortlist_score?: number
           snapshot_education?: Json | null
           snapshot_experience?: Json | null
@@ -937,6 +940,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shortlists: {
+        Row: {
+          ai_model_used: string | null
+          completed_at: string | null
+          created_at: string
+          employer_id: string
+          error_message: string | null
+          id: string
+          job_id: string
+          status: string
+          total_candidates_analyzed: number | null
+          triggered_at: string
+        }
+        Insert: {
+          ai_model_used?: string | null
+          completed_at?: string | null
+          created_at?: string
+          employer_id: string
+          error_message?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          total_candidates_analyzed?: number | null
+          triggered_at?: string
+        }
+        Update: {
+          ai_model_used?: string | null
+          completed_at?: string | null
+          created_at?: string
+          employer_id?: string
+          error_message?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          total_candidates_analyzed?: number | null
+          triggered_at?: string
+        }
+        Relationships: []
       }
       swipe_events: {
         Row: {

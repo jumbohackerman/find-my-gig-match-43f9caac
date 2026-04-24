@@ -21,6 +21,7 @@ import PackagePurchaseButton from "@/components/employer/PackagePurchaseButton";
 import ShortlistConfirmModal from "@/components/employer/ShortlistConfirmModal";
 import CandidateNotesPanel from "@/components/employer/CandidateNotesPanel";
 import JobPanel from "@/components/employer/JobPanel";
+import AIShortlistSection from "@/components/employer/AIShortlistSection";
 import { useEmployerMessages, type ChatMessage } from "@/hooks/useEmployerMessages";
 import StatusBadge from "@/components/employer/StatusBadge";
 import SourceLabel from "@/components/employer/SourceLabel";
@@ -391,26 +392,7 @@ const Employer = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <JobPanel
-                            jobApps={jobApps}
-                            balance={balance}
-                            renderCandidate={(app) => (
-                              <CandidateCard
-                                app={app}
-                                jobId={job.id}
-                                employerId={user?.id}
-                                onView={() => handleViewCandidate(app)}
-                                onAdvanceStatus={handleAdvanceStatus}
-                                onShortlist={() => requestShortlist(app, job.id, job.title)}
-                                canShortlist={balance.remainingSlots > 0}
-                                chatMessages={messaging.getMessages(app.id)}
-                                onSendMessage={(content) => messaging.sendMessage(app.id, content)}
-                                isChatOpen={messaging.isChatOpen(app.id)}
-                                onUnlockChat={() => messaging.unlockChat(app.id)}
-                                currentUserId={user?.id}
-                              />
-                            )}
-                          />
+                          <AIShortlistSection jobId={job.id} jobApps={jobApps} />
                         </motion.div>
                       )}
                     </AnimatePresence>
