@@ -56,6 +56,7 @@ const App = () => {
               <Route path="/terms" element={<Terms />} />
               <Route path="/cookies" element={<Cookies />} />
               <Route path="/" element={<HomeRedirect><Index /></HomeRedirect>} />
+              <Route path="/browse" element={<Navigate to="/" replace />} />
               <Route
                 path="/my-profile"
                 element={
