@@ -590,7 +590,7 @@ function buildHtml(c: Candidate): string {
 
   // Education: not in current Candidate model — render nothing if absent.
   // (Forward-compat: read from (c as any).education if it ever appears.)
-  const eduRaw = (c as unknown as { education?: Array<{ degree?: string; school?: string; start_date?: string; end_date?: string; is_current?: boolean }> }).education;
+  const eduRaw = (c as unknown as { education?: Array<{ degree?: string; field?: string; school?: string; start_date?: string; end_date?: string; is_current?: boolean }> }).education;
   const eduBlock = Array.isArray(eduRaw) && eduRaw.length ? `
     <section class="cv-main-section">
       <h2 class="cv-main-heading">Wykształcenie</h2>
@@ -598,7 +598,8 @@ function buildHtml(c: Candidate): string {
         <div class="cv-edu-entry">
           <div>
             <div class="cv-edu-degree">${esc(ed.degree || "—")}</div>
-            <div class="cv-edu-school">${esc(ed.school || "")}</div>
+            ${ed.field ? `<div class="cv-edu-field">${esc(ed.field)}</div>` : ""}
+            ${ed.school ? `<div class="cv-edu-school">${esc(ed.school)}</div>` : ""}
           </div>
           <div class="cv-edu-dates">${esc(formatDateRange(ed.start_date || "", ed.end_date || "", !!ed.is_current))}</div>
         </div>`).join("")}
