@@ -37,6 +37,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { hideJob, unhideJob } from "@/lib/moderation";
 import { toast } from "sonner";
 import { timeAgo } from "@/lib/timeAgo";
+import CloseJobModal, { type ClosureReason } from "@/components/employer/CloseJobModal";
+import { closeJob } from "@/hooks/useContactInvitations";
+import { Lock } from "lucide-react";
 
 import { Progress } from "@/components/ui/progress";
 
@@ -73,6 +76,22 @@ const Employer = () => {
 
   const [hidePending, setHidePending] = useState<string | null>(null);
   const [statusPending, setStatusPending] = useState<string | null>(null);
+  const [closingJob, setClosingJob] = useState<{ id: string; title: string; company: string } | null>(null);
+
+  const handleCloseJob = async (reason: ClosureReason) => {
+    if (!closingJob) return;
+    try {
+      await closeJob({
+        job_id: closingJob.id,
+        reason,
+        job_title: closingJob.title,
+        company_name: closingJob.company,
+      });
+      refetch();
+    } catch (e: any) {
+      toast.error(`Nie udało się zamknąć: ${e?.message || "błąd"}`);
+    }
+  };
 
   const handleAdvanceStatus = async (appId: string, newStatus: ApplicationStatus) => {
     if (statusPending) return;
@@ -358,6 +377,15 @@ const Employer = () => {
                             >
                               {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                             </button>
+                            {job.status !== "closed" && (
+                              <button
+                                onClick={() => setClosingJob({ id: job.id, title: job.title, company: job.company })}
+                                className="p-1.5 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
+                                title="Zakończ rekrutację"
+                              >
+                                <Lock className="w-4 h-4" />
+                              </button>
+                            )}
                             <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -423,6 +451,15 @@ const Employer = () => {
           busy={shortlistBusy}
           onConfirm={confirmShortlist}
           onCancel={() => setPendingShortlist(null)}
+        />
+      )}
+
+      {closingJob && (
+        <CloseJobModal
+          open={!!closingJob}
+          jobTitle={closingJob.title}
+          onClose={() => setClosingJob(null)}
+          onConfirm={handleCloseJob}
         />
       )}
 

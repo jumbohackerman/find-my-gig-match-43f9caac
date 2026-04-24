@@ -3,9 +3,10 @@
  * Renders top 5 ranked candidates after shortlist completion.
  */
 import { useState } from "react";
-import { Trophy, ChevronDown, ChevronUp, Mail, Download, MapPin, Briefcase, DollarSign, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Mail, Download, MapPin, Briefcase, DollarSign, Sparkles } from "lucide-react";
 import type { ShortlistRecord, ShortlistSnapshot } from "@/hooks/useAIShortlist";
-import { supabase } from "@/integrations/supabase/client";
+import { useContactInvitations } from "@/hooks/useContactInvitations";
+import ContactInvitationModal from "./ContactInvitationModal";
 import { toast } from "sonner";
 
 interface Props {
@@ -29,6 +30,8 @@ function formatSalary(min?: number | null, max?: number | null) {
 
 export default function AIShortlistResults({ shortlist, snapshots, totalApplied }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [inviteTarget, setInviteTarget] = useState<ShortlistSnapshot | null>(null);
+  const { sendInvitation } = useContactInvitations(shortlist.job_id);
   const rejectedCount = Math.max(0, totalApplied - snapshots.length);
 
   const toggle = (id: string) => {
@@ -39,18 +42,18 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
     });
   };
 
-  const sendInvite = async (snap: ShortlistSnapshot) => {
+  const handleSendInvite = async (message: string) => {
+    if (!inviteTarget) return;
     try {
-      const { error } = await supabase.from("contact_invitations").insert({
-        candidate_id: snap.candidate_id,
+      await sendInvitation({
+        candidate_id: inviteTarget.candidate_id,
         employer_id: shortlist.employer_id,
         job_id: shortlist.job_id,
-        ai_shortlist_snapshot_id: snap.id,
-        status: "pending",
-        employer_message: "Zapraszamy do kontaktu w sprawie oferty.",
+        ai_shortlist_snapshot_id: inviteTarget.id,
+        message,
+        job_title: (shortlist as any).job_title || "Oferta",
+        company_name: (shortlist as any).company_name || "Firma",
       });
-      if (error) throw error;
-      toast.success("Zaproszenie do kontaktu wysłane");
     } catch (e: any) {
       toast.error(`Błąd: ${e?.message || "nie udało się wysłać"}`);
     }
@@ -130,7 +133,7 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
 
                   <div className="flex flex-wrap gap-2 mt-3">
                     <button
-                      onClick={() => sendInvite(snap)}
+                      onClick={() => setInviteTarget(snap)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent text-accent-foreground hover:opacity-90"
                     >
                       <Mail className="w-3.5 h-3.5" /> Wyślij zaproszenie
@@ -153,6 +156,15 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
         <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
           Pozostałych <strong className="text-foreground">{rejectedCount}</strong> kandydatów zostało odrzuconych i otrzymało automatyczny feedback.
         </p>
+      )}
+
+      {inviteTarget && (
+        <ContactInvitationModal
+          open={!!inviteTarget}
+          candidateName={inviteTarget.snapshot_full_name || "Kandydat"}
+          onClose={() => setInviteTarget(null)}
+          onSubmit={handleSendInvite}
+        />
       )}
     </div>
   );
