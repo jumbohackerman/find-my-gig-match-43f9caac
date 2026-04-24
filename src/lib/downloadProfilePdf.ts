@@ -625,9 +625,10 @@ function buildHtml(c: Candidate): string {
 
       <div class="cv-side-footer">
         <div class="cv-footer-brand">
-          <span class="cv-footer-mark">J</span>
-          <span class="cv-footer-name">JobSwipe</span>
+          <img src="${jobswipeLogo}" alt="JobSwipe" class="cv-footer-logo" />
+          <span class="cv-footer-name">JobSwipe.pl</span>
         </div>
+        <div class="cv-footer-tag">Wygenerowane przez JobSwipe.pl</div>
         <div class="cv-footer-url">jobswipe.pl</div>
       </div>
     </aside>
