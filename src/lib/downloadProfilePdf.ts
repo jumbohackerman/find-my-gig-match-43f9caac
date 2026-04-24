@@ -88,13 +88,14 @@ function ensurePrintStyles() {
     }
 
     /* CV layout — applies in both screen (when forced visible) and print.
-       The gradient background guarantees the dark sidebar column extends
-       across every printed page, even if main-column content overflows. */
+       The gradient background on the wrapper guarantees the dark sidebar
+       column extends across every printed page, regardless of content
+       length. The .cv-sidebar div is transparent and sits on top. */
     #${PRINT_AREA_ID} {
       width: 210mm;
-      min-height: 297mm;
+      height: auto;
       margin: 0 auto;
-      background: linear-gradient(to right, #1a1a2e 0%, #1a1a2e 32%, #ffffff 32%, #ffffff 100%);
+      background: linear-gradient(to right, #1a1a2e 0, #1a1a2e 67.2mm, #ffffff 67.2mm, #ffffff 100%);
       color: #1a1a2e;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 10.5pt;
@@ -108,19 +109,16 @@ function ensurePrintStyles() {
     }
     #${PRINT_AREA_ID} * { box-sizing: border-box; }
 
-    /* ── Sidebar (left, dark) ───────────────────────────── */
+    /* ── Sidebar (left, transparent — wrapper gradient draws color) ── */
     #${PRINT_AREA_ID} .cv-sidebar {
       width: 32%;
-      background: #1a1a2e;
+      background: transparent;
       color: #ffffff;
       padding: 32px 24px 24px;
       display: flex;
       flex-direction: column;
       gap: 22px;
       position: relative;
-      min-height: 100%;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
     }
     /* Subtle vertical orange accent on the sidebar's right edge */
     #${PRINT_AREA_ID} .cv-sidebar::after {
