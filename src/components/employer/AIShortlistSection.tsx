@@ -73,7 +73,7 @@ export default function AIShortlistSection({ jobId, jobApps }: Props) {
       )}
       {shortlist?.status === "failed" && (
         <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-xs text-destructive">
-          Shortlista nie powiodła się: {shortlist as any} — skontaktuj się z supportem.
+          Shortlista nie powiodła się — skontaktuj się z supportem.
         </div>
       )}
     </div>
