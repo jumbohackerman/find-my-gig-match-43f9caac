@@ -3,6 +3,10 @@ import { createRoot } from "react-dom/client";
 import ErrorBoundary from "./components/ErrorBoundary";
 import App from "./App.tsx";
 import "./index.css";
+import { initPostHog } from "./services/posthog";
+
+// Initialize PostHog (no-op if VITE_POSTHOG_KEY not set)
+initPostHog();
 
 // ── Staging SEO: inject noindex for non-production environments ─────────────
 const isProduction = import.meta.env.VITE_APP_ENV === "production";

@@ -1080,6 +1080,10 @@ export type Database = {
         | "shortlisted"
         | "interview_scheduled"
         | "hired"
+        | "contact_invitation"
+        | "invitation_accepted"
+        | "invitation_rejected"
+        | "position_closed"
       swipe_direction: "left" | "right" | "save"
     }
     CompositeTypes: {
@@ -1214,6 +1218,10 @@ export const Constants = {
         "shortlisted",
         "interview_scheduled",
         "hired",
+        "contact_invitation",
+        "invitation_accepted",
+        "invitation_rejected",
+        "position_closed",
       ],
       swipe_direction: ["left", "right", "save"],
     },

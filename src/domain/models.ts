@@ -43,7 +43,11 @@ export type NotificationType =
   | "new_message"
   | "shortlisted"
   | "interview_scheduled"
-  | "hired";
+  | "hired"
+  | "contact_invitation"
+  | "invitation_accepted"
+  | "invitation_rejected"
+  | "position_closed";
 
 // ─── Job ─────────────────────────────────────────────────────────────────────
 
