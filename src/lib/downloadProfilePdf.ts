@@ -303,31 +303,30 @@ function ensurePrintStyles() {
       gap: 8px;
       margin-bottom: 4px;
     }
-    #${PRINT_AREA_ID} .cv-footer-mark {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 10pt;
-      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.4);
+    #${PRINT_AREA_ID} .cv-footer-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      display: inline-block;
     }
     #${PRINT_AREA_ID} .cv-footer-name {
       font-family: 'Outfit', sans-serif;
       font-weight: 700;
       color: #ffffff;
-      font-size: 10pt;
+      font-size: 11pt;
       letter-spacing: 0.5px;
+    }
+    #${PRINT_AREA_ID} .cv-footer-tag {
+      font-size: 7.5pt;
+      color: #94a3b8;
+      letter-spacing: 0.6px;
+      margin-top: 2px;
     }
     #${PRINT_AREA_ID} .cv-footer-url {
       font-size: 8pt;
-      color: #94a3b8;
+      color: #cbd5e1;
       letter-spacing: 0.6px;
+      margin-top: 1px;
     }
 
     /* ── Main (right, white) ─────────────────────────────── */
