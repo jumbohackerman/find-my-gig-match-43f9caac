@@ -17,6 +17,8 @@ import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import { toast } from "sonner";
 import CandidateProfileModal from "@/components/CandidateProfileModal";
 import CandidateCvUpload from "@/components/CandidateCvUpload";
+import ContactInvitationsList from "@/components/candidate/ContactInvitationsList";
+import { downloadCandidateProfilePdf } from "@/lib/downloadProfilePdf";
 import type { SkillsByLevel, ExperienceEntry, CandidateLinks, Language, Candidate } from "@/domain/models";
 import { emptySkills, emptyLinks, getAllSkills } from "@/domain/models";
 
@@ -471,10 +473,20 @@ const MyProfile = () => {
             <Briefcase className="w-4 h-4 sm:hidden" />
           </Link>
           {!isEmployer && (
-            <button onClick={() => setShowPreview(true)} className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-muted transition-colors">
-              <Eye className="w-4 h-4" />
-              <span className="hidden sm:inline">Podgląd</span>
-            </button>
+            <>
+              <button onClick={() => setShowPreview(true)} className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-muted transition-colors">
+                <Eye className="w-4 h-4" />
+                <span className="hidden sm:inline">Podgląd</span>
+              </button>
+              <button
+                onClick={() => user?.id && downloadCandidateProfilePdf(user.id)}
+                className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-muted transition-colors"
+                title="Pobierz CV (PDF)"
+              >
+                <FileText className="w-4 h-4" />
+                <span className="hidden sm:inline">Pobierz CV (PDF)</span>
+              </button>
+            </>
           )}
           <button onClick={handleSave} disabled={saving} aria-busy={saving} data-testid="profile-save"
             className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50 disabled:pointer-events-none">
@@ -807,6 +819,17 @@ const MyProfile = () => {
                   <CandidateCvUpload onParsed={handleCvParsed} />
                 </div>
               </div>
+            </AccordionSection>
+
+            {/* CONTACT INVITATIONS — Block 7B */}
+            <AccordionSection
+              id="invitations"
+              label="Zaproszenia do kontaktu"
+              icon="✉️"
+              isOpen={activeSection === "invitations"}
+              onToggle={() => toggleSection("invitations")}
+            >
+              <ContactInvitationsList />
             </AccordionSection>
 
             {/* CONSENTS — Block 4 */}

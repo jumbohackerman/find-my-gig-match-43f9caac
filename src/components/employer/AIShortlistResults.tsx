@@ -8,6 +8,7 @@ import type { ShortlistRecord, ShortlistSnapshot } from "@/hooks/useAIShortlist"
 import { useContactInvitations } from "@/hooks/useContactInvitations";
 import ContactInvitationModal from "./ContactInvitationModal";
 import { toast } from "sonner";
+import { downloadCandidateProfilePdf } from "@/lib/downloadProfilePdf";
 
 interface Props {
   shortlist: ShortlistRecord;
@@ -60,7 +61,8 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
   };
 
   const downloadCV = (snap: ShortlistSnapshot) => {
-    toast.info(`Pobieranie CV ${snap.snapshot_full_name || "kandydata"} — wkrótce dostępne`);
+    void toast; // keep import
+    void downloadCandidateProfilePdf(snap.candidate_id);
   };
 
   return (
