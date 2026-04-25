@@ -334,6 +334,22 @@ const Employer = () => {
                       })()}
                     </div>
 
+                    {jobApps.length < 10 && job.status !== "closed" && (
+                      <div className="px-4 pb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-primary transition-all duration-500"
+                              style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+                            {jobApps.length}/10 do shortlisty
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="p-4 pt-2">
                       {/* Contextual Suggestion UX */}
                       {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
