@@ -78,7 +78,7 @@ const compareCandidate: CompareRow[] = [
   },
   {
     category: "Informacja zwrotna",
-    old: "„Odezwiemy się do wybranych" (rekrutacyjny ghosting)",
+    old: "„Odezwiemy się do wybranych” (rekrutacyjny ghosting)",
     neu: "Gwarantowany feedback. Zawsze wiesz, na czym stoisz. Otrzymujesz wskazówki co poprawić",
   },
   {
