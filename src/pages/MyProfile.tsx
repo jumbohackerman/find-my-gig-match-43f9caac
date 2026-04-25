@@ -205,6 +205,7 @@ const MyProfile = () => {
       }
 
       toast.success("Profil zapisany");
+      setLastSaved(new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }));
       setAiPrefilled(false);
 
       // Block 4: After first profile save, gate access with the AI consent modal.
