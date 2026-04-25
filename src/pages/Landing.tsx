@@ -1005,6 +1005,9 @@ const Landing = () => {
                         — większość klientów przychodzi z polecenia.
                       </p>
                     </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     {/* CTA */}
                     <div className="px-6 sm:px-8 py-6 bg-muted/30">
