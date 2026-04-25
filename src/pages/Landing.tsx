@@ -301,55 +301,70 @@ const Landing = () => {
 
       {/* ── Example job card ── */}
       <motion.section {...fadeUp} className="px-6 py-16">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-lg mx-auto">
           <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2 text-center">Przykładowa oferta</h2>
-          <p className="text-sm text-muted-foreground text-center mb-8">
+          <p className="text-sm text-muted-foreground text-center mb-10">
             Tak wygląda oferta w JobSwipe — pełna informacja zanim aplikujesz
           </p>
-          <div className="card-gradient rounded-3xl border border-border shadow-xl p-6">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
-                    <p className="text-sm text-muted-foreground">SGH Tech</p>
+          <div className="relative">
+            {/* Ghost card 3 */}
+            <div
+              className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
+              style={{ transform: "scale(0.94) translateY(12px)", opacity: 0.3 }}
+              aria-hidden
+            />
+            {/* Ghost card 2 */}
+            <div
+              className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
+              style={{ transform: "scale(0.97) translateY(6px)", opacity: 0.6 }}
+              aria-hidden
+            />
+            {/* Main card */}
+            <div className="relative card-gradient rounded-3xl border border-border shadow-2xl p-6">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
+                      <p className="text-sm text-muted-foreground">SGH Tech</p>
+                    </div>
+                    <span className="px-2 py-1 rounded-md btn-gradient text-primary-foreground text-xs font-bold">
+                      92% match
+                    </span>
                   </div>
-                  <span className="px-2 py-1 rounded-md btn-gradient text-primary-foreground text-xs font-bold">
-                    92% match
-                  </span>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> Warszawa
-              </span>
-              <span>· Hybrydowo</span>
-              <span>· Senior</span>
-            </div>
-            <p className="text-sm text-foreground mb-4">
-              Dołącz do zespołu budującego nowoczesną platformę edukacyjną. React, TypeScript, GraphQL.
-            </p>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {["React", "TypeScript", "GraphQL", "Node.js"].map((t) => (
-                <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">
-                  {t}
+              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="w-3 h-3" /> Warszawa
                 </span>
-              ))}
+                <span>· Hybrydowo</span>
+                <span>· Senior</span>
+              </div>
+              <p className="text-sm text-foreground mb-4">
+                Dołącz do zespołu budującego nowoczesną platformę edukacyjną. React, TypeScript, GraphQL.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {["React", "TypeScript", "GraphQL", "Node.js"].map((t) => (
+                  <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-sm mb-5">
+                <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
+              </div>
+              <Link
+                to="/auth"
+                className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
+              </Link>
+              <p className="text-xs text-muted-foreground text-center mt-3">
+                Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
+              </p>
             </div>
-            <div className="flex items-center justify-between text-sm mb-5">
-              <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
-            </div>
-            <Link
-              to="/auth"
-              className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2"
-            >
-              <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
-            </Link>
-            <p className="text-xs text-muted-foreground text-center mt-3">
-              Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
-            </p>
           </div>
         </div>
       </motion.section>
