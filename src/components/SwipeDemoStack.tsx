@@ -20,6 +20,11 @@ interface DemoJob {
   posted: string;
   teamSize: string;
   contract: string;
+  requirements: string[];
+  benefits: string[];
+  language: string;
+  startDate: string;
+  industry: string;
 }
 
 const JOBS: DemoJob[] = [
@@ -36,11 +41,16 @@ const JOBS: DemoJob[] = [
     tags: ["React", "TypeScript", "Next.js"],
     summary: "Buduj nowoczesną platformę edukacyjną dla 200k uczniów. Zespół 12 osób, code review, czas na refaktor.",
     perks: ["Prywatna opieka", "Budżet na sprzęt", "4 dni w biurze/mc"],
-    experience: "5+ lat",
+    experience: "min. 5 lat",
     applicants: 42,
     posted: "2 dni temu",
     teamSize: "12 osób",
     contract: "B2B / UoP",
+    requirements: ["React 18 + hooks", "TypeScript w produkcji", "Testy (Vitest/Playwright)"],
+    benefits: ["15 000 zł/rok na sprzęt", "ESOP po 1. roku", "26 dni urlopu (B2B)"],
+    language: "Polski C1, Angielski B2",
+    startDate: "Start: maj 2026",
+    industry: "EdTech · SaaS",
   },
   {
     id: 2,
@@ -55,11 +65,16 @@ const JOBS: DemoJob[] = [
     tags: ["Figma", "UX Research", "Design Systems"],
     summary: "Projektuj checkout obsługujący 14 mln użytkowników. Od research po wdrożenie, blisko z PM i frontem.",
     perks: ["100% zdalnie", "MultiSport", "Konferencje"],
-    experience: "3+ lat",
+    experience: "min. 3 lata",
     applicants: 87,
     posted: "5 dni temu",
     teamSize: "8 designerów",
     contract: "UoP / B2B",
+    requirements: ["Portfolio z case studies", "Figma + Auto Layout", "Prowadzenie user research"],
+    benefits: ["MyBenefit 350 zł/mc", "Budżet 5k zł na rozwój", "Akcje pracownicze"],
+    language: "Polski C1, Angielski B2",
+    startDate: "Start: czerwiec 2026",
+    industry: "E-commerce · Marketplace",
   },
   {
     id: 3,
@@ -74,11 +89,16 @@ const JOBS: DemoJob[] = [
     tags: ["Node.js", "PostgreSQL", "Kafka"],
     summary: "Skaluj backend obsługujący miliony przejazdów dziennie. Systemy rozproszone, event sourcing, ownership.",
     perks: ["Stock options", "Karta lunch", "Bolt credits"],
-    experience: "5+ lat",
+    experience: "min. 5 lat",
     applicants: 28,
     posted: "1 dzień temu",
     teamSize: "20+ inżynierów",
     contract: "B2B",
+    requirements: ["Node.js + TypeScript", "PostgreSQL + Kafka w prod.", "Systemy rozproszone (3+ lata)"],
+    benefits: ["Stock options (RSU)", "Karta lunch 1 200 zł/mc", "Relokacja do 25k zł"],
+    language: "Angielski B2+ (zespół międzynarodowy)",
+    startDate: "Start: ASAP",
+    industry: "Mobility · Tech",
   },
   {
     id: 4,
@@ -98,6 +118,11 @@ const JOBS: DemoJob[] = [
     posted: "3 dni temu",
     teamSize: "15 analityków",
     contract: "UoP",
+    requirements: ["SQL na poziomie zaawansowanym", "Python (pandas, numpy)", "Power BI lub Tableau"],
+    benefits: ["Premia roczna do 20%", "Karta Medicover", "Budżet szkoleniowy 6k zł"],
+    language: "Polski C1, Angielski B1",
+    startDate: "Start: lipiec 2026",
+    industry: "FinTech · Bankowość",
   },
 ];
 
