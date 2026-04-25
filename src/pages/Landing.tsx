@@ -417,6 +417,7 @@ function FinalCtaPair({
 
 const Landing = () => {
   const [view, setView] = useState<View>("candidate");
+  const [exampleExpanded, setExampleExpanded] = useState(false);
   const [counts, setCounts] = useState<{ candidates: number; employers: number }>({
     candidates: 0,
     employers: 0,
@@ -711,6 +712,56 @@ const Landing = () => {
             </div>
           </motion.section>
 
+          {/* ────────── CANDIDATE-ONLY: FEEDBACK EXAMPLE ────────── */}
+          {isCandidate && (
+            <motion.section {...fadeUp} className="px-6 py-20">
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center mb-10">
+                  <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
+                    Jak wygląda feedback od JobSwipe?
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Każdy odrzucony kandydat dostaje konkretne wskazówki — nie ogólniki.
+                  </p>
+                </div>
+                <div className={`${GLASS_CARD} p-6 sm:p-8`}>
+                  <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <MessageCircle className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Feedback od JobSwipe</p>
+                      <p className="text-xs text-muted-foreground">Dotyczy: Senior Frontend Developer · SGH Tech</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 text-sm text-foreground/80 leading-relaxed">
+                    <p>Cześć Anna,</p>
+                    <p>Dziękujemy za aplikację na stanowisko <strong className="text-foreground">Senior Frontend Developer</strong> w firmie SGH Tech. Po analizie profili wszystkich kandydatów, Twoja aplikacja nie znalazła się w shortliście Top 5.</p>
+                    <div className="rounded-xl bg-muted/50 p-4 my-4">
+                      <p className="text-xs font-bold text-primary uppercase tracking-wide mb-2">Wskazówki do rozwoju</p>
+                      <ul className="space-y-1.5">
+                        <li className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>Oferta wymagała min. 5 lat doświadczenia z React — Twój profil wskazuje 2 lata. Rozważ uzupełnienie doświadczenia.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>Brak doświadczenia z Next.js (App Router) — to był kluczowy wymóg techniczny tej oferty.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>Dodanie portfolio z projektami React mogłoby wzmocnić Twój profil przy podobnych ofertach.</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <p>Nie zniechęcaj się — regularnie pojawiają się nowe oferty dopasowane do Twojego poziomu. Powodzenia!</p>
+                    <p className="text-xs text-muted-foreground mt-3">— Zespół JobSwipe</p>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          )}
+
           {/* ────────── SOCIAL PROOF ────────── */}
           {candidatesLabel && employersLabel && (
             isCandidate ? (
@@ -852,6 +903,25 @@ const Landing = () => {
                       </div>
                     </div>
 
+                    {/* Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setExampleExpanded(!exampleExpanded)}
+                      className="w-full py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5 border-t border-border"
+                    >
+                      {exampleExpanded ? "Zwiń ogłoszenie" : "Pokaż pełne ogłoszenie"}
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${exampleExpanded ? "rotate-180" : ""}`} />
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {exampleExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="overflow-hidden"
+                        >
                     {/* About role */}
                     <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
@@ -985,6 +1055,9 @@ const Landing = () => {
                         — większość klientów przychodzi z polecenia.
                       </p>
                     </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     {/* CTA */}
                     <div className="px-6 sm:px-8 py-6 bg-muted/30">
@@ -1117,6 +1190,50 @@ const Landing = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            </motion.section>
+          )}
+
+          {/* ────────── EMPLOYER-ONLY: PRICING ────────── */}
+          {!isCandidate && (
+            <motion.section {...fadeUp} className="px-6 py-20">
+              <div className="max-w-3xl mx-auto text-center">
+                <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
+                  Proste zasady, zero ukrytych kosztów
+                </h2>
+                <p className="text-muted-foreground mb-10">
+                  Publikujesz ofertę za darmo. Płacisz tylko gdy chcesz zobaczyć Top 5.
+                </p>
+                <div className={`${GLASS_CARD} p-8 ring-1 ring-primary/30 max-w-md mx-auto`}>
+                  <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-foreground mb-1">Shortlista Top 5</h3>
+                  <p className="text-4xl font-black text-primary mb-2">299 zł <span className="text-base font-normal text-muted-foreground">netto</span></p>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Jednorazowa opłata za ofertę. Bez abonamentu, bez zobowiązań.
+                  </p>
+                  <div className="space-y-2 text-left text-sm text-foreground/70">
+                    {[
+                      "Publikacja oferty i zbieranie kandydatów — bezpłatne",
+                      "Ranking Top 5 z uzasadnieniem wyboru",
+                      "Automatyczny feedback dla odrzuconych",
+                      "PDF profilu kandydata po shortliście",
+                      "Kontakt z wybranymi kandydatami",
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Link to="/auth?role=employer" className={`${CTA_PRIMARY} w-full mt-6`}>
+                    Dodaj ofertę pracy <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <p className="text-xs text-muted-foreground mt-6">
+                  Pakiety dla firm z wieloma rekrutacjami — wkrótce.
+                </p>
               </div>
             </motion.section>
           )}
