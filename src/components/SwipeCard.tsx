@@ -73,7 +73,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
   return (
     <motion.div
-      className={isTop ? "relative" : "absolute inset-0"}
+      className="absolute inset-0"
       style={{ x, y, rotate, zIndex: isTop ? 2 : 1, pointerEvents: isTop ? "auto" : "none", willChange: "transform" }}
       drag={isTop ? true : false}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
@@ -96,7 +96,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
       }}
     >
       <div
-        className="card-gradient ring-highlight shimmer-overlay rounded-3xl shadow-card hover:shadow-card-hover border border-border/70 cursor-grab active:cursor-grabbing flex flex-col overflow-hidden relative"
+        className="card-gradient ring-highlight shimmer-overlay rounded-3xl shadow-card hover:shadow-card-hover border border-border/70 cursor-grab active:cursor-grabbing h-full flex flex-col overflow-hidden relative"
         data-testid="swipe-card"
       >
         {/* Subtle top accent line */}
