@@ -127,7 +127,7 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
       <div
         className="relative h-full rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
         style={{
-          background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)",
+          background: "linear-gradient(160deg, #0d0d1a 0%, #11111f 55%, #0a0a14 100%)",
           padding: "20px",
           minHeight: "200px",
           pointerEvents: interactive ? "auto" : "none",
