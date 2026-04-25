@@ -547,13 +547,20 @@ const MyProfile = () => {
               </button>
             </>
           )}
-          <button onClick={handleSave} disabled={saving} aria-busy={saving} data-testid="profile-save"
-            className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50 disabled:pointer-events-none">
-            <Save className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {saving ? "Zapisuję…" : (aiPrefilled ? "Zatwierdź i zapisz profil" : "Zapisz profil")}
-            </span>
-          </button>
+          <div className="flex flex-col items-stretch">
+            <button onClick={handleSave} disabled={saving} aria-busy={saving} data-testid="profile-save"
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50 disabled:pointer-events-none">
+              <Save className="w-4 h-4" />
+              <span className="hidden sm:inline">
+                {saving ? "Zapisuję…" : (aiPrefilled ? "Zatwierdź i zapisz profil" : "Zapisz profil")}
+              </span>
+            </button>
+            {lastSaved && (
+              <p className="text-[10px] text-muted-foreground text-center mt-1.5">
+                Ostatni zapis: {lastSaved}
+              </p>
+            )}
+          </div>
         </div>
       </header>
 
