@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter, ArrowRight, ArrowLeft } from "lucide-react";
+import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { SwipeCardSkeleton, EmptyView } from "@/components/StateViews";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Navbar from "@/components/Navbar";
@@ -426,24 +426,21 @@ const Index = () => {
                   <div className="shrink-0">
                     <JobFilters filters={filters} onChange={handleFiltersChange} />
                   </div>
-                  {!hideSuggestion && (!candidate.cvUrl || savedJobs.length > 0) && (
-                    <div className="flex-1 min-w-0 flex items-center gap-2 rounded-lg bg-secondary/60 border border-border px-3 py-1.5">
-                      <p className="text-[11px] font-medium text-foreground truncate">
-                        {!candidate.cvUrl
-                          ? "Dodaj CV do profilu"
-                          : `${savedJobs.length} zapisanych ofert`}
-                      </p>
-                      {!candidate.cvUrl ? (
-                        <Link to="/my-profile" className="px-2 py-1 rounded-md text-[11px] font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">Dodaj CV</Link>
-                      ) : (
-                        <button onClick={() => changeTab("saved")} className="px-2 py-1 rounded-md text-[11px] font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">Zobacz</button>
-                      )}
-                      <button onClick={() => setHideSuggestion(true)} className="p-0.5 rounded text-muted-foreground hover:bg-secondary transition-colors shrink-0" aria-label="Zamknij podpowiedź">
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
                 </div>
+                {!hideSuggestion && !candidate.cvUrl && (
+                  <div className="w-full flex items-center gap-3 rounded-xl bg-primary/5 border border-primary/20 px-4 py-2.5 mb-1">
+                    <Sparkles className="w-4 h-4 text-primary shrink-0" />
+                    <p className="text-xs text-foreground flex-1">
+                      <span className="font-medium">Dodaj CV</span> — JobSwipe automatycznie uzupełni Twój profil i poprawi scoring dopasowania.
+                    </p>
+                    <Link to="/my-profile" className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">
+                      Dodaj CV
+                    </Link>
+                    <button onClick={() => setHideSuggestion(true)} className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors shrink-0" aria-label="Zamknij">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
 
                 {filteredJobs.length === 0 ? (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 w-full max-w-xs mx-auto">
