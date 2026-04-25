@@ -154,12 +154,18 @@ const Landing = () => {
           </h2>
           <p className="text-muted-foreground text-center mb-12">Porównaj nas z tradycyjnymi portalami pracy</p>
 
-          <div className="card-gradient rounded-2xl border border-border overflow-hidden shadow-xl">
+          <div className="card-gradient rounded-2xl border border-border overflow-hidden shadow-xl relative">
+            {/* Decorative gradient glow */}
+            <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl bg-gradient-to-br from-primary to-accent" />
+
             {/* Header row */}
-            <div className="hidden md:grid grid-cols-[1fr_1.4fr_1.4fr] gap-4 px-6 py-5 border-b border-border/60 bg-secondary/30">
+            <div className="hidden md:grid grid-cols-[1fr_1.4fr_1.4fr] gap-4 px-6 py-5 border-b border-border/60 bg-secondary/40 relative">
               <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Kategoria</div>
-              <div className="text-sm font-semibold text-muted-foreground">Tradycyjne portale pracy</div>
-              <div className="text-sm font-bold text-gradient-primary">JobSwipe</div>
+              <div className="text-base font-semibold text-muted-foreground">Tradycyjne portale pracy</div>
+              <div className="text-base font-bold text-gradient-primary inline-flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                JobSwipe
+              </div>
             </div>
 
             {[
@@ -196,25 +202,29 @@ const Landing = () => {
             ].map((row, idx, arr) => (
               <div
                 key={row.category}
-                className={`grid grid-cols-1 md:grid-cols-[1fr_1.4fr_1.4fr] gap-3 md:gap-4 px-6 py-5 ${
+                className={`grid grid-cols-1 md:grid-cols-[1fr_1.4fr_1.4fr] gap-3 md:gap-5 px-6 py-6 relative ${
                   idx !== arr.length - 1 ? "border-b border-border/40" : ""
-                } hover:bg-secondary/20 transition-colors`}
+                } hover:bg-secondary/20 transition-colors group`}
               >
-                <div className="font-semibold text-foreground text-sm md:text-base md:pt-0.5">
+                {/* Left accent bar on hover (desktop) */}
+                <div className="hidden md:block absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary to-primary-glow opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="font-display font-semibold text-foreground text-base md:text-lg md:pt-0.5">
                   {row.category}
                 </div>
-                <div className="text-sm text-muted-foreground leading-relaxed">
-                  <span className="md:hidden block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1">
+                <div className="text-[15px] md:text-base text-muted-foreground leading-relaxed">
+                  <span className="md:hidden block text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5">
                     Tradycyjne portale
                   </span>
                   {row.old}
                 </div>
-                <div className="text-sm leading-relaxed">
-                  <span className="md:hidden block text-[10px] font-bold uppercase tracking-wider text-primary/80 mb-1">
-                    JobSwipe
+                <div className="text-[15px] md:text-base leading-relaxed md:pl-4 md:border-l-2 md:border-primary/30">
+                  <span className="md:hidden inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                    <Sparkles className="w-3 h-3 text-primary" />
+                    <span className="text-gradient-primary">JobSwipe</span>
                   </span>
-                  <span className="font-semibold text-foreground">{row.newTitle}</span>{" "}
-                  <span className="text-muted-foreground">{row.newBody}</span>
+                  <span className="font-bold text-gradient-primary">{row.newTitle}</span>{" "}
+                  <span className="text-foreground/85">{row.newBody}</span>
                 </div>
               </div>
             ))}
