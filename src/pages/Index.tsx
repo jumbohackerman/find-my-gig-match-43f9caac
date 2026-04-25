@@ -463,7 +463,7 @@ const Index = () => {
                   </motion.div>
                 ) : (
                   <>
-                    <div className="browse-card-stage">
+                    <div className="browse-card-stage relative">
                       <div className="browse-card-frame">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
@@ -480,6 +480,57 @@ const Index = () => {
                           ))}
                         </AnimatePresence>
                       </div>
+
+                      {/* Flying directional arrow overlay */}
+                      <AnimatePresence>
+                        {arrowAnim && (
+                          <motion.div
+                            key={`arrow-${arrowAnim.key}`}
+                            initial={{ x: arrowAnim.dir === "right" ? "-30%" : "130%", opacity: 0, scale: 0.6 }}
+                            animate={{
+                              x: arrowAnim.dir === "right" ? "130%" : "-30%",
+                              opacity: [0, 1, 1, 0],
+                              scale: [0.6, 1, 1, 0.8],
+                            }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.6, ease: "easeOut", times: [0, 0.2, 0.75, 1] }}
+                            className="absolute top-1/2 left-0 right-0 -translate-y-1/2 z-50 pointer-events-none flex justify-start"
+                          >
+                            <div className="relative flex items-center">
+                              <div
+                                className="absolute top-1/2 -translate-y-1/2 h-[3px] w-28 rounded-full blur-[1px]"
+                                style={{
+                                  [arrowAnim.dir === "right" ? "right" : "left"]: "40px",
+                                  background:
+                                    arrowAnim.dir === "right"
+                                      ? "linear-gradient(to left, hsl(var(--accent) / 0.9), transparent)"
+                                      : "linear-gradient(to right, hsl(var(--destructive) / 0.9), transparent)",
+                                } as React.CSSProperties}
+                              />
+                              <div
+                                className="relative w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border-2"
+                                style={{
+                                  background: "hsl(var(--background) / 0.5)",
+                                  borderColor:
+                                    arrowAnim.dir === "right"
+                                      ? "hsl(var(--accent) / 0.7)"
+                                      : "hsl(var(--destructive) / 0.7)",
+                                  boxShadow:
+                                    arrowAnim.dir === "right"
+                                      ? "0 0 28px hsl(var(--accent) / 0.7), inset 0 0 14px hsl(var(--accent) / 0.25)"
+                                      : "0 0 28px hsl(var(--destructive) / 0.7), inset 0 0 14px hsl(var(--destructive) / 0.25)",
+                                }}
+                              >
+                                {arrowAnim.dir === "right" ? (
+                                  <ArrowRight className="w-7 h-7 text-accent" strokeWidth={3} />
+                                ) : (
+                                  <ArrowLeft className="w-7 h-7 text-destructive" strokeWidth={3} />
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
 
                     <div className="shrink-0 w-full">
