@@ -398,7 +398,7 @@ const Landing = () => {
           <div className="relative flex justify-center">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
             <div
-              className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-border/60 grid grid-cols-[35%_65%] bg-card"
+              className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-border/60 grid grid-cols-[32%_68%] bg-card shadow-[0_0_40px_rgba(249,115,22,0.2)]"
               aria-hidden
             >
               {/* Sidebar */}
