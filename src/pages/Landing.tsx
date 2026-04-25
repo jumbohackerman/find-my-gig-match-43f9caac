@@ -579,7 +579,47 @@ const Landing = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="flex justify-center"
               >
-                <SwipeDemoStack />
+                {isCandidate ? (
+                  <SwipeDemoStack />
+                ) : (
+                  <div className="w-full max-w-[340px] mx-auto">
+                    <div className="card-gradient rounded-2xl border border-border p-5 shadow-xl">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Zap className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-foreground uppercase tracking-wide">AI Shortlista</p>
+                          <p className="text-[10px] text-muted-foreground">87 kandydatów → Top 5</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        {[
+                          { rank: 1, name: "A. Kowalski", role: "Senior Frontend Dev", score: 94 },
+                          { rank: 2, name: "M. Nowak", role: "Full-Stack Engineer", score: 89 },
+                          { rank: 3, name: "K. Wiśniewska", role: "React Developer", score: 85 },
+                          { rank: 4, name: "P. Zieliński", role: "Frontend Architect", score: 82 },
+                          { rank: 5, name: "J. Lewandowska", role: "UI Engineer", score: 78 },
+                        ].map((c) => (
+                          <div key={c.rank} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary/40 border border-border">
+                            <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                              {c.rank}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                              <p className="text-[11px] text-muted-foreground truncate">{c.role}</p>
+                            </div>
+                            <span className="text-sm font-bold text-primary">{c.score}%</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                        <p className="text-[10px] text-muted-foreground">Analizowane: 87 profili</p>
+                        <p className="text-[10px] font-medium text-primary">Gotowe w 12 sek.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             </div>
           </section>
