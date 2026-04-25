@@ -269,9 +269,9 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                   </span>
                 );
               })}
-              {job.tags.length > 8 && (
+              {job.tags.length > 10 && (
                 <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground">
-                  +{job.tags.length - 8}
+                  +{job.tags.length - 10}
                 </span>
               )}
             </div>
