@@ -81,6 +81,7 @@ const MyProfile = () => {
   const isEmployer = profile?.role === "employer";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
   /** Block 11: True after AI pre-fills profile from CV; cleared after successful save. */
   const [aiPrefilled, setAiPrefilled] = useState(false);
 
@@ -204,6 +205,7 @@ const MyProfile = () => {
       }
 
       toast.success("Profil zapisany");
+      setLastSaved(new Date().toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }));
       setAiPrefilled(false);
 
       // Block 4: After first profile save, gate access with the AI consent modal.
@@ -545,13 +547,20 @@ const MyProfile = () => {
               </button>
             </>
           )}
-          <button onClick={handleSave} disabled={saving} aria-busy={saving} data-testid="profile-save"
-            className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50 disabled:pointer-events-none">
-            <Save className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {saving ? "Zapisuję…" : (aiPrefilled ? "Zatwierdź i zapisz profil" : "Zapisz profil")}
-            </span>
-          </button>
+          <div className="flex flex-col items-stretch">
+            <button onClick={handleSave} disabled={saving} aria-busy={saving} data-testid="profile-save"
+              className="flex items-center gap-2 p-2 sm:px-4 sm:py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform disabled:opacity-50 disabled:pointer-events-none">
+              <Save className="w-4 h-4" />
+              <span className="hidden sm:inline">
+                {saving ? "Zapisuję…" : (aiPrefilled ? "Zatwierdź i zapisz profil" : "Zapisz profil")}
+              </span>
+            </button>
+            {lastSaved && (
+              <p className="text-[10px] text-muted-foreground text-center mt-1.5">
+                Ostatni zapis: {lastSaved}
+              </p>
+            )}
+          </div>
         </div>
       </header>
 
