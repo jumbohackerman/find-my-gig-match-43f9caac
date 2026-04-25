@@ -193,7 +193,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             <div className="rounded-lg bg-accent/5 border border-accent/15 p-2.5">
               <span className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1.5 block">Dlaczego warto</span>
               <div className="space-y-1">
-                {highlights.slice(0, 3).map((h, i) => (
+                {highlights.slice(0, 4).map((h, i) => (
                   <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
                     <Sparkles className="w-3 h-3 text-accent shrink-0 mt-0.5" />
                     <span className="line-clamp-1">{h}</span>
