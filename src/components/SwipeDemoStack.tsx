@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles, Users, Clock, GraduationCap, Building2 } from "lucide-react";
+import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles, Users, Clock, GraduationCap, Building2, CheckCircle2, Gift, Languages, CalendarDays } from "lucide-react";
 
 interface DemoJob {
   id: number;
@@ -20,6 +20,11 @@ interface DemoJob {
   posted: string;
   teamSize: string;
   contract: string;
+  requirements: string[];
+  benefits: string[];
+  language: string;
+  startDate: string;
+  industry: string;
 }
 
 const JOBS: DemoJob[] = [
@@ -36,11 +41,16 @@ const JOBS: DemoJob[] = [
     tags: ["React", "TypeScript", "Next.js"],
     summary: "Buduj nowoczesną platformę edukacyjną dla 200k uczniów. Zespół 12 osób, code review, czas na refaktor.",
     perks: ["Prywatna opieka", "Budżet na sprzęt", "4 dni w biurze/mc"],
-    experience: "5+ lat",
+    experience: "min. 5 lat",
     applicants: 42,
     posted: "2 dni temu",
     teamSize: "12 osób",
     contract: "B2B / UoP",
+    requirements: ["React 18 + hooks", "TypeScript w produkcji", "Testy (Vitest/Playwright)"],
+    benefits: ["15 000 zł/rok na sprzęt", "ESOP po 1. roku", "26 dni urlopu (B2B)"],
+    language: "Polski C1, Angielski B2",
+    startDate: "Start: maj 2026",
+    industry: "EdTech · SaaS",
   },
   {
     id: 2,
@@ -55,11 +65,16 @@ const JOBS: DemoJob[] = [
     tags: ["Figma", "UX Research", "Design Systems"],
     summary: "Projektuj checkout obsługujący 14 mln użytkowników. Od research po wdrożenie, blisko z PM i frontem.",
     perks: ["100% zdalnie", "MultiSport", "Konferencje"],
-    experience: "3+ lat",
+    experience: "min. 3 lata",
     applicants: 87,
     posted: "5 dni temu",
     teamSize: "8 designerów",
     contract: "UoP / B2B",
+    requirements: ["Portfolio z case studies", "Figma + Auto Layout", "Prowadzenie user research"],
+    benefits: ["MyBenefit 350 zł/mc", "Budżet 5k zł na rozwój", "Akcje pracownicze"],
+    language: "Polski C1, Angielski B2",
+    startDate: "Start: czerwiec 2026",
+    industry: "E-commerce · Marketplace",
   },
   {
     id: 3,
@@ -74,11 +89,16 @@ const JOBS: DemoJob[] = [
     tags: ["Node.js", "PostgreSQL", "Kafka"],
     summary: "Skaluj backend obsługujący miliony przejazdów dziennie. Systemy rozproszone, event sourcing, ownership.",
     perks: ["Stock options", "Karta lunch", "Bolt credits"],
-    experience: "5+ lat",
+    experience: "min. 5 lat",
     applicants: 28,
     posted: "1 dzień temu",
     teamSize: "20+ inżynierów",
     contract: "B2B",
+    requirements: ["Node.js + TypeScript", "PostgreSQL + Kafka w prod.", "Systemy rozproszone (3+ lata)"],
+    benefits: ["Stock options (RSU)", "Karta lunch 1 200 zł/mc", "Relokacja do 25k zł"],
+    language: "Angielski B2+ (zespół międzynarodowy)",
+    startDate: "Start: ASAP",
+    industry: "Mobility · Tech",
   },
   {
     id: 4,
@@ -98,6 +118,11 @@ const JOBS: DemoJob[] = [
     posted: "3 dni temu",
     teamSize: "15 analityków",
     contract: "UoP",
+    requirements: ["SQL na poziomie zaawansowanym", "Python (pandas, numpy)", "Power BI lub Tableau"],
+    benefits: ["Premia roczna do 20%", "Karta Medicover", "Budżet szkoleniowy 6k zł"],
+    language: "Polski C1, Angielski B1",
+    startDate: "Start: lipiec 2026",
+    industry: "FinTech · Bankowość",
   },
 ];
 
@@ -268,6 +293,52 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
             ))}
           </div>
 
+          {/* Industry / language / start strip */}
+          <div className="space-y-1 mb-3 text-[10.5px] text-white/55">
+            <div className="flex items-center gap-1.5">
+              <Building2 className="w-3 h-3 text-orange-300/60 shrink-0" />
+              <span className="truncate">{job.industry}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Languages className="w-3 h-3 text-orange-300/60 shrink-0" />
+              <span className="truncate">{job.language}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CalendarDays className="w-3 h-3 text-orange-300/60 shrink-0" />
+              <span className="truncate">{job.startDate}</span>
+            </div>
+          </div>
+
+          {/* Requirements */}
+          <div className="mb-2.5">
+            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
+              Wymagania
+            </p>
+            <ul className="space-y-1">
+              {job.requirements.map((r) => (
+                <li key={r} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400/80 shrink-0 mt-[2px]" />
+                  <span className="truncate">{r}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Benefits */}
+          <div className="mb-3">
+            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
+              Oferujemy
+            </p>
+            <ul className="space-y-1">
+              {job.benefits.map((b) => (
+                <li key={b} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
+                  <Gift className="w-3 h-3 text-orange-300/80 shrink-0 mt-[2px]" />
+                  <span className="truncate">{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Perks */}
           <div className="flex items-center gap-1.5 text-[10.5px] text-white/55 mb-2">
             <Sparkles className="w-3 h-3 text-orange-300/70 shrink-0" />
@@ -364,7 +435,7 @@ const SwipeDemoStack = () => {
   }));
 
   return (
-    <div className="relative mx-auto w-full flex flex-col items-center" style={{ maxWidth: 320 }}>
+    <div className="relative mx-auto w-full flex flex-col items-center" style={{ maxWidth: 340 }}>
       <div
         className="absolute -inset-6 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-3xl blur-2xl pointer-events-none"
         aria-hidden
@@ -374,8 +445,8 @@ const SwipeDemoStack = () => {
       <div
         className="relative"
         style={{
-          width: 320,
-          height: 560,
+          width: 340,
+          height: 720,
           overflow: "hidden",
         }}
       >
@@ -401,12 +472,12 @@ const SwipeDemoStack = () => {
             <motion.div
               key={`arrow-${cycle}`}
               initial={{
-                x: direction === "right" ? -40 : 360,
+                x: direction === "right" ? -40 : 380,
                 opacity: 0,
                 scale: 0.6,
               }}
               animate={{
-                x: direction === "right" ? 360 : -40,
+                x: direction === "right" ? 380 : -40,
                 opacity: [0, 1, 1, 0],
                 scale: [0.6, 1, 1, 0.8],
               }}
