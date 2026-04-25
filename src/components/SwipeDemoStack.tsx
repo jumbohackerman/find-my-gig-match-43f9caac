@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles, Users, Clock, GraduationCap, Building2 } from "lucide-react";
+import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles, Users, Clock, GraduationCap, Building2, CheckCircle2, Gift, Languages, CalendarDays } from "lucide-react";
 
 interface DemoJob {
   id: number;
