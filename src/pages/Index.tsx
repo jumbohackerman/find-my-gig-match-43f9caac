@@ -87,6 +87,7 @@ const Index = () => {
   );
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
+  const [arrowAnim, setArrowAnim] = useState<{ dir: "left" | "right"; key: number } | null>(null);
 
   const requireAuth = useCallback((): boolean => {
     if (isGuest) {
