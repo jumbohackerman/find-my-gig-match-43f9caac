@@ -472,12 +472,12 @@ const SwipeDemoStack = () => {
             <motion.div
               key={`arrow-${cycle}`}
               initial={{
-                x: direction === "right" ? -40 : 360,
+                x: direction === "right" ? -40 : 380,
                 opacity: 0,
                 scale: 0.6,
               }}
               animate={{
-                x: direction === "right" ? 360 : -40,
+                x: direction === "right" ? 380 : -40,
                 opacity: [0, 1, 1, 0],
                 scale: [0.6, 1, 1, 0.8],
               }}
