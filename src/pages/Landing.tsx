@@ -200,25 +200,25 @@ const faqEmployer: FaqItem[] = [
 const CTA_PRIMARY =
   "px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-500 text-white font-medium inline-flex items-center justify-center gap-2 transition-shadow duration-200 hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]";
 const CTA_GHOST =
-  "px-6 py-3 rounded-xl border border-white/20 bg-transparent text-foreground font-medium hover:bg-white/5 transition-colors inline-flex items-center justify-center gap-2";
+  "px-6 py-3 rounded-xl border border-border bg-transparent text-foreground font-medium hover:bg-secondary/50 transition-colors inline-flex items-center justify-center gap-2";
 const GLASS_CARD =
-  "bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl";
+  "bg-secondary/50 border border-border backdrop-blur-sm rounded-2xl";
 
 function PainBar({ stats, conclusion }: { stats: PainStat[]; conclusion: string }) {
   return (
-    <motion.section {...fadeUp} className="px-6 py-14 bg-white/[0.04] border-y border-white/10">
+    <motion.section {...fadeUp} className="px-6 py-14 bg-muted/40 border-y border-border">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-white/10">
           {stats.map((s, i) => (
             <div key={i} className="text-center px-4">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-3">
                 Problem
               </div>
               <div className="text-5xl sm:text-6xl font-black text-orange-500 mb-3 leading-none">
                 {s.value}
               </div>
               <div className="text-sm text-foreground font-bold">{s.title}</div>
-              <div className="text-xs text-gray-400 mt-1">{s.desc}</div>
+              <div className="text-xs text-muted-foreground mt-1">{s.desc}</div>
             </div>
           ))}
         </div>
@@ -243,13 +243,13 @@ function CompareTable({
     <motion.section {...fadeUp} className="px-6 py-20">
       <div className="max-w-4xl mx-auto">
         <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-center">{title}</h2>
-        <p className="text-gray-400 text-center mb-12">{subtitle}</p>
+        <p className="text-muted-foreground text-center mb-12">{subtitle}</p>
 
         <div className={`${GLASS_CARD} overflow-hidden shadow-xl`}>
           {/* Header */}
-          <div className="hidden md:grid grid-cols-[140px_1fr_auto_1fr] gap-4 px-6 py-4 border-b border-white/10 bg-white/[0.03]">
-            <div className="text-xs font-bold uppercase tracking-wider text-gray-500">Kategoria</div>
-            <div className="text-sm font-bold text-gray-400 inline-flex items-center gap-2">
+          <div className="hidden md:grid grid-cols-[140px_1fr_auto_1fr] gap-4 px-6 py-4 border-b border-border bg-muted/30">
+            <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground/70">Kategoria</div>
+            <div className="text-sm font-bold text-muted-foreground inline-flex items-center gap-2">
               <X className="w-4 h-4" /> Tradycyjna rekrutacja
             </div>
             <div className="w-6" />
@@ -262,17 +262,17 @@ function CompareTable({
             <div
               key={idx}
               className={`grid grid-cols-1 md:grid-cols-[140px_1fr_auto_1fr] gap-3 md:gap-4 px-6 py-5 items-start hover:bg-orange-500/5 transition-colors ${
-                idx !== rows.length - 1 ? "border-b border-white/10" : ""
+                idx !== rows.length - 1 ? "border-b border-border" : ""
               }`}
             >
               <div className="text-xs font-bold uppercase tracking-wider text-foreground md:pt-0.5">
                 {row.category}
               </div>
-              <div className="flex items-start gap-2 text-gray-400 text-sm sm:text-[15px] leading-relaxed">
-                <X className="w-4 h-4 mt-0.5 shrink-0 text-gray-500" />
+              <div className="flex items-start gap-2 text-muted-foreground text-sm sm:text-[15px] leading-relaxed">
+                <X className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground/70" />
                 <span>{row.old}</span>
               </div>
-              <ArrowRight className="hidden md:block w-4 h-4 text-gray-600 mt-1" />
+              <ArrowRight className="hidden md:block w-4 h-4 text-muted-foreground/50 mt-1" />
               <div className="flex items-start gap-2 text-foreground text-sm sm:text-[15px] leading-relaxed md:pl-2 md:border-l-2 md:border-orange-500/40">
                 <Check className="w-4 h-4 mt-0.5 shrink-0 text-orange-500" />
                 <span>{row.neu}</span>
@@ -296,7 +296,7 @@ function StepsRow({ steps }: { steps: StepCard[] }) {
               <Icon className="w-5 h-5" />
             </div>
             <h3 className="font-semibold text-lg mb-2 text-foreground">{s.title}</h3>
-            <p className="text-sm text-gray-300 leading-relaxed">{s.body}</p>
+            <p className="text-sm text-foreground/70 leading-relaxed">{s.body}</p>
           </div>
         );
       })}
@@ -311,7 +311,7 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
       {items.map((it, i) => {
         const isOpen = open === i;
         return (
-          <div key={i} className="border-b border-white/10">
+          <div key={i} className="border-b border-border">
             <button
               type="button"
               onClick={() => setOpen(isOpen ? null : i)}
@@ -320,7 +320,7 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
             >
               <span className="text-foreground font-medium text-base">{it.q}</span>
               <ChevronDown
-                className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 ${
+                className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
                 }`}
               />
@@ -335,7 +335,7 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   className="overflow-hidden"
                 >
-                  <p className="text-gray-400 text-sm pb-5 pr-8 leading-relaxed">{it.a}</p>
+                  <p className="text-muted-foreground text-sm pb-5 pr-8 leading-relaxed">{it.a}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -348,7 +348,7 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
 
 function SocialProof({ a, b }: { a: React.ReactNode; b: React.ReactNode }) {
   return (
-    <motion.section {...fadeUp} className="px-6 py-14 bg-white/[0.04] border-y border-white/10">
+    <motion.section {...fadeUp} className="px-6 py-14 bg-muted/40 border-y border-border">
       <div className="max-w-4xl mx-auto text-center space-y-3">
         <p className="text-lg sm:text-2xl text-foreground">{a}</p>
         <p className="text-lg sm:text-2xl text-foreground">{b}</p>
@@ -371,7 +371,7 @@ function FinalCtaPair({
   const PIcon = primary.icon;
   const SIcon = secondary.icon;
   return (
-    <motion.section {...fadeUp} className="px-6 py-20 bg-white/[0.05] border-t border-white/10">
+    <motion.section {...fadeUp} className="px-6 py-20 bg-muted/50 border-t border-border">
       <div className="max-w-5xl mx-auto text-center">
         <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-12 text-foreground">
           {heading}
@@ -383,22 +383,22 @@ function FinalCtaPair({
               <PIcon className="w-6 h-6" />
             </div>
             <h3 className="font-display font-bold text-xl mb-2 text-foreground">{primary.title}</h3>
-            <p className="text-sm text-gray-300 mb-6">{primary.body}</p>
+            <p className="text-sm text-foreground/70 mb-6">{primary.body}</p>
             <Link to={primary.to} className={`${CTA_PRIMARY} w-full`}>
               {primary.cta} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/10 border border-white/10 items-center justify-center text-xs text-gray-400 font-medium z-10">
+          <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-secondary border border-border items-center justify-center text-xs text-muted-foreground font-medium z-10">
             lub
           </div>
 
           <div className={`${GLASS_CARD} p-8 text-left`}>
-            <div className="w-12 h-12 rounded-full bg-white/10 text-foreground flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-full bg-secondary text-foreground flex items-center justify-center mb-4">
               <SIcon className="w-6 h-6" />
             </div>
             <h3 className="font-display font-bold text-xl mb-2 text-foreground">{secondary.title}</h3>
-            <p className="text-sm text-gray-300 mb-6">{secondary.body}</p>
+            <p className="text-sm text-foreground/70 mb-6">{secondary.body}</p>
             <button
               type="button"
               onClick={() => onSwitch(secondary.switchTo)}
@@ -455,7 +455,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* ── Top bar with toggle ── */}
-      <header className="px-4 sm:px-6 py-4 border-b border-white/10 sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+      <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img src={logo} alt="" className="w-9 h-9" />
@@ -469,7 +469,7 @@ const Landing = () => {
             <div
               role="tablist"
               aria-label="Wybierz widok"
-              className="inline-flex gap-1 p-1 rounded-full bg-white/5 border border-white/10"
+              className="inline-flex gap-1 p-1 rounded-full bg-secondary/50 border border-border"
             >
               <button
                 type="button"
@@ -479,7 +479,7 @@ const Landing = () => {
                 className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                   isCandidate
                     ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                    : "text-gray-400 hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Dla kandydata
@@ -492,7 +492,7 @@ const Landing = () => {
                 className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
                   !isCandidate
                     ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                    : "text-gray-400 hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Dla pracodawcy
@@ -502,7 +502,7 @@ const Landing = () => {
 
           <Link
             to="/auth"
-            className="px-3 sm:px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-foreground text-sm font-medium hover:bg-white/10 transition-colors shrink-0"
+            className="px-3 sm:px-4 py-2 rounded-xl bg-secondary/50 border border-border text-foreground text-sm font-medium hover:bg-secondary transition-colors shrink-0"
           >
             Zaloguj się
           </Link>
@@ -545,7 +545,7 @@ const Landing = () => {
                     </>
                   )}
                 </h1>
-                <p className="text-base sm:text-lg text-gray-300 mb-8 max-w-xl leading-relaxed">
+                <p className="text-base sm:text-lg text-foreground/70 mb-8 max-w-xl leading-relaxed">
                   {isCandidate
                     ? "Aplikujesz profilem, nie PDF-em. JobSwipe wybiera top 5 kandydatów — pracodawca kontaktuje tylko najlepszych. A Ty zawsze dostajesz odpowiedź."
                     : "Opublikuj ofertę, zbierz kandydatów, kliknij jeden przycisk. JobSwipe analizuje wszystkich i zwraca Top 5 z uzasadnieniem. Ty kontaktujesz tylko najlepszych."}
@@ -579,7 +579,47 @@ const Landing = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="flex justify-center"
               >
-                <SwipeDemoStack />
+                {isCandidate ? (
+                  <SwipeDemoStack />
+                ) : (
+                  <div className="w-full max-w-[340px] mx-auto">
+                    <div className="card-gradient rounded-2xl border border-border p-5 shadow-xl">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <Zap className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-foreground uppercase tracking-wide">AI Shortlista</p>
+                          <p className="text-[10px] text-muted-foreground">87 kandydatów → Top 5</p>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        {[
+                          { rank: 1, name: "A. Kowalski", role: "Senior Frontend Dev", score: 94 },
+                          { rank: 2, name: "M. Nowak", role: "Full-Stack Engineer", score: 89 },
+                          { rank: 3, name: "K. Wiśniewska", role: "React Developer", score: 85 },
+                          { rank: 4, name: "P. Zieliński", role: "Frontend Architect", score: 82 },
+                          { rank: 5, name: "J. Lewandowska", role: "UI Engineer", score: 78 },
+                        ].map((c) => (
+                          <div key={c.rank} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary/40 border border-border">
+                            <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                              {c.rank}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                              <p className="text-[11px] text-muted-foreground truncate">{c.role}</p>
+                            </div>
+                            <span className="text-sm font-bold text-primary">{c.score}%</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                        <p className="text-[10px] text-muted-foreground">Analizowane: 87 profili</p>
+                        <p className="text-[10px] font-medium text-primary">Gotowe w 12 sek.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             </div>
           </section>
@@ -612,13 +652,13 @@ const Landing = () => {
           {/* ────────── HOW IT WORKS ────────── */}
           <motion.section
             {...fadeUp}
-            className="px-6 py-16 bg-white/[0.03] border-y border-white/10"
+            className="px-6 py-16 bg-muted/30 border-y border-border"
           >
             <div className="max-w-6xl mx-auto">
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">
                 {isCandidate ? "Jak to działa — kandydat" : "Jak to działa — pracodawca"}
               </h2>
-              <p className="text-gray-400 text-center mb-12">
+              <p className="text-muted-foreground text-center mb-12">
                 {isCandidate
                   ? "3 kroki do nowej pracy"
                   : "Top 5 kandydatów wybranych przez JobSwipe — bez czytania CV"}
@@ -648,7 +688,7 @@ const Landing = () => {
               </div>
 
               {/* Banner 2 — neutral RODO/objectivity */}
-              <div className="mt-4 max-w-3xl mx-auto rounded-xl border border-white/20 bg-white/5 px-5 py-4 text-sm text-foreground/90 flex items-start gap-3">
+              <div className="mt-4 max-w-3xl mx-auto rounded-xl border border-border bg-secondary/50 px-5 py-4 text-sm text-foreground/90 flex items-start gap-3">
                 <div className="w-7 h-7 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center shrink-0">
                   <Shield className="w-4 h-4" />
                 </div>
@@ -717,7 +757,7 @@ const Landing = () => {
                   <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3">
                     Przykładowa oferta
                   </h2>
-                  <p className="text-base text-gray-300 max-w-xl mx-auto">
+                  <p className="text-base text-foreground/70 max-w-xl mx-auto">
                     Pełna informacja zanim aplikujesz — widzisz Scoring, wymagania i widełki przed
                     wysłaniem aplikacji.
                   </p>
@@ -725,21 +765,21 @@ const Landing = () => {
 
                 <div className="relative">
                   <div
-                    className="absolute inset-0 card-gradient rounded-3xl border border-white/10 shadow-xl"
+                    className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
                     style={{ transform: "scale(0.96) translateY(14px)", opacity: 0.35 }}
                     aria-hidden
                   />
                   <div
-                    className="absolute inset-0 card-gradient rounded-3xl border border-white/10 shadow-xl"
+                    className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
                     style={{ transform: "scale(0.98) translateY(7px)", opacity: 0.6 }}
                     aria-hidden
                   />
 
-                  <div className="relative card-gradient rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+                  <div className="relative card-gradient rounded-3xl border border-border shadow-2xl overflow-hidden">
                     {/* Header */}
-                    <div className="p-6 sm:p-8 border-b border-white/10">
+                    <div className="p-6 sm:p-8 border-b border-border">
                       <div className="flex items-start gap-4 mb-5">
-                        <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl shrink-0">
+                        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-3xl shrink-0">
                           🚀
                         </div>
                         <div className="flex-1 min-w-0">
@@ -748,7 +788,7 @@ const Landing = () => {
                               <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground">
                                 Senior Frontend Developer
                               </h3>
-                              <p className="text-sm text-gray-400 mt-0.5">
+                              <p className="text-sm text-muted-foreground mt-0.5">
                                 SGH Tech · Edukacja / SaaS
                               </p>
                             </div>
@@ -769,7 +809,7 @@ const Landing = () => {
                         ].map(({ Icon, t }) => (
                           <span
                             key={t}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-foreground"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/50 border border-border text-foreground"
                           >
                             <Icon className="w-3 h-3" /> {t}
                           </span>
@@ -779,13 +819,13 @@ const Landing = () => {
                       <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/30">
                         <Wallet className="w-4 h-4 text-orange-500" />
                         <span className="font-bold text-foreground">18 000 – 25 000 zł</span>
-                        <span className="text-xs text-gray-400">netto / mies. (B2B)</span>
+                        <span className="text-xs text-muted-foreground">netto / mies. (B2B)</span>
                       </div>
                     </div>
 
                     {/* Tech stack */}
-                    <div className="px-6 sm:px-8 py-5 border-b border-white/10">
-                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                    <div className="px-6 sm:px-8 py-5 border-b border-border">
+                      <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-3">
                         Tech stack
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -803,7 +843,7 @@ const Landing = () => {
                             className={`px-2.5 py-1 rounded-md text-xs font-medium ${
                               lvl === "must"
                                 ? "bg-orange-500/15 text-orange-500 border border-orange-500/30"
-                                : "bg-white/5 text-gray-300 border border-white/10"
+                                : "bg-secondary/50 text-foreground/70 border border-border"
                             }`}
                           >
                             {t}
@@ -813,11 +853,11 @@ const Landing = () => {
                     </div>
 
                     {/* About role */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
                         <Target className="w-4 h-4 text-orange-500" /> O roli
                       </h4>
-                      <p className="text-sm text-gray-300 leading-relaxed">
+                      <p className="text-sm text-foreground/70 leading-relaxed">
                         Dołącz do zespołu budującego nowoczesną platformę edukacyjną używaną przez
                         ponad 50 000 studentów w Polsce. Poprowadzisz refaktoryzację frontu na Next.js
                         14, wdrożysz design system oraz zadbasz o wydajność i dostępność (WCAG 2.1).
@@ -826,7 +866,7 @@ const Landing = () => {
                     </div>
 
                     {/* Responsibilities */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
                         <ListChecks className="w-4 h-4 text-orange-500" /> Obowiązki
                       </h4>
@@ -838,7 +878,7 @@ const Landing = () => {
                           "Code review oraz mentoring 2 mid-developerów",
                           "Współpraca z backend i product przy projektowaniu API (GraphQL)",
                         ].map((r, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                          <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
                             <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
                             <span>{r}</span>
                           </li>
@@ -847,7 +887,7 @@ const Landing = () => {
                     </div>
 
                     {/* Requirements */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
                         <Check className="w-4 h-4 text-orange-500" /> Wymagania
                       </h4>
@@ -859,7 +899,7 @@ const Landing = () => {
                           "Praktyka z testowaniem (Jest, Playwright lub Cypress)",
                           "Angielski B2+ (codzienna komunikacja z zespołem QA)",
                         ].map((r, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                          <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
                             <Check className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                             <span>{r}</span>
                           </li>
@@ -868,9 +908,9 @@ const Landing = () => {
                     </div>
 
                     {/* Nice to have */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Star className="w-4 h-4 text-gray-400" /> Mile widziane
+                        <Star className="w-4 h-4 text-muted-foreground" /> Mile widziane
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {[
@@ -881,7 +921,7 @@ const Landing = () => {
                         ].map((n) => (
                           <span
                             key={n}
-                            className="px-2.5 py-1 rounded-full bg-white/5 text-xs text-gray-300 border border-white/10"
+                            className="px-2.5 py-1 rounded-full bg-secondary/50 text-xs text-foreground/70 border border-border"
                           >
                             {n}
                           </span>
@@ -890,7 +930,7 @@ const Landing = () => {
                     </div>
 
                     {/* Benefits */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
                         <Gift className="w-4 h-4 text-orange-500" /> Benefity
                       </h4>
@@ -903,7 +943,7 @@ const Landing = () => {
                           "26 dni urlopu (B2B)",
                           "Hybryda: 2 dni z biura w centrum Warszawy",
                         ].map((b, i) => (
-                          <div key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                          <div key={i} className="flex items-start gap-2 text-sm text-foreground/70">
                             <Check className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
                             <span>{b}</span>
                           </div>
@@ -912,7 +952,7 @@ const Landing = () => {
                     </div>
 
                     {/* Recruitment process */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
                         <Workflow className="w-4 h-4 text-orange-500" /> Proces rekrutacji
                       </h4>
@@ -923,7 +963,7 @@ const Landing = () => {
                           "Spotkanie z zespołem i CTO (45 min)",
                           "Decyzja w ciągu 5 dni roboczych",
                         ].map((s, i) => (
-                          <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                          <li key={i} className="flex items-start gap-3 text-sm text-foreground/70">
                             <span className="w-6 h-6 rounded-full bg-orange-500/15 text-orange-500 text-xs font-bold flex items-center justify-center shrink-0">
                               {i + 1}
                             </span>
@@ -934,11 +974,11 @@ const Landing = () => {
                     </div>
 
                     {/* About company */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-white/10">
+                    <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
                         <Building2 className="w-4 h-4 text-orange-500" /> O firmie
                       </h4>
-                      <p className="text-sm text-gray-300 leading-relaxed">
+                      <p className="text-sm text-foreground/70 leading-relaxed">
                         SGH Tech to spółka technologiczna budująca platformę e-learningową dla
                         uczelni wyższych w Polsce. Zespół liczy 35 osób, działamy od 2019 r.,
                         jesteśmy rentowni od 2022 r. Inwestujemy w rozwój produktu, a nie w marketing
@@ -947,11 +987,11 @@ const Landing = () => {
                     </div>
 
                     {/* CTA */}
-                    <div className="px-6 sm:px-8 py-6 bg-white/[0.03]">
+                    <div className="px-6 sm:px-8 py-6 bg-muted/30">
                       <Link to="/auth" className={`${CTA_PRIMARY} w-full`}>
                         <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
                       </Link>
-                      <p className="text-xs text-gray-400 text-center mt-3">
+                      <p className="text-xs text-muted-foreground text-center mt-3">
                         Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
                       </p>
                     </div>
@@ -965,7 +1005,7 @@ const Landing = () => {
           {isCandidate && (
             <motion.section
               {...fadeUp}
-              className="px-6 py-20 bg-gradient-to-br from-white/[0.03] via-background to-orange-500/[0.05] border-y border-white/10"
+              className="px-6 py-20 bg-gradient-to-br from-white/[0.03] via-background to-orange-500/[0.05] border-y border-border"
             >
               <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                 <div>
@@ -975,7 +1015,7 @@ const Landing = () => {
                   <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4 leading-tight">
                     Darmowe, profesjonalne CV — <span className="text-orange-500">od razu.</span>
                   </h2>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
+                  <p className="text-foreground/70 mb-6 leading-relaxed">
                     Uzupełnij profil i pobierz gotowe CV w formacie A4. Bez Worda, bez Canvy, bez
                     płatnych subskrypcji. Twoje doświadczenie, umiejętności i języki — w estetycznym
                     szablonie z brandingiem JobSwipe.
@@ -988,7 +1028,7 @@ const Landing = () => {
                 <div className="relative flex justify-center">
                   <div className="absolute inset-0 bg-orange-500/20 blur-3xl rounded-full" />
                   <div
-                    className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-white/10 grid grid-cols-[32%_68%] bg-card shadow-[0_0_40px_rgba(249,115,22,0.2)]"
+                    className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-border grid grid-cols-[32%_68%] bg-card shadow-[0_0_40px_rgba(249,115,22,0.2)]"
                     aria-hidden
                   >
                     <div className="bg-foreground/90 p-3 flex flex-col gap-3">
@@ -1046,7 +1086,7 @@ const Landing = () => {
                   <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3">
                     Co dostajesz jako pracodawca
                   </h2>
-                  <p className="text-gray-400 max-w-xl mx-auto">
+                  <p className="text-muted-foreground max-w-xl mx-auto">
                     Pełna kontrola nad procesem, zero chaosu dokumentowego.
                   </p>
                 </div>
@@ -1073,7 +1113,7 @@ const Landing = () => {
                         <Icon className="w-5 h-5" />
                       </div>
                       <h3 className="font-semibold text-lg mb-2 text-foreground">{title}</h3>
-                      <p className="text-sm text-gray-300 leading-relaxed">{body}</p>
+                      <p className="text-sm text-foreground/70 leading-relaxed">{body}</p>
                     </div>
                   ))}
                 </div>
@@ -1084,7 +1124,7 @@ const Landing = () => {
           {/* ────────── FAQ ────────── */}
           <motion.section
             {...fadeUp}
-            className="px-6 py-20 bg-white/[0.03] border-y border-white/10"
+            className="px-6 py-20 bg-muted/30 border-y border-border"
           >
             <div className="max-w-4xl mx-auto">
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10 text-center">
@@ -1138,20 +1178,20 @@ const Landing = () => {
       </AnimatePresence>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/10 px-6 py-6 mt-auto">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-gray-400">
+      <footer className="border-t border-border px-6 py-6 mt-auto">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
           <Link to="/privacy" className="hover:text-foreground transition-colors">
             Prywatność
           </Link>
-          <span className="text-white/20">·</span>
+          <span className="text-border">·</span>
           <Link to="/terms" className="hover:text-foreground transition-colors">
             Regulamin
           </Link>
-          <span className="text-white/20">·</span>
+          <span className="text-border">·</span>
           <Link to="/cookies" className="hover:text-foreground transition-colors">
             Cookies
           </Link>
-          <span className="text-white/20">·</span>
+          <span className="text-border">·</span>
           <span>© {new Date().getFullYear()} JobSwipe</span>
         </div>
       </footer>
