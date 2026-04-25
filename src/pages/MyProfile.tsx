@@ -1029,6 +1029,16 @@ const MyProfile = () => {
                   <li>• Konkretny tytuł zawodowy &gt; ogólny.</li>
                 </ul>
               </div>
+
+              <div className="card-gradient rounded-xl border border-border p-4 mt-4">
+                <p className="text-xs font-bold text-primary uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Jak działa scoring?
+                </p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Każda oferta pokazuje % dopasowania Twojego profilu. Im pełniejszy profil (umiejętności, doświadczenie, oczekiwania), tym trafniejszy scoring i większa szansa na shortlistę.
+                </p>
+              </div>
             </div>
           </aside>
         )}
