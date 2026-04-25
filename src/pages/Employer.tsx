@@ -334,6 +334,13 @@ const Employer = () => {
                       })()}
                     </div>
 
+                    {job.status === "closed" && (
+                      <div className="mx-4 mb-1 px-3 py-1.5 rounded-lg bg-muted/50 border border-border text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                        <Lock className="w-3 h-3" />
+                        Rekrutacja zamknięta
+                      </div>
+                    )}
+
                     {jobApps.length < 10 && job.status !== "closed" && (
                       <div className="px-4 pb-2">
                         <div className="flex items-center gap-2">
