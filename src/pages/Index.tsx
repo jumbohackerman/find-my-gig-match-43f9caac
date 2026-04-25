@@ -71,7 +71,6 @@ const Index = () => {
   const { candidate } = useCandidateProfile();
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
-  const [hideSuggestion, setHideSuggestion] = useState(false);
   const { recentEntries, trackView, clear: clearRecent, count: recentCount } = useRecentlyViewed();
 
   const {
