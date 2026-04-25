@@ -639,7 +639,7 @@ const MyProfile = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Podsumowanie zawodowe ({summary.length}/300)</label>
                   <textarea value={summary} onChange={(e) => setSummary(e.target.value.slice(0, 300))}
-                    placeholder="Frontend engineer specjalizujący się w React i skalowalnych systemach UI."
+                    placeholder="Np. Analityk danych z 3-letnim doświadczeniem w przetwarzaniu i wizualizacji danych. Specjalizacja w Power BI, Python i SQL."
                     rows={3} className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
                 </div>
                 <div className="space-y-1.5">
