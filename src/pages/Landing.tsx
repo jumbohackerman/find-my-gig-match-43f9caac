@@ -190,7 +190,7 @@ const Landing = () => {
 
       {/* ── VS Comparison ── */}
       <motion.section {...fadeUp} className="px-6 py-20">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-center">
             To nie jest kolejny portal z ofertami pracy.
           </h2>
@@ -213,16 +213,16 @@ const Landing = () => {
             {comparison.map((row, idx) => (
               <div
                 key={idx}
-                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 px-6 py-5 items-center hover:bg-secondary/20 transition-colors ${
+                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 px-6 py-4 items-center hover:bg-orange-500/5 transition-colors ${
                   idx !== comparison.length - 1 ? "border-b border-border/40" : ""
-                } ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
+                }`}
               >
-                <div className="flex items-start gap-2 text-muted-foreground text-[15px] leading-relaxed">
+                <div className="flex items-start gap-2 text-muted-foreground text-sm sm:text-[15px] leading-relaxed">
                   <X className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground/70" />
                   <span>{row.old}</span>
                 </div>
                 <ArrowRight className="hidden md:block w-4 h-4 text-muted-foreground/50" />
-                <div className="flex items-start gap-2 text-foreground text-[15px] leading-relaxed md:pl-2 md:border-l-2 md:border-primary/30">
+                <div className="flex items-start gap-2 text-foreground text-sm sm:text-[15px] leading-relaxed md:pl-2 md:border-l-2 md:border-primary/30">
                   <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
                   <span>{row.neu}</span>
                 </div>
@@ -233,27 +233,32 @@ const Landing = () => {
       </motion.section>
 
       {/* ── How it works — candidate ── */}
-      <motion.section {...fadeUp} className="px-6 py-16 bg-secondary/20 border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-16 bg-white/[0.03] border-y border-border/40">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">Jak to działa — kandydat</h2>
           <p className="text-muted-foreground text-center mb-12">3 kroki do nowej pracy</p>
           <div className="grid md:grid-cols-3 gap-6">
-            {candidateSteps.map((s, i) => (
-              <div key={i} className="card-gradient rounded-2xl border border-border p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-11 h-11 rounded-full btn-gradient text-primary-foreground text-xl flex items-center justify-center">
-                    <span>{s.emoji}</span>
+            {candidateSteps.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="card-gradient rounded-2xl border border-border p-6">
+                  <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground">KROK {i + 1}</span>
+                  <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <div className="mt-8 max-w-3xl mx-auto rounded-xl border border-primary/40 bg-primary/5 px-5 py-4 text-sm text-foreground/90">
-            💡 <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
-            odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+          <div className="mt-8 max-w-3xl mx-auto rounded-xl border-2 border-orange-500 bg-orange-500/10 px-5 py-4 text-sm font-medium text-foreground/90 shadow-[0_0_30px_rgba(249,115,22,0.15)] flex items-start gap-3">
+            <div className="w-7 h-7 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">
+              <Lightbulb className="w-4 h-4" />
+            </div>
+            <p>
+              <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
+              odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+            </p>
           </div>
         </div>
       </motion.section>
@@ -266,24 +271,24 @@ const Landing = () => {
             Top 5 kandydatów wybranych przez JobSwipe — bez czytania CV
           </p>
           <div className="grid md:grid-cols-3 gap-6">
-            {employerSteps.map((s, i) => (
-              <div key={i} className="card-gradient rounded-2xl border border-border p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-11 h-11 rounded-full bg-accent/10 text-accent text-xl flex items-center justify-center">
-                    <span>{s.emoji}</span>
+            {employerSteps.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="card-gradient rounded-2xl border border-border p-6">
+                  <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground">KROK {i + 1}</span>
+                  <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </motion.section>
 
       {/* ── Social proof ── */}
-      <motion.section {...fadeUp} className="px-6 py-12 bg-secondary/20 border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-12 bg-white/[0.05] border-y border-border/40">
         <div className="max-w-4xl mx-auto text-center space-y-2">
           <p className="text-lg sm:text-xl text-foreground">
             <span className="font-bold text-gradient-primary">{candidatesLabel}</span> kandydatów już nie wysyła CV w ciemno
