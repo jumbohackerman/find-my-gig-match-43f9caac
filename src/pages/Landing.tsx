@@ -1194,6 +1194,50 @@ const Landing = () => {
             </motion.section>
           )}
 
+          {/* ────────── EMPLOYER-ONLY: PRICING ────────── */}
+          {!isCandidate && (
+            <motion.section {...fadeUp} className="px-6 py-20">
+              <div className="max-w-3xl mx-auto text-center">
+                <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
+                  Proste zasady, zero ukrytych kosztów
+                </h2>
+                <p className="text-muted-foreground mb-10">
+                  Publikujesz ofertę za darmo. Płacisz tylko gdy chcesz zobaczyć Top 5.
+                </p>
+                <div className={`${GLASS_CARD} p-8 ring-1 ring-primary/30 max-w-md mx-auto`}>
+                  <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                    <Zap className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-foreground mb-1">Shortlista Top 5</h3>
+                  <p className="text-4xl font-black text-primary mb-2">299 zł <span className="text-base font-normal text-muted-foreground">netto</span></p>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Jednorazowa opłata za ofertę. Bez abonamentu, bez zobowiązań.
+                  </p>
+                  <div className="space-y-2 text-left text-sm text-foreground/70">
+                    {[
+                      "Publikacja oferty i zbieranie kandydatów — bezpłatne",
+                      "Ranking Top 5 z uzasadnieniem wyboru",
+                      "Automatyczny feedback dla odrzuconych",
+                      "PDF profilu kandydata po shortliście",
+                      "Kontakt z wybranymi kandydatami",
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Link to="/auth?role=employer" className={`${CTA_PRIMARY} w-full mt-6`}>
+                    Dodaj ofertę pracy <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+                <p className="text-xs text-muted-foreground mt-6">
+                  Pakiety dla firm z wieloma rekrutacjami — wkrótce.
+                </p>
+              </div>
+            </motion.section>
+          )}
+
           {/* ────────── FAQ ────────── */}
           <motion.section
             {...fadeUp}
