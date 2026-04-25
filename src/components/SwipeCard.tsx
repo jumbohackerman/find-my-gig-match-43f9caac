@@ -136,7 +136,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </>
         )}
 
-        <div className="h-full p-4 sm:p-5 flex flex-col gap-2">
+        <div className="h-full p-4 sm:p-5 lg:p-6 flex flex-col gap-2 lg:gap-3">
           {/* Header: Logo + Title + Company */}
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
