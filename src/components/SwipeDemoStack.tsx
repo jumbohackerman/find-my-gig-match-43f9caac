@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles } from "lucide-react";
+import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles, Users, Clock, GraduationCap, Building2 } from "lucide-react";
 
 interface DemoJob {
   id: number;
@@ -15,6 +15,11 @@ interface DemoJob {
   tags: string[];
   summary: string;
   perks: string[];
+  experience: string;
+  applicants: number;
+  posted: string;
+  teamSize: string;
+  contract: string;
 }
 
 const JOBS: DemoJob[] = [
