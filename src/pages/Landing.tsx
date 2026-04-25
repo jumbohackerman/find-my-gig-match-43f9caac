@@ -1,17 +1,38 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, Sparkles, Search, Users, Briefcase, MapPin, Lock } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  Briefcase,
+  MapPin,
+  Lock,
+  User,
+  Hand,
+  Mail,
+  ClipboardList,
+  Zap,
+  MessageSquare,
+  Building2,
+  FileText,
+  Check,
+  X,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
 import SwipeDemoStack from "@/components/SwipeDemoStack";
+
+const fadeUp = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.5, ease: "easeOut" as const },
+};
 
 const Landing = () => {
   const [counts, setCounts] = useState<{ candidates: number; employers: number }>({ candidates: 0, employers: 0 });
 
   useEffect(() => {
-    // Public anonymous counts. profiles RLS only returns own row, so this may
-    // return 0 for anon users — show graceful fallback placeholders below.
     let cancelled = false;
     (async () => {
       try {
@@ -20,20 +41,76 @@ const Landing = () => {
           supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "employer"),
         ]);
         if (!cancelled) {
-          setCounts({
-            candidates: c.count ?? 0,
-            employers: e.count ?? 0,
-          });
+          setCounts({ candidates: c.count ?? 0, employers: e.count ?? 0 });
         }
       } catch {
-        // silent
+        /* silent */
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const candidatesLabel = counts.candidates > 0 ? counts.candidates.toLocaleString("pl-PL") : "1 200+";
   const employersLabel = counts.employers > 0 ? counts.employers.toLocaleString("pl-PL") : "180+";
+
+  const painStats = [
+    { value: "73%", title: "kandydatów", desc: "nigdy nie dostaje odpowiedzi" },
+    { value: "6 tyg.", title: "średnio", desc: "czeka na jakąkolwiek odpowiedź" },
+    { value: "60+", title: "CV", desc: "czyta pracodawca przed shortlistą" },
+    { value: "0", title: "odpowiedzi", desc: "dostaje większość odrzuconych" },
+  ];
+
+  const comparison = [
+    { old: "Wysyłasz CV w ciemno, bez śledzenia", neu: "Aplikujesz profilem. Raz tworzysz, wszędzie aplikujesz" },
+    { old: "Tygodnie ciszy po aplikacji", neu: "Każdy kandydat dostaje odpowiedź i feedback od JobSwipe" },
+    { old: "Pracodawca przegląda 80 PDF-ów ręcznie", neu: "JobSwipe analizuje wszystkich i zwraca top 5 z uzasadnieniem" },
+    { old: "Zero informacji, dlaczego odrzucono", neu: "Konkretny feedback: co zadziałało, czego brakowało" },
+    { old: "CV ginie w skrzynce rekrutera", neu: "Profil + darmowe profesjonalne CV do pobrania" },
+  ];
+
+  const candidateSteps = [
+    {
+      icon: User,
+      emoji: "👤",
+      title: "Zbuduj profil raz",
+      body: "Wrzuć CV — JobSwipe automatycznie uzupełni Twój profil. Sprawdzasz, poprawiasz, zatwierdzasz. Żadnych formularzy bez końca. I dostajesz darmowe, profesjonalne CV do pobrania.",
+    },
+    {
+      icon: Hand,
+      emoji: "👆",
+      title: "Swipuj oferty, aplikuj jednym kliknięciem",
+      body: "Przeglądasz karty ofert dopasowanych do Twojego profilu. Widzisz scoring dopasowania zanim aplikujesz. Aplikujesz profilem — bez załączników, bez listów motywacyjnych.",
+    },
+    {
+      icon: Mail,
+      emoji: "📩",
+      title: "Zawsze dostaniesz odpowiedź",
+      body: "Koniec z ciszą po aplikacji. Każdy kandydat — wybrany czy nie — dostaje informację zwrotną od JobSwipe: co zadziałało, czego brakowało, co warto poprawić przed kolejną aplikacją.",
+    },
+  ];
+
+  const employerSteps = [
+    {
+      icon: ClipboardList,
+      emoji: "📋",
+      title: "Dodaj ofertę i zbierz kandydatów",
+      body: "Tworzysz ofertę w kilka minut. Kandydaci aplikują profilem — Ty zbierasz strukturyzowane dane, nie stos PDF-ów. Widzisz podstawowe info o każdym aplikującym.",
+    },
+    {
+      icon: Zap,
+      emoji: "⚡",
+      title: "JobSwipe robi selekcję za Ciebie",
+      body: "Zamiast czytać 60 CV — klikasz jeden przycisk. JobSwipe analizuje wszystkich kandydatów pod kątem wymagań oferty i zwraca top 5 z rankingiem i uzasadnieniem wyboru.",
+    },
+    {
+      icon: MessageSquare,
+      emoji: "💬",
+      title: "Kontaktujesz tylko najlepszych",
+      body: "Widzisz top 5 z wynikami i uzasadnieniem JobSwipe. Decydujesz, do kogo piszesz. Reszta kandydatów automatycznie dostaje feedback — bez Twojego zaangażowania.",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -58,21 +135,17 @@ const Landing = () => {
       {/* ── Hero ── */}
       <section className="px-6 py-16 sm:py-24">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium mb-6">
               <Sparkles className="w-3 h-3" />
-              <span>AI shortlista — top 5 kandydatów</span>
+              <span>Nowy sposób na rekrutację</span>
             </div>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
-              Rekrutacja, która <span className="text-gradient-primary">szanuje Twój czas.</span>
+              Koniec z rekrutacją <span className="text-gradient-primary">w ciemno.</span>
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 max-w-xl">
-              Aplikuj profilem. Bez wysyłania CV w ciemno. AI shortlista wybiera najlepszych —
-              pracodawca kontaktuje tylko tych, których chce poznać.
+            <p className="text-base sm:text-lg text-muted-foreground mb-8 max-w-xl">
+              Aplikujesz profilem, nie PDF-em. JobSwipe wybiera top 5 kandydatów — pracodawca kontaktuje tylko
+              najlepszych. A Ty zawsze dostajesz odpowiedź.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
@@ -90,7 +163,6 @@ const Landing = () => {
             </div>
           </motion.div>
 
-          {/* Animated swipe demo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -101,161 +173,159 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ── Pain points bar ── */}
+      <motion.section {...fadeUp} className="px-6 py-12 bg-foreground/[0.04] border-y border-border/40">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-border/40">
+            {painStats.map((s, i) => (
+              <div key={i} className="text-center px-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-2">
+                  Problem
+                </div>
+                <div className="text-3xl sm:text-4xl font-display font-bold text-primary mb-1">{s.value}</div>
+                <div className="text-sm text-foreground font-medium">{s.title}</div>
+                <div className="text-xs text-muted-foreground mt-1">{s.desc}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center mt-10 text-base sm:text-lg font-semibold text-gradient-primary">
+            JobSwipe rozwiązuje każdy z tych problemów.
+          </p>
+        </div>
+      </motion.section>
+
+      {/* ── VS Comparison ── */}
+      <motion.section {...fadeUp} className="px-6 py-20">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-center">
+            To nie jest kolejny portal z ofertami pracy.
+          </h2>
+          <p className="text-muted-foreground text-center mb-12">
+            JobSwipe to nowy model pierwszego etapu rekrutacji.
+          </p>
+
+          <div className="card-gradient rounded-2xl border border-border overflow-hidden shadow-xl">
+            {/* Header */}
+            <div className="hidden md:grid grid-cols-[1fr_auto_1fr] gap-4 px-6 py-4 border-b border-border/60 bg-secondary/30">
+              <div className="text-sm font-bold text-muted-foreground inline-flex items-center gap-2">
+                <X className="w-4 h-4" /> Tradycyjna rekrutacja
+              </div>
+              <div className="w-6" />
+              <div className="text-sm font-bold text-gradient-primary inline-flex items-center gap-2">
+                <Check className="w-4 h-4 text-primary" /> JobSwipe
+              </div>
+            </div>
+
+            {comparison.map((row, idx) => (
+              <div
+                key={idx}
+                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 px-6 py-5 items-center hover:bg-secondary/20 transition-colors ${
+                  idx !== comparison.length - 1 ? "border-b border-border/40" : ""
+                } ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
+              >
+                <div className="flex items-start gap-2 text-muted-foreground text-[15px] leading-relaxed">
+                  <X className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground/70" />
+                  <span>{row.old}</span>
+                </div>
+                <ArrowRight className="hidden md:block w-4 h-4 text-muted-foreground/50" />
+                <div className="flex items-start gap-2 text-foreground text-[15px] leading-relaxed md:pl-2 md:border-l-2 md:border-primary/30">
+                  <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
+                  <span>{row.neu}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
       {/* ── How it works — candidate ── */}
-      <section className="px-6 py-16 bg-secondary/20 border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-16 bg-secondary/20 border-y border-border/40">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">Jak to działa — kandydat</h2>
           <p className="text-muted-foreground text-center mb-12">3 kroki do nowej pracy</p>
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { n: "1", title: "Zbuduj profil raz", body: "AI uzupełni Twój profil danymi z CV. Bez wklejania, bez formularzy bez końca." },
-              { n: "2", title: "Przeglądaj oferty", body: "Aplikuj jednym kliknięciem. Twój profil trafia bezpośrednio do pracodawcy." },
-              { n: "3", title: "Zawsze znasz wynik", body: "Koniec z „damy znać”. Po każdej aplikacji dostajesz jasny status i feedback. Jeśli firma Cię odrzuci, JobSwipe wygeneruje krótkie podsumowanie: co zadecydowało, czego zabrakło i co możesz poprawić." },
-            ].map((s) => (
-              <div key={s.n} className="card-gradient rounded-2xl border border-border p-6">
-                <div className="w-10 h-10 rounded-full btn-gradient text-primary-foreground font-bold flex items-center justify-center mb-4">{s.n}</div>
+            {candidateSteps.map((s, i) => (
+              <div key={i} className="card-gradient rounded-2xl border border-border p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-11 h-11 rounded-full btn-gradient text-primary-foreground text-xl flex items-center justify-center">
+                    <span>{s.emoji}</span>
+                  </div>
+                  <span className="text-xs font-bold text-muted-foreground">KROK {i + 1}</span>
+                </div>
                 <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground">{s.body}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
+          <div className="mt-8 max-w-3xl mx-auto rounded-xl border border-primary/40 bg-primary/5 px-5 py-4 text-sm text-foreground/90">
+            💡 <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
+            odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+          </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── How it works — employer ── */}
-      <section className="px-6 py-16">
+      <motion.section {...fadeUp} className="px-6 py-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">Jak to działa — pracodawca</h2>
-          <p className="text-muted-foreground text-center mb-12">Top 5 kandydatów wybranych przez AI</p>
+          <p className="text-muted-foreground text-center mb-12">
+            Top 5 kandydatów wybranych przez JobSwipe — bez czytania CV
+          </p>
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { n: "1", icon: Briefcase, title: "Dodaj ofertę", body: "Zbierz aplikacje od kandydatów dopasowanych do Twoich kryteriów." },
-              { n: "2", icon: Sparkles, title: "Uruchom AI Shortlistę", body: "AI wybiera top 5 kandydatów spośród wszystkich aplikujących." },
-              { n: "3", icon: Users, title: "Kontaktuj najlepszych", body: "Skontaktuj się tylko z tymi, którzy najlepiej pasują do roli." },
-            ].map((s) => (
-              <div key={s.n} className="card-gradient rounded-2xl border border-border p-6">
+            {employerSteps.map((s, i) => (
+              <div key={i} className="card-gradient rounded-2xl border border-border p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 text-accent flex items-center justify-center"><s.icon className="w-5 h-5" /></div>
-                  <span className="text-xs font-bold text-muted-foreground">KROK {s.n}</span>
+                  <div className="w-11 h-11 rounded-full bg-accent/10 text-accent text-xl flex items-center justify-center">
+                    <span>{s.emoji}</span>
+                  </div>
+                  <span className="text-xs font-bold text-muted-foreground">KROK {i + 1}</span>
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground">{s.body}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* ── Comparison table ── */}
-      <section className="px-6 py-16 bg-secondary/20 border-y border-border/40">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">
-            Dlaczego <span className="text-gradient-primary">JobSwipe</span>?
-          </h2>
-          <p className="text-muted-foreground text-center mb-12">Porównaj nas z tradycyjnymi portalami pracy</p>
-
-          <div className="card-gradient rounded-2xl border border-border overflow-hidden shadow-xl relative">
-            {/* Decorative gradient glow */}
-            <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl bg-gradient-to-br from-primary to-accent" />
-
-            {/* Header row */}
-            <div className="hidden md:grid grid-cols-[1fr_1.4fr_1.4fr] gap-4 px-6 py-5 border-b border-border/60 bg-secondary/40 relative">
-              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Kategoria</div>
-              <div className="text-base font-semibold text-muted-foreground">Tradycyjne portale pracy</div>
-              <div className="text-base font-bold text-gradient-primary inline-flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                JobSwipe
-              </div>
-            </div>
-
-            {[
-              {
-                category: "Aplikowanie",
-                old: "Wysyłasz PDF i mozolnie wypełniasz formularze.",
-                newTitle: "JobSwipe buduje Twój profil.",
-                newBody: "System automatycznie uzupełnia Twoje dane na podstawie CV, przygotowując Cię do szybkiego swipe'owania.",
-              },
-              {
-                category: "Gdzie jesteś?",
-                old: "Ciągłe przekierowania na zewnętrzne strony i obce systemy firmowe.",
-                newTitle: "JobSwipe integruje proces w jednym miejscu.",
-                newBody: "Cały proces rekrutacyjny odbywa się wyłącznie wewnątrz naszej aplikacji.",
-              },
-              {
-                category: "Odpowiedź",
-                old: "„Odezwiemy się do wybranych\" (rekrutacyjny ghosting).",
-                newTitle: "JobSwipe gwarantuje feedback.",
-                newBody: "Zawsze wiesz, na czym stoisz. JobSwipe generuje dla Ciebie automatyczne wskazówki rozwojowe.",
-              },
-              {
-                category: "Dla firm",
-                old: "Tracenie godzin na ręczne czytanie 150 chaotycznych życiorysów.",
-                newTitle: "JobSwipe dostarcza Shortlistę.",
-                newBody: "System analizuje profile i wybiera Top 5 kandydatów, oszczędzając czas rekruterów.",
-              },
-              {
-                category: "Co zyskujesz?",
-                old: "Płatne szablony. Na innych portalach musisz zapłacić za wygenerowanie CV.",
-                newTitle: "JobSwipe oferuje darmowe CV.",
-                newBody: "Pobierasz profesjonalny, gotowy do użycia PDF wygenerowany bezpośrednio z Twojego profilu.",
-              },
-            ].map((row, idx, arr) => (
-              <div
-                key={row.category}
-                className={`grid grid-cols-1 md:grid-cols-[1fr_1.4fr_1.4fr] gap-3 md:gap-5 px-6 py-6 relative ${
-                  idx !== arr.length - 1 ? "border-b border-border/40" : ""
-                } hover:bg-secondary/20 transition-colors group`}
-              >
-                {/* Left accent bar on hover (desktop) */}
-                <div className="hidden md:block absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary to-primary-glow opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                <div className="font-display font-semibold text-foreground text-base md:text-lg md:pt-0.5">
-                  {row.category}
-                </div>
-                <div className="text-[15px] md:text-base text-muted-foreground leading-relaxed">
-                  <span className="md:hidden block text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1.5">
-                    Tradycyjne portale
-                  </span>
-                  {row.old}
-                </div>
-                <div className="text-[15px] md:text-base leading-relaxed md:pl-4 md:border-l-2 md:border-primary/30">
-                  <span className="md:hidden inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider mb-1.5">
-                    <Sparkles className="w-3 h-3 text-primary" />
-                    <span className="text-gradient-primary">JobSwipe</span>
-                  </span>
-                  <span className="font-bold text-gradient-primary">{row.newTitle}</span>{" "}
-                  <span className="text-foreground/85">{row.newBody}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      </motion.section>
 
       {/* ── Social proof ── */}
-      <section className="px-6 py-12">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-lg text-foreground">
-            Dołącz do <span className="font-bold text-gradient-primary">{candidatesLabel}</span> kandydatów
-            {" "}i <span className="font-bold text-gradient-primary">{employersLabel}</span> pracodawców
+      <motion.section {...fadeUp} className="px-6 py-12 bg-secondary/20 border-y border-border/40">
+        <div className="max-w-4xl mx-auto text-center space-y-2">
+          <p className="text-lg sm:text-xl text-foreground">
+            <span className="font-bold text-gradient-primary">{candidatesLabel}</span> kandydatów już nie wysyła CV w ciemno
+          </p>
+          <p className="text-lg sm:text-xl text-foreground">
+            <span className="font-bold text-gradient-primary">{employersLabel}</span> pracodawców nie czyta stosów PDF-ów
           </p>
         </div>
-      </section>
+      </motion.section>
 
-      {/* ── Example job card with login overlay ── */}
-      <section className="px-6 py-16">
+      {/* ── Example job card ── */}
+      <motion.section {...fadeUp} className="px-6 py-16">
         <div className="max-w-md mx-auto">
-          <h2 className="font-display text-2xl font-bold mb-6 text-center">Przykładowa oferta</h2>
-          <div className="relative card-gradient rounded-3xl border border-border shadow-xl p-6">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2 text-center">Przykładowa oferta</h2>
+          <p className="text-sm text-muted-foreground text-center mb-8">
+            Tak wygląda oferta w JobSwipe — pełna informacja zanim aplikujesz
+          </p>
+          <div className="card-gradient rounded-3xl border border-border shadow-xl p-6">
             <div className="flex items-start gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
               <div className="flex-1">
-                <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
-                <p className="text-sm text-muted-foreground">SGH Tech</p>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
+                    <p className="text-sm text-muted-foreground">SGH Tech</p>
+                  </div>
+                  <span className="px-2 py-1 rounded-md btn-gradient text-primary-foreground text-xs font-bold">
+                    92% match
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> Warszawa</span>
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> Warszawa
+              </span>
               <span>· Hybrydowo</span>
               <span>· Senior</span>
             </div>
@@ -264,36 +334,168 @@ const Landing = () => {
             </p>
             <div className="flex flex-wrap gap-2 mb-5">
               {["React", "TypeScript", "GraphQL", "Node.js"].map((t) => (
-                <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">{t}</span>
+                <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">
+                  {t}
+                </span>
               ))}
             </div>
-            <div className="flex items-center justify-between text-sm mb-2">
+            <div className="flex items-center justify-between text-sm mb-5">
               <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
             </div>
+            <Link
+              to="/auth"
+              className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2"
+            >
+              <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
+            </Link>
+            <p className="text-xs text-muted-foreground text-center mt-3">
+              Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
+            </p>
+          </div>
+        </div>
+      </motion.section>
 
-            {/* Overlay CTA */}
-            <div className="absolute inset-0 rounded-3xl bg-background/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
-              <Lock className="w-6 h-6 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Aplikowanie wymaga konta</p>
+      {/* ── Free CV callout ── */}
+      <motion.section
+        {...fadeUp}
+        className="px-6 py-20 bg-gradient-to-br from-secondary/30 via-background to-primary/5 border-y border-border/40"
+      >
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-5">
+              <FileText className="w-3 h-3" /> Bonus dla kandydatów
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4 leading-tight">
+              Darmowe, profesjonalne CV — <span className="text-gradient-primary">od razu.</span>
+            </h2>
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Uzupełnij profil i pobierz gotowe CV w formacie A4. Bez Worda, bez Canvy, bez płatnych subskrypcji. Twoje
+              doświadczenie, umiejętności i języki — w estetycznym szablonie z brandingiem JobSwipe.
+            </p>
+            <Link
+              to="/auth?role=candidate"
+              className="px-6 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow hover:scale-[1.02] transition-transform inline-flex items-center gap-2"
+            >
+              Załóż konto i pobierz CV <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* CV thumbnail */}
+          <div className="relative flex justify-center">
+            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+            <div
+              className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-border/60 grid grid-cols-[35%_65%] bg-card"
+              aria-hidden
+            >
+              {/* Sidebar */}
+              <div className="bg-foreground/90 p-3 flex flex-col gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/30 mx-auto" />
+                <div className="space-y-1">
+                  <div className="h-1.5 bg-background/40 rounded w-full" />
+                  <div className="h-1.5 bg-background/30 rounded w-3/4" />
+                </div>
+                <div className="space-y-1 mt-2">
+                  <div className="h-1 bg-primary/60 rounded w-1/2" />
+                  <div className="h-1 bg-background/30 rounded w-full" />
+                  <div className="h-1 bg-background/30 rounded w-5/6" />
+                  <div className="h-1 bg-background/30 rounded w-4/6" />
+                </div>
+                <div className="space-y-1 mt-2">
+                  <div className="h-1 bg-primary/60 rounded w-1/2" />
+                  <div className="h-1 bg-background/30 rounded w-full" />
+                  <div className="h-1 bg-background/30 rounded w-3/4" />
+                </div>
+              </div>
+              {/* Content */}
+              <div className="bg-white p-4 flex flex-col gap-3">
+                <div className="space-y-1">
+                  <div className="h-2.5 bg-foreground/80 rounded w-2/3" />
+                  <div className="h-1.5 bg-primary rounded w-1/3" />
+                </div>
+                <div className="space-y-1.5 mt-2">
+                  <div className="h-1 bg-primary rounded w-1/4" />
+                  <div className="h-1 bg-foreground/30 rounded w-full" />
+                  <div className="h-1 bg-foreground/30 rounded w-5/6" />
+                  <div className="h-1 bg-foreground/30 rounded w-4/6" />
+                </div>
+                <div className="space-y-1.5 mt-2">
+                  <div className="h-1 bg-primary rounded w-1/3" />
+                  <div className="h-1 bg-foreground/30 rounded w-full" />
+                  <div className="h-1 bg-foreground/30 rounded w-3/4" />
+                  <div className="h-1 bg-foreground/30 rounded w-5/6" />
+                </div>
+                <div className="space-y-1.5 mt-2">
+                  <div className="h-1 bg-primary rounded w-1/4" />
+                  <div className="h-1 bg-foreground/30 rounded w-full" />
+                  <div className="h-1 bg-foreground/30 rounded w-2/3" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ── Final CTA ── */}
+      <motion.section {...fadeUp} className="px-6 py-20">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-12">
+            Gotowy na rekrutację, <span className="text-gradient-primary">która działa?</span>
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6 relative">
+            <div className="card-gradient rounded-2xl border border-border p-8 text-left">
+              <div className="w-12 h-12 rounded-full btn-gradient text-primary-foreground text-2xl flex items-center justify-center mb-4">
+                👤
+              </div>
+              <h3 className="font-display font-bold text-xl mb-2">Jestem kandydatem</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Stwórz profil, aplikuj bez CV, zawsze dostań odpowiedź.
+              </p>
               <Link
-                to="/auth"
-                className="px-5 py-2.5 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center gap-2"
+                to="/auth?role=candidate"
+                className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow hover:scale-[1.02] transition-transform inline-flex items-center justify-center gap-2"
               >
-                <Search className="w-4 h-4" /> Zaloguj się, by aplikować
+                Zacznij za darmo <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background border border-border items-center justify-center text-xs text-muted-foreground font-medium z-10">
+              lub
+            </div>
+
+            <div className="card-gradient rounded-2xl border border-border p-8 text-left">
+              <div className="w-12 h-12 rounded-full bg-accent/10 text-accent text-2xl flex items-center justify-center mb-4">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="font-display font-bold text-xl mb-2">Jestem pracodawcą</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Dodaj ofertę, zbierz kandydatów, uruchom shortlistę JobSwipe.
+              </p>
+              <Link
+                to="/auth?role=employer"
+                className="w-full px-5 py-3 rounded-xl border border-border bg-transparent text-foreground font-medium hover:bg-secondary transition-colors inline-flex items-center justify-center gap-2"
+              >
+                <Briefcase className="w-4 h-4" /> Dodaj ofertę pracy
               </Link>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Footer ── */}
       <footer className="border-t border-border/40 px-6 py-6 mt-auto">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
-          <Link to="/privacy" className="hover:text-foreground transition-colors">Prywatność</Link>
+          <Link to="/privacy" className="hover:text-foreground transition-colors">
+            Prywatność
+          </Link>
           <span className="text-border">·</span>
-          <Link to="/terms" className="hover:text-foreground transition-colors">Regulamin</Link>
+          <Link to="/terms" className="hover:text-foreground transition-colors">
+            Regulamin
+          </Link>
           <span className="text-border">·</span>
-          <Link to="/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
+          <Link to="/cookies" className="hover:text-foreground transition-colors">
+            Cookies
+          </Link>
           <span className="text-border">·</span>
           <span>© {new Date().getFullYear()} JobSwipe</span>
         </div>
