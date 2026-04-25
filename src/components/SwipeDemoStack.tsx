@@ -217,33 +217,60 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </motion.div>
         )}
 
+        {/* Top accent line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(251,146,60,0.6), transparent)",
+          }}
+        />
+
         {/* Content */}
         <div className="relative h-full flex flex-col">
           <div className="flex items-start gap-3 mb-3">
-            <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl shrink-0">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 border border-white/10"
+              style={{
+                background: "linear-gradient(135deg, rgba(251,146,60,0.15), rgba(255,255,255,0.04))",
+              }}
+            >
               {job.logo}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-white/60">{job.company}</p>
-              <h3 className="font-bold text-white leading-tight text-[15px] line-clamp-2">
+              <p className="text-[11px] text-white/50 uppercase tracking-wider font-medium">
+                {job.company}
+              </p>
+              <h3 className="font-bold text-white leading-tight text-[16px] line-clamp-2 mt-0.5">
                 {job.title}
               </h3>
             </div>
             <span
-              className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-bold border ${matchColor(job.match)}`}
+              className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold border ${matchColor(job.match)}`}
             >
               {job.match}%
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-xs text-white/60 mb-3">
-            <span className="inline-flex items-center gap-1">
+          {/* Meta chips */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/70">
               <MapPin className="w-3 h-3" /> {job.location}
             </span>
-            <span>· {job.workMode}</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/70">
+              {job.workMode}
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/70">
+              <Briefcase className="w-3 h-3" /> {job.seniority}
+            </span>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          {/* Summary */}
+          <p className="text-[12px] text-white/70 leading-relaxed mb-3 line-clamp-3">
+            {job.summary}
+          </p>
+
+          {/* Tech tags */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
             {job.tags.map((t) => (
               <span
                 key={t}
@@ -254,10 +281,24 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
             ))}
           </div>
 
-          <div className="mt-auto flex items-center justify-between text-sm pt-3 border-t border-white/10">
-            <span className="font-semibold text-white text-[13px]">{job.salary}</span>
-            <span className="text-[10px] text-white/40 uppercase tracking-wider">dopasowanie</span>
+          {/* Perks */}
+          <div className="flex items-center gap-1.5 text-[10.5px] text-white/50 mb-3">
+            <Sparkles className="w-3 h-3 text-orange-300/70 shrink-0" />
+            <span className="truncate">{job.perks.join(" · ")}</span>
           </div>
+
+          <div className="mt-auto flex items-center justify-between pt-3 border-t border-white/10">
+            <div>
+              <p className="text-[10px] text-white/40 uppercase tracking-wider mb-0.5">
+                Wynagrodzenie
+              </p>
+              <span className="font-semibold text-white text-[13px]">{job.salary}</span>
+            </div>
+            <span className="text-[10px] text-white/40 uppercase tracking-wider">
+              dopasowanie
+            </span>
+          </div>
+        </div>
         </div>
       </div>
     </motion.div>
