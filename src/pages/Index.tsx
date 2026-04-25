@@ -16,7 +16,7 @@ import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
 import type { Job } from "@/domain/models";
 import { useAuth } from "@/hooks/useAuth";
-import { useCandidateProfile } from "@/hooks/useCandidateProfile";
+
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
