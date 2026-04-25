@@ -17,6 +17,15 @@ import {
   Lightbulb,
   Check,
   X,
+  Wifi,
+  GraduationCap,
+  Users,
+  Wallet,
+  Target,
+  ListChecks,
+  Gift,
+  Workflow,
+  Star,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
@@ -299,71 +308,248 @@ const Landing = () => {
         </div>
       </motion.section>
 
-      {/* ── Example job card ── */}
-      <motion.section {...fadeUp} className="px-6 py-16">
-        <div className="max-w-lg mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2 text-center">Przykładowa oferta</h2>
-          <p className="text-sm text-muted-foreground text-center mb-10">
-            Tak wygląda oferta w JobSwipe — pełna informacja zanim aplikujesz
-          </p>
+      {/* ── Example job card (full preview) ── */}
+      <motion.section {...fadeUp} className="px-6 py-20">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
+              <Sparkles className="w-3 h-3" /> Pełny widok oferty
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3">Przykładowa oferta</h2>
+            <p className="text-base text-muted-foreground max-w-xl mx-auto">
+              Tak wygląda oferta w JobSwipe — wszystkie informacje od razu widoczne. Bez pustych ogłoszeń typu „dynamiczny zespół".
+            </p>
+          </div>
+
           <div className="relative">
-            {/* Ghost card 3 */}
             <div
               className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
-              style={{ transform: "scale(0.94) translateY(12px)", opacity: 0.3 }}
+              style={{ transform: "scale(0.96) translateY(14px)", opacity: 0.35 }}
               aria-hidden
             />
-            {/* Ghost card 2 */}
             <div
               className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
-              style={{ transform: "scale(0.97) translateY(6px)", opacity: 0.6 }}
+              style={{ transform: "scale(0.98) translateY(7px)", opacity: 0.6 }}
               aria-hidden
             />
-            {/* Main card */}
-            <div className="relative card-gradient rounded-3xl border border-border shadow-2xl p-6">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
-                      <p className="text-sm text-muted-foreground">SGH Tech</p>
+
+            <div className="relative card-gradient rounded-3xl border border-border shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="p-6 sm:p-8 border-b border-border/60">
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-3xl shrink-0">
+                    🚀
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div>
+                        <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground">
+                          Senior Frontend Developer
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-0.5">SGH Tech · Edukacja / SaaS</p>
+                      </div>
+                      <span className="px-3 py-1.5 rounded-lg btn-gradient text-primary-foreground text-sm font-bold shadow-glow">
+                        92% match
+                      </span>
                     </div>
-                    <span className="px-2 py-1 rounded-md btn-gradient text-primary-foreground text-xs font-bold">
-                      92% match
-                    </span>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> Warszawa
-                </span>
-                <span>· Hybrydowo</span>
-                <span>· Senior</span>
-              </div>
-              <p className="text-sm text-foreground mb-4">
-                Dołącz do zespołu budującego nowoczesną platformę edukacyjną. React, TypeScript, GraphQL.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {["React", "TypeScript", "GraphQL", "Node.js"].map((t) => (
-                  <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">
-                    {t}
+
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 text-foreground">
+                    <MapPin className="w-3 h-3" /> Warszawa
                   </span>
-                ))}
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 text-foreground">
+                    <Wifi className="w-3 h-3" /> Hybrydowo (2 dni / tydz.)
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 text-foreground">
+                    <GraduationCap className="w-3 h-3" /> Senior · 5+ lat
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 text-foreground">
+                    <Briefcase className="w-3 h-3" /> B2B / UoP
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/60 text-foreground">
+                    <Users className="w-3 h-3" /> Zespół 8 osób
+                  </span>
+                </div>
+
+                <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
+                  <Wallet className="w-4 h-4 text-primary" />
+                  <span className="font-bold text-foreground">18 000 – 25 000 zł</span>
+                  <span className="text-xs text-muted-foreground">netto / mies. (B2B)</span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm mb-5">
-                <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
+
+              {/* Tech stack */}
+              <div className="px-6 sm:px-8 py-5 border-b border-border/60">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  Tech stack
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { t: "React", lvl: "must" },
+                    { t: "TypeScript", lvl: "must" },
+                    { t: "GraphQL", lvl: "must" },
+                    { t: "Next.js", lvl: "must" },
+                    { t: "Node.js", lvl: "nice" },
+                    { t: "Tailwind", lvl: "nice" },
+                    { t: "Playwright", lvl: "nice" },
+                  ].map(({ t, lvl }) => (
+                    <span
+                      key={t}
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium ${
+                        lvl === "must"
+                          ? "bg-primary/15 text-primary border border-primary/30"
+                          : "bg-secondary text-secondary-foreground border border-border"
+                      }`}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <Link
-                to="/auth"
-                className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2"
-              >
-                <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
-              </Link>
-              <p className="text-xs text-muted-foreground text-center mt-3">
-                Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
-              </p>
+
+              {/* About role */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <Target className="w-4 h-4 text-primary" /> O roli
+                </h4>
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  Dołącz do zespołu budującego nowoczesną platformę edukacyjną używaną przez ponad 50 000 studentów w Polsce.
+                  Poprowadzisz refaktoryzację frontu na Next.js 14, wdrożysz design system oraz zadbasz o wydajność i
+                  dostępność (WCAG 2.1). Pracujesz blisko z PM, designerem i 3 backendowcami w Go.
+                </p>
+              </div>
+
+              {/* Responsibilities */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <ListChecks className="w-4 h-4 text-accent" /> Obowiązki
+                </h4>
+                <ul className="space-y-2">
+                  {[
+                    "Rozwój głównej aplikacji webowej w React + Next.js",
+                    "Migracja istniejącego kodu z Pages Router na App Router",
+                    "Współtworzenie i utrzymanie wewnętrznego design systemu",
+                    "Code review oraz mentoring 2 mid-developerów",
+                    "Współpraca z backend i product przy projektowaniu API (GraphQL)",
+                  ].map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-foreground/90">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Requirements */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <Check className="w-4 h-4 text-primary" /> Wymagania
+                </h4>
+                <ul className="space-y-2">
+                  {[
+                    "5+ lat komercyjnego doświadczenia z React",
+                    "Bardzo dobra znajomość TypeScript (typy generyczne, narrowing)",
+                    "Doświadczenie z Next.js (App Router) na produkcji",
+                    "Praktyka z testowaniem (Jest, Playwright lub Cypress)",
+                    "Angielski B2+ (codzienna komunikacja z zespołem QA)",
+                  ].map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-foreground/90">
+                      <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Nice to have */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <Star className="w-4 h-4 text-muted-foreground" /> Mile widziane
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {["Design systems (Storybook)", "Accessibility (WCAG 2.1)", "GraphQL Codegen", "Doświadczenie w EdTech"].map(
+                    (n) => (
+                      <span
+                        key={n}
+                        className="px-2.5 py-1 rounded-full bg-secondary text-xs text-muted-foreground border border-border"
+                      >
+                        {n}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+
+              {/* Benefits */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <Gift className="w-4 h-4 text-primary" /> Benefity
+                </h4>
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {[
+                    "Prywatna opieka medyczna (Medicover)",
+                    "Karta Multisport Plus",
+                    "Budżet szkoleniowy 5 000 zł / rok",
+                    "MacBook Pro M3 + monitor 4K",
+                    "26 dni urlopu (B2B)",
+                    "Hybryda: 2 dni z biura w centrum Warszawy",
+                  ].map((b, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm text-foreground/90">
+                      <Check className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                      <span>{b}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recruitment process */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <Workflow className="w-4 h-4 text-primary" /> Proces rekrutacji
+                </h4>
+                <ol className="space-y-2.5">
+                  {[
+                    "Krótka rozmowa z rekruterką (30 min)",
+                    "Zadanie techniczne na żywo z lead developerem (60 min)",
+                    "Spotkanie z zespołem i CTO (45 min)",
+                    "Decyzja w ciągu 5 dni roboczych",
+                  ].map((s, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-foreground/90">
+                      <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                        {i + 1}
+                      </span>
+                      <span className="pt-0.5">{s}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* About company */}
+              <div className="px-6 sm:px-8 py-6 border-b border-border/60">
+                <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
+                  <Building2 className="w-4 h-4 text-primary" /> O firmie
+                </h4>
+                <p className="text-sm text-foreground/90 leading-relaxed">
+                  SGH Tech to spółka technologiczna budująca platformę e-learningową dla uczelni wyższych w Polsce. Zespół
+                  liczy 35 osób, działamy od 2019 r., jesteśmy rentowni od 2022 r. Inwestujemy w rozwój produktu, a nie w
+                  marketing — większość klientów przychodzi z polecenia.
+                </p>
+              </div>
+
+              {/* CTA */}
+              <div className="px-6 sm:px-8 py-6 bg-secondary/20">
+                <Link
+                  to="/auth"
+                  className="w-full px-5 py-3.5 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2 hover:scale-[1.01] transition-transform"
+                >
+                  <Lock className="w-4 h-4" /> Zaloguj się, by aplikować jednym swipem
+                </Link>
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
+                </p>
+              </div>
             </div>
           </div>
         </div>
