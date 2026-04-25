@@ -1309,6 +1309,10 @@ const Landing = () => {
             Cookies
           </Link>
           <span className="text-border">·</span>
+          <a href="mailto:kontakt@jobswipe.pl" className="hover:text-foreground transition-colors">
+            kontakt@jobswipe.pl
+          </a>
+          <span className="text-border">·</span>
           <span>© {new Date().getFullYear()} JobSwipe</span>
         </div>
       </footer>

@@ -10,6 +10,10 @@ const Footer = () => (
         <span className="text-border">·</span>
         <Link to="/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
         <span className="text-border">·</span>
+        <a href="mailto:kontakt@jobswipe.pl" className="hover:text-foreground transition-colors">
+          kontakt@jobswipe.pl
+        </a>
+        <span className="text-border hidden sm:inline">·</span>
         <span>© {new Date().getFullYear()} JobSwipe</span>
       </div>
     </div>
