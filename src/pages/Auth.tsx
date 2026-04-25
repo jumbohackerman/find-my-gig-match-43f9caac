@@ -24,7 +24,9 @@ const Auth = () => {
       navigate(profile.role === "employer" ? "/employer" : "/", { replace: true });
     }
   }, [user, profile, authLoading, navigate]);
-  const defaultRole = (location.state as any)?.defaultRole;
+  const searchParams = new URLSearchParams(location.search);
+  const roleFromUrl = searchParams.get("role");
+  const defaultRole = roleFromUrl || (location.state as any)?.defaultRole;
   const [mode, setMode] = useState<Mode>("login");
   const [role, setRole] = useState<Role>(defaultRole === "employer" ? "employer" : "candidate");
   const [email, setEmail] = useState("");

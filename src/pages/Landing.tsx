@@ -442,8 +442,8 @@ const Landing = () => {
     };
   }, []);
 
-  const candidatesLabel = counts.candidates > 0 ? counts.candidates.toLocaleString("pl-PL") : "1 200+";
-  const employersLabel = counts.employers > 0 ? counts.employers.toLocaleString("pl-PL") : "180+";
+  const candidatesLabel = counts.candidates > 0 ? counts.candidates.toLocaleString("pl-PL") : null;
+  const employersLabel = counts.employers > 0 ? counts.employers.toLocaleString("pl-PL") : null;
 
   const switchView = (v: View) => {
     setView(v);
@@ -672,36 +672,38 @@ const Landing = () => {
           </motion.section>
 
           {/* ────────── SOCIAL PROOF ────────── */}
-          {isCandidate ? (
-            <SocialProof
-              a={
-                <>
-                  <span className="font-bold text-orange-500">{candidatesLabel}</span> kandydatów już
-                  nie wysyła CV w ciemno
-                </>
-              }
-              b={
-                <>
-                  <span className="font-bold text-orange-500">{employersLabel}</span> pracodawców nie
-                  czyta stosów PDF-ów
-                </>
-              }
-            />
-          ) : (
-            <SocialProof
-              a={
-                <>
-                  <span className="font-bold text-orange-500">{employersLabel}</span> pracodawców
-                  oszczędza czas na selekcji
-                </>
-              }
-              b={
-                <>
-                  <span className="font-bold text-orange-500">{candidatesLabel}</span> kandydatów
-                  przeanalizowanych przez JobSwipe
-                </>
-              }
-            />
+          {candidatesLabel && employersLabel && (
+            isCandidate ? (
+              <SocialProof
+                a={
+                  <>
+                    <span className="font-bold text-orange-500">{candidatesLabel}</span> kandydatów już
+                    nie wysyła CV w ciemno
+                  </>
+                }
+                b={
+                  <>
+                    <span className="font-bold text-orange-500">{employersLabel}</span> pracodawców nie
+                    czyta stosów PDF-ów
+                  </>
+                }
+              />
+            ) : (
+              <SocialProof
+                a={
+                  <>
+                    <span className="font-bold text-orange-500">{employersLabel}</span> pracodawców
+                    oszczędza czas na selekcji
+                  </>
+                }
+                b={
+                  <>
+                    <span className="font-bold text-orange-500">{candidatesLabel}</span> kandydatów
+                    przeanalizowanych przez JobSwipe
+                  </>
+                }
+              />
+            )
           )}
 
           {/* ────────── CANDIDATE-ONLY: EXAMPLE JOB CARD ────────── */}
