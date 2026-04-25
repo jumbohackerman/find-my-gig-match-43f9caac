@@ -9,9 +9,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
+  // Skip splash if already seen this session
+  useEffect(() => {
+    if (sessionStorage.getItem("jobswipe_splash_seen")) {
+      onFinish();
+    }
+  }, [onFinish]);
+
   useEffect(() => {
     const exitTimer = setTimeout(() => setExiting(true), SPLASH_DURATION);
     const finishTimer = setTimeout(onFinish, SPLASH_DURATION + EXIT_DURATION);
+    sessionStorage.setItem("jobswipe_splash_seen", "1");
     return () => {
       clearTimeout(exitTimer);
       clearTimeout(finishTimer);
@@ -615,6 +623,18 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
           .sp-icon-bg svg .draw { stroke-dashoffset: 0 !important; }
           .sp-progress-fill { width: 100% !important; }
         }
+
+        .sp-skip {
+          position: absolute; bottom: 32px; right: 32px; z-index: 30;
+          font-size: 12px; font-weight: 500; color: rgba(255,225,200,0.5);
+          background: none; border: none; cursor: pointer;
+          letter-spacing: 0.05em; text-transform: uppercase;
+          opacity: 0;
+          animation: spSkipIn 0.3s ease 1.5s forwards;
+          transition: color 0.2s;
+        }
+        .sp-skip:hover { color: rgba(255,225,200,0.9); }
+        @keyframes spSkipIn { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
 
       <div ref={rootRef} className={`sp-root${exiting ? " exiting" : ""}`}>
@@ -664,6 +684,17 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            sessionStorage.setItem("jobswipe_splash_seen", "1");
+            onFinish();
+          }}
+          className="sp-skip"
+        >
+          Pomiń
+        </button>
       </div>
     </>
   );
