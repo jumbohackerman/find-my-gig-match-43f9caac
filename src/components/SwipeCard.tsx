@@ -251,7 +251,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
             {/* Tech stack tags */}
             <div className="flex flex-wrap gap-1.5">
-              {job.tags.slice(0, 8).map((tag) => {
+              {job.tags.slice(0, 10).map((tag) => {
                 const isMatched = matchResult?.matchedSkills.includes(tag);
                 const isMissing = matchResult?.missingSkills.includes(tag);
                 return (
