@@ -435,7 +435,7 @@ const SwipeDemoStack = () => {
   }));
 
   return (
-    <div className="relative mx-auto w-full flex flex-col items-center" style={{ maxWidth: 320 }}>
+    <div className="relative mx-auto w-full flex flex-col items-center" style={{ maxWidth: 340 }}>
       <div
         className="absolute -inset-6 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-3xl blur-2xl pointer-events-none"
         aria-hidden
@@ -445,8 +445,8 @@ const SwipeDemoStack = () => {
       <div
         className="relative"
         style={{
-          width: 320,
-          height: 560,
+          width: 340,
+          height: 720,
           overflow: "hidden",
         }}
       >
