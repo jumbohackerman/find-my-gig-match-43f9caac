@@ -73,31 +73,31 @@ const Landing = () => {
   const candidateSteps = [
     {
       icon: FileText,
-      title: "Zbuduj profil raz",
-      body: "Wrzuć CV — JobSwipe automatycznie uzupełni Twój profil. Sprawdzasz, poprawiasz, zatwierdzasz. Żadnych formularzy bez końca. I dostajesz darmowe, profesjonalne CV do pobrania.",
+      title: "Zbuduj profil w sekundę",
+      body: "Wrzuć swoje stare CV raz — JobSwipe natychmiast wyciągnie z niego dane i stworzy strukturalny profil. Jako bonus: w każdej chwili pobierzesz z niego nowoczesne, darmowe CV w formacie PDF.",
     },
     {
       icon: Layers,
-      title: "Swipuj oferty, aplikuj jednym kliknięciem",
-      body: "Przeglądasz karty ofert dopasowanych do Twojego profilu. Widzisz scoring dopasowania zanim aplikujesz. Aplikujesz profilem — bez załączników, bez listów motywacyjnych.",
+      title: "Swipuj i aplikuj jednym kliknięciem",
+      body: "Od razu widzisz nasz Scoring — procentowe dopasowanie Twojego profilu do oferty. Pasuje? Swipuj w prawo i aplikacja wysłana. Zero formularzy, zero załączników.",
     },
     {
       icon: MessageCircle,
       title: "Zawsze dostaniesz odpowiedź",
-      body: "Koniec z ciszą po aplikacji. Każdy kandydat — wybrany czy nie — dostaje informację zwrotną od JobSwipe: co zadziałało, czego brakowało, co warto poprawić przed kolejną aplikacją.",
+      body: "Kończymy z ghostingiem. Jeśli nie trafisz na Shortlistę, JobSwipe wygeneruje dla Ciebie automatyczny, merytoryczny feedback wskazujący konkretne obszary do poprawy.",
     },
   ];
 
   const employerSteps = [
     {
       icon: PlusSquare,
-      title: "Dodaj ofertę i zbierz kandydatów",
-      body: "Tworzysz ofertę w kilka minut. Kandydaci aplikują profilem — Ty zbierasz strukturyzowane dane, nie stos PDF-ów. Widzisz podstawowe info o każdym aplikującym.",
+      title: "Zbierz aplikacje bez czytania PDF-ów",
+      body: "Opublikuj ofertę i patrz jak spływają uporządkowane profile kandydatów. Zero PDF-ów, zero chaosu. Same czyste dane gotowe do shortlisty.",
     },
     {
       icon: Zap,
-      title: "JobSwipe robi selekcję za Ciebie",
-      body: "Zamiast czytać 60 CV — klikasz jeden przycisk. JobSwipe analizuje wszystkich kandydatów pod kątem wymagań oferty i zwraca top 5 z rankingiem i uzasadnieniem wyboru.",
+      title: "Wybierz Top 5 jednym kliknięciem",
+      body: "Kliknij jeden przycisk — JobSwipe analizuje wszystkich kandydatów i podaje Ci Top 5 z rankingiem i uzasadnieniem wyboru. Oszczędzasz godziny ręcznej selekcji.",
     },
     {
       icon: UserCheck,
@@ -256,8 +256,8 @@ const Landing = () => {
               <Lightbulb className="w-4 h-4" />
             </div>
             <p>
-              <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
-              odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+              <span className="font-semibold">Jako jedyna platforma w Polsce</span> kończymy z ghostingiem — każdy
+              odrzucony kandydat dostaje automatyczny, merytoryczny feedback od JobSwipe. Bez udziału pracodawcy.
             </p>
           </div>
         </div>
