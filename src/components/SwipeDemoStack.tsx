@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles } from "lucide-react";
+import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles, Users, Clock, GraduationCap, Building2 } from "lucide-react";
 
 interface DemoJob {
   id: number;
@@ -15,6 +15,11 @@ interface DemoJob {
   tags: string[];
   summary: string;
   perks: string[];
+  experience: string;
+  applicants: number;
+  posted: string;
+  teamSize: string;
+  contract: string;
 }
 
 const JOBS: DemoJob[] = [
@@ -31,6 +36,11 @@ const JOBS: DemoJob[] = [
     tags: ["React", "TypeScript", "Next.js"],
     summary: "Buduj nowoczesną platformę edukacyjną dla 200k uczniów. Zespół 12 osób, code review, czas na refaktor.",
     perks: ["Prywatna opieka", "Budżet na sprzęt", "4 dni w biurze/mc"],
+    experience: "5+ lat",
+    applicants: 42,
+    posted: "2 dni temu",
+    teamSize: "12 osób",
+    contract: "B2B / UoP",
   },
   {
     id: 2,
@@ -45,6 +55,11 @@ const JOBS: DemoJob[] = [
     tags: ["Figma", "UX Research", "Design Systems"],
     summary: "Projektuj checkout obsługujący 14 mln użytkowników. Od research po wdrożenie, blisko z PM i frontem.",
     perks: ["100% zdalnie", "MultiSport", "Konferencje"],
+    experience: "3+ lat",
+    applicants: 87,
+    posted: "5 dni temu",
+    teamSize: "8 designerów",
+    contract: "UoP / B2B",
   },
   {
     id: 3,
@@ -59,6 +74,11 @@ const JOBS: DemoJob[] = [
     tags: ["Node.js", "PostgreSQL", "Kafka"],
     summary: "Skaluj backend obsługujący miliony przejazdów dziennie. Systemy rozproszone, event sourcing, ownership.",
     perks: ["Stock options", "Karta lunch", "Bolt credits"],
+    experience: "5+ lat",
+    applicants: 28,
+    posted: "1 dzień temu",
+    teamSize: "20+ inżynierów",
+    contract: "B2B",
   },
   {
     id: 4,
@@ -73,6 +93,11 @@ const JOBS: DemoJob[] = [
     tags: ["Python", "SQL", "Power BI"],
     summary: "Analizuj zachowania 5 mln klientów. Współpraca z zespołem ryzyka i marketingu, realny wpływ na produkty.",
     perks: ["Premia roczna", "Szkolenia", "Opieka medyczna"],
+    experience: "2-4 lat",
+    applicants: 64,
+    posted: "3 dni temu",
+    teamSize: "15 analityków",
+    contract: "UoP",
   },
 ];
 
@@ -244,21 +269,44 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </div>
 
           {/* Perks */}
-          <div className="flex items-center gap-1.5 text-[10.5px] text-white/50 mb-3">
+          <div className="flex items-center gap-1.5 text-[10.5px] text-white/55 mb-2">
             <Sparkles className="w-3 h-3 text-orange-300/70 shrink-0" />
             <span className="truncate">{job.perks.join(" · ")}</span>
           </div>
 
-          <div className="mt-auto flex items-center justify-between pt-3 border-t border-white/10">
+          {/* Extra info grid */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3 text-[10.5px] text-white/60">
+            <div className="flex items-center gap-1.5">
+              <GraduationCap className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.experience}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Building2 className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.contract}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.teamSize}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.posted}</span>
+            </div>
+          </div>
+
+          <div className="mt-auto flex items-end justify-between pt-3 border-t border-white/10">
             <div>
               <p className="text-[10px] text-white/40 uppercase tracking-wider mb-0.5">
                 Wynagrodzenie
               </p>
               <span className="font-semibold text-white text-[13px]">{job.salary}</span>
             </div>
-            <span className="text-[10px] text-white/40 uppercase tracking-wider">
-              dopasowanie
-            </span>
+            <div className="text-right">
+              <p className="text-[10px] text-white/40 uppercase tracking-wider mb-0.5">
+                Aplikacji
+              </p>
+              <span className="font-semibold text-white/80 text-[13px]">{job.applicants}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -327,7 +375,7 @@ const SwipeDemoStack = () => {
         className="relative"
         style={{
           width: 320,
-          height: 480,
+          height: 560,
           overflow: "hidden",
         }}
       >
