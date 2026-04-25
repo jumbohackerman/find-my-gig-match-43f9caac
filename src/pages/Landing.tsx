@@ -110,7 +110,7 @@ const Landing = () => {
             {[
               { n: "1", title: "Zbuduj profil raz", body: "AI uzupełni Twój profil danymi z CV. Bez wklejania, bez formularzy bez końca." },
               { n: "2", title: "Przeglądaj oferty", body: "Aplikuj jednym kliknięciem. Twój profil trafia bezpośrednio do pracodawcy." },
-              { n: "3", title: "Czekaj na kontakt", body: "Pracodawcy odzywają się tylko do tych, których naprawdę chcą poznać." },
+              { n: "3", title: "Zawsze znasz wynik", body: "Koniec z „damy znać”. Po każdej aplikacji dostajesz jasny status i feedback. Jeśli firma Cię odrzuci, JobSwipe wygeneruje krótkie podsumowanie: co zadecydowało, czego zabrakło i co możesz poprawić." },
             ].map((s) => (
               <div key={s.n} className="card-gradient rounded-2xl border border-border p-6">
                 <div className="w-10 h-10 rounded-full btn-gradient text-primary-foreground font-bold flex items-center justify-center mb-4">{s.n}</div>
