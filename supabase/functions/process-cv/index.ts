@@ -1,4 +1,9 @@
 /**
+ * @deprecated Use parse-cv-ai instead. This edge function returns MOCK data only.
+ * It will be removed after migration to production hosting.
+ * The production CV parser is: supabase/functions/parse-cv-ai/index.ts
+ */
+/**
  * Edge function: process-cv
  *
  * AI-powered CV → structured profile data extraction.
