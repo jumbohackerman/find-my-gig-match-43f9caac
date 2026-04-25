@@ -358,8 +358,8 @@ const Index = () => {
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto w-full px-4 sm:px-6 pb-2 pt-2 sm:pt-3 flex flex-col">
-        <div className={`browse-shell flex-1 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
+      <main className="flex-1 min-h-0 w-full px-4 sm:px-6 pb-2 pt-2 sm:pt-3 flex flex-col">
+        <div className={`browse-shell flex-1 min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
           <LocalErrorBoundary label="Panel">
             {activeTab === "applied" ? (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full" id="panel-applied">
@@ -421,7 +421,7 @@ const Index = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="browse-column w-full flex flex-col gap-2 pb-1" id="panel-swipe">
+              <div className="browse-column w-full flex-1 min-h-0 flex flex-col gap-2 pb-1" id="panel-swipe">
                 <div className="shrink-0 flex items-center gap-2">
                   <div className="shrink-0">
                     <JobFilters filters={filters} onChange={handleFiltersChange} />
@@ -460,7 +460,7 @@ const Index = () => {
                   </motion.div>
                 ) : (
                   <>
-                    <div className="browse-card-stage relative">
+                    <div className="browse-card-stage relative flex-1 min-h-0">
                       <div className="browse-card-frame">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
