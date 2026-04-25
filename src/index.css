@@ -68,7 +68,7 @@
     --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
     --shadow-elevated: 0 20px 50px -16px hsl(0 0% 0% / 0.6);
 
-    --browse-card-column: 24rem;
+    --browse-card-column: 100%;
 
     --sidebar-background: 230 28% 6%;
     --sidebar-foreground: 210 25% 96%;
