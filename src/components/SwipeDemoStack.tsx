@@ -269,21 +269,44 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </div>
 
           {/* Perks */}
-          <div className="flex items-center gap-1.5 text-[10.5px] text-white/50 mb-3">
+          <div className="flex items-center gap-1.5 text-[10.5px] text-white/55 mb-2">
             <Sparkles className="w-3 h-3 text-orange-300/70 shrink-0" />
             <span className="truncate">{job.perks.join(" · ")}</span>
           </div>
 
-          <div className="mt-auto flex items-center justify-between pt-3 border-t border-white/10">
+          {/* Extra info grid */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3 text-[10.5px] text-white/60">
+            <div className="flex items-center gap-1.5">
+              <GraduationCap className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.experience}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Building2 className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.contract}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.teamSize}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.posted}</span>
+            </div>
+          </div>
+
+          <div className="mt-auto flex items-end justify-between pt-3 border-t border-white/10">
             <div>
               <p className="text-[10px] text-white/40 uppercase tracking-wider mb-0.5">
                 Wynagrodzenie
               </p>
               <span className="font-semibold text-white text-[13px]">{job.salary}</span>
             </div>
-            <span className="text-[10px] text-white/40 uppercase tracking-wider">
-              dopasowanie
-            </span>
+            <div className="text-right">
+              <p className="text-[10px] text-white/40 uppercase tracking-wider mb-0.5">
+                Aplikacji
+              </p>
+              <span className="font-semibold text-white/80 text-[13px]">{job.applicants}</span>
+            </div>
           </div>
         </div>
       </div>
