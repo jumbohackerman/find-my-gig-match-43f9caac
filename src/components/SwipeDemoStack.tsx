@@ -239,7 +239,7 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
 
         {/* Content */}
         <div className="relative h-full flex flex-col">
-          <div className="flex items-start gap-3 mb-3">
+          <div className="flex items-start gap-3 mb-2">
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 border border-white/10"
               style={{
