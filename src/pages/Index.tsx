@@ -108,6 +108,10 @@ const Index = () => {
     if (direction === "left") setButtonExitDir("left");
     else if (direction === "right") setButtonExitDir("right");
     else setButtonExitDir(null);
+    if (direction === "left" || direction === "right") {
+      setArrowAnim({ dir: direction, key: Date.now() });
+      setTimeout(() => setArrowAnim(null), 600);
+    }
     await handleSwipe(direction);
     if (direction === "right") refetchApps();
     setTimeout(() => setButtonExitDir(null), 650);
