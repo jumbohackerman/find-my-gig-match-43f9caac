@@ -387,6 +387,8 @@
 
   .browse-card-stage {
     @apply w-full;
+    flex: 1 1 0%;
+    min-height: 0;
     position: relative;
     overflow: visible;
   }
@@ -537,4 +539,8 @@ html {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+}
+
+.overscroll-contain {
+  overscroll-behavior: contain;
 }

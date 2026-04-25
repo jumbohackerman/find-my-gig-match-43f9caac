@@ -358,8 +358,8 @@ const Index = () => {
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto w-full px-4 sm:px-6 pb-2 pt-2 sm:pt-3 flex flex-col">
-        <div className={`browse-shell flex-1 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
+      <main className="flex-1 min-h-0 w-full px-4 sm:px-6 pb-2 pt-2 sm:pt-3 flex flex-col">
+        <div className={`browse-shell flex-1 min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
           <LocalErrorBoundary label="Panel">
             {activeTab === "applied" ? (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full" id="panel-applied">
@@ -421,7 +421,7 @@ const Index = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="browse-column w-full flex flex-col gap-2 pb-1" id="panel-swipe">
+              <div className="browse-column w-full flex-1 min-h-0 flex flex-col gap-2 pb-1" id="panel-swipe">
                 <div className="shrink-0 flex items-center gap-2">
                   <div className="shrink-0">
                     <JobFilters filters={filters} onChange={handleFiltersChange} />
@@ -460,7 +460,7 @@ const Index = () => {
                   </motion.div>
                 ) : (
                   <>
-                    <div className="browse-card-stage relative">
+                    <div className="browse-card-stage relative flex-1 min-h-0">
                       <div className="browse-card-frame">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
@@ -531,43 +531,43 @@ const Index = () => {
                     </div>
 
                     <div className="shrink-0 w-full">
-                      <div className="flex items-center justify-center gap-4 sm:gap-5 pt-1" role="group" aria-label="Akcje swipe">
+                      <div className="flex items-center justify-center gap-3 sm:gap-4 pt-1" role="group" aria-label="Akcje swipe">
                         <motion.button
                           whileHover={{ scale: 1.08, rotate: -6 }}
                           whileTap={{ scale: 0.92 }}
                           onClick={() => handleSwipeWithRefetch("left")}
                           disabled={actionPending}
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full glass-surface border border-border/60 flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/60 hover:shadow-[0_0_24px_-4px_hsl(var(--destructive)/0.5)] transition-all disabled:opacity-40 disabled:pointer-events-none"
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-surface border border-border/60 flex items-center justify-center text-muted-foreground hover:text-destructive hover:border-destructive/60 hover:shadow-[0_0_24px_-4px_hsl(var(--destructive)/0.5)] transition-all disabled:opacity-40 disabled:pointer-events-none"
                           title="Pomiń"
                           data-testid="swipe-skip"
                         >
-                          <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                          <X className="w-4 h-4 sm:w-5 sm:h-5" />
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.1, y: -2 }}
                           whileTap={{ scale: 0.92 }}
                           onClick={() => handleSwipeWithRefetch("save")}
                           disabled={actionPending}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-surface border border-border/60 flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400/60 hover:shadow-[0_0_20px_-4px_hsl(48_95%_55%/0.5)] transition-all disabled:opacity-40 disabled:pointer-events-none"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full glass-surface border border-border/60 flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400/60 hover:shadow-[0_0_20px_-4px_hsl(48_95%_55%/0.5)] transition-all disabled:opacity-40 disabled:pointer-events-none"
                           title="Zapisz na później"
                           data-testid="swipe-save"
                         >
-                          <Star className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.12, rotate: 6 }}
                           whileTap={{ scale: 0.94 }}
                           onClick={() => handleSwipeWithRefetch("right")}
                           disabled={actionPending}
-                          className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow animate-glow-pulse disabled:opacity-50"
+                          className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full btn-gradient flex items-center justify-center text-primary-foreground shadow-glow animate-glow-pulse disabled:opacity-50"
                           title="Aplikuj"
                           data-testid="swipe-apply"
                         >
                           <span className="absolute inset-0 rounded-full ring-2 ring-primary/30 ring-offset-2 ring-offset-background/20" />
-                          {actionPending ? <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin relative z-10" /> : <Check className="w-6 h-6 sm:w-7 sm:h-7 relative z-10" />}
+                          {actionPending ? <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin relative z-10" /> : <Check className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />}
                         </motion.button>
                       </div>
-                      <p className="text-center text-muted-foreground text-[10px] sm:text-xs pt-2.5 tracking-wide">
+                      <p className="text-center text-muted-foreground text-[10px] pt-1.5 tracking-wide">
                         <span className="text-foreground/80 font-semibold">{currentIndex + 1}</span>
                         <span className="opacity-50"> / {filteredJobs.length}</span>
                         <span className="hidden sm:inline ml-3 opacity-50">← → klawisze strzałek</span>
