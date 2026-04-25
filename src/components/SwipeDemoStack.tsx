@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { MapPin, Check, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, Check, X, ArrowRight, ArrowLeft } from "lucide-react";
 
 interface DemoJob {
   id: number;
@@ -62,7 +62,7 @@ const JOBS: DemoJob[] = [
 ];
 
 function matchColor(score: number) {
-  if (score > 85) return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+  if (score >= 85) return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
   if (score >= 70) return "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
   return "bg-orange-500/20 text-orange-300 border-orange-500/40";
 }
@@ -76,97 +76,171 @@ interface CardProps {
 }
 
 const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
-  // For top exiting card use motion value to fade overlays
-  const x = useMotionValue(0);
-  const greenOpacity = useTransform(x, [0, 200], [0, 1]);
-  const redOpacity = useTransform(x, [-200, 0], [1, 0]);
-
   const baseScale = depth === 0 ? 1 : depth === 1 ? 0.95 : 0.9;
   const baseY = depth === 0 ? 0 : depth === 1 ? 8 : 16;
-  const baseOpacity = depth === 0 ? 1 : depth === 1 ? 0.85 : 0.6;
+  const baseOpacity = depth === 0 ? 1 : depth === 1 ? 0.7 : 0.4;
   const zIndex = 10 - depth;
 
-  // animate exit when isTop && exiting
   const animate = exiting && isTop
     ? {
-        x: direction === "right" ? "140%" : "-140%",
+        x: direction === "right" ? "110%" : "-110%",
         rotate: direction === "right" ? 18 : -18,
         opacity: 0,
+        scale: 1,
+        y: 0,
       }
     : { x: 0, scale: baseScale, y: baseY, opacity: baseOpacity, rotate: 0 };
 
+  const interactive = isTop && !exiting;
+
   return (
     <motion.div
-      style={{ zIndex, x: isTop ? x : 0 }}
+      style={{ zIndex }}
       initial={
         depth === 2
           ? { scale: 0.85, y: 28, opacity: 0 }
           : { scale: baseScale, y: baseY, opacity: baseOpacity }
       }
       animate={animate}
-      transition={{ duration: exiting && isTop ? 0.5 : 0.4, ease: "easeOut" }}
+      transition={{
+        duration: exiting && isTop ? 0.45 : 0.35,
+        ease: "easeOut",
+      }}
       className="absolute inset-0"
     >
-      <div className="relative h-full rounded-3xl border border-white/10 shadow-2xl p-6 overflow-hidden"
-        style={{ background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)" }}
+      <div
+        className="relative h-full rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)",
+          padding: "20px",
+          minHeight: "200px",
+          pointerEvents: interactive ? "auto" : "none",
+          userSelect: "none",
+        }}
       >
-        {/* Overlays — only on top card while exiting */}
+        {/* Tint overlay during exit */}
+        {isTop && exiting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            style={{
+              background:
+                direction === "right"
+                  ? "rgba(34, 197, 94, 0.18)"
+                  : "rgba(239, 68, 68, 0.18)",
+              border:
+                direction === "right"
+                  ? "2px solid rgba(34,197,94,0.6)"
+                  : "2px solid rgba(239,68,68,0.6)",
+            }}
+          />
+        )}
+
+        {/* Stamp label */}
         {isTop && exiting && direction === "right" && (
           <motion.div
-            style={{ opacity: 1 }}
-            className="absolute inset-0 rounded-3xl pointer-events-none flex items-start justify-end p-5"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-4 right-4 -rotate-12 px-2.5 py-1 rounded-md border-2 border-emerald-400 text-emerald-300 font-bold text-xs tracking-wider flex items-center gap-1 bg-emerald-500/10 z-20"
           >
-            <div className="absolute inset-0 rounded-3xl"
-              style={{ background: "rgba(34, 197, 94, 0.18)", border: "2px solid rgba(34,197,94,0.6)" }}
-            />
-            <div className="relative -rotate-12 px-3 py-1.5 rounded-lg border-2 border-emerald-400 text-emerald-300 font-bold text-sm tracking-wider flex items-center gap-1.5 bg-emerald-500/10">
-              <Check className="w-4 h-4" /> APLIKUJ
-            </div>
+            <Check className="w-3 h-3" /> APLIKUJ
           </motion.div>
         )}
         {isTop && exiting && direction === "left" && (
           <motion.div
-            className="absolute inset-0 rounded-3xl pointer-events-none flex items-start justify-start p-5"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-4 left-4 rotate-12 px-2.5 py-1 rounded-md border-2 border-red-400 text-red-300 font-bold text-xs tracking-wider flex items-center gap-1 bg-red-500/10 z-20"
           >
-            <div className="absolute inset-0 rounded-3xl"
-              style={{ background: "rgba(239, 68, 68, 0.18)", border: "2px solid rgba(239,68,68,0.6)" }}
+            <X className="w-3 h-3" /> POMIŃ
+          </motion.div>
+        )}
+
+        {/* Direction arrow with trail */}
+        {isTop && exiting && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 0.4, delay: 0.1, times: [0, 0.2, 0.7, 1] }}
+            className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
+            style={{
+              [direction === "right" ? "right" : "left"]: "12px",
+            } as React.CSSProperties}
+          >
+            {/* Trail */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 h-[2px] w-16 rounded-full"
+              style={{
+                [direction === "right" ? "right" : "left"]: "20px",
+                background:
+                  direction === "right"
+                    ? "linear-gradient(to left, rgba(34,197,94,0.7), transparent)"
+                    : "linear-gradient(to right, rgba(239,68,68,0.7), transparent)",
+              } as React.CSSProperties}
             />
-            <div className="relative rotate-12 px-3 py-1.5 rounded-lg border-2 border-red-400 text-red-300 font-bold text-sm tracking-wider flex items-center gap-1.5 bg-red-500/10">
-              <X className="w-4 h-4" /> POMIŃ
+            <div
+              className="relative w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                boxShadow:
+                  direction === "right"
+                    ? "0 0 20px rgba(34,197,94,0.6)"
+                    : "0 0 20px rgba(239,68,68,0.6)",
+              }}
+            >
+              {direction === "right" ? (
+                <ArrowRight className="w-5 h-5" style={{ color: "#22c55e" }} strokeWidth={3} />
+              ) : (
+                <ArrowLeft className="w-5 h-5" style={{ color: "#ef4444" }} strokeWidth={3} />
+              )}
             </div>
           </motion.div>
         )}
 
-        <div className="relative">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0">
+        {/* Content */}
+        <div className="relative h-full flex flex-col">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl shrink-0">
               {job.logo}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-white leading-tight">{job.title}</h3>
-              <p className="text-sm text-white/60">{job.company}</p>
+              <p className="text-xs text-white/60">{job.company}</p>
+              <h3 className="font-bold text-white leading-tight text-[15px] line-clamp-2">
+                {job.title}
+              </h3>
             </div>
-            <span className={`shrink-0 px-2 py-1 rounded-full text-[11px] font-bold border ${matchColor(job.match)}`}>
+            <span
+              className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-bold border ${matchColor(job.match)}`}
+            >
               {job.match}%
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-xs text-white/60 mb-4">
-            <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {job.location}</span>
+          <div className="flex flex-wrap gap-2 text-xs text-white/60 mb-3">
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="w-3 h-3" /> {job.location}
+            </span>
             <span>· {job.workMode}</span>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-5">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {job.tags.map((t) => (
-              <span key={t} className="px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/30 text-orange-300 text-xs font-medium">
+              <span
+                key={t}
+                className="px-2 py-0.5 rounded-md bg-orange-500/10 border border-orange-500/30 text-orange-300 text-[11px] font-medium"
+              >
                 {t}
               </span>
             ))}
           </div>
 
-          <div className="flex items-center justify-between text-sm pt-3 border-t border-white/10">
-            <span className="font-semibold text-white">{job.salary}</span>
-            <span className="text-xs text-white/50">dopasowanie</span>
+          <div className="mt-auto flex items-center justify-between text-sm pt-3 border-t border-white/10">
+            <span className="font-semibold text-white text-[13px]">{job.salary}</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-wider">dopasowanie</span>
           </div>
         </div>
       </div>
@@ -182,24 +256,13 @@ const HandHint = () => (
     className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
     aria-hidden
   >
-    <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-      <g filter="url(#glow)">
-        <path
-          d="M22 14c0-1.7 1.3-3 3-3s3 1.3 3 3v14h2V18c0-1.7 1.3-3 3-3s3 1.3 3 3v12h2v-8c0-1.7 1.3-3 3-3s3 1.3 3 3v18c0 6-4 10-10 10h-6c-3 0-5-1-7-3l-7-9c-1-1.5-1-3 .5-4s3-.5 4 .5l4 4V14z"
-          fill="#fff"
-          stroke="#1a1a2e"
-          strokeWidth="1.5"
-        />
-      </g>
-      <defs>
-        <filter id="glow" x="-10" y="-10" width="80" height="80">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
+    <svg width="48" height="48" viewBox="0 0 56 56" fill="none">
+      <path
+        d="M22 14c0-1.7 1.3-3 3-3s3 1.3 3 3v14h2V18c0-1.7 1.3-3 3-3s3 1.3 3 3v12h2v-8c0-1.7 1.3-3 3-3s3 1.3 3 3v18c0 6-4 10-10 10h-6c-3 0-5-1-7-3l-7-9c-1-1.5-1-3 .5-4s3-.5 4 .5l4 4V14z"
+        fill="#fff"
+        stroke="#1a1a2e"
+        strokeWidth="1.5"
+      />
     </svg>
   </motion.div>
 );
@@ -220,36 +283,38 @@ const SwipeDemoStack = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setExiting(true);
-      // After exit animation completes, advance the deck
       setTimeout(() => {
         setIndex((i) => (i + 1) % JOBS.length);
         setCycle((c) => c + 1);
         setExiting(false);
-      }, 520);
-    }, 2800);
+      }, 470);
+    }, 4500);
     return () => clearInterval(interval);
   }, []);
 
-  // Build the 3 visible cards
   const visible = [0, 1, 2].map((d) => ({
     job: JOBS[(index + d) % JOBS.length],
     depth: d,
   }));
 
   return (
-    <div className="relative max-w-sm mx-auto w-full scale-[0.85] sm:scale-100 origin-top">
+    <div className="relative mx-auto w-full flex flex-col items-center" style={{ maxWidth: 320 }}>
       <div
-        className="absolute -inset-6 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-3xl blur-2xl"
+        className="absolute -inset-6 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-3xl blur-2xl pointer-events-none"
         aria-hidden
       />
 
-      {/* Card stack — fixed aspect for stability */}
-      <div className="relative h-[420px]">
-        <AnimatePresence>
-          {showHint && <HandHint key="hint" />}
-        </AnimatePresence>
+      {/* Strict container — cards never render outside */}
+      <div
+        className="relative"
+        style={{
+          width: 320,
+          height: 420,
+          overflow: "hidden",
+        }}
+      >
+        <AnimatePresence>{showHint && <HandHint key="hint" />}</AnimatePresence>
 
-        {/* Render bottom-up so top card is last in DOM */}
         {visible
           .slice()
           .reverse()
