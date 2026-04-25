@@ -417,6 +417,7 @@ function FinalCtaPair({
 
 const Landing = () => {
   const [view, setView] = useState<View>("candidate");
+  const [exampleExpanded, setExampleExpanded] = useState(false);
   const [counts, setCounts] = useState<{ candidates: number; employers: number }>({
     candidates: 0,
     employers: 0,
