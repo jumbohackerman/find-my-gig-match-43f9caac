@@ -176,46 +176,8 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </motion.div>
         )}
 
-        {/* Direction arrow with trail */}
-        {isTop && exiting && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 0.4, delay: 0.1, times: [0, 0.2, 0.7, 1] }}
-            className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
-            style={{
-              [direction === "right" ? "right" : "left"]: "12px",
-            } as React.CSSProperties}
-          >
-            {/* Trail */}
-            <div
-              className="absolute top-1/2 -translate-y-1/2 h-[2px] w-16 rounded-full"
-              style={{
-                [direction === "right" ? "right" : "left"]: "20px",
-                background:
-                  direction === "right"
-                    ? "linear-gradient(to left, rgba(34,197,94,0.7), transparent)"
-                    : "linear-gradient(to right, rgba(239,68,68,0.7), transparent)",
-              } as React.CSSProperties}
-            />
-            <div
-              className="relative w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md"
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                boxShadow:
-                  direction === "right"
-                    ? "0 0 20px rgba(34,197,94,0.6)"
-                    : "0 0 20px rgba(239,68,68,0.6)",
-              }}
-            >
-              {direction === "right" ? (
-                <ArrowRight className="w-5 h-5" style={{ color: "#22c55e" }} strokeWidth={3} />
-              ) : (
-                <ArrowLeft className="w-5 h-5" style={{ color: "#ef4444" }} strokeWidth={3} />
-              )}
-            </div>
-          </motion.div>
-        )}
+
+
 
         {/* Top accent line */}
         <div
