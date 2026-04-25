@@ -36,6 +36,11 @@ const JOBS: DemoJob[] = [
     tags: ["React", "TypeScript", "Next.js"],
     summary: "Buduj nowoczesną platformę edukacyjną dla 200k uczniów. Zespół 12 osób, code review, czas na refaktor.",
     perks: ["Prywatna opieka", "Budżet na sprzęt", "4 dni w biurze/mc"],
+    experience: "5+ lat",
+    applicants: 42,
+    posted: "2 dni temu",
+    teamSize: "12 osób",
+    contract: "B2B / UoP",
   },
   {
     id: 2,
@@ -50,6 +55,11 @@ const JOBS: DemoJob[] = [
     tags: ["Figma", "UX Research", "Design Systems"],
     summary: "Projektuj checkout obsługujący 14 mln użytkowników. Od research po wdrożenie, blisko z PM i frontem.",
     perks: ["100% zdalnie", "MultiSport", "Konferencje"],
+    experience: "3+ lat",
+    applicants: 87,
+    posted: "5 dni temu",
+    teamSize: "8 designerów",
+    contract: "UoP / B2B",
   },
   {
     id: 3,
@@ -64,6 +74,11 @@ const JOBS: DemoJob[] = [
     tags: ["Node.js", "PostgreSQL", "Kafka"],
     summary: "Skaluj backend obsługujący miliony przejazdów dziennie. Systemy rozproszone, event sourcing, ownership.",
     perks: ["Stock options", "Karta lunch", "Bolt credits"],
+    experience: "5+ lat",
+    applicants: 28,
+    posted: "1 dzień temu",
+    teamSize: "20+ inżynierów",
+    contract: "B2B",
   },
   {
     id: 4,
@@ -78,6 +93,11 @@ const JOBS: DemoJob[] = [
     tags: ["Python", "SQL", "Power BI"],
     summary: "Analizuj zachowania 5 mln klientów. Współpraca z zespołem ryzyka i marketingu, realny wpływ na produkty.",
     perks: ["Premia roczna", "Szkolenia", "Opieka medyczna"],
+    experience: "2-4 lat",
+    applicants: 64,
+    posted: "3 dni temu",
+    teamSize: "15 analityków",
+    contract: "UoP",
   },
 ];
 
