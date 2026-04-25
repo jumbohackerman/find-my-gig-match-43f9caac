@@ -320,40 +320,47 @@ const Index = () => {
 
       <div className="shrink-0 px-4 sm:px-6 pt-3 pb-2 sticky top-[57px] z-30 bg-background/95 backdrop-blur-sm shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)]">
         <div className="browse-shell overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
-          <div className="flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft w-fit mx-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => changeTab(tab.key)}
-                role="tab"
-                aria-selected={activeTab === tab.key}
-                aria-controls={`panel-${tab.key}`}
-                data-testid={`tab-${tab.key}`}
-                className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                  activeTab === tab.key
-                    ? "text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {activeTab === tab.key && (
-                  <motion.span
-                    layoutId="active-tab-pill"
-                    className="absolute inset-0 btn-gradient rounded-xl shadow-glow"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                )}
-                <span className="relative z-10 inline-flex items-center">
-                  {tab.label}
-                  {tab.count != null && tab.count > 0 && (
-                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      activeTab === tab.key ? "bg-primary-foreground/25 text-primary-foreground" : "bg-primary/15 text-primary"
-                    }`} aria-label={`${tab.count} elementów`}>
-                      {tab.count}
-                    </span>
+          <div className="flex items-center justify-center gap-2 w-fit mx-auto">
+            <div className="flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => changeTab(tab.key)}
+                  role="tab"
+                  aria-selected={activeTab === tab.key}
+                  aria-controls={`panel-${tab.key}`}
+                  data-testid={`tab-${tab.key}`}
+                  className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    activeTab === tab.key
+                      ? "text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {activeTab === tab.key && (
+                    <motion.span
+                      layoutId="active-tab-pill"
+                      className="absolute inset-0 btn-gradient rounded-xl shadow-glow"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
                   )}
-                </span>
-              </button>
-            ))}
+                  <span className="relative z-10 inline-flex items-center">
+                    {tab.label}
+                    {tab.count != null && tab.count > 0 && (
+                      <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        activeTab === tab.key ? "bg-primary-foreground/25 text-primary-foreground" : "bg-primary/15 text-primary"
+                      }`} aria-label={`${tab.count} elementów`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {activeTab === "swipe" && (
+              <div className="shrink-0">
+                <JobFilters filters={filters} onChange={handleFiltersChange} />
+              </div>
+            )}
           </div>
         </div>
       </div>
