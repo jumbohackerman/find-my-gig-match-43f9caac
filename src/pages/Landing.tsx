@@ -168,15 +168,15 @@ const Landing = () => {
       </section>
 
       {/* ── Pain points bar ── */}
-      <motion.section {...fadeUp} className="px-6 py-12 bg-foreground/[0.04] border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-12 bg-white/[0.05] border-y border-border/40">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-border/40">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-border/40">
             {painStats.map((s, i) => (
               <div key={i} className="text-center px-4">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-2">
                   Problem
                 </div>
-                <div className="text-3xl sm:text-4xl font-display font-bold text-primary mb-1">{s.value}</div>
+                <div className="text-5xl sm:text-6xl font-display font-black text-primary mb-2 leading-none">{s.value}</div>
                 <div className="text-sm text-foreground font-medium">{s.title}</div>
                 <div className="text-xs text-muted-foreground mt-1">{s.desc}</div>
               </div>
