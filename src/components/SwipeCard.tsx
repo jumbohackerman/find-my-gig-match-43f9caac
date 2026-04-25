@@ -186,7 +186,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </div>
 
           {/* Summary teaser (max 2 lines) */}
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-3 break-words">{summaryText}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-3 lg:line-clamp-4 break-words">{summaryText}</p>
 
           {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
