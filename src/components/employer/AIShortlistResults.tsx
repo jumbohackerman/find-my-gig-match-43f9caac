@@ -82,6 +82,13 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
         </div>
       </div>
 
+      {isMock && (
+        <div className="flex items-start gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
+          <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <span>Tryb demo — wyniki wygenerowane losowo. W wersji produkcyjnej AI analizuje profile kandydatów.</span>
+        </div>
+      )}
+
       <div className="space-y-2">
         {snapshots.map((snap) => {
           const style = RANK_STYLES[snap.rank];
