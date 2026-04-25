@@ -72,20 +72,17 @@ const Landing = () => {
 
   const candidateSteps = [
     {
-      icon: User,
-      emoji: "👤",
+      icon: FileText,
       title: "Zbuduj profil raz",
       body: "Wrzuć CV — JobSwipe automatycznie uzupełni Twój profil. Sprawdzasz, poprawiasz, zatwierdzasz. Żadnych formularzy bez końca. I dostajesz darmowe, profesjonalne CV do pobrania.",
     },
     {
-      icon: Hand,
-      emoji: "👆",
+      icon: Layers,
       title: "Swipuj oferty, aplikuj jednym kliknięciem",
       body: "Przeglądasz karty ofert dopasowanych do Twojego profilu. Widzisz scoring dopasowania zanim aplikujesz. Aplikujesz profilem — bez załączników, bez listów motywacyjnych.",
     },
     {
-      icon: Mail,
-      emoji: "📩",
+      icon: MessageCircle,
       title: "Zawsze dostaniesz odpowiedź",
       body: "Koniec z ciszą po aplikacji. Każdy kandydat — wybrany czy nie — dostaje informację zwrotną od JobSwipe: co zadziałało, czego brakowało, co warto poprawić przed kolejną aplikacją.",
     },
@@ -93,20 +90,17 @@ const Landing = () => {
 
   const employerSteps = [
     {
-      icon: ClipboardList,
-      emoji: "📋",
+      icon: PlusSquare,
       title: "Dodaj ofertę i zbierz kandydatów",
       body: "Tworzysz ofertę w kilka minut. Kandydaci aplikują profilem — Ty zbierasz strukturyzowane dane, nie stos PDF-ów. Widzisz podstawowe info o każdym aplikującym.",
     },
     {
       icon: Zap,
-      emoji: "⚡",
       title: "JobSwipe robi selekcję za Ciebie",
       body: "Zamiast czytać 60 CV — klikasz jeden przycisk. JobSwipe analizuje wszystkich kandydatów pod kątem wymagań oferty i zwraca top 5 z rankingiem i uzasadnieniem wyboru.",
     },
     {
-      icon: MessageSquare,
-      emoji: "💬",
+      icon: UserCheck,
       title: "Kontaktujesz tylko najlepszych",
       body: "Widzisz top 5 z wynikami i uzasadnieniem JobSwipe. Decydujesz, do kogo piszesz. Reszta kandydatów automatycznie dostaje feedback — bez Twojego zaangażowania.",
     },
