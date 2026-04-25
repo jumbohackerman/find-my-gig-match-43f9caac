@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { MapPin, Briefcase, Wifi, GraduationCap, Sparkles, Users, ListChecks, Clock, ChevronRight } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
