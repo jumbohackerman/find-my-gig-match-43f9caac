@@ -17,6 +17,15 @@ import {
   Lightbulb,
   Check,
   X,
+  Wifi,
+  GraduationCap,
+  Users,
+  Wallet,
+  Target,
+  ListChecks,
+  Gift,
+  Workflow,
+  Star,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
