@@ -256,8 +256,8 @@ const Landing = () => {
               <Lightbulb className="w-4 h-4" />
             </div>
             <p>
-              <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
-              odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+              <span className="font-semibold">Jako jedyna platforma w Polsce</span> kończymy z ghostingiem — każdy
+              odrzucony kandydat dostaje automatyczny, merytoryczny feedback od JobSwipe. Bez udziału pracodawcy.
             </p>
           </div>
         </div>
