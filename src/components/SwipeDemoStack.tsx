@@ -299,7 +299,6 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
             </span>
           </div>
         </div>
-        </div>
       </div>
     </motion.div>
   );
