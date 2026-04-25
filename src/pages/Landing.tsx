@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles, Search, Users, Briefcase, MapPin, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
+import SwipeDemoStack from "@/components/SwipeDemoStack";
 
 const Landing = () => {
   const [counts, setCounts] = useState<{ candidates: number; employers: number }>({ candidates: 0, employers: 0 });
@@ -89,40 +90,13 @@ const Landing = () => {
             </div>
           </motion.div>
 
-          {/* Mockup card */}
+          {/* Animated swipe demo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative max-w-sm mx-auto w-full"
           >
-            <div className="absolute -inset-6 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-3xl blur-2xl" aria-hidden />
-            <div className="relative card-gradient rounded-3xl border border-border shadow-2xl p-6">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
-                  <p className="text-sm text-muted-foreground">SGH Tech</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-                <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> Warszawa</span>
-                <span>· Hybrydowo</span>
-                <span>· Senior</span>
-              </div>
-              <p className="text-sm text-foreground mb-4">
-                Dołącz do zespołu budującego nowoczesną platformę edukacyjną. React, TypeScript, GraphQL.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {["React", "TypeScript", "GraphQL"].map((t) => (
-                  <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">{t}</span>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
-                <span className="text-xs text-accent font-medium">95% dopasowania</span>
-              </div>
-            </div>
+            <SwipeDemoStack />
           </motion.div>
         </div>
       </section>
