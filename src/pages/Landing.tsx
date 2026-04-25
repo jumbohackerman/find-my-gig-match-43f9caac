@@ -712,6 +712,56 @@ const Landing = () => {
             </div>
           </motion.section>
 
+          {/* ────────── CANDIDATE-ONLY: FEEDBACK EXAMPLE ────────── */}
+          {isCandidate && (
+            <motion.section {...fadeUp} className="px-6 py-20">
+              <div className="max-w-3xl mx-auto">
+                <div className="text-center mb-10">
+                  <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
+                    Jak wygląda feedback od JobSwipe?
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Każdy odrzucony kandydat dostaje konkretne wskazówki — nie ogólniki.
+                  </p>
+                </div>
+                <div className={`${GLASS_CARD} p-6 sm:p-8`}>
+                  <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <MessageCircle className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Feedback od JobSwipe</p>
+                      <p className="text-xs text-muted-foreground">Dotyczy: Senior Frontend Developer · SGH Tech</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 text-sm text-foreground/80 leading-relaxed">
+                    <p>Cześć Anna,</p>
+                    <p>Dziękujemy za aplikację na stanowisko <strong className="text-foreground">Senior Frontend Developer</strong> w firmie SGH Tech. Po analizie profili wszystkich kandydatów, Twoja aplikacja nie znalazła się w shortliście Top 5.</p>
+                    <div className="rounded-xl bg-muted/50 p-4 my-4">
+                      <p className="text-xs font-bold text-primary uppercase tracking-wide mb-2">Wskazówki do rozwoju</p>
+                      <ul className="space-y-1.5">
+                        <li className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>Oferta wymagała min. 5 lat doświadczenia z React — Twój profil wskazuje 2 lata. Rozważ uzupełnienie doświadczenia.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>Brak doświadczenia z Next.js (App Router) — to był kluczowy wymóg techniczny tej oferty.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>Dodanie portfolio z projektami React mogłoby wzmocnić Twój profil przy podobnych ofertach.</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <p>Nie zniechęcaj się — regularnie pojawiają się nowe oferty dopasowane do Twojego poziomu. Powodzenia!</p>
+                    <p className="text-xs text-muted-foreground mt-3">— Zespół JobSwipe</p>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          )}
+
           {/* ────────── SOCIAL PROOF ────────── */}
           {candidatesLabel && employersLabel && (
             isCandidate ? (
