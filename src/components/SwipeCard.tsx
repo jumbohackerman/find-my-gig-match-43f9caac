@@ -137,23 +137,23 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </>
         )}
 
-        <div className="h-full p-4 sm:p-5 lg:p-6 flex flex-col gap-2 lg:gap-3">
+        <div className="flex-1 overflow-y-auto overscroll-contain scrollbar-none p-3 sm:p-4 lg:p-5 flex flex-col gap-2">
           {/* Header: Logo + Title + Company */}
-          <div className="flex items-start gap-3">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="flex items-start gap-2.5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
               {job.logo && (job.logo.startsWith("http") || job.logo.startsWith("/")) ? (
                 <img src={job.logo} alt={`${job.company} logo`} className="w-full h-full object-contain" />
               ) : (
-                <span className="text-lg">{job.logo || job.company?.slice(0, 2).toUpperCase()}</span>
+                <span className="text-base">{job.logo || job.company?.slice(0, 2).toUpperCase()}</span>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-base sm:text-lg lg:text-xl font-bold text-foreground leading-tight line-clamp-2 break-words">{job.title}</h2>
-              <p className="text-sm sm:text-base text-primary font-medium line-clamp-1 break-words">{job.company}</p>
+              <h2 className="font-display text-sm sm:text-base lg:text-lg font-bold text-foreground leading-tight line-clamp-1 break-words">{job.title}</h2>
+              <p className="text-xs sm:text-sm text-primary font-medium line-clamp-1 break-words">{job.company}</p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               {isSaved && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-400/15 text-yellow-400 font-medium border border-yellow-400/30">⭐</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-400/15 text-yellow-400 font-medium border border-yellow-400/30">⭐</span>
               )}
               {matchResult && <MatchBadge result={matchResult} compact />}
             </div>
@@ -162,40 +162,40 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           {/* Salary */}
           <div>
             {hasSalary ? (
-              <span className="text-sm sm:text-base font-bold text-accent">{job.salary}</span>
+              <span className="text-xs sm:text-sm font-bold text-accent">{job.salary}</span>
             ) : (
-              <span className="text-xs text-muted-foreground italic">Wynagrodzenie nie podane</span>
+              <span className="text-[10px] text-muted-foreground italic">Wynagrodzenie nie podane</span>
             )}
           </div>
 
           {/* Meta chips: location, work mode, type, seniority */}
-          <div className="flex flex-wrap gap-1.5">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-[11px] font-medium">
+          <div className="flex flex-wrap gap-1">
+            <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-md bg-secondary text-secondary-foreground text-[10px] font-medium">
               <MapPin className="w-3 h-3 text-primary" /> {job.location}
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-[11px] font-medium">
+            <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-md bg-secondary text-secondary-foreground text-[10px] font-medium">
               <Wifi className="w-3 h-3 text-accent" /> {workMode}
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-[11px] font-medium">
+            <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-md bg-secondary text-secondary-foreground text-[10px] font-medium">
               <Briefcase className="w-3 h-3 text-primary" /> {job.contractType || job.type}
             </span>
             {seniority && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-[11px] font-medium">
+              <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-md bg-secondary text-secondary-foreground text-[10px] font-medium">
                 <GraduationCap className="w-3 h-3 text-primary" /> {seniority}
               </span>
             )}
           </div>
 
-          {/* Summary teaser (max 2 lines) */}
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-3 lg:line-clamp-4 break-words">{summaryText}</p>
+          {/* Summary teaser — hidden on mobile, 2 lines on desktop */}
+          <p className="hidden sm:block text-muted-foreground text-xs leading-relaxed line-clamp-2 break-words">{summaryText}</p>
 
           {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
-            <div className="rounded-lg bg-accent/5 border border-accent/15 p-2.5">
-              <span className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1.5 block">Dlaczego warto</span>
-              <div className="space-y-1">
-                {highlights.slice(0, 4).map((h, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
+            <div className="rounded-lg bg-accent/5 border border-accent/15 p-2">
+              <span className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1 block">Dlaczego warto</span>
+              <div className="space-y-0.5">
+                {highlights.slice(0, 3).map((h, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-[11px] text-foreground">
                     <Sparkles className="w-3 h-3 text-accent shrink-0 mt-0.5" />
                     <span className="line-clamp-1">{h}</span>
                   </div>
@@ -206,13 +206,13 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
           {/* Compact match score row */}
           {matchResult && (
-            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-secondary/50 border border-border">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-secondary/50 border border-border">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Dopasowanie</span>
-              <span className="text-sm font-bold text-foreground">{matchResult.score}%</span>
+              <span className="text-xs font-bold text-foreground">{matchResult.score}%</span>
               {matchResult.reasons.length > 0 && (
                 <>
                   <span className="text-border">·</span>
-                  <span className="text-[11px] text-muted-foreground truncate flex-1">{matchResult.reasons[0]}</span>
+                  <span className="text-[10px] text-muted-foreground truncate flex-1">{matchResult.reasons[0]}</span>
                 </>
               )}
               {matchResult.score < 40 && matchResult.matchedSkills.length === 0 && (
@@ -225,27 +225,27 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
           {/* Requirements preview */}
           {job.requirements && job.requirements.length > 0 && (
-            <div className="rounded-lg bg-secondary/40 border border-border p-2.5">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 block">Wymagania</span>
-              <div className="space-y-1">
-                {job.requirements.slice(0, 4).map((r, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
+            <div className="rounded-lg bg-secondary/40 border border-border p-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 block">Wymagania</span>
+              <div className="space-y-0.5">
+                {job.requirements.slice(0, 3).map((r, i) => (
+                  <div key={i} className="flex items-start gap-1 text-[11px] text-foreground/80">
                     <span className="text-primary shrink-0 mt-0.5">•</span>
                     <span className="line-clamp-1">{r}</span>
                   </div>
                 ))}
-                {job.requirements.length > 4 && (
-                  <span className="text-[10px] text-muted-foreground">+{job.requirements.length - 4} więcej</span>
+                {job.requirements.length > 3 && (
+                  <span className="text-[10px] text-muted-foreground">+{job.requirements.length - 3} więcej</span>
                 )}
               </div>
             </div>
           )}
 
           {/* Bottom section: metadata strip + tech tags */}
-          <div className="mt-auto flex flex-col gap-2">
+          <div className="mt-auto flex flex-col gap-1.5">
             {/* Metadata strip */}
             {metaItems.length > 0 && (
-              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+              <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground">
                 {metaItems.map((item, i) => (
                   <span key={i} className="inline-flex items-center gap-1">
                     <item.icon className="w-3 h-3" />
@@ -256,14 +256,14 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             )}
 
             {/* Tech stack tags */}
-            <div className="flex flex-wrap gap-1.5">
-              {job.tags.slice(0, 10).map((tag) => {
+            <div className="flex flex-wrap gap-1">
+              {job.tags.slice(0, 7).map((tag) => {
                 const isMatched = matchResult?.matchedSkills.includes(tag);
                 const isMissing = matchResult?.missingSkills.includes(tag);
                 return (
                   <span
                     key={tag}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${
+                    className={`px-1.5 py-px rounded text-[10px] font-medium ${
                       isMatched
                         ? "bg-accent/15 text-accent border border-accent/30"
                         : isMissing
@@ -275,17 +275,17 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                   </span>
                 );
               })}
-              {job.tags.length > 10 && (
-                <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground">
-                  +{job.tags.length - 10}
+              {job.tags.length > 7 && (
+                <span className="px-1.5 py-px rounded text-[10px] font-medium bg-muted text-muted-foreground">
+                  +{job.tags.length - 7}
                 </span>
               )}
             </div>
 
             {/* Tap hint */}
-            <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground/60">
+            <div className="flex items-center justify-center gap-1 text-[9px] text-muted-foreground/60">
               <span>Kliknij, aby zobaczyć szczegóły</span>
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight className="w-2.5 h-2.5" />
             </div>
           </div>
         </div>
