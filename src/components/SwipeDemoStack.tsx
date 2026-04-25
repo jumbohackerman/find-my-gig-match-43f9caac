@@ -346,6 +346,68 @@ const SwipeDemoStack = () => {
               exiting={exiting}
             />
           ))}
+
+        {/* Flying directional arrow — follows the swipe across the stack */}
+        <AnimatePresence>
+          {exiting && (
+            <motion.div
+              key={`arrow-${cycle}`}
+              initial={{
+                x: direction === "right" ? -40 : 360,
+                opacity: 0,
+                scale: 0.6,
+              }}
+              animate={{
+                x: direction === "right" ? 360 : -40,
+                opacity: [0, 1, 1, 0],
+                scale: [0.6, 1, 1, 0.8],
+              }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.55,
+                ease: "easeOut",
+                times: [0, 0.2, 0.75, 1],
+              }}
+              className="absolute top-1/2 -translate-y-1/2 z-40 pointer-events-none"
+              style={{ left: 0 }}
+            >
+              <div className="relative flex items-center">
+                {/* Trail behind arrow */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 h-[3px] w-24 rounded-full blur-[1px]"
+                  style={{
+                    [direction === "right" ? "right" : "left"]: "32px",
+                    background:
+                      direction === "right"
+                        ? "linear-gradient(to left, rgba(34,197,94,0.9), transparent)"
+                        : "linear-gradient(to right, rgba(239,68,68,0.9), transparent)",
+                  } as React.CSSProperties}
+                />
+                {/* Arrow head */}
+                <div
+                  className="relative w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border"
+                  style={{
+                    background: "rgba(255,255,255,0.12)",
+                    borderColor:
+                      direction === "right"
+                        ? "rgba(34,197,94,0.5)"
+                        : "rgba(239,68,68,0.5)",
+                    boxShadow:
+                      direction === "right"
+                        ? "0 0 24px rgba(34,197,94,0.7), inset 0 0 12px rgba(34,197,94,0.2)"
+                        : "0 0 24px rgba(239,68,68,0.7), inset 0 0 12px rgba(239,68,68,0.2)",
+                  }}
+                >
+                  {direction === "right" ? (
+                    <ArrowRight className="w-6 h-6" style={{ color: "#22c55e" }} strokeWidth={3} />
+                  ) : (
+                    <ArrowLeft className="w-6 h-6" style={{ color: "#ef4444" }} strokeWidth={3} />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Indicator pills */}
