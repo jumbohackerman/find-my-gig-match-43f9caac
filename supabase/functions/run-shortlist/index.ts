@@ -76,25 +76,40 @@ interface AIResult {
  * Returns identical JSON structure as real AI would.
  */
 function mockAIShortlist(candidates: AICandidate[]): AIResult {
-  const sorted = [...candidates].sort((a, b) =>
-    (a.full_name || a.candidate_id).localeCompare(
-      b.full_name || b.candidate_id,
-      "pl",
-    ),
-  );
-  const top5 = sorted.slice(0, 5).map((c, i) => ({
+  // Shuffle candidates pseudo-randomly instead of sorting alphabetically
+  const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+
+  const scores = [91.5, 85.0, 79.5, 74.0, 68.5];
+  const justifications = [
+    "Profil najlepiej odpowiada wymaganiom technicznym oferty. Doświadczenie i umiejętności wysoce kompatybilne z opisem stanowiska.",
+    "Silne dopasowanie kompetencji zawodowych. Doświadczenie w podobnym sektorze i na zbliżonym poziomie seniority.",
+    "Dobry zakres umiejętności technicznych. Doświadczenie częściowo pokrywa się z wymaganiami — solidny kandydat z potencjałem.",
+    "Kompetencje bazowe zgodne z ofertą. Niektóre wymagania wymagają dodatkowej weryfikacji podczas rozmowy.",
+    "Profil spełnia minimalne wymagania oferty. Kandydat może wnieść wartość dodaną dzięki unikalnym doświadczeniom.",
+  ];
+
+  const top5 = shuffled.slice(0, 5).map((c, i) => ({
     candidate_id: c.candidate_id,
     rank: i + 1,
-    shortlist_score: Math.round((90 - i * 5) * 10) / 10,
-    justification: `[MOCK] Kandydat wybrany na pozycji ${i + 1}. W trybie produkcyjnym AI dostarczy uzasadnienie merytoryczne na podstawie umiejętności, doświadczenia i dopasowania do oferty.`,
+    shortlist_score: scores[i],
+    justification: justifications[i],
   }));
-  const rejected_feedbacks = sorted.slice(5).map((c) => ({
+
+  const rejectionReasons = [
+    "Poziom doświadczenia poniżej wymagań oferty. Sugerujemy uzupełnienie kompetencji w kluczowych technologiach.",
+    "Oczekiwania finansowe znacząco powyżej widełek oferowanych na tym stanowisku.",
+    "Profil skoncentrowany na innym obszarze specjalizacji niż wymagany w ofercie.",
+    "Brak wymaganego doświadczenia komercyjnego w kluczowych technologiach.",
+  ];
+
+  const rejected_feedbacks = shuffled.slice(5).map((c) => ({
     candidate_id: c.candidate_id,
     feedback_points: [
-      "[MOCK] Inni kandydaci lepiej dopasowani do wymagań oferty.",
-      "[MOCK] Sugerujemy rozwijanie kluczowych kompetencji wymienionych w ogłoszeniu.",
+      rejectionReasons[Math.floor(Math.random() * rejectionReasons.length)],
+      "Zachęcamy do śledzenia nowych ofert — Twoje kompetencje mogą pasować do innych stanowisk.",
     ],
   }));
+
   return { top5, rejected_feedbacks };
 }
 
