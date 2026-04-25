@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles, Search, Users, Briefcase, MapPin, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
+import SwipeDemoStack from "@/components/SwipeDemoStack";
 
 const Landing = () => {
   const [counts, setCounts] = useState<{ candidates: number; employers: number }>({ candidates: 0, employers: 0 });
