@@ -421,7 +421,7 @@ const Index = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="browse-column flex flex-1 min-h-0 flex-col gap-2 pb-1" id="panel-swipe">
+              <div className="browse-column w-full flex flex-1 min-h-0 flex-col gap-2 pb-1" id="panel-swipe">
                 <div className="shrink-0 flex items-center gap-2">
                   <div className="shrink-0">
                     <JobFilters filters={filters} onChange={handleFiltersChange} />
