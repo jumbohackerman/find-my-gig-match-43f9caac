@@ -450,7 +450,7 @@ const Landing = () => {
       </motion.section>
 
       {/* ── Final CTA ── */}
-      <motion.section {...fadeUp} className="px-6 py-20">
+      <motion.section {...fadeUp} className="px-6 py-20 bg-white/[0.05] border-t border-border/40">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-12">
             Gotowy na rekrutację, <span className="text-gradient-primary">która działa?</span>
