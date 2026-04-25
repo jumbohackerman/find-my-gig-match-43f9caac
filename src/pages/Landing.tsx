@@ -146,8 +146,84 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ── Comparison table ── */}
+      <section className="px-6 py-16 bg-secondary/20 border-y border-border/40">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">
+            Dlaczego <span className="text-gradient-primary">JobSwipe</span>?
+          </h2>
+          <p className="text-muted-foreground text-center mb-12">Porównaj nas z tradycyjnymi portalami pracy</p>
+
+          <div className="card-gradient rounded-2xl border border-border overflow-hidden shadow-xl">
+            {/* Header row */}
+            <div className="hidden md:grid grid-cols-[1fr_1.4fr_1.4fr] gap-4 px-6 py-5 border-b border-border/60 bg-secondary/30">
+              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Kategoria</div>
+              <div className="text-sm font-semibold text-muted-foreground">Tradycyjne portale pracy</div>
+              <div className="text-sm font-bold text-gradient-primary">JobSwipe</div>
+            </div>
+
+            {[
+              {
+                category: "Aplikowanie",
+                old: "Wysyłasz PDF i mozolnie wypełniasz formularze.",
+                newTitle: "JobSwipe buduje Twój profil.",
+                newBody: "System automatycznie uzupełnia Twoje dane na podstawie CV, przygotowując Cię do szybkiego swipe'owania.",
+              },
+              {
+                category: "Gdzie jesteś?",
+                old: "Ciągłe przekierowania na zewnętrzne strony i obce systemy firmowe.",
+                newTitle: "JobSwipe integruje proces w jednym miejscu.",
+                newBody: "Cały proces rekrutacyjny odbywa się wyłącznie wewnątrz naszej aplikacji.",
+              },
+              {
+                category: "Odpowiedź",
+                old: "„Odezwiemy się do wybranych\" (rekrutacyjny ghosting).",
+                newTitle: "JobSwipe gwarantuje feedback.",
+                newBody: "Zawsze wiesz, na czym stoisz. JobSwipe generuje dla Ciebie automatyczne wskazówki rozwojowe.",
+              },
+              {
+                category: "Dla firm",
+                old: "Tracenie godzin na ręczne czytanie 150 chaotycznych życiorysów.",
+                newTitle: "JobSwipe dostarcza Shortlistę.",
+                newBody: "System analizuje profile i wybiera Top 5 kandydatów, oszczędzając czas rekruterów.",
+              },
+              {
+                category: "Co zyskujesz?",
+                old: "Płatne szablony. Na innych portalach musisz zapłacić za wygenerowanie CV.",
+                newTitle: "JobSwipe oferuje darmowe CV.",
+                newBody: "Pobierasz profesjonalny, gotowy do użycia PDF wygenerowany bezpośrednio z Twojego profilu.",
+              },
+            ].map((row, idx, arr) => (
+              <div
+                key={row.category}
+                className={`grid grid-cols-1 md:grid-cols-[1fr_1.4fr_1.4fr] gap-3 md:gap-4 px-6 py-5 ${
+                  idx !== arr.length - 1 ? "border-b border-border/40" : ""
+                } hover:bg-secondary/20 transition-colors`}
+              >
+                <div className="font-semibold text-foreground text-sm md:text-base md:pt-0.5">
+                  {row.category}
+                </div>
+                <div className="text-sm text-muted-foreground leading-relaxed">
+                  <span className="md:hidden block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-1">
+                    Tradycyjne portale
+                  </span>
+                  {row.old}
+                </div>
+                <div className="text-sm leading-relaxed">
+                  <span className="md:hidden block text-[10px] font-bold uppercase tracking-wider text-primary/80 mb-1">
+                    JobSwipe
+                  </span>
+                  <span className="font-semibold text-foreground">{row.newTitle}</span>{" "}
+                  <span className="text-muted-foreground">{row.newBody}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Social proof ── */}
-      <section className="px-6 py-12 bg-secondary/20 border-y border-border/40">
+      <section className="px-6 py-12">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-lg text-foreground">
             Dołącz do <span className="font-bold text-gradient-primary">{candidatesLabel}</span> kandydatów
