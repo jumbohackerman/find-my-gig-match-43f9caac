@@ -853,6 +853,25 @@ const Landing = () => {
                       </div>
                     </div>
 
+                    {/* Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setExampleExpanded(!exampleExpanded)}
+                      className="w-full py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5 border-t border-border"
+                    >
+                      {exampleExpanded ? "Zwiń ogłoszenie" : "Pokaż pełne ogłoszenie"}
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${exampleExpanded ? "rotate-180" : ""}`} />
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {exampleExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="overflow-hidden"
+                        >
                     {/* About role */}
                     <div className="px-6 sm:px-8 py-6 border-b border-border">
                       <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
