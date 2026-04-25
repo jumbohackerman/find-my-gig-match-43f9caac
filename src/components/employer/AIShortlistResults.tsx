@@ -34,6 +34,7 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
   const [inviteTarget, setInviteTarget] = useState<ShortlistSnapshot | null>(null);
   const { sendInvitation } = useContactInvitations(shortlist.job_id);
   const rejectedCount = Math.max(0, totalApplied - snapshots.length);
+  const isMock = !shortlist.ai_model_used || shortlist.ai_model_used?.toLowerCase().includes("mock");
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
