@@ -264,7 +264,7 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </div>
 
           {/* Meta chips */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-2">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/70">
               <MapPin className="w-3 h-3" /> {job.location}
             </span>
