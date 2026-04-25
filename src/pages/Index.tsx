@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter, ArrowRight, ArrowLeft } from "lucide-react";
 import { SwipeCardSkeleton, EmptyView } from "@/components/StateViews";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Navbar from "@/components/Navbar";
@@ -16,7 +16,7 @@ import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
 import type { Job } from "@/domain/models";
 import { useAuth } from "@/hooks/useAuth";
-import { useCandidateProfile } from "@/hooks/useCandidateProfile";
+
 import { useCandidateApplications } from "@/hooks/useApplications";
 import { useJobFeed } from "@/hooks/useJobFeed";
 import { useOnboarding } from "@/hooks/useOnboarding";
@@ -68,10 +68,9 @@ const Index = () => {
   const navigate = useNavigate();
   const isGuest = !user;
   const [searchParams, setSearchParams] = useSearchParams();
-  const { candidate } = useCandidateProfile();
+  
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
-  const [hideSuggestion, setHideSuggestion] = useState(false);
   const { recentEntries, trackView, clear: clearRecent, count: recentCount } = useRecentlyViewed();
 
   const {
@@ -320,40 +319,47 @@ const Index = () => {
 
       <div className="shrink-0 px-4 sm:px-6 pt-3 pb-2 sticky top-[57px] z-30 bg-background/95 backdrop-blur-sm shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)]">
         <div className="browse-shell overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
-          <div className="flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft w-fit mx-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => changeTab(tab.key)}
-                role="tab"
-                aria-selected={activeTab === tab.key}
-                aria-controls={`panel-${tab.key}`}
-                data-testid={`tab-${tab.key}`}
-                className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                  activeTab === tab.key
-                    ? "text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {activeTab === tab.key && (
-                  <motion.span
-                    layoutId="active-tab-pill"
-                    className="absolute inset-0 btn-gradient rounded-xl shadow-glow"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                )}
-                <span className="relative z-10 inline-flex items-center">
-                  {tab.label}
-                  {tab.count != null && tab.count > 0 && (
-                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      activeTab === tab.key ? "bg-primary-foreground/25 text-primary-foreground" : "bg-primary/15 text-primary"
-                    }`} aria-label={`${tab.count} elementów`}>
-                      {tab.count}
-                    </span>
+          <div className="flex items-center justify-center gap-2 w-fit mx-auto">
+            <div className="flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => changeTab(tab.key)}
+                  role="tab"
+                  aria-selected={activeTab === tab.key}
+                  aria-controls={`panel-${tab.key}`}
+                  data-testid={`tab-${tab.key}`}
+                  className={`relative px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    activeTab === tab.key
+                      ? "text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {activeTab === tab.key && (
+                    <motion.span
+                      layoutId="active-tab-pill"
+                      className="absolute inset-0 btn-gradient rounded-xl shadow-glow"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
                   )}
-                </span>
-              </button>
-            ))}
+                  <span className="relative z-10 inline-flex items-center">
+                    {tab.label}
+                    {tab.count != null && tab.count > 0 && (
+                      <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        activeTab === tab.key ? "bg-primary-foreground/25 text-primary-foreground" : "bg-primary/15 text-primary"
+                      }`} aria-label={`${tab.count} elementów`}>
+                        {tab.count}
+                      </span>
+                    )}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {activeTab === "swipe" && (
+              <div className="shrink-0">
+                <JobFilters filters={filters} onChange={handleFiltersChange} />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -422,26 +428,6 @@ const Index = () => {
               </motion.div>
             ) : (
               <div className="browse-column w-full flex-1 min-h-0 flex flex-col gap-2 pb-1" id="panel-swipe">
-                <div className="shrink-0 flex items-center gap-2">
-                  <div className="shrink-0">
-                    <JobFilters filters={filters} onChange={handleFiltersChange} />
-                  </div>
-                </div>
-                {!hideSuggestion && !candidate.cvUrl && (
-                  <div className="w-full flex items-center gap-3 rounded-xl bg-primary/5 border border-primary/20 px-4 py-2.5 mb-1">
-                    <Sparkles className="w-4 h-4 text-primary shrink-0" />
-                    <p className="text-xs text-foreground flex-1">
-                      <span className="font-medium">Dodaj CV</span> — JobSwipe automatycznie uzupełni Twój profil i poprawi scoring dopasowania.
-                    </p>
-                    <Link to="/my-profile" className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">
-                      Dodaj CV
-                    </Link>
-                    <button onClick={() => setHideSuggestion(true)} className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors shrink-0" aria-label="Zamknij">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-
                 {filteredJobs.length === 0 ? (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 w-full max-w-xs mx-auto">
                     <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-3xl">🔍</div>
