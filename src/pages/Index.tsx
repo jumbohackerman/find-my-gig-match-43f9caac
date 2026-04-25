@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter, ArrowRight, ArrowLeft } from "lucide-react";
+import { X, Check, Star, RotateCcw, Loader2, SlidersHorizontal, Bookmark, Filter, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { SwipeCardSkeleton, EmptyView } from "@/components/StateViews";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Navbar from "@/components/Navbar";
