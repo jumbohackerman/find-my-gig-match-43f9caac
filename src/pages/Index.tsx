@@ -429,26 +429,6 @@ const Index = () => {
               </motion.div>
             ) : (
               <div className="browse-column w-full flex-1 min-h-0 flex flex-col gap-2 pb-1" id="panel-swipe">
-                <div className="shrink-0 flex items-center gap-2">
-                  <div className="shrink-0">
-                    <JobFilters filters={filters} onChange={handleFiltersChange} />
-                  </div>
-                </div>
-                {!hideSuggestion && !candidate.cvUrl && (
-                  <div className="w-full flex items-center gap-3 rounded-xl bg-primary/5 border border-primary/20 px-4 py-2.5 mb-1">
-                    <Sparkles className="w-4 h-4 text-primary shrink-0" />
-                    <p className="text-xs text-foreground flex-1">
-                      <span className="font-medium">Dodaj CV</span> — JobSwipe automatycznie uzupełni Twój profil i poprawi scoring dopasowania.
-                    </p>
-                    <Link to="/my-profile" className="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-primary-foreground whitespace-nowrap shrink-0">
-                      Dodaj CV
-                    </Link>
-                    <button onClick={() => setHideSuggestion(true)} className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors shrink-0" aria-label="Zamknij">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-
                 {filteredJobs.length === 0 ? (
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 w-full max-w-xs mx-auto">
                     <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-3xl">🔍</div>
