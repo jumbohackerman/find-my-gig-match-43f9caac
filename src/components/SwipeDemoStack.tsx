@@ -438,7 +438,7 @@ const SwipeDemoStack = () => {
         className="relative"
         style={{
           width: 340,
-          height: 720,
+          height: 560,
           overflow: "hidden",
         }}
       >
