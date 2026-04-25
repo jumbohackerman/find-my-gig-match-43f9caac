@@ -277,12 +277,12 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </div>
 
           {/* Summary */}
-          <p className="text-[12px] text-white/70 leading-relaxed mb-3 line-clamp-3">
+          <p className="text-[12px] text-white/70 leading-relaxed mb-2.5 line-clamp-2">
             {job.summary}
           </p>
 
           {/* Tech tags */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-2.5">
             {job.tags.map((t) => (
               <span
                 key={t}
@@ -293,60 +293,8 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
             ))}
           </div>
 
-          {/* Industry / language / start strip */}
-          <div className="space-y-1 mb-3 text-[10.5px] text-white/55">
-            <div className="flex items-center gap-1.5">
-              <Building2 className="w-3 h-3 text-orange-300/60 shrink-0" />
-              <span className="truncate">{job.industry}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Languages className="w-3 h-3 text-orange-300/60 shrink-0" />
-              <span className="truncate">{job.language}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CalendarDays className="w-3 h-3 text-orange-300/60 shrink-0" />
-              <span className="truncate">{job.startDate}</span>
-            </div>
-          </div>
-
-          {/* Requirements */}
-          <div className="mb-2.5">
-            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
-              Wymagania
-            </p>
-            <ul className="space-y-1">
-              {job.requirements.map((r) => (
-                <li key={r} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400/80 shrink-0 mt-[2px]" />
-                  <span className="truncate">{r}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Benefits */}
-          <div className="mb-3">
-            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
-              Oferujemy
-            </p>
-            <ul className="space-y-1">
-              {job.benefits.map((b) => (
-                <li key={b} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
-                  <Gift className="w-3 h-3 text-orange-300/80 shrink-0 mt-[2px]" />
-                  <span className="truncate">{b}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Perks */}
-          <div className="flex items-center gap-1.5 text-[10.5px] text-white/55 mb-2">
-            <Sparkles className="w-3 h-3 text-orange-300/70 shrink-0" />
-            <span className="truncate">{job.perks.join(" · ")}</span>
-          </div>
-
-          {/* Extra info grid */}
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3 text-[10.5px] text-white/60">
+          {/* Compact info grid */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 mb-2.5 text-[10.5px] text-white/60">
             <div className="flex items-center gap-1.5">
               <GraduationCap className="w-3 h-3 text-white/40 shrink-0" />
               <span className="truncate">{job.experience}</span>
@@ -360,9 +308,53 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
               <span className="truncate">{job.teamSize}</span>
             </div>
             <div className="flex items-center gap-1.5">
+              <CalendarDays className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.startDate}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Languages className="w-3 h-3 text-white/40 shrink-0" />
+              <span className="truncate">{job.language}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
               <Clock className="w-3 h-3 text-white/40 shrink-0" />
               <span className="truncate">{job.posted}</span>
             </div>
+          </div>
+
+          {/* Requirements */}
+          <div className="mb-2">
+            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
+              Wymagania
+            </p>
+            <ul className="space-y-0.5">
+              {job.requirements.slice(0, 3).map((r) => (
+                <li key={r} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400/80 shrink-0 mt-[2px]" />
+                  <span className="truncate">{r}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Benefits */}
+          <div className="mb-2">
+            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
+              Oferujemy
+            </p>
+            <ul className="space-y-0.5">
+              {job.benefits.slice(0, 2).map((b) => (
+                <li key={b} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
+                  <Gift className="w-3 h-3 text-orange-300/80 shrink-0 mt-[2px]" />
+                  <span className="truncate">{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Perks single line */}
+          <div className="flex items-center gap-1.5 text-[10.5px] text-white/55 mb-2">
+            <Sparkles className="w-3 h-3 text-orange-300/70 shrink-0" />
+            <span className="truncate">{job.perks.join(" · ")}</span>
           </div>
 
           <div className="mt-auto flex items-end justify-between pt-3 border-t border-white/10">
