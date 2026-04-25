@@ -321,21 +321,6 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
             </div>
           </div>
 
-          {/* Requirements */}
-          <div className="mb-2">
-            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
-              Wymagania
-            </p>
-            <ul className="space-y-0.5">
-              {job.requirements.slice(0, 3).map((r) => (
-                <li key={r} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400/80 shrink-0 mt-[2px]" />
-                  <span className="truncate">{r}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Benefits */}
           <div className="mb-2">
             <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
