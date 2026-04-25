@@ -87,7 +87,7 @@ const SampleJobsPanel = () => {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground">Wzorcowe oferty — inspiracja</p>
           <p className="text-[11px] text-muted-foreground">
-            Zobacz jak wygląda dobrze uzupełnione ogłoszenie, które daje trafne dopasowania.
+            Dobrze uzupełniona oferta przyciąga lepszych kandydatów i daje trafniejszą shortlistę. Zobacz przykłady.
           </p>
         </div>
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform shrink-0 ${expanded ? "rotate-180" : ""}`} />
