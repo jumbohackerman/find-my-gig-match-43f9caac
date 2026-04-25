@@ -7,14 +7,14 @@ import {
   Briefcase,
   MapPin,
   Lock,
-  User,
-  Hand,
-  Mail,
-  ClipboardList,
   Zap,
-  MessageSquare,
   Building2,
   FileText,
+  Layers,
+  MessageCircle,
+  PlusSquare,
+  UserCheck,
+  Lightbulb,
   Check,
   X,
 } from "lucide-react";
@@ -72,20 +72,17 @@ const Landing = () => {
 
   const candidateSteps = [
     {
-      icon: User,
-      emoji: "👤",
+      icon: FileText,
       title: "Zbuduj profil raz",
       body: "Wrzuć CV — JobSwipe automatycznie uzupełni Twój profil. Sprawdzasz, poprawiasz, zatwierdzasz. Żadnych formularzy bez końca. I dostajesz darmowe, profesjonalne CV do pobrania.",
     },
     {
-      icon: Hand,
-      emoji: "👆",
+      icon: Layers,
       title: "Swipuj oferty, aplikuj jednym kliknięciem",
       body: "Przeglądasz karty ofert dopasowanych do Twojego profilu. Widzisz scoring dopasowania zanim aplikujesz. Aplikujesz profilem — bez załączników, bez listów motywacyjnych.",
     },
     {
-      icon: Mail,
-      emoji: "📩",
+      icon: MessageCircle,
       title: "Zawsze dostaniesz odpowiedź",
       body: "Koniec z ciszą po aplikacji. Każdy kandydat — wybrany czy nie — dostaje informację zwrotną od JobSwipe: co zadziałało, czego brakowało, co warto poprawić przed kolejną aplikacją.",
     },
@@ -93,20 +90,17 @@ const Landing = () => {
 
   const employerSteps = [
     {
-      icon: ClipboardList,
-      emoji: "📋",
+      icon: PlusSquare,
       title: "Dodaj ofertę i zbierz kandydatów",
       body: "Tworzysz ofertę w kilka minut. Kandydaci aplikują profilem — Ty zbierasz strukturyzowane dane, nie stos PDF-ów. Widzisz podstawowe info o każdym aplikującym.",
     },
     {
       icon: Zap,
-      emoji: "⚡",
       title: "JobSwipe robi selekcję za Ciebie",
       body: "Zamiast czytać 60 CV — klikasz jeden przycisk. JobSwipe analizuje wszystkich kandydatów pod kątem wymagań oferty i zwraca top 5 z rankingiem i uzasadnieniem wyboru.",
     },
     {
-      icon: MessageSquare,
-      emoji: "💬",
+      icon: UserCheck,
       title: "Kontaktujesz tylko najlepszych",
       body: "Widzisz top 5 z wynikami i uzasadnieniem JobSwipe. Decydujesz, do kogo piszesz. Reszta kandydatów automatycznie dostaje feedback — bez Twojego zaangażowania.",
     },
@@ -174,15 +168,15 @@ const Landing = () => {
       </section>
 
       {/* ── Pain points bar ── */}
-      <motion.section {...fadeUp} className="px-6 py-12 bg-foreground/[0.04] border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-12 bg-white/[0.05] border-y border-border/40">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-border/40">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x lg:divide-border/40">
             {painStats.map((s, i) => (
               <div key={i} className="text-center px-4">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 mb-2">
                   Problem
                 </div>
-                <div className="text-3xl sm:text-4xl font-display font-bold text-primary mb-1">{s.value}</div>
+                <div className="text-5xl sm:text-6xl font-display font-black text-primary mb-2 leading-none">{s.value}</div>
                 <div className="text-sm text-foreground font-medium">{s.title}</div>
                 <div className="text-xs text-muted-foreground mt-1">{s.desc}</div>
               </div>
@@ -196,7 +190,7 @@ const Landing = () => {
 
       {/* ── VS Comparison ── */}
       <motion.section {...fadeUp} className="px-6 py-20">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-center">
             To nie jest kolejny portal z ofertami pracy.
           </h2>
@@ -219,16 +213,16 @@ const Landing = () => {
             {comparison.map((row, idx) => (
               <div
                 key={idx}
-                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 px-6 py-5 items-center hover:bg-secondary/20 transition-colors ${
+                className={`grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 md:gap-4 px-6 py-4 items-center hover:bg-orange-500/5 transition-colors ${
                   idx !== comparison.length - 1 ? "border-b border-border/40" : ""
-                } ${idx % 2 === 1 ? "bg-secondary/10" : ""}`}
+                }`}
               >
-                <div className="flex items-start gap-2 text-muted-foreground text-[15px] leading-relaxed">
+                <div className="flex items-start gap-2 text-muted-foreground text-sm sm:text-[15px] leading-relaxed">
                   <X className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground/70" />
                   <span>{row.old}</span>
                 </div>
                 <ArrowRight className="hidden md:block w-4 h-4 text-muted-foreground/50" />
-                <div className="flex items-start gap-2 text-foreground text-[15px] leading-relaxed md:pl-2 md:border-l-2 md:border-primary/30">
+                <div className="flex items-start gap-2 text-foreground text-sm sm:text-[15px] leading-relaxed md:pl-2 md:border-l-2 md:border-primary/30">
                   <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
                   <span>{row.neu}</span>
                 </div>
@@ -239,27 +233,32 @@ const Landing = () => {
       </motion.section>
 
       {/* ── How it works — candidate ── */}
-      <motion.section {...fadeUp} className="px-6 py-16 bg-secondary/20 border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-16 bg-white/[0.03] border-y border-border/40">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-2 text-center">Jak to działa — kandydat</h2>
           <p className="text-muted-foreground text-center mb-12">3 kroki do nowej pracy</p>
           <div className="grid md:grid-cols-3 gap-6">
-            {candidateSteps.map((s, i) => (
-              <div key={i} className="card-gradient rounded-2xl border border-border p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-11 h-11 rounded-full btn-gradient text-primary-foreground text-xl flex items-center justify-center">
-                    <span>{s.emoji}</span>
+            {candidateSteps.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="card-gradient rounded-2xl border border-border p-6">
+                  <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground">KROK {i + 1}</span>
+                  <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <div className="mt-8 max-w-3xl mx-auto rounded-xl border border-primary/40 bg-primary/5 px-5 py-4 text-sm text-foreground/90">
-            💡 <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
-            odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+          <div className="mt-8 max-w-3xl mx-auto rounded-xl border-2 border-orange-500 bg-orange-500/10 px-5 py-4 text-sm font-medium text-foreground/90 shadow-[0_0_30px_rgba(249,115,22,0.15)] flex items-start gap-3">
+            <div className="w-7 h-7 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">
+              <Lightbulb className="w-4 h-4" />
+            </div>
+            <p>
+              <span className="font-semibold">Jako jedyna platforma w Polsce</span> gwarantujemy feedback dla każdego
+              odrzuconego kandydata — automatycznie, bez udziału pracodawcy.
+            </p>
           </div>
         </div>
       </motion.section>
@@ -272,24 +271,24 @@ const Landing = () => {
             Top 5 kandydatów wybranych przez JobSwipe — bez czytania CV
           </p>
           <div className="grid md:grid-cols-3 gap-6">
-            {employerSteps.map((s, i) => (
-              <div key={i} className="card-gradient rounded-2xl border border-border p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-11 h-11 rounded-full bg-accent/10 text-accent text-xl flex items-center justify-center">
-                    <span>{s.emoji}</span>
+            {employerSteps.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="card-gradient rounded-2xl border border-border p-6">
+                  <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-bold text-muted-foreground">KROK {i + 1}</span>
+                  <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </motion.section>
 
       {/* ── Social proof ── */}
-      <motion.section {...fadeUp} className="px-6 py-12 bg-secondary/20 border-y border-border/40">
+      <motion.section {...fadeUp} className="px-6 py-12 bg-white/[0.05] border-y border-border/40">
         <div className="max-w-4xl mx-auto text-center space-y-2">
           <p className="text-lg sm:text-xl text-foreground">
             <span className="font-bold text-gradient-primary">{candidatesLabel}</span> kandydatów już nie wysyła CV w ciemno
@@ -302,55 +301,70 @@ const Landing = () => {
 
       {/* ── Example job card ── */}
       <motion.section {...fadeUp} className="px-6 py-16">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-lg mx-auto">
           <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2 text-center">Przykładowa oferta</h2>
-          <p className="text-sm text-muted-foreground text-center mb-8">
+          <p className="text-sm text-muted-foreground text-center mb-10">
             Tak wygląda oferta w JobSwipe — pełna informacja zanim aplikujesz
           </p>
-          <div className="card-gradient rounded-3xl border border-border shadow-xl p-6">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
-                    <p className="text-sm text-muted-foreground">SGH Tech</p>
+          <div className="relative">
+            {/* Ghost card 3 */}
+            <div
+              className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
+              style={{ transform: "scale(0.94) translateY(12px)", opacity: 0.3 }}
+              aria-hidden
+            />
+            {/* Ghost card 2 */}
+            <div
+              className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
+              style={{ transform: "scale(0.97) translateY(6px)", opacity: 0.6 }}
+              aria-hidden
+            />
+            {/* Main card */}
+            <div className="relative card-gradient rounded-3xl border border-border shadow-2xl p-6">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-2xl">🚀</div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold text-foreground">Senior Frontend Developer</h3>
+                      <p className="text-sm text-muted-foreground">SGH Tech</p>
+                    </div>
+                    <span className="px-2 py-1 rounded-md btn-gradient text-primary-foreground text-xs font-bold">
+                      92% match
+                    </span>
                   </div>
-                  <span className="px-2 py-1 rounded-md btn-gradient text-primary-foreground text-xs font-bold">
-                    92% match
-                  </span>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> Warszawa
-              </span>
-              <span>· Hybrydowo</span>
-              <span>· Senior</span>
-            </div>
-            <p className="text-sm text-foreground mb-4">
-              Dołącz do zespołu budującego nowoczesną platformę edukacyjną. React, TypeScript, GraphQL.
-            </p>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {["React", "TypeScript", "GraphQL", "Node.js"].map((t) => (
-                <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">
-                  {t}
+              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="w-3 h-3" /> Warszawa
                 </span>
-              ))}
+                <span>· Hybrydowo</span>
+                <span>· Senior</span>
+              </div>
+              <p className="text-sm text-foreground mb-4">
+                Dołącz do zespołu budującego nowoczesną platformę edukacyjną. React, TypeScript, GraphQL.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {["React", "TypeScript", "GraphQL", "Node.js"].map((t) => (
+                  <span key={t} className="px-2 py-1 rounded-md bg-secondary text-secondary-foreground text-xs">
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-sm mb-5">
+                <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
+              </div>
+              <Link
+                to="/auth"
+                className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
+              </Link>
+              <p className="text-xs text-muted-foreground text-center mt-3">
+                Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
+              </p>
             </div>
-            <div className="flex items-center justify-between text-sm mb-5">
-              <span className="font-semibold text-foreground">18 000 – 25 000 zł</span>
-            </div>
-            <Link
-              to="/auth"
-              className="w-full px-5 py-3 rounded-xl btn-gradient text-primary-foreground font-medium shadow-glow inline-flex items-center justify-center gap-2"
-            >
-              <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
-            </Link>
-            <p className="text-xs text-muted-foreground text-center mt-3">
-              Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
-            </p>
           </div>
         </div>
       </motion.section>
@@ -384,7 +398,7 @@ const Landing = () => {
           <div className="relative flex justify-center">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
             <div
-              className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-border/60 grid grid-cols-[35%_65%] bg-card"
+              className="relative w-[280px] sm:w-[320px] aspect-[1/1.414] rounded-lg overflow-hidden shadow-2xl border border-border/60 grid grid-cols-[32%_68%] bg-card shadow-[0_0_40px_rgba(249,115,22,0.2)]"
               aria-hidden
             >
               {/* Sidebar */}
@@ -436,7 +450,7 @@ const Landing = () => {
       </motion.section>
 
       {/* ── Final CTA ── */}
-      <motion.section {...fadeUp} className="px-6 py-20">
+      <motion.section {...fadeUp} className="px-6 py-20 bg-white/[0.05] border-t border-border/40">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-12">
             Gotowy na rekrutację, <span className="text-gradient-primary">która działa?</span>
