@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Check, X, ArrowRight, ArrowLeft } from "lucide-react";
+import { MapPin, Check, X, ArrowRight, ArrowLeft, Briefcase, Sparkles } from "lucide-react";
 
 interface DemoJob {
   id: number;
@@ -9,9 +9,12 @@ interface DemoJob {
   logo: string;
   location: string;
   workMode: string;
+  seniority: string;
   salary: string;
   match: number;
   tags: string[];
+  summary: string;
+  perks: string[];
 }
 
 const JOBS: DemoJob[] = [
@@ -22,9 +25,12 @@ const JOBS: DemoJob[] = [
     logo: "🚀",
     location: "Warszawa",
     workMode: "Hybrydowo",
+    seniority: "Senior",
     salary: "18 000 – 25 000 zł",
     match: 95,
-    tags: ["React", "TypeScript"],
+    tags: ["React", "TypeScript", "Next.js"],
+    summary: "Buduj nowoczesną platformę edukacyjną dla 200k uczniów. Zespół 12 osób, code review, czas na refaktor.",
+    perks: ["Prywatna opieka", "Budżet na sprzęt", "4 dni w biurze/mc"],
   },
   {
     id: 2,
@@ -33,20 +39,26 @@ const JOBS: DemoJob[] = [
     logo: "🎨",
     location: "Remote",
     workMode: "Zdalnie",
+    seniority: "Mid",
     salary: "15 000 – 20 000 zł",
     match: 78,
-    tags: ["Figma", "UX Research"],
+    tags: ["Figma", "UX Research", "Design Systems"],
+    summary: "Projektuj checkout obsługujący 14 mln użytkowników. Od research po wdrożenie, blisko z PM i frontem.",
+    perks: ["100% zdalnie", "MultiSport", "Konferencje"],
   },
   {
     id: 3,
     title: "Backend Engineer",
     company: "Bolt",
     logo: "⚙️",
-    location: "Warszawa/Remote",
+    location: "Warszawa / Remote",
     workMode: "Hybrydowo",
+    seniority: "Senior",
     salary: "20 000 – 28 000 zł",
     match: 88,
-    tags: ["Node.js", "PostgreSQL"],
+    tags: ["Node.js", "PostgreSQL", "Kafka"],
+    summary: "Skaluj backend obsługujący miliony przejazdów dziennie. Systemy rozproszone, event sourcing, ownership.",
+    perks: ["Stock options", "Karta lunch", "Bolt credits"],
   },
   {
     id: 4,
@@ -54,10 +66,13 @@ const JOBS: DemoJob[] = [
     company: "mBank",
     logo: "📊",
     location: "Warszawa",
-    workMode: "Stacjonarnie",
+    workMode: "Hybrydowo",
+    seniority: "Mid",
     salary: "12 000 – 17 000 zł",
     match: 71,
     tags: ["Python", "SQL", "Power BI"],
+    summary: "Analizuj zachowania 5 mln klientów. Współpraca z zespołem ryzyka i marketingu, realny wpływ na produkty.",
+    perks: ["Premia roczna", "Szkolenia", "Opieka medyczna"],
   },
 ];
 
@@ -66,6 +81,7 @@ function matchColor(score: number) {
   if (score >= 70) return "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
   return "bg-orange-500/20 text-orange-300 border-orange-500/40";
 }
+
 
 interface CardProps {
   job: DemoJob;
