@@ -532,7 +532,7 @@ const Landing = () => {
                   <span>
                     {isCandidate
                       ? "Nowy sposób na rekrutację"
-                      : "Rekrutacja bez chaosu i ręcznej selekcji"}
+                      : "Pierwszy etap rekrutacji na autopilocie"}
                   </span>
                 </div>
                 <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight mb-6">
