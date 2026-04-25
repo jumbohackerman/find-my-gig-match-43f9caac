@@ -387,28 +387,8 @@
 
   .browse-card-stage {
     @apply w-full;
-    flex: 1 1 0%;
-    min-height: 420px;
     position: relative;
     overflow: visible;
-  }
-
-  @media (min-width: 640px) {
-    .browse-card-stage {
-      min-height: 480px;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .browse-card-stage {
-      min-height: 540px;
-    }
-  }
-
-  @media (min-width: 1440px) {
-    .browse-card-stage {
-      min-height: 600px;
-    }
   }
 
   .browse-card-frame {
