@@ -111,6 +111,22 @@ const Auth = () => {
               : "Podaj email, aby otrzymać link do resetowania."}
           </p>
 
+          {mode === "signup" && (
+            <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20">
+              <p className="text-xs text-foreground leading-relaxed">
+                {role === "candidate" ? (
+                  <>
+                    ✦ Jako kandydat: aplikujesz profilem jednym kliknięciem, widzisz scoring dopasowania, pobierasz darmowe CV, a nawet jeśli nie przejdziesz dalej — zawsze dostajesz feedback.
+                  </>
+                ) : (
+                  <>
+                    ✦ Jako pracodawca: publikujesz ofertę za darmo, zbierasz uporządkowane profile, uruchamiasz Shortlistę Top 5 jednym kliknięciem — odrzuceni kandydaci dostaną automatyczny feedback.
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4" data-testid="auth-form" aria-label={mode === "login" ? "Formularz logowania" : mode === "signup" ? "Formularz rejestracji" : "Formularz resetowania hasła"}>
             {mode === "signup" && (
               <>
