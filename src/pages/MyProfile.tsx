@@ -81,6 +81,7 @@ const MyProfile = () => {
   const isEmployer = profile?.role === "employer";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
   /** Block 11: True after AI pre-fills profile from CV; cleared after successful save. */
   const [aiPrefilled, setAiPrefilled] = useState(false);
 
