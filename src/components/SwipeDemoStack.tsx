@@ -239,7 +239,7 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
 
         {/* Content */}
         <div className="relative h-full flex flex-col">
-          <div className="flex items-start gap-3 mb-3">
+          <div className="flex items-start gap-3 mb-2">
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 border border-white/10"
               style={{
@@ -264,7 +264,7 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
           </div>
 
           {/* Meta chips */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-2">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-white/70">
               <MapPin className="w-3 h-3" /> {job.location}
             </span>
@@ -319,21 +319,6 @@ const Card = ({ job, direction, isTop, depth, exiting }: CardProps) => {
               <Clock className="w-3 h-3 text-white/40 shrink-0" />
               <span className="truncate">{job.posted}</span>
             </div>
-          </div>
-
-          {/* Requirements */}
-          <div className="mb-2">
-            <p className="text-[9.5px] uppercase tracking-wider text-white/40 font-semibold mb-1">
-              Wymagania
-            </p>
-            <ul className="space-y-0.5">
-              {job.requirements.slice(0, 3).map((r) => (
-                <li key={r} className="flex items-start gap-1.5 text-[11px] text-white/75 leading-snug">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400/80 shrink-0 mt-[2px]" />
-                  <span className="truncate">{r}</span>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Benefits */}
@@ -438,7 +423,7 @@ const SwipeDemoStack = () => {
         className="relative"
         style={{
           width: 340,
-          height: 560,
+          height: 460,
           overflow: "hidden",
         }}
       >
