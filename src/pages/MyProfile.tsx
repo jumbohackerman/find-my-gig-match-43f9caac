@@ -906,11 +906,11 @@ const MyProfile = () => {
             {/* CONSENTS — Block 4 */}
             <AccordionSection
               id="consents"
-              label="Zgody"
+              label="Zgody i RODO"
               icon="🛡️"
               isOpen={activeSection === "consents"}
               onToggle={() => toggleSection("consents")}
-              badge={consentLoading ? undefined : hasConsent ? "Aktywna" : hasDecided ? "Wycofana" : "Nie udzielono"}
+              badge={consentLoading ? undefined : hasConsent ? "Zgoda na analizę AI — aktywna" : hasDecided ? "Wycofana" : "Nie udzielono"}
             >
               <div className="space-y-4">
                 <div className={`p-4 rounded-xl border ${hasConsent ? "bg-accent/10 border-accent/30" : "bg-secondary/40 border-border"}`}>
