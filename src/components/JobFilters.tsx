@@ -98,12 +98,14 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden will-change-auto"
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full mt-2 z-50 w-[min(92vw,28rem)]"
           >
-            <div className="mt-3 p-4 rounded-2xl glass-surface ring-highlight shadow-elevated space-y-4">
+            <div className="p-4 rounded-2xl shadow-elevated space-y-4 bg-popover/98 backdrop-blur-md border border-border max-h-[70vh] overflow-y-auto">
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Location */}
                 <div className="space-y-1.5">
