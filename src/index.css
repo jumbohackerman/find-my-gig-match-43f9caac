@@ -68,7 +68,7 @@
     --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
     --shadow-elevated: 0 20px 50px -16px hsl(0 0% 0% / 0.6);
 
-    --browse-card-column: 24rem;
+    --browse-card-column: 100%;
 
     --sidebar-background: 230 28% 6%;
     --sidebar-foreground: 210 25% 96%;
@@ -152,13 +152,25 @@
 
 @media (min-width: 640px) {
   :root {
-    --browse-card-column: 26rem;
+    --browse-card-column: 30rem;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --browse-card-column: 28rem;
+    --browse-card-column: 34rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --browse-card-column: 38rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --browse-card-column: 42rem;
   }
 }
 
@@ -376,9 +388,27 @@
   .browse-card-stage {
     @apply w-full;
     flex: 1 1 0%;
-    min-height: 0;
+    min-height: 420px;
     position: relative;
     overflow: visible;
+  }
+
+  @media (min-width: 640px) {
+    .browse-card-stage {
+      min-height: 480px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .browse-card-stage {
+      min-height: 540px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .browse-card-stage {
+      min-height: 600px;
+    }
   }
 
   .browse-card-frame {

@@ -391,7 +391,7 @@ const Index = () => {
                 <RecentlyViewedList entries={recentEntries} onJobClick={openJobModal} onClear={clearRecent} />
               </motion.div>
             ) : isFinished ? (
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="browse-column text-center py-8" id="panel-swipe">
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="browse-column w-full text-center py-8" id="panel-swipe">
                 <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-4xl">🎉</div>
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">Wszystko przejrzane!</h2>
                 <p className="text-muted-foreground text-sm mb-1">
@@ -421,7 +421,7 @@ const Index = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="browse-column flex flex-1 min-h-0 flex-col gap-2 pb-1" id="panel-swipe">
+              <div className="browse-column w-full flex flex-1 min-h-0 flex-col gap-2 pb-1" id="panel-swipe">
                 <div className="shrink-0 flex items-center gap-2">
                   <div className="shrink-0">
                     <JobFilters filters={filters} onChange={handleFiltersChange} />

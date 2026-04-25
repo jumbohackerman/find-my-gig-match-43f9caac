@@ -136,7 +136,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </>
         )}
 
-        <div className="h-full p-4 sm:p-5 flex flex-col gap-2">
+        <div className="h-full p-4 sm:p-5 lg:p-6 flex flex-col gap-2 lg:gap-3">
           {/* Header: Logo + Title + Company */}
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-secondary flex items-center justify-center shrink-0 overflow-hidden">
@@ -147,7 +147,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display text-base sm:text-xl font-bold text-foreground leading-tight line-clamp-2 break-words">{job.title}</h2>
+              <h2 className="font-display text-base sm:text-lg lg:text-xl font-bold text-foreground leading-tight line-clamp-2 break-words">{job.title}</h2>
               <p className="text-sm sm:text-base text-primary font-medium line-clamp-1 break-words">{job.company}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -186,14 +186,14 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           </div>
 
           {/* Summary teaser (max 2 lines) */}
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-3 break-words">{summaryText}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed line-clamp-3 lg:line-clamp-4 break-words">{summaryText}</p>
 
           {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
             <div className="rounded-lg bg-accent/5 border border-accent/15 p-2.5">
               <span className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1.5 block">Dlaczego warto</span>
               <div className="space-y-1">
-                {highlights.slice(0, 3).map((h, i) => (
+                {highlights.slice(0, 4).map((h, i) => (
                   <div key={i} className="flex items-start gap-1.5 text-xs text-foreground">
                     <Sparkles className="w-3 h-3 text-accent shrink-0 mt-0.5" />
                     <span className="line-clamp-1">{h}</span>
@@ -222,14 +222,14 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
             <div className="rounded-lg bg-secondary/40 border border-border p-2.5">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 block">Wymagania</span>
               <div className="space-y-1">
-                {job.requirements.slice(0, 3).map((r, i) => (
+                {job.requirements.slice(0, 4).map((r, i) => (
                   <div key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
                     <span className="text-primary shrink-0 mt-0.5">•</span>
                     <span className="line-clamp-1">{r}</span>
                   </div>
                 ))}
-                {job.requirements.length > 3 && (
-                  <span className="text-[10px] text-muted-foreground">+{job.requirements.length - 3} więcej</span>
+                {job.requirements.length > 4 && (
+                  <span className="text-[10px] text-muted-foreground">+{job.requirements.length - 4} więcej</span>
                 )}
               </div>
             </div>
@@ -251,7 +251,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
             {/* Tech stack tags */}
             <div className="flex flex-wrap gap-1.5">
-              {job.tags.slice(0, 8).map((tag) => {
+              {job.tags.slice(0, 10).map((tag) => {
                 const isMatched = matchResult?.matchedSkills.includes(tag);
                 const isMissing = matchResult?.missingSkills.includes(tag);
                 return (
@@ -269,9 +269,9 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                   </span>
                 );
               })}
-              {job.tags.length > 8 && (
+              {job.tags.length > 10 && (
                 <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-muted text-muted-foreground">
-                  +{job.tags.length - 8}
+                  +{job.tags.length - 10}
                 </span>
               )}
             </div>
