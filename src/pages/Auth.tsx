@@ -43,6 +43,17 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (mode === "signup" && password.length < 6) {
+      toast.error("Hasło musi mieć co najmniej 6 znaków");
+      setLoading(false);
+      return;
+    }
+    if (mode === "signup" && !fullName.trim()) {
+      toast.error("Podaj imię i nazwisko");
+      setLoading(false);
+      return;
+    }
+
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
