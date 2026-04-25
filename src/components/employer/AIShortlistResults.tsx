@@ -34,6 +34,7 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
   const [inviteTarget, setInviteTarget] = useState<ShortlistSnapshot | null>(null);
   const { sendInvitation } = useContactInvitations(shortlist.job_id);
   const rejectedCount = Math.max(0, totalApplied - snapshots.length);
+  const isMock = !shortlist.ai_model_used || shortlist.ai_model_used?.toLowerCase().includes("mock");
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
@@ -80,6 +81,13 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
           </div>
         </div>
       </div>
+
+      {isMock && (
+        <div className="flex items-start gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
+          <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <span>Tryb demo — wyniki wygenerowane losowo. W wersji produkcyjnej AI analizuje profile kandydatów.</span>
+        </div>
+      )}
 
       <div className="space-y-2">
         {snapshots.map((snap) => {

@@ -1,4 +1,9 @@
 /**
+ * @deprecated Use parse-cv-ai instead. This edge function returns MOCK data only.
+ * It will be removed after migration to production hosting.
+ * The production CV parser is: supabase/functions/parse-cv-ai/index.ts
+ */
+/**
  * Edge function: process-cv
  *
  * AI-powered CV → structured profile data extraction.
@@ -20,7 +25,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
 const corsHeaders = {
-  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "*",
+  "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") ?? "https://www.jobswipe.pl",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
