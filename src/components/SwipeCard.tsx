@@ -215,6 +215,11 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                   <span className="text-[11px] text-muted-foreground truncate flex-1">{matchResult.reasons[0]}</span>
                 </>
               )}
+              {matchResult.score < 40 && matchResult.matchedSkills.length === 0 && (
+                <Link to="/my-profile" className="text-[10px] text-primary font-medium hover:underline whitespace-nowrap ml-auto">
+                  Uzupełnij profil →
+                </Link>
+              )}
             </div>
           )}
 
