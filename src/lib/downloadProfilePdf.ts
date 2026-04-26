@@ -60,9 +60,16 @@ function ensurePrintStyles() {
   const style = document.createElement("style");
   style.id = PRINT_STYLE_ID;
   style.textContent = `
-    /* Hide the print area on screen — only used for printing */
+    /* Keep the print area measurable on screen, but invisible/off-canvas. */
     @media screen {
-      #${PRINT_AREA_ID} { display: none !important; }
+      #${PRINT_AREA_ID} {
+        display: flex !important;
+        position: fixed !important;
+        left: -10000px !important;
+        top: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
     }
 
     /* When printing: hide everything else, show only the CV */
@@ -700,6 +707,13 @@ function renderAndPrint(candidate: Candidate) {
   container.innerHTML = buildHtml(candidate);
   document.body.appendChild(container);
 
+  const fitToFullA4Pages = () => {
+    const pxPerMm = container.getBoundingClientRect().width / 210 || 96 / 25.4;
+    const pageHeightPx = 297 * pxPerMm;
+    const pages = Math.max(1, Math.ceil((container.scrollHeight + 2) / pageHeightPx));
+    container.style.minHeight = `${pages * 297}mm`;
+  };
+
   // Cleanup after print dialog closes
   const cleanup = () => {
     const node = document.getElementById(PRINT_AREA_ID);
@@ -709,8 +723,10 @@ function renderAndPrint(candidate: Candidate) {
   window.addEventListener("afterprint", cleanup);
 
   // Slight delay so fonts/layout settle before the print dialog snapshots
-  setTimeout(() => {
+  setTimeout(async () => {
     try {
+      await document.fonts?.ready;
+      fitToFullA4Pages();
       window.print();
     } catch (e) {
       console.warn("print failed", e);
