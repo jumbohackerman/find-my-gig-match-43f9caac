@@ -397,6 +397,27 @@ const Employer = () => {
                       </div>
                     )}
 
+                    {jobApps.length >= 10 && !slotsExhausted && job.status !== "closed" && (
+                      <div className="px-4 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setExpandedJob(job.id);
+                            setTimeout(() => {
+                              document
+                                .getElementById(`shortlist-section-${job.id}`)
+                                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }, 200);
+                          }}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform"
+                          data-testid={`employer-run-shortlist-${job.id}`}
+                        >
+                          <Zap className="w-4 h-4" aria-hidden="true" />
+                          Uruchom Shortlistę ({jobApps.length} kandydatów)
+                        </button>
+                      </div>
+                    )}
+
                     <div className="p-4 pt-2">
                       {/* Contextual Suggestion UX */}
                       {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
