@@ -116,7 +116,19 @@ const Index = () => {
     await handleSwipe(direction);
     if (direction === "right") refetchApps();
     setTimeout(() => setButtonExitDir(null), 650);
-  }, [handleSwipe, refetchApps, requireAuth, filteredJobs, currentIndex, trackView]);
+
+    // Show inline undo for skips
+    if (direction === "left") {
+      if (lastSkipped?.timeout) clearTimeout(lastSkipped.timeout);
+      const skippedJob = filteredJobs[currentIndex];
+      if (skippedJob) {
+        const timeout = setTimeout(() => setLastSkipped(null), 3000);
+        setLastSkipped({ title: skippedJob.title, timeout });
+      }
+    } else {
+      setLastSkipped(null);
+    }
+  }, [handleSwipe, refetchApps, requireAuth, filteredJobs, currentIndex, trackView, lastSkipped]);
 
   // ── Keyboard arrow controls ──────────────────────────────────────────────
   useEffect(() => {
