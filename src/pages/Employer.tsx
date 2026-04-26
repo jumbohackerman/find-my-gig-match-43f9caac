@@ -209,7 +209,12 @@ const Employer = () => {
                   icon: "✅",
                 },
               ].map((card) => (
-                <div key={card.label} className="card-gradient rounded-xl border border-border p-3 text-center">
+                <div
+                  key={card.label}
+                  className={`card-gradient rounded-xl border border-border p-3 text-center transition-colors ${
+                    card.value > 0 ? "hover:border-primary/30" : "opacity-60"
+                  }`}
+                >
                   <span className="text-xl mb-1 block" aria-hidden="true">{card.icon}</span>
                   <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
                   <p className="text-[10px] text-muted-foreground font-medium">{card.label}</p>
