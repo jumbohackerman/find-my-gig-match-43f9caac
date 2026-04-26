@@ -444,6 +444,16 @@ const Landing = () => {
     };
   }, []);
 
+  // Auto-rotate employer hero mockup steps
+  useEffect(() => {
+    if (view === "candidate") return;
+    setHeroStep(0);
+    const timer = setInterval(() => {
+      setHeroStep((s) => (s + 1) % 3);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [view]);
+
   const candidatesLabel = counts.candidates > 0 ? counts.candidates.toLocaleString("pl-PL") : null;
   const employersLabel = counts.employers > 0 ? counts.employers.toLocaleString("pl-PL") : null;
 
