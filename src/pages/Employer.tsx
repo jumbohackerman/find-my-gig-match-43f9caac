@@ -439,7 +439,14 @@ const Employer = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
+                          <h4 className="font-display text-sm font-semibold text-foreground truncate flex items-center gap-1.5">
+                            <span
+                              className={`w-2 h-2 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
+                              title={job.status === "closed" ? "Zamknięta" : "Aktywna"}
+                              aria-hidden="true"
+                            />
+                            <span className="truncate">{job.title}</span>
+                          </h4>
                           <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
                         </div>
                         {job.employerId === user?.id && (
