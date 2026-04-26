@@ -255,6 +255,7 @@ const Navbar = () => {
           )}
         </nav>
       </div>
+      <EmployerProfileModal open={showEmployerProfile} onClose={() => setShowEmployerProfile(false)} />
     </header>
   );
 };
