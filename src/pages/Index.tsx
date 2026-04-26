@@ -78,7 +78,7 @@ const Index = () => {
     allJobs, filteredJobs, remainingJobs, savedJobs, savedJobIds,
     currentIndex, isFinished, jobsLoading, filters, matchResults,
     handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
-    undoLast,
+    undoLast, hasConsent,
   } = useJobFeed();
 
   // ── Deep-link: tab ────────────────────────────────────────────────────────
