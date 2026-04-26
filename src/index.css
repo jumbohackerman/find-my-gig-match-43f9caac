@@ -136,12 +136,12 @@
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 230 30% 12%;
-    --sidebar-primary: 16 92% 52%;
+    --sidebar-primary: 24 95% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 16% 94%;
     --sidebar-accent-foreground: 230 30% 18%;
     --sidebar-border: 220 16% 86%;
-    --sidebar-ring: 16 92% 52%;
+    --sidebar-ring: 24 95% 48%;
   }
 
   :root[data-theme="light"] .glass-surface {
