@@ -244,5 +244,6 @@ export function useJobFeed() {
     resetFeed,
     updateFilters,
     hasConsent,
+    undoLast,
   };
 }
