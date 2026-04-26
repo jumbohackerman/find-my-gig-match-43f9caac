@@ -147,7 +147,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
               </button>
             </div>
 
-            <div className="p-5 space-y-4 overflow-y-auto">
+            <div className="p-5 space-y-4">
               {fetching ? (
                 <div className="py-8 flex items-center justify-center text-muted-foreground text-sm">
                   <Loader2 className="w-4 h-4 animate-spin mr-2" /> Ładowanie...
