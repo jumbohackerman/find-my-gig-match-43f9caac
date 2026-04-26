@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationType } from "@/domain/models";
 import EmployerProfileModal from "@/components/employer/EmployerProfileModal";
+import { toast } from "sonner";
 
 function notificationIcon(type: NotificationType) {
   switch (type) {
@@ -104,6 +105,25 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
           </button>
+
+          {/* ── Keyboard shortcuts hint (candidate, desktop only) ── */}
+          {isCandidate && (
+            <button
+              type="button"
+              onClick={() => {
+                toast("Skróty klawiszowe", {
+                  description: "← Pomiń · → Aplikuj · ↑ Zapisz · Enter — szczegóły",
+                  duration: 5000,
+                });
+              }}
+              className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors hidden sm:flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Skróty klawiszowe"
+              title="Skróty klawiszowe"
+              data-testid="nav-keyboard-shortcuts"
+            >
+              <span className="text-xs font-mono font-bold w-4 h-4 flex items-center justify-center">?</span>
+            </button>
+          )}
 
           {/* ── Guest CTA ── */}
           {isGuest && (
