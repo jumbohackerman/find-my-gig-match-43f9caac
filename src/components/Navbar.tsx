@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationType } from "@/domain/models";
+import EmployerProfileModal from "@/components/employer/EmployerProfileModal";
 
 function notificationIcon(type: NotificationType) {
   switch (type) {
@@ -52,6 +53,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showEmployerProfile, setShowEmployerProfile] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const isCandidate = profile?.role === "candidate";
@@ -140,16 +142,17 @@ const Navbar = () => {
               <span className="hidden sm:inline">Panel pracodawcy</span>
             </Link>
           )}
-          {/* TODO: /my-profile is currently candidate-only (RoleGate). Add employer profile page or relax gate before this link works for employers. */}
           {isEmployer && (
-            <Link
-              to="/my-profile"
+            <button
+              type="button"
+              onClick={() => setShowEmployerProfile(true)}
               className="p-2 sm:px-4 sm:py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Profil firmy"
+              data-testid="nav-employer-profile"
             >
               <User className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">Profil firmy</span>
-            </Link>
+            </button>
           )}
 
           {/* ── Notifications (authenticated only) ── */}
@@ -252,6 +255,7 @@ const Navbar = () => {
           )}
         </nav>
       </div>
+      <EmployerProfileModal open={showEmployerProfile} onClose={() => setShowEmployerProfile(false)} />
     </header>
   );
 };
