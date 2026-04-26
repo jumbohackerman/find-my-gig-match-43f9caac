@@ -578,6 +578,12 @@ const Index = () => {
         onSelectJob={(j) => setSelectedJob(j)}
       />
       <Footer />
+      <MobileBottomNav
+        activeTab={activeTab}
+        onChangeTab={(t) => changeTab(t as Tab)}
+        appliedCount={dbApplications.length}
+        savedCount={savedJobs.length}
+      />
     </div>
   );
 };
