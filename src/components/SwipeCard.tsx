@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Briefcase, Wifi, GraduationCap, Sparkles, Users, ListChecks, Clock, ChevronRight } from "lucide-react";
+import { MapPin, Briefcase, Wifi, GraduationCap, Sparkles, Users, ListChecks, Clock, ChevronRight, Shield } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
 import { timeAgo } from "@/lib/timeAgo";
+import { useConsent } from "@/hooks/useConsent";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 
@@ -32,6 +33,7 @@ const vibrateOnThreshold = () => {
 };
 
 const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
+  const { hasConsent } = useConsent();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-320, 320], [-14, 14]);
@@ -297,6 +299,19 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
                 </span>
               )}
             </div>
+
+            {/* RODO consent banner — shown only on top card when user hasn't consented */}
+            {!hasConsent && isTop && (
+              <Link
+                to="/my-profile"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-[11px] text-yellow-500 font-medium hover:bg-yellow-400/20 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Shield className="w-3.5 h-3.5 shrink-0" />
+                <span>Udziel zgody RODO aby móc aplikować</span>
+                <ChevronRight className="w-3 h-3 ml-auto shrink-0" />
+              </Link>
+            )}
 
             {/* Tap hint */}
             <div className="flex items-center justify-center gap-1 text-[9px] text-muted-foreground/60">
