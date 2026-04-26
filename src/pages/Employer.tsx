@@ -504,7 +504,9 @@ const Employer = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <AIShortlistSection jobId={job.id} jobApps={jobApps} />
+                          <div id={`shortlist-section-${job.id}`}>
+                            <AIShortlistSection jobId={job.id} jobApps={jobApps} />
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
