@@ -1366,40 +1366,66 @@ const Landing = () => {
               </div>
 
               {/* Founders */}
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-5">
                 {[
                   {
                     name: "Robert Matysiak",
-                    role: "Data Scientist @LOT Polish Airlines",
+                    position: "Data Scientist",
+                    company: "LOT Polish Airlines",
                     linkedin: "https://www.linkedin.com/in/robert-matysiak-abc/",
                   },
                   {
                     name: "Jędrzej Kalisiewicz",
-                    role: "Lead BI @Renters.pl",
+                    position: "Lead BI",
+                    company: "Renters.pl",
                     linkedin: "https://www.linkedin.com/in/j%C4%99drzej-kalisiewicz-97958a233/",
                   },
                 ].map((person) => (
-                  <div key={person.name} className={`${GLASS_CARD} p-5 flex flex-col`}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center text-lg font-bold text-primary">
+                  <div
+                    key={person.name}
+                    className={`${GLASS_CARD} relative overflow-hidden p-7 sm:p-8 flex flex-col group hover:border-primary/40 transition-all duration-300`}
+                  >
+                    {/* Decorative gradient blob */}
+                    <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full bg-primary/10 blur-3xl group-hover:bg-primary/20 transition-colors" />
+
+                    {/* Avatar + name */}
+                    <div className="relative flex items-center gap-4 mb-5">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
                         {person.name.split(" ").map((n) => n[0]).join("")}
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground">{person.name}</p>
-                        <p className="text-[11px] text-primary font-medium">{person.role}</p>
+                      <div className="min-w-0">
+                        <p className="text-lg sm:text-xl font-bold text-foreground leading-tight truncate">
+                          {person.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Co-founder</p>
                       </div>
                     </div>
+
+                    {/* Position block */}
+                    <div className="relative rounded-xl bg-foreground/[0.03] border border-foreground/5 px-4 py-3 mb-5">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                        Obecnie
+                      </p>
+                      <p className="text-base font-semibold text-foreground leading-tight">
+                        {person.position}
+                      </p>
+                      <p className="text-sm text-primary font-medium mt-0.5">
+                        @ {person.company}
+                      </p>
+                    </div>
+
+                    {/* LinkedIn CTA */}
                     <a
                       href={person.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Profil LinkedIn — ${person.name}`}
-                      className="inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-full text-[11px] font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                      className="relative mt-auto inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-colors"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
-                      LinkedIn
+                      Zobacz profil LinkedIn
                     </a>
                   </div>
                 ))}
