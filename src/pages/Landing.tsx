@@ -1417,6 +1417,117 @@ const Landing = () => {
             </div>
           </motion.section>
 
+          {/* ────────── WHY JOBSWIPE / TRUST SECTION ────────── */}
+          <motion.section {...fadeUp} className="px-6 py-20">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
+                  Technologia, której możesz zaufać
+                </h2>
+                <p className="text-muted-foreground max-w-xl mx-auto">
+                  JobSwipe to nie kolejny portal ogłoszeniowy. To silnik selekcji oparty na danych
+                  — zbudowany przez ludzi, którzy budują systemy decyzyjne na co dzień.
+                </p>
+              </div>
+
+              {/* 3-column trust pillars */}
+              <div className="grid sm:grid-cols-3 gap-4 mb-10">
+                {[
+                  {
+                    icon: "🔬",
+                    title: "Scoring oparty na danych",
+                    desc: "Algorytm dopasowania analizuje umiejętności, doświadczenie, widełki, lokalizację i tryb pracy. Każda decyzja ma uzasadnienie — zero losowości.",
+                  },
+                  {
+                    icon: "🏗️",
+                    title: "Architektura enterprise-grade",
+                    desc: "Silnik shortlisty zaprojektowany z doświadczeniem w budowie systemów BI i data pipelines dla sektora finansowego i lotniczego.",
+                  },
+                  {
+                    icon: "🔒",
+                    title: "RODO by design",
+                    desc: "Dane osobowe kandydatów ukryte przed Shortlistą. Analiza oparta wyłącznie o kompetencje zawodowe. Każdy kandydat świadomie wyraża zgodę na przetwarzanie.",
+                  },
+                ].map((pillar) => (
+                  <div key={pillar.title} className={`${GLASS_CARD} p-5`}>
+                    <span className="text-2xl mb-3 block">{pillar.icon}</span>
+                    <h3 className="text-sm font-bold text-foreground mb-1.5">{pillar.title}</h3>
+                    <p className="text-xs text-foreground/70 leading-relaxed">{pillar.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Team — compact, credential-focused */}
+              <div className={`${GLASS_CARD} p-6 sm:p-8`}>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-5">
+                  <div>
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Zespół założycielski</p>
+                    <h3 className="font-display text-lg font-bold text-foreground">
+                      Zbudowane przez praktyków data science i business intelligence
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4 mb-5">
+                  {[
+                    {
+                      name: "Robert Matysiak",
+                      credential: "Data Scientist · LOT Polish Airlines",
+                      stack: "Machine Learning · Databricks · PySpark · Power BI",
+                      focus: "Scoring dopasowania, architektura danych, ML pipeline'y",
+                      linkedin: "https://www.linkedin.com/in/robert-matysiak-abc/",
+                    },
+                    {
+                      name: "Jędrzej Kalisiewicz",
+                      credential: "Senior Business Analyst / Lead BI · Renters.pl",
+                      stack: "BI Architecture · KPI Frameworks · Figma · Data Pipelines",
+                      focus: "Silnik shortlisty, architektura AI, analiza decyzyjna",
+                      linkedin: "https://www.linkedin.com/in/j%C4%99drzej-kalisiewicz-97958a233/",
+                    },
+                  ].map((person) => (
+                    <div key={person.name} className="p-4 rounded-xl bg-secondary/30 border border-border">
+                      <div className="flex items-center gap-3 mb-2.5">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                          {person.name.split(" ").map(n => n[0]).join("")}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-foreground">{person.name}</p>
+                          <p className="text-[11px] text-primary font-medium">{person.credential}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-1.5 text-[11px]">
+                        <div className="flex items-start gap-2">
+                          <span className="text-muted-foreground shrink-0 w-16 font-medium">Stack:</span>
+                          <span className="text-foreground/70">{person.stack}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-muted-foreground shrink-0 w-16 font-medium">W JobSwipe:</span>
+                          <span className="text-foreground/70">{person.focus}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={person.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Profil LinkedIn — ${person.name}`}
+                        className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors font-medium"
+                      >
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        Profil LinkedIn
+                      </a>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-xs text-muted-foreground leading-relaxed text-center">
+                  Doświadczenie w budowie systemów analitycznych dla LOT Polish Airlines, Renters.pl i sektora fintech.
+                  <br className="hidden sm:block" />
+                  Stack produkcyjny: React · Supabase · Edge Functions · Anthropic AI.
+                </p>
+              </div>
+            </div>
+          </motion.section>
+
           {/* ────────── FINAL CTA ────────── */}
           {isCandidate ? (
             <FinalCtaPair
