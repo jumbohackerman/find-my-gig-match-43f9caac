@@ -14,6 +14,7 @@ import JobFilters from "@/components/JobFilters";
 import { defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import type { Job } from "@/domain/models";
 import { useAuth } from "@/hooks/useAuth";
 
