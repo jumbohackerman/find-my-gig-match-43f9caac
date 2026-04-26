@@ -114,9 +114,9 @@
 
     --border: 220 16% 86%;
     --input: 220 16% 90%;
-    --ring: 16 92% 52%;
+    --ring: 24 95% 48%;
 
-    --swipe-right: 16 92% 52%;
+    --swipe-right: 24 95% 48%;
     --swipe-left: 220 10% 50%;
 
     --gradient-card: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 20% 98%) 60%, hsl(220 18% 96%) 100%);
