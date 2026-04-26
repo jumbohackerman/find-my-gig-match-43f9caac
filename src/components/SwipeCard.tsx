@@ -4,7 +4,6 @@ import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { MapPin, Briefcase, Wifi, GraduationCap, Sparkles, Users, ListChecks, Clock, ChevronRight, Shield } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
 import { timeAgo } from "@/lib/timeAgo";
-import { useConsent } from "@/hooks/useConsent";
 import type { Job } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 
@@ -16,6 +15,7 @@ interface SwipeCardProps {
   isSaved?: boolean;
   onTap?: () => void;
   forcedExitDirection?: "left" | "right" | null;
+  hasConsent?: boolean;
 }
 
 const EXIT_SPRING = { type: "spring" as const, stiffness: 68, damping: 16, mass: 0.95 };
