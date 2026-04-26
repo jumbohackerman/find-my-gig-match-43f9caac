@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationType } from "@/domain/models";
 import EmployerProfileModal from "@/components/employer/EmployerProfileModal";
+import { toast } from "sonner";
 
 function notificationIcon(type: NotificationType) {
   switch (type) {
