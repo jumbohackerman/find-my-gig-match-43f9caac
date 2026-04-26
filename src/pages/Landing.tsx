@@ -595,41 +595,110 @@ const Landing = () => {
                   <SwipeDemoStack />
                 ) : (
                   <div className="w-full max-w-[340px] mx-auto">
-                    <div className="card-gradient rounded-2xl border border-border p-5 shadow-xl">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Zap className="w-4 h-4 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-foreground uppercase tracking-wide">AI Shortlista</p>
-                          <p className="text-[10px] text-muted-foreground">87 kandydatów → Top 5</p>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        {[
-                          { rank: 1, name: "A. Kowalski", role: "Senior Frontend Dev", score: 94 },
-                          { rank: 2, name: "M. Nowak", role: "Full-Stack Engineer", score: 89 },
-                          { rank: 3, name: "K. Wiśniewska", role: "React Developer", score: 85 },
-                          { rank: 4, name: "P. Zieliński", role: "Frontend Architect", score: 82 },
-                          { rank: 5, name: "J. Lewandowska", role: "UI Engineer", score: 78 },
-                        ].map((c) => (
-                          <div key={c.rank} className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary/40 border border-border">
-                            <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center shrink-0">
-                              {c.rank}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
-                              <p className="text-[11px] text-muted-foreground truncate">{c.role}</p>
-                            </div>
-                            <span className="text-sm font-bold text-primary">{c.score}%</span>
+                    <AnimatePresence mode="wait">
+                      {heroStep === 0 && (
+                        <motion.div
+                          key="hero-step-0"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.35 }}
+                          className="card-gradient rounded-2xl border border-border p-5 shadow-xl"
+                        >
+                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">
+                            87 kandydatów aplikowało
+                          </p>
+                          <div className="space-y-1.5">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                              <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-secondary/40">
+                                <div className="w-6 h-6 rounded-full bg-muted" />
+                                <div className="flex-1">
+                                  <div className="h-3 w-24 rounded bg-muted" />
+                                  <div className="h-2 w-16 rounded bg-muted/60 mt-1" />
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
-                        <p className="text-[10px] text-muted-foreground">Analizowane: 87 profili</p>
-                        <p className="text-[10px] font-medium text-primary">Gotowe w 12 sek.</p>
-                      </div>
-                    </div>
+                          <p className="text-[10px] text-muted-foreground text-center mt-3">
+                            Profile zbierane automatycznie...
+                          </p>
+                        </motion.div>
+                      )}
+
+                      {heroStep === 1 && (
+                        <motion.div
+                          key="hero-step-1"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.35 }}
+                          className="card-gradient rounded-2xl border border-primary/30 p-5 shadow-xl flex flex-col items-center justify-center min-h-[260px]"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 animate-pulse">
+                            <Zap className="w-6 h-6 text-primary" />
+                          </div>
+                          <p className="text-sm font-bold text-foreground">JobSwipe analizuje...</p>
+                          <p className="text-[11px] text-muted-foreground mt-1">Porównuję 87 profili z wymaganiami</p>
+                          <div className="flex gap-1 mt-4">
+                            {[0, 1, 2].map((i) => (
+                              <div
+                                key={i}
+                                className="w-2 h-2 rounded-full bg-primary animate-bounce"
+                                style={{ animationDelay: `${i * 0.15}s` }}
+                              />
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {heroStep === 2 && (
+                        <motion.div
+                          key="hero-step-2"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.35 }}
+                          className="card-gradient rounded-2xl border border-border p-5 shadow-xl"
+                        >
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <Zap className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-foreground uppercase tracking-wide">AI Shortlista</p>
+                              <p className="text-[10px] text-muted-foreground">87 kandydatów → Top 5</p>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            {[
+                              { rank: 1, name: "A. Kowalski", role: "Senior Frontend Dev", score: 94 },
+                              { rank: 2, name: "M. Nowak", role: "Full-Stack Engineer", score: 89 },
+                              { rank: 3, name: "K. Wiśniewska", role: "React Developer", score: 85 },
+                              { rank: 4, name: "P. Zieliński", role: "Frontend Architect", score: 82 },
+                              { rank: 5, name: "J. Lewandowska", role: "UI Engineer", score: 78 },
+                            ].map((c) => (
+                              <div
+                                key={c.rank}
+                                className="flex items-center gap-3 p-2.5 rounded-xl bg-secondary/40 border border-border"
+                              >
+                                <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                                  {c.rank}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                                  <p className="text-[11px] text-muted-foreground truncate">{c.role}</p>
+                                </div>
+                                <span className="text-sm font-bold text-primary">{c.score}%</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                            <p className="text-[10px] text-muted-foreground">Analizowane: 87 profili</p>
+                            <p className="text-[10px] font-medium text-primary">Gotowe w 12 sek.</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )}
               </motion.div>
