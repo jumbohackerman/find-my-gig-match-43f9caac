@@ -1425,10 +1425,6 @@ const Landing = () => {
                 ))}
               </div>
 
-              {/* Bottom tagline */}
-              <p className="text-center text-xs text-muted-foreground mt-8">
-                Budowane w Warszawie 🇵🇱 · Na stacku, który sami byśmy wybrali jako kandydaci.
-              </p>
             </div>
           </motion.section>
 
