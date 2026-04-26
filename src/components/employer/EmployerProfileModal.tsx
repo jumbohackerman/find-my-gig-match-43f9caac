@@ -116,7 +116,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 bg-background/70 backdrop-blur-sm flex items-start sm:items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-start sm:items-center justify-center p-4 overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-labelledby="employer-profile-title"
@@ -126,7 +126,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg max-h-[calc(100vh-2rem)] sm:max-h-[90vh] my-auto overflow-hidden flex flex-col rounded-2xl border border-border bg-card shadow-elevated"
+            className="w-full max-w-lg my-auto flex flex-col rounded-2xl border border-border bg-card shadow-elevated"
           >
             <div className="p-5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -147,7 +147,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
               </button>
             </div>
 
-            <div className="p-5 space-y-4 overflow-y-auto">
+            <div className="p-5 space-y-4">
               {fetching ? (
                 <div className="py-8 flex items-center justify-center text-muted-foreground text-sm">
                   <Loader2 className="w-4 h-4 animate-spin mr-2" /> Ładowanie...
