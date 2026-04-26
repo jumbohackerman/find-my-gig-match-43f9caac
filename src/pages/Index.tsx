@@ -318,7 +318,7 @@ const Index = () => {
     <div className="h-[100dvh] bg-background flex flex-col safe-bottom overflow-hidden">
       <Navbar />
 
-      <div className="shrink-0 px-4 sm:px-6 pt-3 pb-2 sticky top-[57px] z-30 bg-background/95 backdrop-blur-sm shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)]">
+      <div className={`shrink-0 px-4 sm:px-6 pt-3 pb-2 sticky top-[57px] z-30 bg-background/95 backdrop-blur-sm shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)] ${activeTab !== "swipe" ? "hidden sm:block" : ""}`}>
         <div className="browse-shell overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
           <div className="flex items-center justify-center sm:justify-center gap-2 w-full sm:w-fit mx-auto">
             <div className="hidden sm:flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft">
@@ -577,7 +577,9 @@ const Index = () => {
         allJobs={allJobs}
         onSelectJob={(j) => setSelectedJob(j)}
       />
-      <Footer />
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
       <MobileBottomNav
         activeTab={activeTab}
         onChangeTab={(t) => changeTab(t as Tab)}
