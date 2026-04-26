@@ -391,12 +391,20 @@ const Employer = () => {
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-primary transition-all duration-500"
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                jobApps.length >= 10
+                                  ? "bg-accent"
+                                  : jobApps.length >= 7
+                                    ? "bg-yellow-500"
+                                    : "bg-primary"
+                              }`}
                               style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
                             />
                           </div>
                           <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
-                            {jobApps.length}/10 do shortlisty
+                            {jobApps.length >= 10
+                              ? "✓ Gotowe do shortlisty!"
+                              : `${jobApps.length}/10 do shortlisty`}
                           </span>
                         </div>
                       </div>
