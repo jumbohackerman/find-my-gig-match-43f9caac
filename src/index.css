@@ -16,10 +16,10 @@
     --popover: 228 22% 10%;
     --popover-foreground: 210 20% 95%;
 
-    /* Vibrant warm primary (coral-orange) */
-    --primary: 16 92% 62%;
+    /* Vibrant warm primary (orange — matches landing #f97316) */
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 24 95% 68%;
+    --primary-glow: 27 96% 61%;
 
     --secondary: 228 18% 16%;
     --secondary-foreground: 210 20% 92%;
@@ -37,20 +37,20 @@
 
     --border: 228 18% 22%;
     --input: 228 18% 20%;
-    --ring: 16 92% 62%;
+    --ring: 24 95% 53%;
 
     --radius: 1rem;
 
-    --swipe-right: 16 92% 62%;
+    --swipe-right: 24 95% 53%;
     --swipe-left: 220 10% 50%;
 
     /* ── Rich gradients ── */
     --gradient-card: linear-gradient(155deg, hsl(228 24% 14%) 0%, hsl(228 22% 10%) 60%, hsl(232 26% 8%) 100%);
     --gradient-card-hover: linear-gradient(155deg, hsl(228 26% 16%) 0%, hsl(228 22% 11%) 60%, hsl(232 26% 9%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(16 92% 62%) 0%, hsl(355 88% 58%) 100%);
-    --gradient-primary-soft: linear-gradient(135deg, hsl(16 92% 62% / 0.18), hsl(355 88% 58% / 0.18));
+    --gradient-primary: linear-gradient(135deg, hsl(24 95% 53%) 0%, hsl(15 90% 50%) 100%);
+    --gradient-primary-soft: linear-gradient(135deg, hsl(24 95% 53% / 0.18), hsl(15 90% 50% / 0.18));
     --gradient-accent: linear-gradient(135deg, hsl(162 70% 48%), hsl(180 75% 50%));
-    --gradient-aurora: radial-gradient(at 20% 10%, hsl(16 92% 62% / 0.18) 0%, transparent 50%),
+    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 95% 53% / 0.18) 0%, transparent 50%),
                        radial-gradient(at 80% 20%, hsl(280 70% 55% / 0.12) 0%, transparent 50%),
                        radial-gradient(at 50% 80%, hsl(162 70% 48% / 0.10) 0%, transparent 50%);
     --gradient-mesh: linear-gradient(125deg, hsl(230 28% 6%) 0%, hsl(232 30% 8%) 50%, hsl(228 28% 7%) 100%);
@@ -60,10 +60,10 @@
                    0 2px 8px -2px hsl(0 0% 0% / 0.4),
                    inset 0 1px 0 0 hsl(210 30% 100% / 0.04);
     --shadow-card-hover: 0 24px 60px -16px hsl(0 0% 0% / 0.75),
-                         0 4px 12px -2px hsl(16 92% 62% / 0.15),
+                         0 4px 12px -2px hsl(24 95% 53% / 0.15),
                          inset 0 1px 0 0 hsl(210 30% 100% / 0.06);
-    --shadow-glow: 0 0 40px -8px hsl(16 92% 62% / 0.45),
-                   0 0 80px -16px hsl(355 88% 58% / 0.25);
+    --shadow-glow: 0 0 40px -8px hsl(24 95% 53% / 0.45),
+                   0 0 80px -16px hsl(15 90% 50% / 0.25);
     --shadow-glow-accent: 0 0 32px -6px hsl(162 70% 48% / 0.40);
     --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
     --shadow-elevated: 0 20px 50px -16px hsl(0 0% 0% / 0.6);
@@ -72,12 +72,12 @@
 
     --sidebar-background: 230 28% 6%;
     --sidebar-foreground: 210 25% 96%;
-    --sidebar-primary: 16 92% 62%;
+    --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 228 18% 16%;
     --sidebar-accent-foreground: 210 20% 92%;
     --sidebar-border: 228 18% 22%;
-    --sidebar-ring: 16 92% 62%;
+    --sidebar-ring: 24 95% 53%;
 
     /* Animation timings */
     --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -95,9 +95,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 230 30% 12%;
 
-    --primary: 16 92% 52%;
+    --primary: 24 95% 48%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 24 95% 60%;
+    --primary-glow: 27 96% 56%;
 
     --secondary: 220 16% 94%;
     --secondary-foreground: 230 30% 18%;
@@ -114,34 +114,34 @@
 
     --border: 220 16% 86%;
     --input: 220 16% 90%;
-    --ring: 16 92% 52%;
+    --ring: 24 95% 48%;
 
-    --swipe-right: 16 92% 52%;
+    --swipe-right: 24 95% 48%;
     --swipe-left: 220 10% 50%;
 
     --gradient-card: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 20% 98%) 60%, hsl(220 18% 96%) 100%);
     --gradient-card-hover: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 22% 99%) 60%, hsl(220 18% 97%) 100%);
     --gradient-mesh: linear-gradient(125deg, hsl(210 25% 98%) 0%, hsl(220 24% 96%) 50%, hsl(215 22% 97%) 100%);
-    --gradient-aurora: radial-gradient(at 20% 10%, hsl(16 92% 62% / 0.10) 0%, transparent 50%),
+    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 95% 53% / 0.10) 0%, transparent 50%),
                        radial-gradient(at 80% 20%, hsl(280 70% 60% / 0.07) 0%, transparent 50%),
                        radial-gradient(at 50% 80%, hsl(162 70% 50% / 0.06) 0%, transparent 50%);
 
     --shadow-card: 0 12px 40px -12px hsl(220 30% 30% / 0.18),
                    0 2px 8px -2px hsl(220 30% 30% / 0.08);
     --shadow-card-hover: 0 24px 60px -16px hsl(220 30% 30% / 0.25),
-                         0 4px 12px -2px hsl(16 92% 52% / 0.18);
-    --shadow-glow: 0 0 40px -8px hsl(16 92% 52% / 0.30);
+                         0 4px 12px -2px hsl(24 95% 48% / 0.18);
+    --shadow-glow: 0 0 40px -8px hsl(24 95% 48% / 0.30);
     --shadow-soft: 0 4px 20px -4px hsl(220 30% 30% / 0.10);
     --shadow-elevated: 0 20px 50px -16px hsl(220 30% 30% / 0.18);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 230 30% 12%;
-    --sidebar-primary: 16 92% 52%;
+    --sidebar-primary: 24 95% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 16% 94%;
     --sidebar-accent-foreground: 230 30% 18%;
     --sidebar-border: 220 16% 86%;
-    --sidebar-ring: 16 92% 52%;
+    --sidebar-ring: 24 95% 48%;
   }
 
   :root[data-theme="light"] .glass-surface {
