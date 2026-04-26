@@ -478,6 +478,7 @@ const Index = () => {
                               isSaved={savedJobIds.has(job.id)}
                               onTap={() => openJobModal(job)}
                               forcedExitDirection={index === 0 ? buttonExitDir : null}
+                              hasConsent={hasConsent}
                             />
                           ))}
                         </AnimatePresence>
