@@ -291,7 +291,10 @@ function StepsRow({ steps }: { steps: StepCard[] }) {
       {steps.map((s, i) => {
         const Icon = s.icon;
         return (
-          <div key={i} className={`${GLASS_CARD} p-6`}>
+          <div key={i} className={`${GLASS_CARD} p-6 relative`}>
+            <div className="absolute top-4 right-4 w-7 h-7 rounded-full bg-primary/15 text-primary font-bold flex items-center justify-center text-sm">
+              {i + 1}
+            </div>
             <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center mb-4">
               <Icon className="w-5 h-5" />
             </div>
