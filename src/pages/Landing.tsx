@@ -1366,7 +1366,7 @@ const Landing = () => {
               </div>
 
               {/* Founders */}
-              <div className="grid sm:grid-cols-2 gap-5">
+              <div className="flex flex-col gap-4">
                 {[
                   {
                     name: "Robert Matysiak",
@@ -1383,34 +1383,28 @@ const Landing = () => {
                 ].map((person) => (
                   <div
                     key={person.name}
-                    className={`${GLASS_CARD} relative overflow-hidden p-7 sm:p-8 flex flex-col group hover:border-primary/40 transition-all duration-300`}
+                    className={`${GLASS_CARD} relative overflow-hidden p-4 sm:p-5 flex items-center gap-4 sm:gap-5 group hover:border-primary/40 transition-all duration-300`}
                   >
                     {/* Decorative gradient blob */}
-                    <div className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full bg-primary/10 blur-3xl group-hover:bg-primary/20 transition-colors" />
+                    <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/10 blur-3xl group-hover:bg-primary/20 transition-colors" />
 
-                    {/* Avatar + name */}
-                    <div className="relative flex items-center gap-4 mb-5">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
-                        {person.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-lg sm:text-xl font-bold text-foreground leading-tight truncate">
-                          {person.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">Co-founder</p>
-                      </div>
+                    {/* Avatar */}
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-lg sm:text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
+                      {person.name.split(" ").map((n) => n[0]).join("")}
                     </div>
 
-                    {/* Position block */}
-                    <div className="relative rounded-xl bg-foreground/[0.03] border border-foreground/5 px-4 py-3 mb-5">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-                        Obecnie
+                    {/* Name + role */}
+                    <div className="relative min-w-0 flex-1">
+                      <p className="text-base sm:text-lg font-bold text-foreground leading-tight truncate">
+                        {person.name}
                       </p>
-                      <p className="text-base font-semibold text-foreground leading-tight">
-                        {person.position}
+                      <p className="text-sm text-foreground/80 mt-0.5 truncate">
+                        <span className="font-medium">{person.position}</span>
+                        <span className="text-muted-foreground"> · </span>
+                        <span className="text-primary font-medium">{person.company}</span>
                       </p>
-                      <p className="text-sm text-primary font-medium mt-0.5">
-                        @ {person.company}
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mt-1">
+                        Co-founder
                       </p>
                     </div>
 
@@ -1420,12 +1414,12 @@ const Landing = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Profil LinkedIn — ${person.name}`}
-                      className="relative mt-auto inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                      className="relative shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-colors"
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
-                      Zobacz profil LinkedIn
+                      <span className="hidden sm:inline">LinkedIn</span>
                     </a>
                   </div>
                 ))}
