@@ -178,6 +178,46 @@ const Employer = () => {
             )}
           </div>
 
+          {/* Overview cards — quick at-a-glance metrics */}
+          {activeView === "my-jobs" && domainJobs.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+              {[
+                {
+                  label: "Aktywne oferty",
+                  value: domainJobs.filter((j) => j.status !== "closed").length,
+                  icon: "📋",
+                },
+                {
+                  label: "Kandydaci łącznie",
+                  value: Object.values(applicationsByJob).reduce((sum, apps) => sum + apps.length, 0),
+                  icon: "👥",
+                },
+                {
+                  label: "Gotowe do shortlisty",
+                  value: domainJobs.filter((j) => {
+                    const apps = applicationsByJob[j.id] || [];
+                    return apps.length >= 10 && j.status !== "closed";
+                  }).length,
+                  icon: "⚡",
+                },
+                {
+                  label: "Shortlisty wykonane",
+                  value: domainJobs.filter((j) => {
+                    const bal = shortlist.getBalance(j.id);
+                    return bal.totalSlots > 0 && bal.remainingSlots < bal.totalSlots;
+                  }).length,
+                  icon: "✅",
+                },
+              ].map((card) => (
+                <div key={card.label} className="card-gradient rounded-xl border border-border p-3 text-center">
+                  <span className="text-xl mb-1 block" aria-hidden="true">{card.icon}</span>
+                  <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium">{card.label}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* View tabs — clearly separates own management from read-only market research */}
           <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-4 rounded-xl bg-secondary/40 border border-border">
             <button
@@ -357,6 +397,27 @@ const Employer = () => {
                       </div>
                     )}
 
+                    {jobApps.length >= 10 && !slotsExhausted && job.status !== "closed" && (
+                      <div className="px-4 pb-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setExpandedJob(job.id);
+                            setTimeout(() => {
+                              document
+                                .getElementById(`shortlist-section-${job.id}`)
+                                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }, 200);
+                          }}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform"
+                          data-testid={`employer-run-shortlist-${job.id}`}
+                        >
+                          <Zap className="w-4 h-4" aria-hidden="true" />
+                          Uruchom Shortlistę ({jobApps.length} kandydatów)
+                        </button>
+                      </div>
+                    )}
+
                     <div className="p-4 pt-2">
                       {/* Contextual Suggestion UX */}
                       {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
@@ -443,7 +504,9 @@ const Employer = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <AIShortlistSection jobId={job.id} jobApps={jobApps} />
+                          <div id={`shortlist-section-${job.id}`}>
+                            <AIShortlistSection jobId={job.id} jobApps={jobApps} />
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
