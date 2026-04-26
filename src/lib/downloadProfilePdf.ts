@@ -62,6 +62,7 @@ function ensurePrintStyles() {
   style.textContent = `
     /* Keep the print area measurable on screen, but invisible/off-canvas. */
     @media screen {
+      .cv-print-page-fill { display: none !important; }
       #${PRINT_AREA_ID} {
         display: flex !important;
         position: fixed !important;
@@ -81,12 +82,35 @@ function ensurePrintStyles() {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      body > *:not(#${PRINT_AREA_ID}) {
+      body > *:not(#${PRINT_AREA_ID}):not(.cv-print-page-fill) {
         display: none !important;
+      }
+      .cv-print-page-fill {
+        display: block !important;
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        pointer-events: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .cv-print-page-fill-sidebar {
+        left: 0;
+        width: 67.2mm;
+        background: #1a1a2e;
+        z-index: 0;
+      }
+      .cv-print-page-fill-rule {
+        left: 67.2mm;
+        width: 2px;
+        background: #f97316;
+        opacity: 0.6;
+        z-index: 0;
       }
       #${PRINT_AREA_ID} {
         display: flex !important;
-        position: static !important;
+        position: relative !important;
+        z-index: 1;
       }
       @page {
         size: A4;
@@ -114,40 +138,6 @@ function ensurePrintStyles() {
       print-color-adjust: exact;
     }
     #${PRINT_AREA_ID} * { box-sizing: border-box; }
-    #${PRINT_AREA_ID}::before,
-    #${PRINT_AREA_ID}::after { content: ""; display: none; }
-
-    @media print {
-      #${PRINT_AREA_ID}::before {
-        display: block;
-        position: fixed;
-        z-index: 0;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 67.2mm;
-        background: #1a1a2e;
-        pointer-events: none;
-      }
-      #${PRINT_AREA_ID}::after {
-        display: block;
-        position: fixed;
-        z-index: 0;
-        left: 67.2mm;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #f97316;
-        opacity: 0.6;
-        pointer-events: none;
-      }
-      #${PRINT_AREA_ID} .cv-sidebar,
-      #${PRINT_AREA_ID} .cv-main {
-        position: relative;
-        z-index: 1;
-      }
-    }
-
     /* ── Sidebar (left, transparent — wrapper gradient draws color) ── */
     #${PRINT_AREA_ID} .cv-sidebar {
       width: 32%;
@@ -705,19 +695,19 @@ function renderAndPrint(candidate: Candidate) {
   const container = document.createElement("div");
   container.id = PRINT_AREA_ID;
   container.innerHTML = buildHtml(candidate);
+  const sidebarFill = document.createElement("div");
+  sidebarFill.className = "cv-print-page-fill cv-print-page-fill-sidebar";
+  const ruleFill = document.createElement("div");
+  ruleFill.className = "cv-print-page-fill cv-print-page-fill-rule";
+  document.body.appendChild(sidebarFill);
+  document.body.appendChild(ruleFill);
   document.body.appendChild(container);
-
-  const fitToFullA4Pages = () => {
-    const pxPerMm = container.getBoundingClientRect().width / 210 || 96 / 25.4;
-    const pageHeightPx = 297 * pxPerMm;
-    const pages = Math.max(1, Math.ceil((container.scrollHeight + 2) / pageHeightPx));
-    container.style.minHeight = `${pages * 297}mm`;
-  };
 
   // Cleanup after print dialog closes
   const cleanup = () => {
     const node = document.getElementById(PRINT_AREA_ID);
     if (node) node.remove();
+    document.querySelectorAll(".cv-print-page-fill").forEach((el) => el.remove());
     window.removeEventListener("afterprint", cleanup);
   };
   window.addEventListener("afterprint", cleanup);
@@ -726,7 +716,6 @@ function renderAndPrint(candidate: Candidate) {
   setTimeout(async () => {
     try {
       await document.fonts?.ready;
-      fitToFullA4Pages();
       window.print();
     } catch (e) {
       console.warn("print failed", e);
