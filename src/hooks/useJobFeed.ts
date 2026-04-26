@@ -168,11 +168,9 @@ export function useJobFeed() {
         }
       } else {
         // direction === "left" (skip)
+        // Cichy skip — undo dostępne z poziomu "Ostatnie" taba.
+        // Nie pokazujemy toasta przy każdym skip — zbyt inwazyjne na mobile.
         lastUndoableRef.current = { direction: "left", job, previousIndex: currentIndex };
-        toast("Pominięta", {
-          action: { label: "Cofnij", onClick: () => undoLast() },
-          duration: 2000,
-        });
       }
 
       setCurrentIndex((prev) => prev + 1);
