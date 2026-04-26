@@ -62,6 +62,7 @@ function ensurePrintStyles() {
   style.textContent = `
     /* Keep the print area measurable on screen, but invisible/off-canvas. */
     @media screen {
+      .cv-print-page-fill { display: none !important; }
       #${PRINT_AREA_ID} {
         display: flex !important;
         position: fixed !important;
@@ -81,12 +82,35 @@ function ensurePrintStyles() {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      body > *:not(#${PRINT_AREA_ID}) {
+      body > *:not(#${PRINT_AREA_ID}):not(.cv-print-page-fill) {
         display: none !important;
+      }
+      .cv-print-page-fill {
+        display: block !important;
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        pointer-events: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .cv-print-page-fill-sidebar {
+        left: 0;
+        width: 67.2mm;
+        background: #1a1a2e;
+        z-index: 0;
+      }
+      .cv-print-page-fill-rule {
+        left: 67.2mm;
+        width: 2px;
+        background: #f97316;
+        opacity: 0.6;
+        z-index: 0;
       }
       #${PRINT_AREA_ID} {
         display: flex !important;
-        position: static !important;
+        position: relative !important;
+        z-index: 1;
       }
       @page {
         size: A4;
