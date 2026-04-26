@@ -129,8 +129,8 @@
     --shadow-card: 0 12px 40px -12px hsl(220 30% 30% / 0.18),
                    0 2px 8px -2px hsl(220 30% 30% / 0.08);
     --shadow-card-hover: 0 24px 60px -16px hsl(220 30% 30% / 0.25),
-                         0 4px 12px -2px hsl(16 92% 52% / 0.18);
-    --shadow-glow: 0 0 40px -8px hsl(16 92% 52% / 0.30);
+                         0 4px 12px -2px hsl(24 95% 48% / 0.18);
+    --shadow-glow: 0 0 40px -8px hsl(24 95% 48% / 0.30);
     --shadow-soft: 0 4px 20px -4px hsl(220 30% 30% / 0.10);
     --shadow-elevated: 0 20px 50px -16px hsl(220 30% 30% / 0.18);
 
