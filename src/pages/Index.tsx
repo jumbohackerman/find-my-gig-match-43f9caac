@@ -545,6 +545,29 @@ const Index = () => {
                       </motion.p>
                     )}
 
+                    <AnimatePresence>
+                      {lastSkipped && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="w-full overflow-hidden"
+                        >
+                          <button
+                            onClick={() => {
+                              undoLast();
+                              if (lastSkipped.timeout) clearTimeout(lastSkipped.timeout);
+                              setLastSkipped(null);
+                            }}
+                            className="mx-auto flex items-center gap-1.5 px-3 py-1 rounded-lg bg-secondary/60 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            Cofnij: {lastSkipped.title.length > 25 ? lastSkipped.title.slice(0, 25) + "…" : lastSkipped.title}
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
                     <div className="shrink-0 w-full">
                       <div className="flex items-center justify-center gap-3 sm:gap-4 pt-1" role="group" aria-label="Akcje swipe">
                         <motion.button
