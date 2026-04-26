@@ -122,7 +122,7 @@
     --gradient-card: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 20% 98%) 60%, hsl(220 18% 96%) 100%);
     --gradient-card-hover: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 22% 99%) 60%, hsl(220 18% 97%) 100%);
     --gradient-mesh: linear-gradient(125deg, hsl(210 25% 98%) 0%, hsl(220 24% 96%) 50%, hsl(215 22% 97%) 100%);
-    --gradient-aurora: radial-gradient(at 20% 10%, hsl(16 92% 62% / 0.10) 0%, transparent 50%),
+    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 95% 53% / 0.10) 0%, transparent 50%),
                        radial-gradient(at 80% 20%, hsl(280 70% 60% / 0.07) 0%, transparent 50%),
                        radial-gradient(at 50% 80%, hsl(162 70% 50% / 0.06) 0%, transparent 50%);
 
