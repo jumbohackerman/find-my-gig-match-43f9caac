@@ -521,6 +521,17 @@ const Index = () => {
                       </AnimatePresence>
                     </div>
 
+                    {currentIndex === 0 && (
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1 }}
+                        className="text-center text-[10px] text-muted-foreground/50 mt-1 sm:hidden"
+                      >
+                        ← przesuń w lewo aby pominąć · w prawo aby aplikować →
+                      </motion.p>
+                    )}
+
                     <div className="shrink-0 w-full">
                       <div className="flex items-center justify-center gap-3 sm:gap-4 pt-1" role="group" aria-label="Akcje swipe">
                         <motion.button
