@@ -33,6 +33,7 @@ const vibrateOnThreshold = () => {
 };
 
 const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExitDirection }: SwipeCardProps) => {
+  const { hasConsent } = useConsent();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-320, 320], [-14, 14]);
