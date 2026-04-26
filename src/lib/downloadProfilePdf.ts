@@ -88,9 +88,8 @@ function ensurePrintStyles() {
     }
 
     /* CV layout — applies in both screen (when forced visible) and print.
-       The gradient background on the wrapper guarantees the dark sidebar
-       column extends across every printed page, regardless of content
-       length. The .cv-sidebar div is transparent and sits on top. */
+       The fixed print fill below repeats on every A4 page, so the dark
+       sidebar always reaches the physical bottom of each printed page. */
     #${PRINT_AREA_ID} {
       width: 210mm;
       height: auto;
@@ -108,6 +107,39 @@ function ensurePrintStyles() {
       print-color-adjust: exact;
     }
     #${PRINT_AREA_ID} * { box-sizing: border-box; }
+    #${PRINT_AREA_ID}::before,
+    #${PRINT_AREA_ID}::after { content: ""; display: none; }
+
+    @media print {
+      #${PRINT_AREA_ID}::before {
+        display: block;
+        position: fixed;
+        z-index: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 67.2mm;
+        background: #1a1a2e;
+        pointer-events: none;
+      }
+      #${PRINT_AREA_ID}::after {
+        display: block;
+        position: fixed;
+        z-index: 0;
+        left: 67.2mm;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #f97316;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      #${PRINT_AREA_ID} .cv-sidebar,
+      #${PRINT_AREA_ID} .cv-main {
+        position: relative;
+        z-index: 1;
+      }
+    }
 
     /* ── Sidebar (left, transparent — wrapper gradient draws color) ── */
     #${PRINT_AREA_ID} .cv-sidebar {
