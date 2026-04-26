@@ -126,7 +126,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-lg max-h-[calc(100vh-2rem)] sm:max-h-[90vh] my-auto overflow-hidden flex flex-col rounded-2xl border border-border bg-card shadow-elevated"
+            className="w-full max-w-lg my-auto flex flex-col rounded-2xl border border-border bg-card shadow-elevated"
           >
             <div className="p-5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2.5">
