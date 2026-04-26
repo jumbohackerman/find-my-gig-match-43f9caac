@@ -602,7 +602,10 @@ function CandidateCard({
       >
         <div
           className="flex items-center gap-3 flex-1 min-w-0"
-          title={`${candidate?.title || "–"}\n${(candidate?.skills || []).slice(0, 5).join(", ")}\n${candidate?.summary?.slice(0, 100) || ""}`}
+          title={`${candidate?.title || "–"}\n${[
+            ...(candidate?.skills?.advanced || []),
+            ...(candidate?.skills?.intermediate || []),
+          ].slice(0, 5).join(", ")}\n${candidate?.summary?.slice(0, 100) || ""}`}
         >
           <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm shrink-0">{avatar}</div>
           <div className="flex-1 min-w-0">
