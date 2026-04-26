@@ -72,12 +72,12 @@
 
     --sidebar-background: 230 28% 6%;
     --sidebar-foreground: 210 25% 96%;
-    --sidebar-primary: 16 92% 62%;
+    --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 228 18% 16%;
     --sidebar-accent-foreground: 210 20% 92%;
     --sidebar-border: 228 18% 22%;
-    --sidebar-ring: 16 92% 62%;
+    --sidebar-ring: 24 95% 53%;
 
     /* Animation timings */
     --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
