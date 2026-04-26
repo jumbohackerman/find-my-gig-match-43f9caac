@@ -695,19 +695,19 @@ function renderAndPrint(candidate: Candidate) {
   const container = document.createElement("div");
   container.id = PRINT_AREA_ID;
   container.innerHTML = buildHtml(candidate);
+  const sidebarFill = document.createElement("div");
+  sidebarFill.className = "cv-print-page-fill cv-print-page-fill-sidebar";
+  const ruleFill = document.createElement("div");
+  ruleFill.className = "cv-print-page-fill cv-print-page-fill-rule";
+  document.body.appendChild(sidebarFill);
+  document.body.appendChild(ruleFill);
   document.body.appendChild(container);
-
-  const fitToFullA4Pages = () => {
-    const pxPerMm = container.getBoundingClientRect().width / 210 || 96 / 25.4;
-    const pageHeightPx = 297 * pxPerMm;
-    const pages = Math.max(1, Math.ceil((container.scrollHeight + 2) / pageHeightPx));
-    container.style.minHeight = `${pages * 297}mm`;
-  };
 
   // Cleanup after print dialog closes
   const cleanup = () => {
     const node = document.getElementById(PRINT_AREA_ID);
     if (node) node.remove();
+    document.querySelectorAll(".cv-print-page-fill").forEach((el) => el.remove());
     window.removeEventListener("afterprint", cleanup);
   };
   window.addEventListener("afterprint", cleanup);
@@ -716,7 +716,6 @@ function renderAndPrint(candidate: Candidate) {
   setTimeout(async () => {
     try {
       await document.fonts?.ready;
-      fitToFullA4Pages();
       window.print();
     } catch (e) {
       console.warn("print failed", e);
