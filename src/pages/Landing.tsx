@@ -1336,7 +1336,7 @@ const Landing = () => {
 
           {/* ────────── WHO'S BEHIND JOBSWIPE ────────── */}
           <motion.section {...fadeUp} className="px-6 py-20">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
                   Kto stoi za JobSwipe?
@@ -1425,10 +1425,6 @@ const Landing = () => {
                 ))}
               </div>
 
-              {/* Bottom tagline */}
-              <p className="text-center text-xs text-muted-foreground mt-8">
-                Budowane w Warszawie 🇵🇱 · Na stacku, który sami byśmy wybrali jako kandydaci.
-              </p>
             </div>
           </motion.section>
 
