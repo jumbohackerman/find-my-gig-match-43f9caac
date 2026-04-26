@@ -1334,6 +1334,89 @@ const Landing = () => {
             </div>
           </motion.section>
 
+          {/* ────────── WHO'S BEHIND JOBSWIPE ────────── */}
+          <motion.section {...fadeUp} className="px-6 py-20">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="font-display text-3xl sm:text-4xl font-bold mb-3 text-foreground">
+                  Kto stoi za JobSwipe?
+                </h2>
+                <p className="text-muted-foreground max-w-lg mx-auto">
+                  Nie kolejna korporacja z działem HR. Dwóch praktyków, którzy mieli dość ghostingu.
+                </p>
+              </div>
+
+              {/* Story block */}
+              <div className={`${GLASS_CARD} p-6 sm:p-8 mb-8`}>
+                <p className="text-sm sm:text-[15px] text-foreground/80 leading-relaxed mb-4">
+                  Zanim zbudowaliśmy JobSwipe, sami wysłaliśmy setki aplikacji. Znamy ten schemat —
+                  godziny na dostosowanie CV, formularze kopiujące te same dane, a na końcu cisza.
+                  Żadnej odpowiedzi, żadnego feedbacku, zero szacunku dla włożonego czasu.
+                </p>
+                <p className="text-sm sm:text-[15px] text-foreground/80 leading-relaxed mb-4">
+                  Jednocześnie rozmawialiśmy ze znajomymi po stronie rekrutacji. Oni tonęli w stosach
+                  nieporównywalnych CV i tracili tygodnie na ręczną selekcję. Problem był po obu stronach —
+                  i nikt go porządnie nie rozwiązywał.
+                </p>
+                <p className="text-sm sm:text-[15px] text-foreground/80 leading-relaxed">
+                  Więc zbudowaliśmy narzędzie, którego sami szukaliśmy. Platforma, która nie marnuje czasu
+                  kandydatów, daje każdemu odpowiedź — i pozwala pracodawcom podejmować decyzje na
+                  podstawie danych, a nie przeczuć.
+                </p>
+              </div>
+
+              {/* Founders */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  {
+                    name: "Robert Matysiak",
+                    role: "Co-founder · Produkt & dane",
+                    bio: "Data Scientist w LOT Polish Airlines. Doświadczenie w machine learning, data pipelines i Databricks. Wcześniej budował systemy BI i automatyzację procesów w ITCARD i Wealthon. Odpowiada za scoring dopasowania i architekturę produktu.",
+                    linkedin: "https://www.linkedin.com/in/robert-matysiak-abc/",
+                  },
+                  {
+                    name: "Jędrzej Kalisiewicz",
+                    role: "Co-founder · Architektura & AI",
+                    bio: "Senior Business Analyst / Lead BI w Renters.pl. Specjalizuje się w architekturze BI, raportowaniu i systemach decyzyjnych. Wcześniej analityk danych w IT Card. Odpowiada za silnik shortlisty i integracje AI.",
+                    linkedin: "https://www.linkedin.com/in/j%C4%99drzej-kalisiewicz-97958a233/",
+                  },
+                ].map((person) => (
+                  <div key={person.name} className={`${GLASS_CARD} p-5 flex flex-col`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center text-lg font-bold text-primary">
+                        {person.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">{person.name}</p>
+                        <p className="text-[11px] text-primary font-medium">{person.role}</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-foreground/70 leading-relaxed flex-1">
+                      {person.bio}
+                    </p>
+                    <a
+                      href={person.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Profil LinkedIn — ${person.name}`}
+                      className="mt-4 inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-full text-[11px] font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                      </svg>
+                      LinkedIn
+                    </a>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom tagline */}
+              <p className="text-center text-xs text-muted-foreground mt-8">
+                Budowane w Warszawie 🇵🇱 · Na stacku, który sami byśmy wybrali jako kandydaci.
+              </p>
+            </div>
+          </motion.section>
+
           {/* ────────── FINAL CTA ────────── */}
           {isCandidate ? (
             <FinalCtaPair
