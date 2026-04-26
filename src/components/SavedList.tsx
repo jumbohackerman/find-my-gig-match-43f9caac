@@ -35,40 +35,53 @@ const SavedList = ({ jobs, onApply, onJobClick }: Props) => {
   return (
     <div className="space-y-3">
       <AnimatePresence>
-        {jobs.map((job, i) => (
-          <motion.div
-            key={job.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="card-gradient rounded-xl p-4 border border-border flex items-center gap-3 cursor-pointer hover:border-primary/30 transition-colors"
-            onClick={() => onJobClick?.(job)}
-          >
-            <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
-              {job.logo?.startsWith("http") ? (
-                <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
-              ) : (
-                <span>{job.logo}</span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
-              <p className="text-xs text-muted-foreground">{job.company} · {job.location}</p>
-            </div>
-            <button
-              onClick={(e) => handleApply(e, job)}
-              disabled={pendingId === job.id}
-              className="px-3 py-1.5 rounded-lg btn-gradient text-primary-foreground text-xs font-medium hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-1.5"
+        {jobs.map((job, i) => {
+          const isClosed = job.status === "closed";
+          return (
+            <motion.div
+              key={job.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`card-gradient rounded-xl p-4 border flex items-center gap-3 cursor-pointer transition-colors ${
+                isClosed ? "border-border opacity-75" : "border-border hover:border-primary/30"
+              }`}
+              onClick={() => onJobClick?.(job)}
             >
-              {pendingId === job.id ? (
-                <><Loader2 className="w-3 h-3 animate-spin" /> Aplikuję…</>
-              ) : (
-                "Aplikuj"
-              )}
-            </button>
-            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 shrink-0" />
-          </motion.div>
-        ))}
+              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                {job.logo?.startsWith("http") ? (
+                  <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                ) : (
+                  <span>{job.logo}</span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
+                  {isClosed && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-destructive/15 text-destructive border border-destructive/20 shrink-0">
+                      Zamknięta
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
+              </div>
+              <button
+                onClick={(e) => handleApply(e, job)}
+                disabled={pendingId === job.id || isClosed}
+                className="px-3 py-1.5 rounded-lg btn-gradient text-primary-foreground text-xs font-medium hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center gap-1.5"
+                title={isClosed ? "Rekrutacja zakończona" : undefined}
+              >
+                {pendingId === job.id ? (
+                  <><Loader2 className="w-3 h-3 animate-spin" /> Aplikuję…</>
+                ) : (
+                  "Aplikuj"
+                )}
+              </button>
+              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 shrink-0" />
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </div>
   );
