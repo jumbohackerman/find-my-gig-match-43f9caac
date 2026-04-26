@@ -1144,7 +1144,7 @@ const Landing = () => {
 
                     {/* CTA */}
                     <div className="px-6 sm:px-8 py-6 bg-muted/30">
-                      <Link to="/auth" className={`${CTA_PRIMARY} w-full`}>
+                      <Link to="/auth?role=candidate" className={`${CTA_PRIMARY} w-full`}>
                         <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
                       </Link>
                       <p className="text-xs text-muted-foreground text-center mt-3">
