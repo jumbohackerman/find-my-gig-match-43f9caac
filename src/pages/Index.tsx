@@ -78,6 +78,7 @@ const Index = () => {
     allJobs, filteredJobs, remainingJobs, savedJobs, savedJobIds,
     currentIndex, isFinished, jobsLoading, filters, matchResults,
     handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
+    undoLast,
   } = useJobFeed();
 
   // ── Deep-link: tab ────────────────────────────────────────────────────────
@@ -88,6 +89,7 @@ const Index = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [buttonExitDir, setButtonExitDir] = useState<"left" | "right" | null>(null);
   const [arrowAnim, setArrowAnim] = useState<{ dir: "left" | "right"; key: number } | null>(null);
+  const [lastSkipped, setLastSkipped] = useState<{ title: string; timeout: ReturnType<typeof setTimeout> } | null>(null);
 
   const requireAuth = useCallback((): boolean => {
     if (isGuest) {
@@ -115,7 +117,19 @@ const Index = () => {
     await handleSwipe(direction);
     if (direction === "right") refetchApps();
     setTimeout(() => setButtonExitDir(null), 650);
-  }, [handleSwipe, refetchApps, requireAuth, filteredJobs, currentIndex, trackView]);
+
+    // Show inline undo for skips
+    if (direction === "left") {
+      if (lastSkipped?.timeout) clearTimeout(lastSkipped.timeout);
+      const skippedJob = filteredJobs[currentIndex];
+      if (skippedJob) {
+        const timeout = setTimeout(() => setLastSkipped(null), 3000);
+        setLastSkipped({ title: skippedJob.title, timeout });
+      }
+    } else {
+      setLastSkipped(null);
+    }
+  }, [handleSwipe, refetchApps, requireAuth, filteredJobs, currentIndex, trackView, lastSkipped]);
 
   // ── Keyboard arrow controls ──────────────────────────────────────────────
   useEffect(() => {
@@ -531,6 +545,29 @@ const Index = () => {
                         ← przesuń w lewo aby pominąć · w prawo aby aplikować →
                       </motion.p>
                     )}
+
+                    <AnimatePresence>
+                      {lastSkipped && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="w-full overflow-hidden"
+                        >
+                          <button
+                            onClick={() => {
+                              undoLast();
+                              if (lastSkipped.timeout) clearTimeout(lastSkipped.timeout);
+                              setLastSkipped(null);
+                            }}
+                            className="mx-auto flex items-center gap-1.5 px-3 py-1 rounded-lg bg-secondary/60 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            Cofnij: {lastSkipped.title.length > 25 ? lastSkipped.title.slice(0, 25) + "…" : lastSkipped.title}
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     <div className="shrink-0 w-full">
                       <div className="flex items-center justify-center gap-3 sm:gap-4 pt-1" role="group" aria-label="Akcje swipe">
