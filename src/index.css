@@ -16,10 +16,10 @@
     --popover: 228 22% 10%;
     --popover-foreground: 210 20% 95%;
 
-    /* Vibrant warm primary (coral-orange) */
-    --primary: 16 92% 62%;
+    /* Vibrant warm primary (orange — matches landing #f97316) */
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 24 95% 68%;
+    --primary-glow: 27 96% 61%;
 
     --secondary: 228 18% 16%;
     --secondary-foreground: 210 20% 92%;
