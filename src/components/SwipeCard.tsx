@@ -45,7 +45,14 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
   const resolvedExit = forcedExitDirection ?? exitDirection;
 
   const handleDragStart = () => { didDrag.current = false; };
-  const handleDrag = () => { didDrag.current = true; };
+  const handleDrag = () => {
+    didDrag.current = true;
+    const xVal = x.get();
+    const yVal = y.get();
+    if (Math.abs(xVal) > SWIPE_THRESHOLD * 0.8 || -yVal > SWIPE_THRESHOLD * 0.8) {
+      vibrateOnThreshold();
+    }
+  };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     const { x: dx, y: dy } = info.offset;
