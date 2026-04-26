@@ -72,9 +72,8 @@ export function useJobFeed() {
       }
       try {
         await getProvider("applications").apply(job, user.id);
-        toast.success(`Zaaplikowano na: ${job.title} @ ${job.company}`, {
-          description: "Powodzenia! Śledzisz status w zakładce Aplikacje.",
-          duration: 4000,
+        toast.success(`Zaaplikowano: ${job.title}`, {
+          duration: 3000,
         });
       } catch (err: any) {
         if (err?.message !== "AI_CONSENT_REQUIRED") {
@@ -138,6 +137,7 @@ export function useJobFeed() {
 
       setActionPending(true);
       lastUndoableRef.current = null; // clear previous undo
+      toast.dismiss(); // ensure only one toast at a time on rapid swipes
 
       // Record swipe event — non-blocking; don't let failures stop the UX
       try {
@@ -159,9 +159,9 @@ export function useJobFeed() {
         try {
           await saveJob(job.id);
           lastUndoableRef.current = { direction: "save", job, previousIndex: currentIndex };
-          toast.success("Oferta zapisana ⭐", {
+          toast.success("Zapisana ⭐", {
             action: { label: "Cofnij", onClick: () => undoLast() },
-            duration: 5000,
+            duration: 2500,
           });
         } catch {
           toast.error("Nie udało się zapisać oferty");
@@ -169,9 +169,9 @@ export function useJobFeed() {
       } else {
         // direction === "left" (skip)
         lastUndoableRef.current = { direction: "left", job, previousIndex: currentIndex };
-        toast("Oferta pominięta", {
+        toast("Pominięta", {
           action: { label: "Cofnij", onClick: () => undoLast() },
-          duration: 5000,
+          duration: 2000,
         });
       }
 
