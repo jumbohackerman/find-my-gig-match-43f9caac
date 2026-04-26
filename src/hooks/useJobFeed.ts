@@ -66,8 +66,8 @@ export function useJobFeed() {
     async (job: Job) => {
       if (!user) return;
       // Block 4: hard guard — no application without recorded AI consent.
+      // Toast handled in handleSwipe; this remains as safety net.
       if (!consentLoading && !hasConsent) {
-        toast.error("Aby aplikować, udziel zgody na analizę profilu przez AI w ustawieniach profilu.");
         throw new Error("AI_CONSENT_REQUIRED");
       }
       try {
