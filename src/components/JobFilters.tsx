@@ -1,6 +1,6 @@
 import { Filter, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -69,146 +69,139 @@ const JobFilters = ({ filters, onChange }: JobFiltersProps) => {
   };
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
-          hasActiveFilters
-            ? "btn-gradient text-primary-foreground border-transparent shadow-glow"
-            : "glass-surface text-secondary-foreground border-border/60 hover:border-primary/40 hover:shadow-soft"
-        }`}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
+            hasActiveFilters
+              ? "btn-gradient text-primary-foreground border-transparent shadow-glow"
+              : "glass-surface text-secondary-foreground border-border/60 hover:border-primary/40 hover:shadow-soft"
+          }`}
+        >
+          <Filter className="w-4 h-4" />
+          Filtry
+          {hasActiveFilters && (
+            <span className="px-1.5 py-0.5 rounded-full bg-primary-foreground/25 text-[10px] font-bold">
+              {[
+                filters.location !== "Wszystkie",
+                filters.type !== "Wszystkie",
+                filters.salaryMin > 0,
+                filters.remote !== "Wszystkie",
+                filters.seniority !== "Wszystkie",
+                filters.contractType !== "Wszystkie",
+                filters.requiredSkills.length > 0,
+              ].filter(Boolean).length}
+            </span>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        className="w-[min(92vw,28rem)] p-4 rounded-2xl shadow-elevated bg-popover/98 backdrop-blur-md border border-border max-h-[70vh] overflow-y-auto z-50"
       >
-        <Filter className="w-4 h-4" />
-        Filtry
-        {hasActiveFilters && (
-          <span className="px-1.5 py-0.5 rounded-full bg-primary-foreground/25 text-[10px] font-bold">
-            {[
-              filters.location !== "Wszystkie",
-              filters.type !== "Wszystkie",
-              filters.salaryMin > 0,
-              filters.remote !== "Wszystkie",
-              filters.seniority !== "Wszystkie",
-              filters.contractType !== "Wszystkie",
-              filters.requiredSkills.length > 0,
-            ].filter(Boolean).length}
-          </span>
-        )}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-2 z-50 w-[min(92vw,28rem)]"
-          >
-            <div className="p-4 rounded-2xl shadow-elevated space-y-4 bg-popover/98 backdrop-blur-md border border-border max-h-[70vh] overflow-y-auto">
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Location */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Lokalizacja</label>
-                  <Select value={filters.location} onValueChange={(v) => onChange({ ...filters, location: v })}>
-                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {locations.map((loc) => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Job Type */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Typ pracy</label>
-                  <Select value={filters.type} onValueChange={(v) => onChange({ ...filters, type: v })}>
-                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {jobTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Remote / Hybrid / On-site */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Tryb pracy</label>
-                  <Select value={filters.remote} onValueChange={(v) => onChange({ ...filters, remote: v })}>
-                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {remoteOptions.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Seniority */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Poziom</label>
-                  <Select value={filters.seniority} onValueChange={(v) => onChange({ ...filters, seniority: v })}>
-                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {seniorityOptions.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Contract type */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Forma współpracy</label>
-                  <Select value={filters.contractType} onValueChange={(v) => onChange({ ...filters, contractType: v })}>
-                    <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {contractOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Salary */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Min. wynagrodzenie: {filters.salaryMin > 0 ? `od ${filters.salaryMin} 000 zł` : "Dowolne"}
-                </label>
-                <Slider
-                  value={[filters.salaryMin]}
-                  onValueChange={([v]) => onChange({ ...filters, salaryMin: v })}
-                  max={50}
-                  step={1}
-                />
-              </div>
-
-              {/* Skills multi-select */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Wymagane umiejętności</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {skillOptions.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => toggleSkill(s)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
-                        filters.requiredSkills.includes(s)
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-background text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-1.5 text-xs text-primary hover:underline"
-                >
-                  <X className="w-3 h-3" /> Wyczyść filtry
-                </button>
-              )}
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Location */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Lokalizacja</label>
+              <Select value={filters.location} onValueChange={(v) => onChange({ ...filters, location: v })}>
+                <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {locations.map((loc) => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+
+            {/* Job Type */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Typ pracy</label>
+              <Select value={filters.type} onValueChange={(v) => onChange({ ...filters, type: v })}>
+                <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {jobTypes.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Remote / Hybrid / On-site */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Tryb pracy</label>
+              <Select value={filters.remote} onValueChange={(v) => onChange({ ...filters, remote: v })}>
+                <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {remoteOptions.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Seniority */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Poziom</label>
+              <Select value={filters.seniority} onValueChange={(v) => onChange({ ...filters, seniority: v })}>
+                <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {seniorityOptions.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Contract type */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Forma współpracy</label>
+              <Select value={filters.contractType} onValueChange={(v) => onChange({ ...filters, contractType: v })}>
+                <SelectTrigger className="h-9 bg-background border-border text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {contractOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Salary */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">
+              Min. wynagrodzenie: {filters.salaryMin > 0 ? `od ${filters.salaryMin} 000 zł` : "Dowolne"}
+            </label>
+            <Slider
+              value={[filters.salaryMin]}
+              onValueChange={([v]) => onChange({ ...filters, salaryMin: v })}
+              max={50}
+              step={1}
+            />
+          </div>
+
+          {/* Skills multi-select */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">Wymagane umiejętności</label>
+            <div className="flex flex-wrap gap-1.5">
+              {skillOptions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => toggleSkill(s)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    filters.requiredSkills.includes(s)
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+            >
+              <X className="w-3 h-3" /> Wyczyść filtry
+            </button>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 
