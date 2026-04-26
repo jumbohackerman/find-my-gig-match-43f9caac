@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Building2, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -108,7 +109,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
   const set = <K extends keyof CompanyForm>(key: K, value: CompanyForm[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -248,7 +249,8 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 
