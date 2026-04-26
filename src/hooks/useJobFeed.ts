@@ -122,6 +122,20 @@ export function useJobFeed() {
       const job = filteredJobs[currentIndex];
       if (!job) return;
 
+      // ── Pre-check: consent required for "right" (apply) ──
+      if (direction === "right" && !consentLoading && !hasConsent) {
+        toast.error("Aby aplikować, udziel zgody na analizę profilu przez AI w ustawieniach profilu.", {
+          action: {
+            label: "Przejdź do ustawień",
+            onClick: () => {
+              window.location.href = "/my-profile";
+            },
+          },
+          duration: 6000,
+        });
+        return; // ← KLUCZOWE: nie przesuwaj karty, nie zapisuj swipe
+      }
+
       setActionPending(true);
       lastUndoableRef.current = null; // clear previous undo
 
@@ -137,7 +151,8 @@ export function useJobFeed() {
         try {
           await applyToJob(job);
         } catch {
-          // toast already shown in applyToJob — advance card anyway
+          // applyToJob already shows toast — but DO advance card
+          // (if we got here, consent was OK — only network/DB error)
         }
         // Apply is not undoable
       } else if (direction === "save") {
@@ -163,7 +178,7 @@ export function useJobFeed() {
       setCurrentIndex((prev) => prev + 1);
       setActionPending(false);
     },
-    [currentIndex, filteredJobs, userId, applyToJob, saveJob, actionPending, undoLast],
+    [currentIndex, filteredJobs, userId, applyToJob, saveJob, actionPending, undoLast, hasConsent, consentLoading],
   );
 
   // ── Apply from saved list ────────────────────────────────────────────────
