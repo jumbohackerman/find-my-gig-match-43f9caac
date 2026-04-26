@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import type { NotificationType } from "@/domain/models";
+import EmployerProfileModal from "@/components/employer/EmployerProfileModal";
 
 function notificationIcon(type: NotificationType) {
   switch (type) {
