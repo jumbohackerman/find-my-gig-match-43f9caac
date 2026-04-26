@@ -53,6 +53,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showEmployerProfile, setShowEmployerProfile] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const isCandidate = profile?.role === "candidate";
