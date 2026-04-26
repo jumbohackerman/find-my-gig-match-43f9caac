@@ -109,7 +109,7 @@ const EmployerProfileModal = ({ open, onClose }: Props) => {
   const set = <K extends keyof CompanyForm>(key: K, value: CompanyForm[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
