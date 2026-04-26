@@ -14,6 +14,7 @@ import JobFilters from "@/components/JobFilters";
 import { defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
 import JobDetailModal from "@/components/JobDetailModal";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import type { Job } from "@/domain/models";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -319,8 +320,8 @@ const Index = () => {
 
       <div className="shrink-0 px-4 sm:px-6 pt-3 pb-2 sticky top-[57px] z-30 bg-background/95 backdrop-blur-sm shadow-[0_4px_12px_-4px_rgba(0,0,0,0.3)]">
         <div className="browse-shell overflow-x-auto scrollbar-none" role="tablist" aria-label="Sekcje przeglądania">
-          <div className="flex items-center justify-center gap-2 w-fit mx-auto">
-            <div className="flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft">
+          <div className="flex items-center justify-center sm:justify-center gap-2 w-full sm:w-fit mx-auto">
+            <div className="hidden sm:flex min-w-max gap-1 p-1 rounded-2xl glass-surface shadow-soft">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -356,7 +357,7 @@ const Index = () => {
               ))}
             </div>
             {activeTab === "swipe" && (
-              <div className="shrink-0">
+              <div className="shrink-0 ml-auto sm:ml-0">
                 <JobFilters filters={filters} onChange={handleFiltersChange} />
               </div>
             )}
@@ -364,7 +365,7 @@ const Index = () => {
         </div>
       </div>
 
-      <main className="flex-1 min-h-0 w-full px-4 sm:px-6 pb-2 pt-2 sm:pt-3 flex flex-col">
+      <main className="flex-1 min-h-0 w-full px-4 sm:px-6 pb-16 sm:pb-2 pt-2 sm:pt-3 flex flex-col">
         <div className={`browse-shell flex-1 min-h-0 ${activeTab === "swipe" ? "flex flex-col" : "overflow-y-auto overflow-x-hidden"}`}>
           <LocalErrorBoundary label="Panel">
             {activeTab === "applied" ? (
@@ -577,6 +578,12 @@ const Index = () => {
         onSelectJob={(j) => setSelectedJob(j)}
       />
       <Footer />
+      <MobileBottomNav
+        activeTab={activeTab}
+        onChangeTab={(t) => changeTab(t as Tab)}
+        appliedCount={dbApplications.length}
+        savedCount={savedJobs.length}
+      />
     </div>
   );
 };
