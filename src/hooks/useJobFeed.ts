@@ -137,6 +137,7 @@ export function useJobFeed() {
 
       setActionPending(true);
       lastUndoableRef.current = null; // clear previous undo
+      toast.dismiss(); // ensure only one toast at a time on rapid swipes
 
       // Record swipe event — non-blocking; don't let failures stop the UX
       try {
