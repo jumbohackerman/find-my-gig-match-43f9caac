@@ -78,7 +78,7 @@ const Index = () => {
     allJobs, filteredJobs, remainingJobs, savedJobs, savedJobIds,
     currentIndex, isFinished, jobsLoading, filters, matchResults,
     handleSwipe, applyFromSaved, applyToJob, resetFeed, updateFilters, actionPending,
-    undoLast,
+    undoLast, hasConsent,
   } = useJobFeed();
 
   // ── Deep-link: tab ────────────────────────────────────────────────────────
@@ -478,6 +478,7 @@ const Index = () => {
                               isSaved={savedJobIds.has(job.id)}
                               onTap={() => openJobModal(job)}
                               forcedExitDirection={index === 0 ? buttonExitDir : null}
+                              hasConsent={hasConsent}
                             />
                           ))}
                         </AnimatePresence>

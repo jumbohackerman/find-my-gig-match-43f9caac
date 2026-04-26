@@ -209,7 +209,12 @@ const Employer = () => {
                   icon: "✅",
                 },
               ].map((card) => (
-                <div key={card.label} className="card-gradient rounded-xl border border-border p-3 text-center">
+                <div
+                  key={card.label}
+                  className={`card-gradient rounded-xl border border-border p-3 text-center transition-colors ${
+                    card.value > 0 ? "hover:border-primary/30" : "opacity-60"
+                  }`}
+                >
                   <span className="text-xl mb-1 block" aria-hidden="true">{card.icon}</span>
                   <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
                   <p className="text-[10px] text-muted-foreground font-medium">{card.label}</p>
@@ -386,12 +391,20 @@ const Employer = () => {
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-primary transition-all duration-500"
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                jobApps.length >= 10
+                                  ? "bg-accent"
+                                  : jobApps.length >= 7
+                                    ? "bg-yellow-500"
+                                    : "bg-primary"
+                              }`}
                               style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
                             />
                           </div>
                           <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
-                            {jobApps.length}/10 do shortlisty
+                            {jobApps.length >= 10
+                              ? "✓ Gotowe do shortlisty!"
+                              : `${jobApps.length}/10 do shortlisty`}
                           </span>
                         </div>
                       </div>
@@ -434,7 +447,14 @@ const Employer = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-display text-sm font-semibold text-foreground truncate">{job.title}</h4>
+                          <h4 className="font-display text-sm font-semibold text-foreground truncate flex items-center gap-1.5">
+                            <span
+                              className={`w-2 h-2 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
+                              title={job.status === "closed" ? "Zamknięta" : "Aktywna"}
+                              aria-hidden="true"
+                            />
+                            <span className="truncate">{job.title}</span>
+                          </h4>
                           <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
                         </div>
                         {job.employerId === user?.id && (
