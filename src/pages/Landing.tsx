@@ -692,9 +692,9 @@ const Landing = () => {
                               </div>
                             ))}
                           </div>
-                          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
-                            <p className="text-[10px] text-muted-foreground">Analizowane: 87 profili</p>
-                            <p className="text-[10px] font-medium text-primary">Gotowe w 12 sek.</p>
+                          <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-between gap-2">
+                            <p className="text-[9px] sm:text-[10px] text-muted-foreground">87 profili</p>
+                            <p className="text-[9px] sm:text-[10px] font-medium text-primary">12 sek.</p>
                           </div>
                         </motion.div>
                       )}

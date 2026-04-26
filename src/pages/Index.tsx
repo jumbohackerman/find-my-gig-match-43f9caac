@@ -171,6 +171,10 @@ const Index = () => {
       else next.set("tab", tab);
       return next;
     }, { replace: true });
+    // Scroll main content to top on tab change
+    const main = document.querySelector("main");
+    if (main) main.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: "auto" });
   }, [setSearchParams]);
 
   // ── Deep-link: job detail modal ───────────────────────────────────────────
