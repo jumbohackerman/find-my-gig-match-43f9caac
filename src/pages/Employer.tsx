@@ -178,6 +178,46 @@ const Employer = () => {
             )}
           </div>
 
+          {/* Overview cards — quick at-a-glance metrics */}
+          {activeView === "my-jobs" && domainJobs.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+              {[
+                {
+                  label: "Aktywne oferty",
+                  value: domainJobs.filter((j) => j.status !== "closed").length,
+                  icon: "📋",
+                },
+                {
+                  label: "Kandydaci łącznie",
+                  value: Object.values(applicationsByJob).reduce((sum, apps) => sum + apps.length, 0),
+                  icon: "👥",
+                },
+                {
+                  label: "Gotowe do shortlisty",
+                  value: domainJobs.filter((j) => {
+                    const apps = applicationsByJob[j.id] || [];
+                    return apps.length >= 10 && j.status !== "closed";
+                  }).length,
+                  icon: "⚡",
+                },
+                {
+                  label: "Shortlisty wykonane",
+                  value: domainJobs.filter((j) => {
+                    const bal = shortlist.getBalance(j.id);
+                    return bal.totalSlots > 0 && bal.remainingSlots < bal.totalSlots;
+                  }).length,
+                  icon: "✅",
+                },
+              ].map((card) => (
+                <div key={card.label} className="card-gradient rounded-xl border border-border p-3 text-center">
+                  <span className="text-xl mb-1 block" aria-hidden="true">{card.icon}</span>
+                  <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
+                  <p className="text-[10px] text-muted-foreground font-medium">{card.label}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* View tabs — clearly separates own management from read-only market research */}
           <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-4 rounded-xl bg-secondary/40 border border-border">
             <button
