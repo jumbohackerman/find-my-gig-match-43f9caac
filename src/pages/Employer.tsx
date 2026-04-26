@@ -180,7 +180,7 @@ const Employer = () => {
 
           {/* Overview cards — quick at-a-glance metrics */}
           {activeView === "my-jobs" && domainJobs.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-2 gap-2 mb-4">
               {[
                 {
                   label: "Aktywne oferty",

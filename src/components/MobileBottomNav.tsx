@@ -61,7 +61,7 @@ const MobileBottomNav = ({ activeTab, onChangeTab, appliedCount = 0, savedCount 
               <button
                 type="button"
                 onClick={() => handleTap(tab)}
-                className={`w-full flex flex-col items-center justify-center py-2 pt-2.5 gap-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md ${
+                className={`w-full relative flex flex-col items-center justify-center py-2 pt-2.5 gap-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md ${
                   isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
                 aria-label={tab.label}
@@ -80,6 +80,9 @@ const MobileBottomNav = ({ activeTab, onChangeTab, appliedCount = 0, savedCount 
                   )}
                 </span>
                 <span className="text-[10px] font-medium leading-none">{tab.label}</span>
+                {isActive && (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" aria-hidden="true" />
+                )}
               </button>
             </li>
           );

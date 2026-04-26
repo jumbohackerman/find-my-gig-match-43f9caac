@@ -185,6 +185,18 @@ export function useJobFeed() {
   const applyFromSaved = useCallback(
     async (job: Job) => {
       if (actionPending) return;
+      if (!hasConsent && !consentLoading) {
+        toast.error("Aby aplikować, udziel zgody RODO w ustawieniach profilu.", {
+          action: {
+            label: "Ustawienia",
+            onClick: () => {
+              window.location.href = "/my-profile";
+            },
+          },
+          duration: 6000,
+        });
+        return;
+      }
       setActionPending(true);
       try {
         await unsaveJob(job.id);
@@ -194,7 +206,7 @@ export function useJobFeed() {
         setActionPending(false);
       }
     },
-    [unsaveJob, applyToJob, actionPending],
+    [unsaveJob, applyToJob, actionPending, hasConsent, consentLoading],
   );
 
   // ── Reset feed ───────────────────────────────────────────────────────────
