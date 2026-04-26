@@ -72,9 +72,8 @@ export function useJobFeed() {
       }
       try {
         await getProvider("applications").apply(job, user.id);
-        toast.success(`Zaaplikowano na: ${job.title} @ ${job.company}`, {
-          description: "Powodzenia! Śledzisz status w zakładce Aplikacje.",
-          duration: 4000,
+        toast.success(`Zaaplikowano: ${job.title}`, {
+          duration: 3000,
         });
       } catch (err: any) {
         if (err?.message !== "AI_CONSENT_REQUIRED") {
