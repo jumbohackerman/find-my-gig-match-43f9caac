@@ -600,7 +600,13 @@ function CandidateCard({
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 cursor-pointer hover:bg-secondary/80 transition-colors"
         onClick={onView}
       >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div
+          className="flex items-center gap-3 flex-1 min-w-0"
+          title={`${candidate?.title || "–"}\n${[
+            ...(candidate?.skills?.advanced || []),
+            ...(candidate?.skills?.intermediate || []),
+          ].slice(0, 5).join(", ")}\n${candidate?.summary?.slice(0, 100) || ""}`}
+        >
           <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-sm shrink-0">{avatar}</div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground">{name}</p>

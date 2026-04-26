@@ -226,7 +226,15 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
           {matchResult && (
             <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-secondary/50 border border-border">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Dopasowanie</span>
-              <span className="text-xs font-bold text-foreground">{matchResult.score}%</span>
+              <span className={`text-xs font-bold ${
+                matchResult.score >= 75 ? "text-accent" :
+                matchResult.score >= 50 ? "text-yellow-500" :
+                matchResult.score >= 30 ? "text-orange-400" :
+                "text-destructive"
+              }`}>{matchResult.score}%</span>
+              {matchResult.score >= 75 && <span className="text-[9px] text-accent font-medium">Świetne dopasowanie</span>}
+              {matchResult.score >= 50 && matchResult.score < 75 && <span className="text-[9px] text-yellow-500 font-medium">Dobre szanse</span>}
+              {matchResult.score < 50 && matchResult.score >= 30 && <span className="text-[9px] text-orange-400 font-medium">Warto spróbować</span>}
               {matchResult.reasons.length > 0 && (
                 <>
                   <span className="text-border">·</span>
