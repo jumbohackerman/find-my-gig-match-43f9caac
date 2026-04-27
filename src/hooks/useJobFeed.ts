@@ -46,8 +46,12 @@ export function useJobFeed() {
       .then((ids) => setSwipedJobIds(new Set(ids)));
   }, [userId]);
 
-  // Filtered and un-swiped jobs
-  const filteredJobs = useMemo(() => filterJobs(allJobs, filters), [allJobs, filters]);
+  // Filtered AND not yet swiped — swiped jobs must never reappear,
+  // even after page refresh or filter change.
+  const filteredJobs = useMemo(
+    () => filterJobs(allJobs, filters).filter((j) => !swipedJobIds.has(j.id)),
+    [allJobs, filters, swipedJobIds],
+  );
 
   // Match scores
   const matchResults = useMemo(() => {
@@ -59,7 +63,7 @@ export function useJobFeed() {
   }, [filteredJobs, candidateProfile]);
 
   const remainingJobs = filteredJobs.slice(currentIndex);
-  const isFinished = currentIndex >= filteredJobs.length;
+  const isFinished = filteredJobs.length > 0 && currentIndex >= filteredJobs.length;
 
   // ── Apply to job (through provider) ────────────────────────────────────
   const applyToJob = useCallback(
