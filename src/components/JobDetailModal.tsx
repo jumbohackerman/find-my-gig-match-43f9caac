@@ -269,6 +269,13 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                       <p className="text-sm text-foreground leading-relaxed">{job.description}</p>
                     </Section>
                   )}
+
+                  {/* About company */}
+                  {job.aboutCompany && (
+                    <Section icon={Building2} title="O firmie">
+                      <p className="text-sm text-foreground leading-relaxed">{job.aboutCompany}</p>
+                    </Section>
+                  )}
                 </div>
 
                 {/* Right column: sidebar */}
@@ -340,15 +347,6 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                     </div>
                   </div>
 
-                  {/* About company */}
-                  {job.aboutCompany && (
-                    <div className="p-4 rounded-xl bg-secondary/30 border border-border">
-                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                        <Building2 className="w-3.5 h-3.5" /> O firmie
-                      </h4>
-                      <p className="text-sm text-foreground leading-relaxed">{job.aboutCompany}</p>
-                    </div>
-                  )}
                 </div>
               </div>
 
