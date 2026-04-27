@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { RefreshCw, ArrowLeft } from "lucide-react";
 import logo from "@/assets/jobswipe-logo.png";
+import { sentryErrorTracking } from "@/services/sentry";
 
 interface Props {
   children: ReactNode;
@@ -22,7 +23,17 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[ErrorBoundary] Uncaught error:", error, errorInfo);
+    if (import.meta.env.DEV) {
+      console.error("[ErrorBoundary] Uncaught error:", error, errorInfo);
+    }
+    try {
+      sentryErrorTracking.captureException(error, {
+        boundary: "ErrorBoundary",
+        componentStack: errorInfo?.componentStack,
+      });
+    } catch {
+      /* never let reporting break the fallback UI */
+    }
   }
 
   handleReset = () => {

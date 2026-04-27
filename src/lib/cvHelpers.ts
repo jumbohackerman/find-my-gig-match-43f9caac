@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { downloadFromBucket, extractTextFromPdf, validateExtractedText } from "@/lib/pdfExtract";
+import { devLog } from "@/lib/logger";
 
 export interface CvRecord {
   id: string;
@@ -86,7 +87,7 @@ export async function startAiPreparation(
   userId: string,
   filePath: string
 ): Promise<{ success: boolean; error?: string }> {
-  console.log("[cvHelpers] startAiPreparation called with", { cvUploadId, userId, filePath });
+  devLog("[cvHelpers] startAiPreparation called with", { cvUploadId, userId, filePath });
 
   // 1. Set status to processing
   const { data: updateData, error: updateErr } = await setCvStatus(cvUploadId, userId, "processing");
@@ -98,7 +99,7 @@ export async function startAiPreparation(
   let pdfBuffer: ArrayBuffer;
   try {
     pdfBuffer = await downloadFromBucket("candidate-cvs", filePath);
-    console.log("[cvHelpers] PDF downloaded, size:", pdfBuffer.byteLength);
+    devLog("[cvHelpers] PDF downloaded, size:", pdfBuffer.byteLength);
   } catch (err: any) {
     console.error("[cvHelpers] PDF download failed:", err);
     await setCvStatus(cvUploadId, userId, "failed", err.message);
@@ -109,7 +110,7 @@ export async function startAiPreparation(
   let rawText: string;
   try {
     rawText = await extractTextFromPdf(pdfBuffer);
-    console.log("[cvHelpers] Extracted text length:", rawText.length);
+    devLog("[cvHelpers] Extracted text length:", rawText.length);
   } catch (err: any) {
     console.error("[cvHelpers] PDF text extraction failed:", err);
     const msg = "Nie udało się odczytać tekstu z PDF: " + err.message;
@@ -142,7 +143,7 @@ export async function startAiPreparation(
       await setCvStatus(cvUploadId, userId, "failed", updErr.message);
       return { success: false, error: updErr.message };
     }
-    console.log("[cvHelpers] cv_parsed_data updated with raw_text");
+    devLog("[cvHelpers] cv_parsed_data updated with raw_text");
   } else {
     const { error: insErr } = await (supabase as any)
       .from("cv_parsed_data")
@@ -162,7 +163,7 @@ export async function startAiPreparation(
       await setCvStatus(cvUploadId, userId, "failed", insErr.message);
       return { success: false, error: insErr.message };
     }
-    console.log("[cvHelpers] cv_parsed_data inserted with raw_text");
+    devLog("[cvHelpers] cv_parsed_data inserted with raw_text");
   }
 
   // 6. Set status to needs_review (text extracted, ready for AI parsing)
@@ -172,7 +173,7 @@ export async function startAiPreparation(
     return { success: false, error: finalErr.message };
   }
 
-  console.log("[cvHelpers] startAiPreparation completed successfully");
+  devLog("[cvHelpers] startAiPreparation completed successfully");
   return { success: true };
 }
 
@@ -184,18 +185,18 @@ export async function startAiParsing(
   cvUploadId: string,
   userId: string
 ): Promise<{ success: boolean; error?: string; parsedJson?: unknown }> {
-  console.log("[cvHelpers] startAiParsing called", { cvUploadId, userId });
+  devLog("[cvHelpers] startAiParsing called", { cvUploadId, userId });
 
   // Guard: Verify parsed data with raw_text exists
   const existing = await fetchParsedData(cvUploadId);
   if (!existing || !existing.raw_text || existing.raw_text.length < 30) {
-    console.log("[cvHelpers] BLOCKED — no raw_text for cv_upload_id:", cvUploadId);
+    devLog("[cvHelpers] BLOCKED — no raw_text for cv_upload_id:", cvUploadId);
     return { success: false, error: "Brak tekstu z CV do analizy. Najpierw odczytaj tekst z PDF." };
   }
 
   // Guard: If parsed_json already exists, return cached result (hard dedup)
   if (existing.parsed_json && typeof existing.parsed_json === "object" && Object.keys(existing.parsed_json as Record<string, unknown>).length > 0) {
-    console.log("[cvHelpers] BLOCKED — parsed_json already exists, returning cached result for:", cvUploadId);
+    devLog("[cvHelpers] BLOCKED — parsed_json already exists, returning cached result for:", cvUploadId);
     return { success: true, parsedJson: existing.parsed_json };
   }
 
@@ -214,7 +215,7 @@ export async function startAiParsing(
     return { success: false, error: "Brak aktywnej sesji użytkownika. Zaloguj się ponownie." };
   }
 
-  console.log("[cvHelpers] AI request ACTUALLY FIRED for cv_upload_id:", cvUploadId);
+  devLog("[cvHelpers] AI request ACTUALLY FIRED for cv_upload_id:", cvUploadId);
 
   const { data, error } = await supabase.functions.invoke("parse-cv-ai", {
     body: { cv_upload_id: cvUploadId },
@@ -239,6 +240,6 @@ export async function startAiParsing(
     return { success: false, error: "Nieoczekiwana odpowiedź z serwera." };
   }
 
-  console.log("[cvHelpers] AI parsing succeeded, confidence:", data.parse_confidence);
+  devLog("[cvHelpers] AI parsing succeeded, confidence:", data.parse_confidence);
   return { success: true, parsedJson: data.parsed_json };
 }
