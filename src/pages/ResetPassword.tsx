@@ -5,6 +5,7 @@ import { Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/jobswipe-logo.png";
+import PublicHeader, { type PublicHeaderRole } from "@/components/PublicHeader";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [headerRole, setHeaderRole] = useState<PublicHeaderRole>("candidate");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -53,7 +55,9 @@ const ResetPassword = () => {
 
   if (!isRecovery) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-background flex flex-col">
+        <PublicHeader role={headerRole} onRoleChange={setHeaderRole} variant="auth" />
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -75,12 +79,15 @@ const ResetPassword = () => {
             </button>
           </div>
         </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex flex-col">
+      <PublicHeader role={headerRole} onRoleChange={setHeaderRole} variant="auth" />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -143,6 +150,7 @@ const ResetPassword = () => {
           </form>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 };

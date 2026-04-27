@@ -35,6 +35,7 @@ import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
 import founderJedrzej from "@/assets/founder-jedrzej.png";
 import SwipeDemoStack from "@/components/SwipeDemoStack";
+import PublicHeader from "@/components/PublicHeader";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -470,60 +471,8 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* ── Top bar with toggle ── */}
-      <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <img src={logo} alt="" className="w-9 h-9" />
-            <span className="font-display text-xl font-bold hidden sm:inline">
-              Job<span className="text-gradient-primary">Swipe</span>
-            </span>
-          </Link>
-
-          {/* Toggle pills */}
-          <div className="flex-1 flex justify-center">
-            <div
-              role="tablist"
-              aria-label="Wybierz widok"
-              className="inline-flex gap-1 p-1 rounded-full bg-secondary/50 border border-border"
-            >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={isCandidate}
-                onClick={() => switchView("candidate")}
-                className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  isCandidate
-                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Dla kandydata
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={!isCandidate}
-                onClick={() => switchView("employer")}
-                className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  !isCandidate
-                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Dla pracodawcy
-              </button>
-            </div>
-          </div>
-
-          <Link
-            to="/auth"
-            className="px-3 sm:px-4 py-2 rounded-xl bg-secondary/50 border border-border text-foreground text-sm font-medium hover:bg-secondary transition-colors shrink-0"
-          >
-            Zaloguj się
-          </Link>
-        </div>
-      </header>
+      {/* ── Shared public header ── */}
+      <PublicHeader role={view} onRoleChange={(r) => switchView(r)} variant="landing" />
 
       {/* Wrap views with smooth transition */}
       <AnimatePresence mode="wait">
