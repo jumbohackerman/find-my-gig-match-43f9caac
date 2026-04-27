@@ -248,12 +248,12 @@
       inset 0 0 0 1px hsl(210 30% 100% / 0.02);
   }
 
-  /* Glassy elevated surface */
+  /* Glassy elevated surface (navbar) — slightly lighter than page bg */
   .glass-surface {
-    background: linear-gradient(155deg, hsl(228 24% 14% / 0.85), hsl(228 22% 10% / 0.85));
+    background: linear-gradient(155deg, hsl(222 30% 17% / 0.85), hsl(222 30% 13% / 0.85));
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid hsl(210 30% 100% / 0.06);
+    border: 1px solid hsl(210 30% 100% / 0.07);
   }
 
   /* Animated shimmer overlay */
