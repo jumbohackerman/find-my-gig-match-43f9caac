@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import logo from "@/assets/jobswipe-logo.png";
+import PublicHeader from "@/components/PublicHeader";
 
 type Mode = "login" | "signup" | "forgot";
 type Role = "candidate" | "employer";
