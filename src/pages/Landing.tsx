@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
+import founderJedrzej from "@/assets/founder-jedrzej.png";
 import SwipeDemoStack from "@/components/SwipeDemoStack";
 
 const fadeUp = {
@@ -1373,6 +1374,7 @@ const Landing = () => {
                     position: "Lead BI",
                     company: "Renters.pl",
                     linkedin: "https://www.linkedin.com/in/j%C4%99drzej-kalisiewicz-97958a233/",
+                    image: founderJedrzej,
                   },
                 ].map((person) => (
                   <div
@@ -1383,8 +1385,17 @@ const Landing = () => {
                     <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/10 blur-3xl group-hover:bg-primary/20 transition-colors" />
 
                     {/* Avatar */}
-                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-lg sm:text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
-                      {person.name.split(" ").map((n) => n[0]).join("")}
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-lg sm:text-xl font-bold text-primary-foreground shadow-lg shadow-primary/20 shrink-0 overflow-hidden">
+                      {(person as { image?: string }).image ? (
+                        <img
+                          src={(person as { image?: string }).image}
+                          alt={person.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        person.name.split(" ").map((n) => n[0]).join("")
+                      )}
                     </div>
 
                     {/* Name + role */}
