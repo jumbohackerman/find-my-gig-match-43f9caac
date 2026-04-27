@@ -46,8 +46,12 @@ export function useJobFeed() {
       .then((ids) => setSwipedJobIds(new Set(ids)));
   }, [userId]);
 
-  // Filtered and un-swiped jobs
-  const filteredJobs = useMemo(() => filterJobs(allJobs, filters), [allJobs, filters]);
+  // Filtered AND not yet swiped — swiped jobs must never reappear,
+  // even after page refresh or filter change.
+  const filteredJobs = useMemo(
+    () => filterJobs(allJobs, filters).filter((j) => !swipedJobIds.has(j.id)),
+    [allJobs, filters, swipedJobIds],
+  );
 
   // Match scores
   const matchResults = useMemo(() => {
@@ -59,7 +63,7 @@ export function useJobFeed() {
   }, [filteredJobs, candidateProfile]);
 
   const remainingJobs = filteredJobs.slice(currentIndex);
-  const isFinished = currentIndex >= filteredJobs.length;
+  const isFinished = filteredJobs.length > 0 && currentIndex >= filteredJobs.length;
 
   // ── Apply to job (through provider) ────────────────────────────────────
   const applyToJob = useCallback(
@@ -78,7 +82,14 @@ export function useJobFeed() {
       } catch (err: any) {
         if (err?.message !== "AI_CONSENT_REQUIRED") {
           console.error("Apply error:", err);
-          toast.error("Nie udało się zaaplikować. Spróbuj ponownie.");
+          const msg = String(err?.message || "");
+          if (/duplicate|already|unique/i.test(msg)) {
+            toast.info("Już aplikowałeś na tę ofertę.");
+          } else if (/network|fetch|timeout|offline/i.test(msg)) {
+            toast.error("Brak połączenia. Sprawdź internet i spróbuj ponownie.");
+          } else {
+            toast.error("Nie udało się wysłać aplikacji. Spróbuj ponownie za chwilę.");
+          }
         }
         throw err;
       }
@@ -139,22 +150,17 @@ export function useJobFeed() {
       lastUndoableRef.current = null; // clear previous undo
       toast.dismiss(); // ensure only one toast at a time on rapid swipes
 
-      // Record swipe event — non-blocking; don't let failures stop the UX
-      try {
-        await getProvider("swipeEvents").record(userId, job.id, direction);
-      } catch (err) {
-        console.warn("[useJobFeed] swipe record failed (non-blocking):", err);
-      }
-      setSwipedJobIds((prev) => new Set(prev).add(job.id));
-
+      // For "right" (apply): try apply FIRST. If it fails, keep the card
+      // (don't advance, don't mark as swiped) so user can retry.
       if (direction === "right") {
         try {
           await applyToJob(job);
         } catch {
-          // applyToJob already shows toast — but DO advance card
-          // (if we got here, consent was OK — only network/DB error)
+          // applyToJob already showed a friendly toast.
+          // Card stays — we do NOT record swipe, do NOT advance.
+          setActionPending(false);
+          return;
         }
-        // Apply is not undoable
       } else if (direction === "save") {
         try {
           await saveJob(job.id);
@@ -164,14 +170,22 @@ export function useJobFeed() {
             duration: 2500,
           });
         } catch {
-          toast.error("Nie udało się zapisać oferty");
+          toast.error("Nie udało się zapisać oferty. Spróbuj ponownie.");
+          setActionPending(false);
+          return;
         }
       } else {
-        // direction === "left" (skip)
-        // Cichy skip — undo dostępne z poziomu "Ostatnie" taba.
-        // Nie pokazujemy toasta przy każdym skip — zbyt inwazyjne na mobile.
+        // direction === "left" (skip) — silent
         lastUndoableRef.current = { direction: "left", job, previousIndex: currentIndex };
       }
+
+      // Side-effect succeeded → record swipe (non-blocking) + advance.
+      try {
+        await getProvider("swipeEvents").record(userId, job.id, direction);
+      } catch (err) {
+        console.warn("[useJobFeed] swipe record failed (non-blocking):", err);
+      }
+      setSwipedJobIds((prev) => new Set(prev).add(job.id));
 
       setCurrentIndex((prev) => prev + 1);
       setActionPending(false);
@@ -197,9 +211,16 @@ export function useJobFeed() {
       }
       setActionPending(true);
       try {
-        await unsaveJob(job.id);
-        toast.info("Usunięto z zapisanych");
+        // Apply FIRST. If it fails, the job stays in saved.
         await applyToJob(job);
+        // Only remove from saved after a successful apply.
+        try {
+          await unsaveJob(job.id);
+        } catch (err) {
+          console.warn("[useJobFeed] unsave after apply failed (non-blocking):", err);
+        }
+      } catch {
+        // applyToJob already showed a friendly toast; saved entry preserved.
       } finally {
         setActionPending(false);
       }
