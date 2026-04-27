@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -98,46 +97,65 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
+      {/* ── Top bar — same as Landing ── */}
+      <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <img src={logo} alt="" className="w-9 h-9" />
+            <span className="font-display text-xl font-bold hidden sm:inline">
+              Job<span className="text-gradient-primary">Swipe</span>
+            </span>
+          </Link>
+
+          {/* Toggle pills — drive the role selector */}
+          <div className="flex-1 flex justify-center">
+            <div
+              role="tablist"
+              aria-label="Wybierz widok"
+              className="inline-flex gap-1 p-1 rounded-full bg-secondary/50 border border-border"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={role === "candidate"}
+                onClick={() => setRole("candidate")}
+                className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                  role === "candidate"
+                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Dla kandydata
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={role === "employer"}
+                onClick={() => setRole("employer")}
+                className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
+                  role === "employer"
+                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Dla pracodawcy
+              </button>
+            </div>
+          </div>
+
+          <div className="w-[88px] sm:w-[110px] shrink-0" aria-hidden="true" />
+        </div>
+      </header>
+
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className="mb-5 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Wróć do strony głównej"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Wróć do strony głównej
-        </button>
-
-        <div className="flex items-center gap-2 justify-center mb-5">
+        <div className="flex items-center gap-2 justify-center mb-6">
           <img src={logo} alt="" className="w-10 h-10 object-contain" />
           <h1 className="font-display text-2xl font-bold text-foreground">JobSwipe</h1>
-        </div>
-
-        {/* Role pill toggle (matches landing page style) */}
-        <div className="mb-5 flex justify-center">
-          <div className="inline-flex p-1 rounded-full bg-secondary border border-border">
-            {(["candidate", "employer"] as Role[]).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                  role === r
-                    ? "btn-gradient text-primary-foreground shadow-glow"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                aria-pressed={role === r}
-              >
-                {r === "candidate" ? "Dla kandydata" : "Dla pracodawcy"}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="card-gradient rounded-2xl border border-border p-6">
