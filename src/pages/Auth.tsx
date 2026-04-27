@@ -114,7 +114,7 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* ── Top bar — same panel style as landing ── */}
       <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-6">
+        <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img src={logo} alt="" className="w-9 h-9" />
             <span className="font-display text-xl font-bold hidden sm:inline">
@@ -122,7 +122,7 @@ const Auth = () => {
             </span>
           </Link>
 
-          <div className="flex justify-center">
+          <div className="flex-1 flex justify-center">
             <div
               role="tablist"
               aria-label="Wybierz widok"
@@ -157,7 +157,12 @@ const Auth = () => {
             </div>
           </div>
 
-          <div className="w-[104px] sm:w-[148px] shrink-0" aria-hidden="true" />
+          <Link
+            to="/auth"
+            className="px-3 sm:px-4 py-2 rounded-xl bg-secondary/50 border border-border text-foreground text-sm font-medium hover:bg-secondary transition-colors shrink-0"
+          >
+            Zaloguj się
+          </Link>
         </div>
       </header>
 
