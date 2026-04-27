@@ -150,22 +150,17 @@ export function useJobFeed() {
       lastUndoableRef.current = null; // clear previous undo
       toast.dismiss(); // ensure only one toast at a time on rapid swipes
 
-      // Record swipe event — non-blocking; don't let failures stop the UX
-      try {
-        await getProvider("swipeEvents").record(userId, job.id, direction);
-      } catch (err) {
-        console.warn("[useJobFeed] swipe record failed (non-blocking):", err);
-      }
-      setSwipedJobIds((prev) => new Set(prev).add(job.id));
-
+      // For "right" (apply): try apply FIRST. If it fails, keep the card
+      // (don't advance, don't mark as swiped) so user can retry.
       if (direction === "right") {
         try {
           await applyToJob(job);
         } catch {
-          // applyToJob already shows toast — but DO advance card
-          // (if we got here, consent was OK — only network/DB error)
+          // applyToJob already showed a friendly toast.
+          // Card stays — we do NOT record swipe, do NOT advance.
+          setActionPending(false);
+          return;
         }
-        // Apply is not undoable
       } else if (direction === "save") {
         try {
           await saveJob(job.id);
@@ -175,14 +170,22 @@ export function useJobFeed() {
             duration: 2500,
           });
         } catch {
-          toast.error("Nie udało się zapisać oferty");
+          toast.error("Nie udało się zapisać oferty. Spróbuj ponownie.");
+          setActionPending(false);
+          return;
         }
       } else {
-        // direction === "left" (skip)
-        // Cichy skip — undo dostępne z poziomu "Ostatnie" taba.
-        // Nie pokazujemy toasta przy każdym skip — zbyt inwazyjne na mobile.
+        // direction === "left" (skip) — silent
         lastUndoableRef.current = { direction: "left", job, previousIndex: currentIndex };
       }
+
+      // Side-effect succeeded → record swipe (non-blocking) + advance.
+      try {
+        await getProvider("swipeEvents").record(userId, job.id, direction);
+      } catch (err) {
+        console.warn("[useJobFeed] swipe record failed (non-blocking):", err);
+      }
+      setSwipedJobIds((prev) => new Set(prev).add(job.id));
 
       setCurrentIndex((prev) => prev + 1);
       setActionPending(false);
