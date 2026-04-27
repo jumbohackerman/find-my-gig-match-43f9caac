@@ -173,6 +173,8 @@ const MyProfile = () => {
   // Czy w bazie istnieje już realny rekord candidate (vs. pusty szkielet do uzupełnienia).
   const [profileExists, setProfileExists] = useState(false);
 
+  const [activeSection, setActiveSection] = useState<string>("basic");
+  const [showPreview, setShowPreview] = useState(false);
 
   // ── AI processing consent (Block 4) ───────────────────────────────────────
   const { consent, hasConsent, hasDecided, grantConsent, withdrawConsent, loading: consentLoading } = useConsent();
