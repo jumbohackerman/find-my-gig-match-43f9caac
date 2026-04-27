@@ -16,6 +16,7 @@ const Auth = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Redirect already-authenticated users to their home
   useEffect(() => {
@@ -24,11 +25,26 @@ const Auth = () => {
       navigate(profile.role === "employer" ? "/employer" : "/", { replace: true });
     }
   }, [user, profile, authLoading, navigate]);
-  const searchParams = new URLSearchParams(location.search);
+
   const roleFromUrl = searchParams.get("role");
   const defaultRole = roleFromUrl || (location.state as any)?.defaultRole;
   const [mode, setMode] = useState<Mode>("login");
   const [role, setRole] = useState<Role>(defaultRole === "employer" ? "employer" : "candidate");
+
+  // Keep role state in sync when the URL ?role= param changes (e.g. via header toggle or external nav)
+  useEffect(() => {
+    const r = searchParams.get("role");
+    if (r === "candidate" || r === "employer") {
+      if (r !== role) setRole(r);
+    }
+  }, [searchParams, role]);
+
+  const handleRoleChange = (r: Role) => {
+    setRole(r);
+    const next = new URLSearchParams(searchParams);
+    next.set("role", r);
+    setSearchParams(next, { replace: true });
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
