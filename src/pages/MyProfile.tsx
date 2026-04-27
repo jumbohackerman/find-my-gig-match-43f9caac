@@ -229,16 +229,27 @@ const MyProfile = () => {
 
     try {
       if (!isEmployer) {
-        const allSkillsList = [...skills.advanced, ...skills.intermediate, ...skills.beginner];
+        // Walidacja PRZED zapisem — nie zapisujemy cicho złych danych.
+        const errors = validateCandidateProfile({
+          fullName, title, location, salaryMin, salaryMax, links,
+        });
+        if (errors.length > 0) {
+          toast.error(errors[0], {
+            description: errors.length > 1 ? `+${errors.length - 1} kolejnych błędów do poprawienia.` : undefined,
+          });
+          setSaving(false);
+          return;
+        }
+
         const completeness = computeCompleteness({
           fullName, title, location, summary, skills, experienceEntries,
           salaryMin, links, languages, primaryIndustry,
         });
 
         await getProvider("candidates").upsert(user.id, {
-          fullName,
-          title,
-          location,
+          fullName: fullName.trim(),
+          title: title.trim(),
+          location: location.trim(),
           summary,
           skills,
           seniority: seniority as Candidate["seniority"],
@@ -255,8 +266,14 @@ const MyProfile = () => {
           profileCompleteness: completeness.score,
           cvUrl,
         });
+        setProfileExists(true);
       } else {
-        await getProvider("profiles").update(user.id, { fullName });
+        if (!fullName.trim()) {
+          toast.error("Podaj nazwę firmy / imię i nazwisko.");
+          setSaving(false);
+          return;
+        }
+        await getProvider("profiles").update(user.id, { fullName: fullName.trim() });
       }
 
       toast.success("Profil zapisany");
@@ -268,7 +285,8 @@ const MyProfile = () => {
         setShowConsentModal(true);
       }
     } catch (error) {
-      toast.error("Nie udało się zapisać profilu");
+      const msg = (error as Error)?.message || "Nie udało się zapisać profilu";
+      toast.error(`Nie udało się zapisać profilu: ${msg}`);
     }
 
     setSaving(false);
