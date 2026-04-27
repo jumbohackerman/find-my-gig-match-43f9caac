@@ -77,13 +77,13 @@
 
     --browse-card-column: 100%;
 
-    --sidebar-background: 230 28% 6%;
+    --sidebar-background: 222 39% 9%;
     --sidebar-foreground: 210 25% 96%;
     --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 228 18% 16%;
-    --sidebar-accent-foreground: 210 20% 92%;
-    --sidebar-border: 228 18% 22%;
+    --sidebar-accent: 222 28% 18%;
+    --sidebar-accent-foreground: 210 22% 94%;
+    --sidebar-border: 222 22% 26%;
     --sidebar-ring: 24 95% 53%;
 
     /* Animation timings */
