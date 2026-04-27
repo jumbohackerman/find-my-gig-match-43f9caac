@@ -9,7 +9,7 @@ import AIShortlistButton from "./AIShortlistButton";
 import AIShortlistResults from "./AIShortlistResults";
 import LimitedCandidateCard from "./LimitedCandidateCard";
 import EmptyState from "./EmptyState";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 import type { EnrichedEmployerApplication } from "@/domain/models";
 
 interface Props {
@@ -42,11 +42,21 @@ export default function AIShortlistSection({ jobId, jobApps }: Props) {
 
   return (
     <div className="px-4 pb-4 border-t border-border pt-3 space-y-3">
+      <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/40 text-xs text-amber-200">
+        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+        <div className="space-y-0.5">
+          <p className="font-semibold text-amber-100">Tryb testowy (mock)</p>
+          <p>
+            Shortlista AI działa obecnie w trybie demonstracyjnym — wyniki są generowane losowo i nie powinny być używane jako finalna decyzja rekrutacyjna. Statusy aplikacji kandydatów nie są zmieniane, a żadne wiadomości nie są wysyłane.
+          </p>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 className="font-display text-sm font-bold text-foreground">Kandydaci ({jobApps.length})</h3>
           <p className="text-[11px] text-muted-foreground">
-            Pełne profile odblokujesz po wygenerowaniu shortlisty AI.
+            Pełne profile odblokujesz po wygenerowaniu shortlisty AI (demo).
           </p>
         </div>
         <AIShortlistButton applicationsCount={appliedCount} running={running} onRun={run} />

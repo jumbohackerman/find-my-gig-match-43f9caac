@@ -187,7 +187,13 @@ serve(async (req) => {
       industry: c.primary_industry,
     }));
 
-    const aiModel = Deno.env.get("AI_MODEL") ?? "claude-opus-4-5";
+    // MOCK MODE: brak prawdziwego klucza AI → oznaczamy model jako mock,
+    // żeby UI mógł jasno pokazać "Tryb testowy".
+    const hasRealAIKey = !!Deno.env.get("AI_API_KEY");
+    const aiModel = hasRealAIKey
+      ? (Deno.env.get("AI_MODEL") ?? "claude-opus-4-5")
+      : "mock-random-v1";
+    const isMockMode = !hasRealAIKey;
 
     // Create shortlist record (status=processing)
     const { data: shortlist, error: shortlistErr } = await supabase
@@ -255,17 +261,21 @@ serve(async (req) => {
         snapshot_links: c?.links,
       });
 
-      await supabase
-        .from("applications")
-        .update({ status: "shortlisted" })
-        .eq("job_id", job_id)
-        .eq("candidate_id", sel.candidate_id);
+      // W trybie mock NIE zmieniamy realnego statusu aplikacji,
+      // żeby losowy wynik nie wpływał na rekrutację produkcyjną.
+      if (!isMockMode) {
+        await supabase
+          .from("applications")
+          .update({ status: "shortlisted" })
+          .eq("job_id", job_id)
+          .eq("candidate_id", sel.candidate_id);
+      }
     }
 
-    // Reject the rest
+    // Reject the rest — TYLKO w trybie produkcyjnym AI.
     const shortlistedIds = new Set(result.top5.map((s) => s.candidate_id));
     const rejectedIds = candidateIds.filter((id) => !shortlistedIds.has(id));
-    if (rejectedIds.length > 0) {
+    if (!isMockMode && rejectedIds.length > 0) {
       await supabase
         .from("applications")
         .update({ status: "not_selected" })
@@ -283,23 +293,28 @@ serve(async (req) => {
       })
       .eq("id", shortlist.id);
 
-    // Fire-and-forget email notifications
-    supabase.functions
-      .invoke("send-email", {
-        body: {
-          type: "shortlist_complete",
-          job_id,
-          shortlist_id: shortlist.id,
-          top5_ids: [...shortlistedIds],
-          rejected_feedbacks: result.rejected_feedbacks,
-          job_title: job.title,
-          company_name: job.company,
-        },
-      })
-      .catch((e) => console.error("[run-shortlist] email invoke error:", e));
+    // Fire-and-forget email notifications — wyłączone w trybie mock,
+    // żeby nie wysyłać realnych wiadomości na podstawie losowych wyników.
+    if (!isMockMode) {
+      supabase.functions
+        .invoke("send-email", {
+          body: {
+            type: "shortlist_complete",
+            job_id,
+            shortlist_id: shortlist.id,
+            top5_ids: [...shortlistedIds],
+            rejected_feedbacks: result.rejected_feedbacks,
+            job_title: job.title,
+            company_name: job.company,
+          },
+        })
+        .catch((e) => console.error("[run-shortlist] email invoke error:", e));
+    } else {
+      console.log("[run-shortlist] MOCK MODE — pominięto wysyłkę emaili i zmiany statusów aplikacji");
+    }
 
     return new Response(
-      JSON.stringify({ success: true, shortlist_id: shortlist.id, mock: true }),
+      JSON.stringify({ success: true, shortlist_id: shortlist.id, mock: isMockMode }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
