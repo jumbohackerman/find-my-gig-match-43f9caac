@@ -79,7 +79,10 @@ const ResetPassword = () => {
             </button>
           </div>
         </motion.div>
+        </motion.div>
+        </div>
       </div>
+
     );
   }
 
