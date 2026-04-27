@@ -13,6 +13,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [headerRole, setHeaderRole] = useState<PublicHeaderRole>("candidate");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
