@@ -607,7 +607,7 @@ const Landing = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.35 }}
-                          className="card-gradient rounded-2xl border border-border p-5 shadow-xl"
+                          className="card-gradient rounded-2xl border border-border p-5 shadow-xl w-full"
                         >
                           <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3">
                             87 kandydatów aplikowało
@@ -636,7 +636,7 @@ const Landing = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.35 }}
-                          className="card-gradient rounded-2xl border border-primary/30 p-5 shadow-xl flex flex-col items-center justify-center min-h-[260px]"
+                          className="card-gradient rounded-2xl border border-primary/30 p-5 shadow-xl flex flex-col items-center justify-center w-full min-h-[420px]"
                         >
                           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 animate-pulse">
                             <Zap className="w-6 h-6 text-primary" />
@@ -662,7 +662,7 @@ const Landing = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.35 }}
-                          className="card-gradient rounded-2xl border border-border p-5 shadow-xl"
+                          className="card-gradient rounded-2xl border border-border p-5 shadow-xl w-full"
                         >
                           <div className="flex items-center gap-2 mb-4">
                             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
