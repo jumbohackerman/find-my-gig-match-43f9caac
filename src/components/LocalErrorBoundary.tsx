@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { sentryErrorTracking } from "@/services/sentry";
 
 interface Props {
   children: ReactNode;
@@ -29,7 +30,18 @@ class LocalErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error(`[LocalErrorBoundary${this.props.label ? ` – ${this.props.label}` : ""}]`, error, info);
+    if (import.meta.env.DEV) {
+      console.error(`[LocalErrorBoundary${this.props.label ? ` – ${this.props.label}` : ""}]`, error, info);
+    }
+    try {
+      sentryErrorTracking.captureException(error, {
+        boundary: "LocalErrorBoundary",
+        label: this.props.label ?? null,
+        componentStack: info?.componentStack,
+      });
+    } catch {
+      /* never let reporting break the fallback UI */
+    }
   }
 
   handleRetry = () => {
