@@ -598,7 +598,7 @@ const Landing = () => {
                 {isCandidate ? (
                   <SwipeDemoStack />
                 ) : (
-                  <div className="w-full max-w-[340px] mx-auto">
+                  <div className="w-full max-w-[340px] mx-auto min-h-[420px] flex items-center">
                     <AnimatePresence mode="wait">
                       {heroStep === 0 && (
                         <motion.div
