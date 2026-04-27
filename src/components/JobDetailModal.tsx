@@ -287,7 +287,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                 </div>
 
                 {/* Right column: sidebar */}
-                <div className="lg:w-72 shrink-0 space-y-4">
+                <div className="lg:w-72 shrink-0 space-y-4 lg:-mt-4">
                   {/* CTA — mobile only (desktop CTA lives next to salary in hero) */}
                   {onApply && (
                     <button
