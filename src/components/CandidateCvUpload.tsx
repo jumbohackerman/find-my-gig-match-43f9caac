@@ -12,6 +12,7 @@ import {
   startAiPreparation,
   startAiParsing,
 } from "@/lib/cvHelpers";
+import { devLog } from "@/lib/logger";
 
 type CvState = "empty" | "uploaded" | "ready_for_ai" | "processing" | "needs_review" | "ai_parsing" | "parsed" | "failed";
 
@@ -166,25 +167,25 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   };
 
   const handleStartAi = async () => {
-    console.log("[CvUpload] handleStartAi clicked", { cvId: lastCv?.id, aiProcessing, inFlight: aiRequestInFlight.current });
+    devLog("[CvUpload] handleStartAi clicked", { cvId: lastCv?.id, aiProcessing, inFlight: aiRequestInFlight.current });
 
     if (!lastCv || !user) return;
 
     // Guard 1: ref-based in-flight check (survives re-renders)
     if (aiRequestInFlight.current) {
-      console.log("[CvUpload] BLOCKED — AI request already in flight");
+      devLog("[CvUpload] BLOCKED — AI request already in flight");
       return;
     }
 
     // Guard 2: state-based check
     if (aiProcessing) {
-      console.log("[CvUpload] BLOCKED — aiProcessing state is true");
+      devLog("[CvUpload] BLOCKED — aiProcessing state is true");
       return;
     }
 
     // Guard 3: already parsed for this cv_upload_id (in-memory cache)
     if (parsedCvIds.current.has(lastCv.id)) {
-      console.log("[CvUpload] BLOCKED — cv_upload_id already parsed (local cache)");
+      devLog("[CvUpload] BLOCKED — cv_upload_id already parsed (local cache)");
       toast.info("CV zostało już przeanalizowane przez AI.");
       return;
     }
@@ -192,7 +193,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     // Guard 4: check DB for existing parsed data
     const existing = await fetchParsedData(lastCv.id);
     if (hasParsedJson(existing)) {
-      console.log("[CvUpload] BLOCKED — parsed_json already exists in DB");
+      devLog("[CvUpload] BLOCKED — parsed_json already exists in DB");
       parsedCvIds.current.add(lastCv.id);
       setParsedData(existing);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
@@ -203,7 +204,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
 
     // Guard 5: check if status indicates processing in progress
     if (lastCv.status === "ai_processing" || lastCv.status === "processing") {
-      console.log("[CvUpload] BLOCKED — CV is already being processed, status:", lastCv.status);
+      devLog("[CvUpload] BLOCKED — CV is already being processed, status:", lastCv.status);
       toast.info("Analiza CV jest już w toku.");
       return;
     }
@@ -211,7 +212,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     // ── All guards passed — lock and start ──
     aiRequestInFlight.current = true;
     setAiProcessing(true);
-    console.log("[CvUpload] AI analysis STARTED for cv_upload_id:", lastCv.id);
+    devLog("[CvUpload] AI analysis STARTED for cv_upload_id:", lastCv.id);
 
     try {
       // If raw_text exists, skip extraction and go straight to AI parsing
@@ -273,7 +274,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     } finally {
       aiRequestInFlight.current = false;
       setAiProcessing(false);
-      console.log("[CvUpload] AI analysis FINISHED for cv_upload_id:", lastCv.id);
+      devLog("[CvUpload] AI analysis FINISHED for cv_upload_id:", lastCv.id);
     }
   };
 
