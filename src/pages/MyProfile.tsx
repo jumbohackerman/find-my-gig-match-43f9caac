@@ -170,8 +170,9 @@ const MyProfile = () => {
   // CV
   const [cvUrl, setCvUrl] = useState<string | null>(null);
 
-  const [activeSection, setActiveSection] = useState<string>("basic");
-  const [showPreview, setShowPreview] = useState(false);
+  // Czy w bazie istnieje już realny rekord candidate (vs. pusty szkielet do uzupełnienia).
+  const [profileExists, setProfileExists] = useState(false);
+
 
   // ── AI processing consent (Block 4) ───────────────────────────────────────
   const { consent, hasConsent, hasDecided, grantConsent, withdrawConsent, loading: consentLoading } = useConsent();
