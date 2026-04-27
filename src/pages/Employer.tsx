@@ -515,7 +515,7 @@ const Employer = () => {
                       </div>
                     </div>
 
-                    {/* Expanded panel: analytics + tabs (Aplikacje / AI / Shortlista / Pipeline) */}
+                    {/* Expanded panel: candidate list + analytics + AI shortlist */}
                     <AnimatePresence>
                       {isExpanded && (
                         <motion.div
@@ -524,6 +524,44 @@ const Employer = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
+                          {/* Aplikacje — actionable candidate list (status, shortlist, chat) */}
+                          {jobApps.length > 0 && (
+                            <div className="px-4 pt-3 pb-2 border-t border-border space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-display text-sm font-bold text-foreground">
+                                  Aplikacje ({jobApps.length})
+                                </h3>
+                                {balance.totalSlots > 0 && (
+                                  <span className="text-[10px] text-muted-foreground">
+                                    Sloty shortlisty: {balance.remainingSlots}/{balance.totalSlots}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-2">
+                                {jobApps.map((app) => (
+                                  <CandidateCard
+                                    key={app.id}
+                                    app={app}
+                                    jobId={job.id}
+                                    employerId={user?.id}
+                                    onView={() => handleViewCandidate(app)}
+                                    onAdvanceStatus={handleAdvanceStatus}
+                                    onShortlist={() => requestShortlist(app, job.id, job.title)}
+                                    canShortlist={balance.remainingSlots > 0 && job.status !== "closed"}
+                                    chatMessages={messaging.getMessages(app.id)}
+                                    onSendMessage={(content) => messaging.sendMessage(app.id, content)}
+                                    isChatOpen={messaging.isChatOpen(app.id)}
+                                    onUnlockChat={() => {
+                                      messaging.unlockChat(app.id);
+                                      messaging.loadMessages(app.id);
+                                    }}
+                                    currentUserId={user?.id}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           <div id={`shortlist-section-${job.id}`}>
                             <AIShortlistSection jobId={job.id} jobApps={jobApps} />
                           </div>
