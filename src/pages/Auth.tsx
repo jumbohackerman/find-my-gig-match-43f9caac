@@ -105,16 +105,39 @@ const Auth = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-4"
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="mb-5 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label="Wróć do strony głównej"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Wróć do strony głównej
-        </Link>
+        </button>
 
-        <div className="flex items-center gap-2 justify-center mb-6">
+        <div className="flex items-center gap-2 justify-center mb-5">
           <img src={logo} alt="" className="w-10 h-10 object-contain" />
           <h1 className="font-display text-2xl font-bold text-foreground">JobSwipe</h1>
+        </div>
+
+        {/* Role pill toggle (matches landing page style) */}
+        <div className="mb-5 flex justify-center">
+          <div className="inline-flex p-1 rounded-full bg-secondary border border-border">
+            {(["candidate", "employer"] as Role[]).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  role === r
+                    ? "btn-gradient text-primary-foreground shadow-glow"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                aria-pressed={role === r}
+              >
+                {r === "candidate" ? "Dla kandydata" : "Dla pracodawcy"}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="card-gradient rounded-2xl border border-border p-6">
