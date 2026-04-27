@@ -1342,7 +1342,7 @@ const Landing = () => {
                   Kto stoi za JobSwipe?
                 </h2>
                 <p className="text-muted-foreground max-w-lg mx-auto">
-                  JobSwipe powstał z potrzeby zmiany rynku, który zbyt długo akceptował wolne procesy, brak odpowiedzi i przeciążenie po stronie pracodawców. Tworzymy rozwiązanie, które upraszcza aplikowanie, porządkuje selekcję i skraca drogę od pierwszego zainteresowania do decyzji.
+                  Budujemy nowy standard rekrutacji — szybszy, prostszy i bardziej transparentny dla obu stron.
                 </p>
               </div>
 
