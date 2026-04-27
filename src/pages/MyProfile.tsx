@@ -76,6 +76,53 @@ function computeCompleteness(data: {
   };
 }
 
+/** Walidacja URL — pusty string OK; w przeciwnym razie wymagany http(s):// */
+function isValidUrl(value: string): boolean {
+  const v = value.trim();
+  if (!v) return true;
+  try {
+    const u = new URL(v);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+interface ProfileValidationInput {
+  fullName: string;
+  title: string;
+  location: string;
+  salaryMin: number;
+  salaryMax: number;
+  links: CandidateLinks;
+}
+
+/** Zwraca listę błędów walidacji formularza profilu kandydata. */
+function validateCandidateProfile(input: ProfileValidationInput): string[] {
+  const errors: string[] = [];
+  if (!input.fullName.trim()) errors.push("Imię i nazwisko są wymagane.");
+  if (!input.title.trim()) errors.push("Tytuł zawodowy jest wymagany.");
+  if (!input.location.trim()) errors.push("Lokalizacja jest wymagana.");
+  if (input.salaryMin < 0 || input.salaryMax < 0) {
+    errors.push("Wynagrodzenie nie może być ujemne.");
+  }
+  if (input.salaryMin > 0 && input.salaryMax > 0 && input.salaryMin > input.salaryMax) {
+    errors.push("Minimalne wynagrodzenie nie może być wyższe niż maksymalne.");
+  }
+  const linkChecks: [string, string | undefined][] = [
+    ["Portfolio", input.links.portfolio_url],
+    ["GitHub", input.links.github_url],
+    ["LinkedIn", input.links.linkedin_url],
+    ["Strona osobista", input.links.website_url],
+  ];
+  for (const [label, val] of linkChecks) {
+    if (val && !isValidUrl(val)) {
+      errors.push(`Link "${label}" musi być poprawnym adresem URL (np. https://...).`);
+    }
+  }
+  return errors;
+}
+
 const MyProfile = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const isEmployer = profile?.role === "employer";
@@ -123,6 +170,9 @@ const MyProfile = () => {
   // CV
   const [cvUrl, setCvUrl] = useState<string | null>(null);
 
+  // Czy w bazie istnieje już realny rekord candidate (vs. pusty szkielet do uzupełnienia).
+  const [profileExists, setProfileExists] = useState(false);
+
   const [activeSection, setActiveSection] = useState<string>("basic");
   const [showPreview, setShowPreview] = useState(false);
 
@@ -142,6 +192,7 @@ const MyProfile = () => {
       if (!isEmployer) {
         const candidate = await getProvider("candidates").getByUserId(user.id);
         if (candidate) {
+          setProfileExists(true);
           setFullName(candidate.fullName || "");
           setTitle(candidate.title || "");
           setLocation(candidate.location || "");
@@ -159,6 +210,10 @@ const MyProfile = () => {
           setLanguages(candidate.languages || []);
           setPrimaryIndustry(candidate.primaryIndustry || "");
           setCvUrl(candidate.cvUrl || null);
+        } else {
+          // Brak realnego profilu w bazie — UI pokaże baner "Uzupełnij profil",
+          // a wartości pól pozostaną domyślnie puste (nie używamy demo profilu jako prawdy).
+          setProfileExists(false);
         }
       } else {
         setFullName(profile?.full_name || user.user_metadata?.full_name || "");
@@ -174,16 +229,27 @@ const MyProfile = () => {
 
     try {
       if (!isEmployer) {
-        const allSkillsList = [...skills.advanced, ...skills.intermediate, ...skills.beginner];
+        // Walidacja PRZED zapisem — nie zapisujemy cicho złych danych.
+        const errors = validateCandidateProfile({
+          fullName, title, location, salaryMin, salaryMax, links,
+        });
+        if (errors.length > 0) {
+          toast.error(errors[0], {
+            description: errors.length > 1 ? `+${errors.length - 1} kolejnych błędów do poprawienia.` : undefined,
+          });
+          setSaving(false);
+          return;
+        }
+
         const completeness = computeCompleteness({
           fullName, title, location, summary, skills, experienceEntries,
           salaryMin, links, languages, primaryIndustry,
         });
 
         await getProvider("candidates").upsert(user.id, {
-          fullName,
-          title,
-          location,
+          fullName: fullName.trim(),
+          title: title.trim(),
+          location: location.trim(),
           summary,
           skills,
           seniority: seniority as Candidate["seniority"],
@@ -200,8 +266,14 @@ const MyProfile = () => {
           profileCompleteness: completeness.score,
           cvUrl,
         });
+        setProfileExists(true);
       } else {
-        await getProvider("profiles").update(user.id, { fullName });
+        if (!fullName.trim()) {
+          toast.error("Podaj nazwę firmy / imię i nazwisko.");
+          setSaving(false);
+          return;
+        }
+        await getProvider("profiles").update(user.id, { fullName: fullName.trim() });
       }
 
       toast.success("Profil zapisany");
@@ -213,7 +285,8 @@ const MyProfile = () => {
         setShowConsentModal(true);
       }
     } catch (error) {
-      toast.error("Nie udało się zapisać profilu");
+      const msg = (error as Error)?.message || "Nie udało się zapisać profilu";
+      toast.error(`Nie udało się zapisać profilu: ${msg}`);
     }
 
     setSaving(false);
@@ -575,6 +648,19 @@ const MyProfile = () => {
               ? "Uzupełnij dane firmy, aby kandydaci mogli Cię lepiej poznać."
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
+
+          {/* Profil nie istnieje jeszcze w bazie — jasny komunikat zamiast cichego pokazywania pustego stanu jako "profilu". */}
+          {!isEmployer && !profileExists && (
+            <div className="mb-6 p-4 rounded-2xl border border-primary/40 bg-primary/10 flex items-start gap-3" role="status" aria-live="polite">
+              <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="text-sm text-foreground">
+                <p className="font-semibold mb-1">Uzupełnij swój profil</p>
+                <p className="text-muted-foreground">
+                  Nie masz jeszcze zapisanego profilu kandydata. Wypełnij wymagane pola (imię i nazwisko, tytuł, lokalizacja) i kliknij <strong>Zapisz</strong>, aby zacząć aplikować na oferty.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Block 11: AI prefill banner */}
           {!isEmployer && aiPrefilled && (
