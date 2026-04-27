@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
@@ -421,7 +421,17 @@ function FinalCtaPair({
 /* ================= PAGE ================= */
 
 const Landing = () => {
-  const [view, setView] = useState<View>("candidate");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialView: View = searchParams.get("view") === "employer" ? "employer" : "candidate";
+  const [view, setView] = useState<View>(initialView);
+
+  // Keep state in sync if URL ?view= changes externally (back/forward, header link)
+  useEffect(() => {
+    const v = searchParams.get("view");
+    const next: View = v === "employer" ? "employer" : "candidate";
+    if (next !== view) setView(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
   const [exampleExpanded, setExampleExpanded] = useState(false);
   const [heroStep, setHeroStep] = useState(0);
   const [counts, setCounts] = useState<{ candidates: number; employers: number }>({
@@ -464,6 +474,9 @@ const Landing = () => {
 
   const switchView = (v: View) => {
     setView(v);
+    const next = new URLSearchParams(searchParams);
+    next.set("view", v);
+    setSearchParams(next, { replace: false });
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
