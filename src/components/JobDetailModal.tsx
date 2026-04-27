@@ -284,9 +284,9 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                   {onApply && (
                     <button
                       onClick={() => { onApply(job); onClose(); }}
-                      className="w-full py-3 rounded-xl btn-gradient text-primary-foreground font-semibold text-sm hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-glow"
+                      className="w-full py-4 rounded-xl btn-gradient text-primary-foreground font-bold text-base hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-glow ring-2 ring-primary/40"
                     >
-                      <CheckCircle2 className="w-4 h-4" /> Aplikuj na to stanowisko
+                      <CheckCircle2 className="w-5 h-5" /> Aplikuj na to stanowisko
                     </button>
                   )}
 
