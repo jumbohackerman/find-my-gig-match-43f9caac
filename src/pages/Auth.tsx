@@ -33,6 +33,21 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const authCopy = {
+    candidate: {
+      loginTitle: "Zaloguj się jako kandydat",
+      loginBody: "Wróć do ofert, aplikacji i swojego profilu.",
+      signupTitle: "Utwórz konto kandydata",
+      signupBody: "Załóż profil i aplikuj jednym ruchem.",
+    },
+    employer: {
+      loginTitle: "Zaloguj się jako pracodawca",
+      loginBody: "Wróć do panelu ofert i kandydatów.",
+      signupTitle: "Utwórz konto pracodawcy",
+      signupBody: "Dodaj ofertę i zarządzaj rekrutacją w jednym miejscu.",
+    },
+  } as const;
+
   // Determine where to send user after auth based on role
   const getPostAuthRedirect = (userRole?: string) => {
     return userRole === "employer" ? "/employer" : "/";
@@ -97,7 +112,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* ── Top bar — same as Landing ── */}
+      {/* ── Top bar — same panel style as landing ── */}
       <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
@@ -107,7 +122,6 @@ const Auth = () => {
             </span>
           </Link>
 
-          {/* Toggle pills — drive the role selector */}
           <div className="flex-1 flex justify-center">
             <div
               role="tablist"
@@ -143,11 +157,16 @@ const Auth = () => {
             </div>
           </div>
 
-          <div className="w-[88px] sm:w-[110px] shrink-0" aria-hidden="true" />
+          <Link
+            to="/auth"
+            className="px-3 sm:px-4 py-2 rounded-xl bg-secondary/50 border border-border text-foreground text-sm font-medium hover:bg-secondary transition-colors shrink-0"
+          >
+            Zaloguj się
+          </Link>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="flex-1 flex flex-col items-center justify-start px-4 pt-14 sm:pt-20 pb-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -160,13 +179,17 @@ const Auth = () => {
 
         <div className="card-gradient rounded-2xl border border-border p-6">
           <h2 className="font-display text-lg font-bold text-foreground mb-1">
-            {mode === "login" ? "Witaj ponownie" : mode === "signup" ? "Utwórz konto" : "Resetuj hasło"}
+            {mode === "login"
+              ? authCopy[role].loginTitle
+              : mode === "signup"
+              ? authCopy[role].signupTitle
+              : "Resetuj hasło"}
           </h2>
           <p className="text-muted-foreground text-sm mb-5">
             {mode === "login"
-              ? "Zaloguj się, aby kontynuować przeglądanie."
+              ? authCopy[role].loginBody
               : mode === "signup"
-              ? "Dołącz jako kandydat lub pracodawca."
+              ? authCopy[role].signupBody
               : "Podaj email, aby otrzymać link do resetowania."}
           </p>
 
@@ -189,25 +212,6 @@ const Auth = () => {
           <form onSubmit={handleSubmit} className="space-y-4" data-testid="auth-form" aria-label={mode === "login" ? "Formularz logowania" : mode === "signup" ? "Formularz rejestracji" : "Formularz resetowania hasła"}>
             {mode === "signup" && (
               <>
-                {/* Role selector */}
-                <div className="grid grid-cols-2 gap-2">
-                  {(["candidate", "employer"] as Role[]).map((r) => (
-                    <button
-                      type="button"
-                      key={r}
-                      onClick={() => setRole(r)}
-                      data-testid={`auth-role-${r}`}
-                      className={`py-2.5 rounded-xl text-sm font-medium transition-all ${
-                        role === r
-                          ? "btn-gradient text-primary-foreground shadow-glow"
-                          : "bg-secondary text-secondary-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {r === "candidate" ? "🧑‍💻 Kandydat" : "🏢 Pracodawca"}
-                    </button>
-                  ))}
-                </div>
-
                 <div className="space-y-1.5">
                   <label htmlFor="auth-fullname" className="text-xs text-muted-foreground font-medium">Imię i nazwisko</label>
                   <div className="relative">
