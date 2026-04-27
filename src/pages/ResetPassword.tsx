@@ -5,6 +5,7 @@ import { Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/jobswipe-logo.png";
+import PublicHeader, { type PublicHeaderRole } from "@/components/PublicHeader";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
