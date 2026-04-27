@@ -6,26 +6,32 @@
 
 @layer base {
   :root {
-    /* ── Core palette: deeper, richer dark with subtle blue cast ── */
-    --background: 230 28% 6%;
+    /* ── Core palette: refined premium dark navy/slate (subtle polish, not a redesign) ── */
+    /* Page bg ~ #0B1120 — one notch lighter than before */
+    --background: 222 39% 9%;
+    /* Primary text ~ #F3F4F6 */
     --foreground: 210 25% 96%;
 
-    --card: 228 22% 11%;
-    --card-foreground: 210 20% 95%;
+    /* Card surface ~ #162033 — clearly separates from background */
+    --card: 222 30% 14%;
+    --card-foreground: 210 20% 96%;
 
-    --popover: 228 22% 10%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 222 30% 13%;
+    --popover-foreground: 210 20% 96%;
 
     /* Vibrant warm primary (orange — matches landing #f97316) */
     --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 27 96% 61%;
 
-    --secondary: 228 18% 16%;
-    --secondary-foreground: 210 20% 92%;
+    /* Secondary surface ~ #1C2740 */
+    --secondary: 222 28% 18%;
+    --secondary-foreground: 210 22% 94%;
 
-    --muted: 228 16% 14%;
-    --muted-foreground: 220 12% 60%;
+    /* Muted surface ~ #182235 */
+    --muted: 222 28% 16%;
+    /* Muted text ~ #94A3B8 (slate-400) — clearly readable */
+    --muted-foreground: 215 20% 65%;
 
     /* Cool emerald accent for contrast */
     --accent: 162 70% 48%;
@@ -35,8 +41,9 @@
     --destructive: 0 75% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 228 18% 22%;
-    --input: 228 18% 20%;
+    /* Borders: ~rgba(255,255,255,0.09) for clearer layer separation */
+    --border: 222 22% 26%;
+    --input: 222 22% 24%;
     --ring: 24 95% 53%;
 
     --radius: 1rem;
@@ -44,39 +51,39 @@
     --swipe-right: 24 95% 53%;
     --swipe-left: 220 10% 50%;
 
-    /* ── Rich gradients ── */
-    --gradient-card: linear-gradient(155deg, hsl(228 24% 14%) 0%, hsl(228 22% 10%) 60%, hsl(232 26% 8%) 100%);
-    --gradient-card-hover: linear-gradient(155deg, hsl(228 26% 16%) 0%, hsl(228 22% 11%) 60%, hsl(232 26% 9%) 100%);
+    /* ── Rich gradients (slightly lifted for premium feel) ── */
+    --gradient-card: linear-gradient(155deg, hsl(222 30% 16%) 0%, hsl(222 30% 13%) 60%, hsl(225 32% 11%) 100%);
+    --gradient-card-hover: linear-gradient(155deg, hsl(222 32% 18%) 0%, hsl(222 30% 14%) 60%, hsl(225 32% 12%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(24 95% 53%) 0%, hsl(15 90% 50%) 100%);
     --gradient-primary-soft: linear-gradient(135deg, hsl(24 95% 53% / 0.18), hsl(15 90% 50% / 0.18));
     --gradient-accent: linear-gradient(135deg, hsl(162 70% 48%), hsl(180 75% 50%));
-    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 95% 53% / 0.18) 0%, transparent 50%),
-                       radial-gradient(at 80% 20%, hsl(280 70% 55% / 0.12) 0%, transparent 50%),
-                       radial-gradient(at 50% 80%, hsl(162 70% 48% / 0.10) 0%, transparent 50%);
-    --gradient-mesh: linear-gradient(125deg, hsl(230 28% 6%) 0%, hsl(232 30% 8%) 50%, hsl(228 28% 7%) 100%);
+    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 95% 53% / 0.16) 0%, transparent 50%),
+                       radial-gradient(at 80% 20%, hsl(280 70% 55% / 0.10) 0%, transparent 50%),
+                       radial-gradient(at 50% 80%, hsl(162 70% 48% / 0.08) 0%, transparent 50%);
+    --gradient-mesh: linear-gradient(125deg, hsl(222 39% 9%) 0%, hsl(224 36% 11%) 50%, hsl(222 36% 10%) 100%);
 
-    /* ── Layered shadows for depth ── */
-    --shadow-card: 0 12px 40px -12px hsl(0 0% 0% / 0.65),
-                   0 2px 8px -2px hsl(0 0% 0% / 0.4),
-                   inset 0 1px 0 0 hsl(210 30% 100% / 0.04);
-    --shadow-card-hover: 0 24px 60px -16px hsl(0 0% 0% / 0.75),
-                         0 4px 12px -2px hsl(24 95% 53% / 0.15),
-                         inset 0 1px 0 0 hsl(210 30% 100% / 0.06);
-    --shadow-glow: 0 0 40px -8px hsl(24 95% 53% / 0.45),
-                   0 0 80px -16px hsl(15 90% 50% / 0.25);
+    /* ── Layered shadows for depth (slightly softer; better with lighter bg) ── */
+    --shadow-card: 0 12px 40px -12px hsl(0 0% 0% / 0.55),
+                   0 2px 8px -2px hsl(0 0% 0% / 0.35),
+                   inset 0 1px 0 0 hsl(210 30% 100% / 0.05);
+    --shadow-card-hover: 0 24px 60px -16px hsl(0 0% 0% / 0.65),
+                         0 4px 12px -2px hsl(24 95% 53% / 0.18),
+                         inset 0 1px 0 0 hsl(210 30% 100% / 0.07);
+    --shadow-glow: 0 0 40px -8px hsl(24 95% 53% / 0.40),
+                   0 0 80px -16px hsl(15 90% 50% / 0.22);
     --shadow-glow-accent: 0 0 32px -6px hsl(162 70% 48% / 0.40);
-    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
-    --shadow-elevated: 0 20px 50px -16px hsl(0 0% 0% / 0.6);
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.35);
+    --shadow-elevated: 0 20px 50px -16px hsl(0 0% 0% / 0.55);
 
     --browse-card-column: 100%;
 
-    --sidebar-background: 230 28% 6%;
+    --sidebar-background: 222 39% 9%;
     --sidebar-foreground: 210 25% 96%;
     --sidebar-primary: 24 95% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 228 18% 16%;
-    --sidebar-accent-foreground: 210 20% 92%;
-    --sidebar-border: 228 18% 22%;
+    --sidebar-accent: 222 28% 18%;
+    --sidebar-accent-foreground: 210 22% 94%;
+    --sidebar-border: 222 22% 26%;
     --sidebar-ring: 24 95% 53%;
 
     /* Animation timings */
@@ -241,12 +248,12 @@
       inset 0 0 0 1px hsl(210 30% 100% / 0.02);
   }
 
-  /* Glassy elevated surface */
+  /* Glassy elevated surface (navbar) — slightly lighter than page bg */
   .glass-surface {
-    background: linear-gradient(155deg, hsl(228 24% 14% / 0.85), hsl(228 22% 10% / 0.85));
+    background: linear-gradient(155deg, hsl(222 30% 17% / 0.85), hsl(222 30% 13% / 0.85));
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid hsl(210 30% 100% / 0.06);
+    border: 1px solid hsl(210 30% 100% / 0.07);
   }
 
   /* Animated shimmer overlay */
