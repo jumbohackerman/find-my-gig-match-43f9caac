@@ -649,6 +649,19 @@ const MyProfile = () => {
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
 
+          {/* Profil nie istnieje jeszcze w bazie — jasny komunikat zamiast cichego pokazywania pustego stanu jako "profilu". */}
+          {!isEmployer && !profileExists && (
+            <div className="mb-6 p-4 rounded-2xl border border-primary/40 bg-primary/10 flex items-start gap-3" role="status" aria-live="polite">
+              <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="text-sm text-foreground">
+                <p className="font-semibold mb-1">Uzupełnij swój profil</p>
+                <p className="text-muted-foreground">
+                  Nie masz jeszcze zapisanego profilu kandydata. Wypełnij wymagane pola (imię i nazwisko, tytuł, lokalizacja) i kliknij <strong>Zapisz</strong>, aby zacząć aplikować na oferty.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Block 11: AI prefill banner */}
           {!isEmployer && aiPrefilled && (
             <div className="mb-6 p-4 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 flex items-start gap-3" role="status" aria-live="polite">
