@@ -269,6 +269,13 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                       <p className="text-sm text-foreground leading-relaxed">{job.description}</p>
                     </Section>
                   )}
+
+                  {/* About company */}
+                  {job.aboutCompany && (
+                    <Section icon={Building2} title="O firmie">
+                      <p className="text-sm text-foreground leading-relaxed">{job.aboutCompany}</p>
+                    </Section>
+                  )}
                 </div>
 
                 {/* Right column: sidebar */}
