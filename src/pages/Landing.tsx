@@ -1342,26 +1342,20 @@ const Landing = () => {
                   Kto stoi za JobSwipe?
                 </h2>
                 <p className="text-muted-foreground max-w-lg mx-auto">
-                  Nie kolejna korporacja z działem HR. Dwóch praktyków, którzy mieli dość ghostingu.
+                  JobSwipe powstał z potrzeby zmiany rynku, który zbyt długo akceptował wolne procesy, brak odpowiedzi i przeciążenie po stronie pracodawców. Tworzymy rozwiązanie, które upraszcza aplikowanie, porządkuje selekcję i skraca drogę od pierwszego zainteresowania do decyzji.
                 </p>
               </div>
 
               {/* Story block */}
               <div className={`${GLASS_CARD} p-6 sm:p-8 mb-8`}>
                 <p className="text-sm sm:text-[15px] text-foreground/80 leading-relaxed mb-4">
-                  Zanim zbudowaliśmy JobSwipe, sami wysłaliśmy setki aplikacji. Znamy ten schemat —
-                  godziny na dostosowanie CV, formularze kopiujące te same dane, a na końcu cisza.
-                  Żadnej odpowiedzi, żadnego feedbacku, zero szacunku dla włożonego czasu.
+                  Rekrutacja utknęła między masowym aplikowaniem a ręczną selekcją. Kandydaci wysyłają dziesiątki zgłoszeń i zbyt często nie dostają żadnej odpowiedzi. Pracodawcy toną w CV, tracą czas na porządkowanie kandydatów i próbują rozwiązywać rosnący wolumen zatrudnianiem kolejnych osób do selekcji. To model, który nie skaluje się do tempa współczesnego rynku pracy.
                 </p>
                 <p className="text-sm sm:text-[15px] text-foreground/80 leading-relaxed mb-4">
-                  Jednocześnie rozmawialiśmy ze znajomymi po stronie rekrutacji. Oni tonęli w stosach
-                  nieporównywalnych CV i tracili tygodnie na ręczną selekcję. Problem był po obu stronach —
-                  i nikt go porządnie nie rozwiązywał.
+                  JobSwipe zmienia ten proces od podstaw. Kandydat może aplikować jednym swipem — szybko, prosto i bez powtarzania tych samych danych w kolejnych formularzach. Pracodawca otrzymuje uporządkowany profil kandydata i narzędzie, które pozwala szybciej przejść od zainteresowania do decyzji, bez konieczności rozbudowywania zespołu rekrutacyjnego tylko po to, by przetwarzać większą liczbę aplikacji.
                 </p>
                 <p className="text-sm sm:text-[15px] text-foreground/80 leading-relaxed">
-                  Więc zbudowaliśmy narzędzie, którego sami szukaliśmy. Platforma, która nie marnuje czasu
-                  kandydatów, daje każdemu odpowiedź — i pozwala pracodawcom podejmować decyzje na
-                  podstawie danych, a nie przeczuć.
+                  Nasza wizja jest prosta: rekrutacja, w której każda aplikacja ma jasny status, kandydat otrzymuje odpowiedź i feedback, a pracodawca podejmuje decyzje szybciej, na lepiej uporządkowanych danych. Nie tworzymy kolejnego job boardu. Budujemy nowy standard rekrutacji — szybszy, trafniejszy i bardziej transparentny. Taki, w którym technologia realnie oszczędza czas i podnosi jakość decyzji.
                 </p>
               </div>
 
