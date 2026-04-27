@@ -1,41 +1,28 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "@/assets/jobswipe-logo.png";
 
 export type PublicHeaderRole = "candidate" | "employer";
 
 interface PublicHeaderProps {
-  /** Currently selected role (controls toggle highlight). */
   role: PublicHeaderRole;
-  /** Called when user picks a role from the toggle. */
   onRoleChange: (role: PublicHeaderRole) => void;
   /**
-   * Variant controls the right-hand contextual button.
-   * - "landing": shows "Zaloguj się" → /auth?role={role}
-   * - "auth": shows "Strona główna" → /
+   * - "landing": prawy przycisk → /auth?role={role}
+   * - "auth":    prawy przycisk → / (Strona główna)
    */
   variant?: "landing" | "auth";
 }
 
 /**
- * Shared public header used on Landing, Auth and ResetPassword pages.
- * Logo + name always navigate to the candidate landing view (/).
+ * Wspólny publiczny nagłówek (Landing, Auth, ResetPassword).
+ * Logo zawsze prowadzi na "/" (widok kandydata).
  */
 const PublicHeader = ({ role, onRoleChange, variant = "landing" }: PublicHeaderProps) => {
-  const navigate = useNavigate();
-
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Always go to candidate landing view
-    onRoleChange("candidate");
-    navigate("/");
-  };
-
   return (
     <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
         <Link
           to="/"
-          onClick={handleLogoClick}
           className="flex items-center gap-2.5 shrink-0"
           aria-label="JobSwipe — strona główna"
         >
