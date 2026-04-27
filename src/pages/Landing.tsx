@@ -35,6 +35,7 @@ import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/jobswipe-logo.png";
 import founderJedrzej from "@/assets/founder-jedrzej.png";
 import SwipeDemoStack from "@/components/SwipeDemoStack";
+import PublicHeader from "@/components/PublicHeader";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
