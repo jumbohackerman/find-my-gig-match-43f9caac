@@ -192,6 +192,7 @@ const MyProfile = () => {
       if (!isEmployer) {
         const candidate = await getProvider("candidates").getByUserId(user.id);
         if (candidate) {
+          setProfileExists(true);
           setFullName(candidate.fullName || "");
           setTitle(candidate.title || "");
           setLocation(candidate.location || "");
@@ -209,6 +210,10 @@ const MyProfile = () => {
           setLanguages(candidate.languages || []);
           setPrimaryIndustry(candidate.primaryIndustry || "");
           setCvUrl(candidate.cvUrl || null);
+        } else {
+          // Brak realnego profilu w bazie — UI pokaże baner "Uzupełnij profil",
+          // a wartości pól pozostaną domyślnie puste (nie używamy demo profilu jako prawdy).
+          setProfileExists(false);
         }
       } else {
         setFullName(profile?.full_name || user.user_metadata?.full_name || "");
