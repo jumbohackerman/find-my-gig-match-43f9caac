@@ -211,9 +211,16 @@ export function useJobFeed() {
       }
       setActionPending(true);
       try {
-        await unsaveJob(job.id);
-        toast.info("Usunięto z zapisanych");
+        // Apply FIRST. If it fails, the job stays in saved.
         await applyToJob(job);
+        // Only remove from saved after a successful apply.
+        try {
+          await unsaveJob(job.id);
+        } catch (err) {
+          console.warn("[useJobFeed] unsave after apply failed (non-blocking):", err);
+        }
+      } catch {
+        // applyToJob already showed a friendly toast; saved entry preserved.
       } finally {
         setActionPending(false);
       }
