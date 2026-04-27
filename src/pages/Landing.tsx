@@ -866,254 +866,320 @@ const Landing = () => {
 
                 <div className="relative">
                   <div
-                    className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
+                    className="absolute inset-0 card-gradient rounded-2xl border border-border shadow-xl"
                     style={{ transform: "scale(0.96) translateY(14px)", opacity: 0.35 }}
                     aria-hidden
                   />
                   <div
-                    className="absolute inset-0 card-gradient rounded-3xl border border-border shadow-xl"
+                    className="absolute inset-0 card-gradient rounded-2xl border border-border shadow-xl"
                     style={{ transform: "scale(0.98) translateY(7px)", opacity: 0.6 }}
                     aria-hidden
                   />
 
-                  <div className="relative card-gradient rounded-3xl border border-border shadow-2xl overflow-hidden">
-                    {/* Header */}
-                    <div className="p-6 sm:p-8 border-b border-border">
-                      <div className="flex items-start gap-4 mb-5">
-                        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-3xl shrink-0">
-                          🚀
+                  <div className="relative card-gradient rounded-2xl border border-border shadow-2xl overflow-hidden">
+                    {/* Top bar — mirrors JobDetailModal sticky header */}
+                    <div className="bg-background/90 backdrop-blur-md border-b border-border px-5 py-3 flex items-center justify-between">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center overflow-hidden shrink-0">
+                          <span className="text-base">🚀</span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-3 flex-wrap">
-                            <div>
-                              <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground">
-                                Senior Frontend Developer
-                              </h3>
-                              <p className="text-sm text-muted-foreground mt-0.5">
-                                SGH Tech · Edukacja / SaaS
+                        <div className="min-w-0">
+                          <h3 className="font-display text-sm font-bold text-foreground truncate">
+                            Senior Frontend Developer
+                          </h3>
+                          <p className="text-xs text-primary font-medium truncate">SGH Tech</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 text-xs">
+                          <Flag className="w-3.5 h-3.5" /> Zgłoś
+                        </span>
+                        <X className="w-5 h-5" aria-hidden />
+                      </div>
+                    </div>
+
+                    <div className="p-5">
+                      {/* Hero */}
+                      <div className="mb-5">
+                        <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-1">
+                          Senior Frontend Developer
+                        </h2>
+                        <p className="text-sm text-primary font-medium mb-3">SGH Tech</p>
+
+                        {/* Meta badges */}
+                        <div className="flex items-center gap-2 flex-wrap mb-4">
+                          {[
+                            { Icon: MapPin, t: "Warszawa" },
+                            { Icon: Wifi, t: "Hybrydowo" },
+                            { Icon: Briefcase, t: "B2B / UoP" },
+                            { Icon: GraduationCap, t: "Senior · 5+ lat" },
+                            { Icon: Users, t: "Zespół 8 osób" },
+                            { Icon: Clock, t: "4 dni temu" },
+                          ].map(({ Icon, t }) => (
+                            <span
+                              key={t}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium"
+                            >
+                              <Icon className="w-3 h-3" /> {t}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Salary box */}
+                        <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 mb-4">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-accent" />
+                            <span className="text-base font-bold text-accent">
+                              18 000 – 25 000 zł
+                            </span>
+                            <span className="text-xs text-muted-foreground">netto / mies. (B2B)</span>
+                          </div>
+                        </div>
+
+                        {/* Match block */}
+                        <div className="p-3 rounded-xl bg-secondary/50 border border-border mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                              Dopasowanie do Twojego profilu
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full text-xs font-bold border bg-accent/15 border-accent/30 text-accent">
+                              92%
+                            </span>
+                          </div>
+                          <div className="space-y-1">
+                            {[
+                              "Wszystkie wymagane umiejętności pasują",
+                              "Poziom doświadczenia pasuje (Senior)",
+                              "Wynagrodzenie w Twoich oczekiwaniach",
+                              "Lokalizacja: Warszawa",
+                              "Tryb pracy pasuje — hybrydowo",
+                            ].map((r, i) => (
+                              <p key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                                <span className="mt-0.5">•</span>
+                                <span>{r}</span>
                               </p>
-                            </div>
-                            <span className="px-3 py-1.5 rounded-lg bg-orange-500 text-white text-sm font-bold shadow-[0_0_20px_rgba(249,115,22,0.3)]">
-                              92% match
-                            </span>
+                            ))}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {["React", "TypeScript", "GraphQL", "Next.js"].map((s) => (
+                              <span
+                                key={s}
+                                className="text-[10px] px-2 py-0.5 rounded-full bg-accent/15 text-accent font-medium"
+                              >
+                                ✓ {s}
+                              </span>
+                            ))}
+                            {["Node.js", "Tailwind", "Playwright"].map((s) => (
+                              <span
+                                key={s}
+                                className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium"
+                              >
+                                {s}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 text-xs">
-                        {[
-                          { Icon: MapPin, t: "Warszawa" },
-                          { Icon: Wifi, t: "Hybrydowo (2 dni / tydz.)" },
-                          { Icon: GraduationCap, t: "Senior · 5+ lat" },
-                          { Icon: Briefcase, t: "B2B / UoP" },
-                          { Icon: Users, t: "Zespół 8 osób" },
-                        ].map(({ Icon, t }) => (
-                          <span
-                            key={t}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/50 border border-border text-foreground"
-                          >
-                            <Icon className="w-3 h-3" /> {t}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/30">
-                        <Wallet className="w-4 h-4 text-orange-500" />
-                        <span className="font-bold text-foreground">18 000 – 25 000 zł</span>
-                        <span className="text-xs text-muted-foreground">netto / mies. (B2B)</span>
-                      </div>
-                    </div>
-
-                    {/* Tech stack */}
-                    <div className="px-6 sm:px-8 py-5 border-b border-border">
-                      <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-3">
-                        Tech stack
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { t: "React", lvl: "must" },
-                          { t: "TypeScript", lvl: "must" },
-                          { t: "GraphQL", lvl: "must" },
-                          { t: "Next.js", lvl: "must" },
-                          { t: "Node.js", lvl: "nice" },
-                          { t: "Tailwind", lvl: "nice" },
-                          { t: "Playwright", lvl: "nice" },
-                        ].map(({ t, lvl }) => (
-                          <span
-                            key={t}
-                            className={`px-2.5 py-1 rounded-md text-xs font-medium ${
-                              lvl === "must"
-                                ? "bg-orange-500/15 text-orange-500 border border-orange-500/30"
-                                : "bg-secondary/50 text-foreground/70 border border-border"
-                            }`}
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* About role — always visible */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Target className="w-4 h-4 text-orange-500" /> O roli
-                      </h4>
-                      <p className="text-sm text-foreground/70 leading-relaxed">
-                        Dołącz do zespołu budującego nowoczesną platformę edukacyjną używaną przez
-                        ponad 50 000 studentów w Polsce. Poprowadzisz refaktoryzację frontu na Next.js
-                        14, wdrożysz design system oraz zadbasz o wydajność i dostępność (WCAG 2.1).
-                        Pracujesz blisko z PM, designerem i 3 backendowcami w Go.
-                      </p>
-                    </div>
-
-                    {/* Responsibilities — always visible */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <ListChecks className="w-4 h-4 text-orange-500" /> Obowiązki
-                      </h4>
-                      <ul className="space-y-2">
-                        {[
-                          "Rozwój głównej aplikacji webowej w React + Next.js",
-                          "Migracja istniejącego kodu z Pages Router na App Router",
-                          "Współtworzenie i utrzymanie wewnętrznego design systemu",
-                          "Code review oraz mentoring 2 mid-developerów",
-                          "Współpraca z backend i product przy projektowaniu API (GraphQL)",
-                        ].map((r, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
-                            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                            <span>{r}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Toggle */}
-                    <button
-                      type="button"
-                      onClick={() => setExampleExpanded(!exampleExpanded)}
-                      className="w-full py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5 border-t border-border"
-                    >
-                      {exampleExpanded ? "Zwiń ogłoszenie" : "Pokaż wymagania, benefity i więcej..."}
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${exampleExpanded ? "rotate-180" : ""}`} />
-                    </button>
-
-                    <AnimatePresence initial={false}>
-                      {exampleExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                    {/* Requirements */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Check className="w-4 h-4 text-orange-500" /> Wymagania
-                      </h4>
-                      <ul className="space-y-2">
-                        {[
-                          "5+ lat komercyjnego doświadczenia z React",
-                          "Bardzo dobra znajomość TypeScript (typy generyczne, narrowing)",
-                          "Doświadczenie z Next.js (App Router) na produkcji",
-                          "Praktyka z testowaniem (Jest, Playwright lub Cypress)",
-                          "Angielski B2+ (codzienna komunikacja z zespołem QA)",
-                        ].map((r, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
-                            <Check className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                            <span>{r}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Nice to have */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Star className="w-4 h-4 text-muted-foreground" /> Mile widziane
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          "Design systems (Storybook)",
-                          "Accessibility (WCAG 2.1)",
-                          "GraphQL Codegen",
-                          "Doświadczenie w EdTech",
-                        ].map((n) => (
-                          <span
-                            key={n}
-                            className="px-2.5 py-1 rounded-full bg-secondary/50 text-xs text-foreground/70 border border-border"
-                          >
-                            {n}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Benefits */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Gift className="w-4 h-4 text-orange-500" /> Benefity
-                      </h4>
-                      <div className="grid sm:grid-cols-2 gap-2">
-                        {[
-                          "Prywatna opieka medyczna (Medicover)",
-                          "Karta Multisport Plus",
-                          "Budżet szkoleniowy 5 000 zł / rok",
-                          "MacBook Pro M3 + monitor 4K",
-                          "26 dni urlopu (B2B)",
-                          "Hybryda: 2 dni z biura w centrum Warszawy",
-                        ].map((b, i) => (
-                          <div key={i} className="flex items-start gap-2 text-sm text-foreground/70">
-                            <Check className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                            <span>{b}</span>
+                      {/* 2-column layout */}
+                      <div className="flex flex-col lg:flex-row gap-5">
+                        {/* Left column */}
+                        <div className="flex-1 min-w-0">
+                          {/* O roli */}
+                          <div className="mb-5">
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5" /> O roli
+                            </h4>
+                            <p className="text-sm text-foreground leading-relaxed">
+                              Dołącz do zespołu budującego nowoczesną platformę edukacyjną używaną
+                              przez ponad 50 000 studentów w Polsce. Poprowadzisz refaktoryzację
+                              frontu na Next.js 14, wdrożysz design system oraz zadbasz o wydajność
+                              i dostępność (WCAG 2.1). Pracujesz blisko z PM, designerem i 3
+                              backendowcami w Go.
+                            </p>
                           </div>
-                        ))}
+
+                          {/* Zakres obowiązków */}
+                          <div className="mb-5">
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                              <ListChecks className="w-3.5 h-3.5" /> Zakres obowiązków
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {[
+                                "Rozwój głównej aplikacji webowej w React + Next.js",
+                                "Migracja istniejącego kodu z Pages Router na App Router",
+                                "Współtworzenie i utrzymanie wewnętrznego design systemu",
+                                "Code review oraz mentoring 2 mid-developerów",
+                                "Współpraca z backend i product przy projektowaniu API (GraphQL)",
+                              ].map((item, i) => (
+                                <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <AnimatePresence initial={false}>
+                            {exampleExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                              >
+                                {/* Wymagania */}
+                                <div className="mb-5">
+                                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Wymagania
+                                  </h4>
+                                  <ul className="space-y-1.5">
+                                    {[
+                                      "5+ lat komercyjnego doświadczenia z React",
+                                      "Bardzo dobra znajomość TypeScript (typy generyczne, narrowing)",
+                                      "Doświadczenie z Next.js (App Router) na produkcji",
+                                      "Praktyka z testowaniem (Jest, Playwright lub Cypress)",
+                                      "Angielski B2+ (codzienna komunikacja z zespołem QA)",
+                                    ].map((item, i) => (
+                                      <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
+                                        {item}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+
+                                {/* Mile widziane */}
+                                <div className="mb-5">
+                                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                    <Heart className="w-3.5 h-3.5" /> Mile widziane
+                                  </h4>
+                                  <ul className="space-y-1.5">
+                                    {[
+                                      "Design systems (Storybook)",
+                                      "Accessibility (WCAG 2.1)",
+                                      "GraphQL Codegen",
+                                      "Doświadczenie w EdTech",
+                                    ].map((item, i) => (
+                                      <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-muted-foreground shrink-0" />
+                                        {item}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+
+                                {/* O firmie */}
+                                <div className="mb-5">
+                                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                    <Building2 className="w-3.5 h-3.5" /> O firmie
+                                  </h4>
+                                  <p className="text-sm text-foreground leading-relaxed">
+                                    SGH Tech to spółka technologiczna budująca platformę
+                                    e-learningową dla uczelni wyższych w Polsce. Zespół liczy 35
+                                    osób, działamy od 2019 r., jesteśmy rentowni od 2022 r.
+                                    Inwestujemy w rozwój produktu, a nie w marketing — większość
+                                    klientów przychodzi z polecenia.
+                                  </p>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        {/* Right sidebar */}
+                        <div className="lg:w-72 shrink-0 space-y-4">
+                          {/* CTA */}
+                          <Link
+                            to="/auth?role=candidate"
+                            className="w-full py-3 rounded-xl btn-gradient text-primary-foreground font-semibold text-sm hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 shadow-glow"
+                          >
+                            <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
+                          </Link>
+
+                          {/* Benefity */}
+                          <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                              <Gift className="w-3.5 h-3.5" /> Benefity
+                            </h4>
+                            <div className="space-y-1.5">
+                              {[
+                                "Prywatna opieka medyczna (Medicover)",
+                                "Karta Multisport Plus",
+                                "Budżet szkoleniowy 5 000 zł / rok",
+                                "MacBook Pro M3 + monitor 4K",
+                                "26 dni urlopu (B2B)",
+                                "Hybryda: 2 dni z biura w centrum Warszawy",
+                              ].map((b, i) => (
+                                <div key={i} className="flex items-start gap-2 text-sm text-foreground">
+                                  <span className="text-accent mt-0.5">✓</span>
+                                  {b}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Etapy rekrutacji */}
+                          <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                              <ArrowRight className="w-3.5 h-3.5" /> Etapy rekrutacji
+                            </h4>
+                            <ol className="space-y-2">
+                              {[
+                                "Krótka rozmowa z rekruterką (30 min)",
+                                "Zadanie techniczne na żywo z lead developerem (60 min)",
+                                "Spotkanie z zespołem i CTO (45 min)",
+                                "Decyzja w ciągu 5 dni roboczych",
+                              ].map((s, i) => (
+                                <li key={i} className="text-sm text-foreground flex items-start gap-2.5">
+                                  <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                    {i + 1}
+                                  </span>
+                                  {s}
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+
+                          {/* Tech Stack & Poziom */}
+                          <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+                              Tech Stack & Poziom
+                            </h4>
+                            <div className="flex flex-col gap-2">
+                              {[
+                                "React",
+                                "TypeScript",
+                                "GraphQL",
+                                "Next.js",
+                                "Node.js",
+                                "Tailwind",
+                                "Playwright",
+                              ].map((tag) => (
+                                <div
+                                  key={tag}
+                                  className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium border bg-[hsl(45_80%_55%/0.12)] text-[hsl(45_80%_45%)] border-[hsl(45_80%_55%/0.25)]"
+                                >
+                                  <span>{tag}</span>
+                                  <span className="text-[10px] opacity-80">Brak w profilu</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Recruitment process */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Workflow className="w-4 h-4 text-orange-500" /> Proces rekrutacji
-                      </h4>
-                      <ol className="space-y-2.5">
-                        {[
-                          "Krótka rozmowa z rekruterką (30 min)",
-                          "Zadanie techniczne na żywo z lead developerem (60 min)",
-                          "Spotkanie z zespołem i CTO (45 min)",
-                          "Decyzja w ciągu 5 dni roboczych",
-                        ].map((s, i) => (
-                          <li key={i} className="flex items-start gap-3 text-sm text-foreground/70">
-                            <span className="w-6 h-6 rounded-full bg-orange-500/15 text-orange-500 text-xs font-bold flex items-center justify-center shrink-0">
-                              {i + 1}
-                            </span>
-                            <span className="pt-0.5">{s}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
+                      {/* Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => setExampleExpanded(!exampleExpanded)}
+                        className="mt-5 w-full py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1.5 border-t border-border"
+                      >
+                        {exampleExpanded ? "Zwiń ogłoszenie" : "Pokaż wymagania, benefity i więcej…"}
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${exampleExpanded ? "rotate-180" : ""}`} />
+                      </button>
 
-                    {/* About company */}
-                    <div className="px-6 sm:px-8 py-6 border-b border-border">
-                      <h4 className="flex items-center gap-2 font-semibold text-foreground mb-3">
-                        <Building2 className="w-4 h-4 text-orange-500" /> O firmie
-                      </h4>
-                      <p className="text-sm text-foreground/70 leading-relaxed">
-                        SGH Tech to spółka technologiczna budująca platformę e-learningową dla
-                        uczelni wyższych w Polsce. Zespół liczy 35 osób, działamy od 2019 r.,
-                        jesteśmy rentowni od 2022 r. Inwestujemy w rozwój produktu, a nie w marketing
-                        — większość klientów przychodzi z polecenia.
-                      </p>
-                    </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* CTA */}
-                    <div className="px-6 sm:px-8 py-6 bg-muted/30">
-                      <Link to="/auth?role=candidate" className={`${CTA_PRIMARY} w-full`}>
-                        <Lock className="w-4 h-4" /> Zaloguj się, by aplikować
-                      </Link>
                       <p className="text-xs text-muted-foreground text-center mt-3">
                         Przeglądanie ofert jest darmowe. Konto wymagane tylko do aplikowania.
                       </p>
