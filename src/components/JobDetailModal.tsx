@@ -288,11 +288,11 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
 
                 {/* Right column: sidebar */}
                 <div className="lg:w-72 shrink-0 space-y-4">
-                  {/* CTA */}
+                  {/* CTA — mobile only (desktop CTA lives next to salary in hero) */}
                   {onApply && (
                     <button
                       onClick={() => { onApply(job); onClose(); }}
-                      className="w-full py-4 rounded-xl btn-gradient text-primary-foreground font-bold text-base hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-glow ring-2 ring-primary/40"
+                      className="lg:hidden w-full py-4 rounded-xl btn-gradient text-primary-foreground font-bold text-base hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-glow ring-2 ring-primary/40"
                     >
                       <CheckCircle2 className="w-5 h-5" /> Aplikuj na to stanowisko
                     </button>
