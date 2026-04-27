@@ -3,7 +3,7 @@
  * Renders top 5 ranked candidates after shortlist completion.
  */
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Mail, Download, MapPin, Briefcase, DollarSign, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Mail, Download, MapPin, Briefcase, DollarSign, Sparkles, AlertTriangle } from "lucide-react";
 import type { ShortlistRecord, ShortlistSnapshot } from "@/hooks/useAIShortlist";
 import { useContactInvitations } from "@/hooks/useContactInvitations";
 import ContactInvitationModal from "./ContactInvitationModal";
@@ -72,8 +72,13 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-orange-400" />
           <div>
-            <h3 className="font-display text-base font-bold text-foreground">
+            <h3 className="font-display text-base font-bold text-foreground flex items-center gap-2 flex-wrap">
               Shortlista AI — Top 5 kandydatów
+              {isMock && (
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-200 text-[10px] font-bold uppercase tracking-wider">
+                  Demo / Mock
+                </span>
+              )}
             </h3>
             <p className="text-[11px] text-muted-foreground">
               Ukończono {shortlist.completed_at ? new Date(shortlist.completed_at).toLocaleString("pl-PL") : "—"} • Model: {shortlist.ai_model_used || "—"}
@@ -83,9 +88,14 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
       </div>
 
       {isMock && (
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
-          <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-          <span>Tryb demo — wyniki wygenerowane losowo. W wersji produkcyjnej AI analizuje profile kandydatów.</span>
+        <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/40 text-xs text-amber-200">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="font-semibold text-amber-100">Tryb testowy — wyniki nie powinny być używane jako finalna decyzja rekrutacyjna</p>
+            <p>
+              Ranking i uzasadnienia są wygenerowane losowo (mock). Statusy aplikacji kandydatów nie zostały zmienione, a żadne automatyczne wiadomości nie zostały wysłane. Realna analiza AI zostanie włączona po podłączeniu produkcyjnego modelu.
+            </p>
+          </div>
         </div>
       )}
 
@@ -162,9 +172,14 @@ export default function AIShortlistResults({ shortlist, snapshots, totalApplied 
         })}
       </div>
 
-      {rejectedCount > 0 && (
+      {rejectedCount > 0 && !isMock && (
         <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
           Pozostałych <strong className="text-foreground">{rejectedCount}</strong> kandydatów zostało odrzuconych i otrzymało automatyczny feedback.
+        </p>
+      )}
+      {rejectedCount > 0 && isMock && (
+        <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
+          Pozostałych <strong className="text-foreground">{rejectedCount}</strong> kandydatów pozostaje w statusie <strong>Aplikowano</strong> — w trybie testowym nie odrzucamy aplikacji ani nie wysyłamy feedbacku.
         </p>
       )}
 
