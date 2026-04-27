@@ -76,6 +76,53 @@ function computeCompleteness(data: {
   };
 }
 
+/** Walidacja URL — pusty string OK; w przeciwnym razie wymagany http(s):// */
+function isValidUrl(value: string): boolean {
+  const v = value.trim();
+  if (!v) return true;
+  try {
+    const u = new URL(v);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+interface ProfileValidationInput {
+  fullName: string;
+  title: string;
+  location: string;
+  salaryMin: number;
+  salaryMax: number;
+  links: CandidateLinks;
+}
+
+/** Zwraca listę błędów walidacji formularza profilu kandydata. */
+function validateCandidateProfile(input: ProfileValidationInput): string[] {
+  const errors: string[] = [];
+  if (!input.fullName.trim()) errors.push("Imię i nazwisko są wymagane.");
+  if (!input.title.trim()) errors.push("Tytuł zawodowy jest wymagany.");
+  if (!input.location.trim()) errors.push("Lokalizacja jest wymagana.");
+  if (input.salaryMin < 0 || input.salaryMax < 0) {
+    errors.push("Wynagrodzenie nie może być ujemne.");
+  }
+  if (input.salaryMin > 0 && input.salaryMax > 0 && input.salaryMin > input.salaryMax) {
+    errors.push("Minimalne wynagrodzenie nie może być wyższe niż maksymalne.");
+  }
+  const linkChecks: [string, string | undefined][] = [
+    ["Portfolio", input.links.portfolio_url],
+    ["GitHub", input.links.github_url],
+    ["LinkedIn", input.links.linkedin_url],
+    ["Strona osobista", input.links.website_url],
+  ];
+  for (const [label, val] of linkChecks) {
+    if (val && !isValidUrl(val)) {
+      errors.push(`Link "${label}" musi być poprawnym adresem URL (np. https://...).`);
+    }
+  }
+  return errors;
+}
+
 const MyProfile = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const isEmployer = profile?.role === "employer";
