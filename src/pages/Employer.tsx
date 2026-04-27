@@ -89,7 +89,12 @@ const Employer = () => {
       });
       refetch();
     } catch (e: any) {
-      toast.error(`Nie udało się zamknąć: ${e?.message || "błąd"}`);
+      const msg = String(e?.message || "");
+      if (/network|fetch|timeout|offline/i.test(msg)) {
+        toast.error("Brak połączenia. Sprawdź internet i spróbuj ponownie.");
+      } else {
+        toast.error("Nie udało się zamknąć rekrutacji. Spróbuj ponownie.");
+      }
     }
   };
 
@@ -99,8 +104,15 @@ const Employer = () => {
     try {
       await appActions.advanceStatus(appId, newStatus);
       toast.success("Status zaktualizowany");
-    } catch {
-      toast.error("Nie udało się zmienić statusu. Spróbuj ponownie.");
+    } catch (err: any) {
+      const msg = String(err?.message || "");
+      if (/invalid.*transition|state.*machine/i.test(msg)) {
+        toast.error("Ta zmiana statusu nie jest dozwolona w tym etapie.");
+      } else if (/network|fetch|timeout|offline/i.test(msg)) {
+        toast.error("Brak połączenia. Spróbuj ponownie za chwilę.");
+      } else {
+        toast.error("Nie udało się zmienić statusu. Spróbuj ponownie.");
+      }
     } finally {
       setStatusPending(null);
     }
