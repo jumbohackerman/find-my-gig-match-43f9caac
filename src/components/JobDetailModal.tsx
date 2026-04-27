@@ -191,8 +191,8 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                   </span>
                 </div>
 
-                {/* Salary box */}
-                <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 mb-4">
+                {/* Salary box — width aligned with left column (sidebar = lg:w-72 + gap-5) */}
+                <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 mb-4 lg:max-w-[calc(100%-19rem)]">
                   <div className="flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-accent" />
                     <span className={`text-base font-bold ${job.salary?.trim() ? 'text-accent' : 'text-muted-foreground italic text-sm'}`}>
