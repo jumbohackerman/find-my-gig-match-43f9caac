@@ -55,14 +55,13 @@ export function useContactInvitations(jobId: string | null) {
       });
       if (error) throw error;
 
-      // Fire-and-forget email
+      // Fire-and-forget email (funkcja send-email sama pobiera tytuł/firmę i autoryzuje employer/job/candidate)
       supabase.functions
         .invoke("send-email", {
           body: {
             type: "contact_invitation",
             candidate_id: params.candidate_id,
-            job_title: params.job_title,
-            company_name: params.company_name,
+            job_id: params.job_id,
             employer_message: params.message,
           },
         })
