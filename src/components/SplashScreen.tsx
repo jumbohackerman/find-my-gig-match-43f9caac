@@ -215,14 +215,12 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       const w = size * 1.1,
         h = size * 0.8;
       ctx.beginPath();
-      // @ts-ignore roundRect
       ctx.roundRect(x - w / 2, y - h / 2 + 2, w, h, 2);
       ctx.fill();
       ctx.stroke();
       const hw = w * 0.45,
         hh = size * 0.3;
       ctx.beginPath();
-      // @ts-ignore
       ctx.roundRect(x - hw / 2, y - h / 2 - hh + 2, hw, hh, 2);
       ctx.stroke();
       ctx.beginPath();
@@ -391,7 +389,6 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
       const cardY = cy - 70 + 5 * Math.sin(t * 0.016);
       const cardAlpha = 0.04 + 0.02 * Math.sin(t * 0.02);
       ctx.beginPath();
-      // @ts-ignore
       ctx.roundRect(cx - cw / 2, cardY - ch / 2, cw, ch, cr);
       ctx.fillStyle = `rgba(245,130,70,${cardAlpha})`;
       ctx.fill();
