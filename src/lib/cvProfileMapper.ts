@@ -135,7 +135,7 @@ function parseFuzzyDate(raw: string | null | undefined): Date | null {
   const s = raw.trim();
   const isoMatch = s.match(/^(\d{4})-(\d{1,2})/);
   if (isoMatch) return new Date(+isoMatch[1], +isoMatch[2] - 1, 1);
-  const slashMatch = s.match(/^(\d{1,2})[\/.](\d{4})$/);
+  const slashMatch = s.match(/^(\d{1,2})[/.](\d{4})$/);
   if (slashMatch) return new Date(+slashMatch[2], +slashMatch[1] - 1, 1);
   const monthYearMatch = s.match(/^([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+)\s+(\d{4})$/);
   if (monthYearMatch) {

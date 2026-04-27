@@ -163,9 +163,12 @@ function renderHtml(c: any) {
               <div class="company">${esc(e?.company || e?.company_name || "")}</div>
               <div class="role">${esc(e?.role || e?.title || e?.job_title || "")}</div>
               <div class="period">${esc(e?.start_date || e?.startDate || "")} – ${esc(e?.end_date || e?.endDate || "Obecnie")}</div>
-              ${Array.isArray(e?.bullets || e?.description_points) && (e?.bullets || e?.description_points).filter(Boolean).length > 0
-                ? `<ul>${(e?.bullets || e?.description_points).filter(Boolean).map((b: string) => `<li>${esc(b)}</li>`).join("")}</ul>`
-                : (e?.description ? `<p>${esc(e.description)}</p>` : "")}
+              ${(() => {
+                const bullets = (e?.bullets ?? e?.description_points);
+                return Array.isArray(bullets) && bullets.filter(Boolean).length > 0
+                  ? `<ul>${bullets.filter(Boolean).map((b: string) => `<li>${esc(b)}</li>`).join("")}</ul>`
+                  : (e?.description ? `<p>${esc(e.description)}</p>` : "");
+              })()}
             </div>
           `).join("")}
         </div>
