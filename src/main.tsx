@@ -1,4 +1,3 @@
-import "./instrument";
 import { createRoot } from "react-dom/client";
 import ErrorBoundary from "./components/ErrorBoundary";
 import App from "./App.tsx";
@@ -23,3 +22,8 @@ createRoot(document.getElementById("root")!).render(
     <App />
   </ErrorBoundary>
 );
+
+// Load error tracking after the app is mounted so monitoring can never block rendering.
+void import("./instrument").catch(() => {
+  // Keep the application usable even when the optional tracking bundle fails.
+});
