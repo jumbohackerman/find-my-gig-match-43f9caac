@@ -129,59 +129,8 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* ── Top bar — same panel style as landing ── */}
-      <header className="px-4 sm:px-6 py-4 border-b border-border sticky top-0 z-40 bg-background/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto flex items-center gap-3 sm:gap-6">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <img src={logo} alt="" className="w-9 h-9" />
-            <span className="font-display text-xl font-bold hidden sm:inline">
-              Job<span className="text-gradient-primary">Swipe</span>
-            </span>
-          </Link>
-
-          <div className="flex-1 flex justify-center">
-            <div
-              role="tablist"
-              aria-label="Wybierz widok"
-              className="inline-flex gap-1 p-1 rounded-full bg-secondary/50 border border-border"
-            >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={role === "candidate"}
-                onClick={() => setRole("candidate")}
-                className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  role === "candidate"
-                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Dla kandydata
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={role === "employer"}
-                onClick={() => setRole("employer")}
-                className={`px-3 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  role === "employer"
-                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Dla pracodawcy
-              </button>
-            </div>
-          </div>
-
-          <Link
-            to="/auth"
-            className="px-3 sm:px-4 py-2 rounded-xl bg-secondary/50 border border-border text-foreground text-sm font-medium hover:bg-secondary transition-colors shrink-0"
-          >
-            Zaloguj się
-          </Link>
-        </div>
-      </header>
+      {/* ── Shared public header ── */}
+      <PublicHeader role={role} onRoleChange={handleRoleChange} variant="auth" />
 
       <div className="flex-1 flex flex-col items-center justify-start px-4 pt-14 sm:pt-20 pb-8">
       <motion.div
