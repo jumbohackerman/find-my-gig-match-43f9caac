@@ -99,13 +99,20 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <div className="flex-1 flex flex-col items-center justify-center px-4">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
-        <div className="flex items-center gap-2 justify-center mb-8">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Wróć do strony głównej
+        </Link>
+
+        <div className="flex items-center gap-2 justify-center mb-6">
           <img src={logo} alt="" className="w-10 h-10 object-contain" />
           <h1 className="font-display text-2xl font-bold text-foreground">JobSwipe</h1>
         </div>
