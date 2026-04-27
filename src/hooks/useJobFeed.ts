@@ -82,7 +82,14 @@ export function useJobFeed() {
       } catch (err: any) {
         if (err?.message !== "AI_CONSENT_REQUIRED") {
           console.error("Apply error:", err);
-          toast.error("Nie udało się zaaplikować. Spróbuj ponownie.");
+          const msg = String(err?.message || "");
+          if (/duplicate|already|unique/i.test(msg)) {
+            toast.info("Już aplikowałeś na tę ofertę.");
+          } else if (/network|fetch|timeout|offline/i.test(msg)) {
+            toast.error("Brak połączenia. Sprawdź internet i spróbuj ponownie.");
+          } else {
+            toast.error("Nie udało się wysłać aplikacji. Spróbuj ponownie za chwilę.");
+          }
         }
         throw err;
       }
