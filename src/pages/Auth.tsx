@@ -129,8 +129,8 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* ── Shared public header ── */}
-      <PublicHeader role={role} onRoleChange={handleRoleChange} variant="auth" />
+      {/* ── Shared public header (auth variant: role buttons navigate to /?view=...) ── */}
+      <PublicHeader role={role} variant="auth" />
 
       <div className="flex-1 flex flex-col items-center justify-start px-4 pt-14 sm:pt-20 pb-8">
       <motion.div
