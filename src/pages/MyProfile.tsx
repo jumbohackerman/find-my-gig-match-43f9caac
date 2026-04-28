@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   Briefcase, Save, Plus, X, Upload, FileText,
   Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2, Eye, Languages,
-  Sparkles, ShieldCheck, ShieldOff, AlertTriangle
+  Sparkles, ShieldCheck, ShieldOff, AlertTriangle, CheckCircle2
 } from "lucide-react";
 import logo from "@/assets/jobswipe-logo.png";
 import { getProvider } from "@/providers/registry";
