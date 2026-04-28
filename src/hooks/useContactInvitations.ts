@@ -121,17 +121,17 @@ export async function closeJob(params: {
       .eq("job_id", params.job_id)
       .in("candidate_id", noContactCandidates);
 
-    // 4. Email them (fire-and-forget)
-    supabase.functions
-      .invoke("send-email", {
-        body: {
-          type: "position_closed",
-          candidate_ids: noContactCandidates,
-          job_title: params.job_title,
-          company_name: params.company_name,
-        },
-      })
-      .catch((e) => console.error("[send-email] position_closed invoke error:", e));
+    // 4. Email them — UWAGA: typ `position_closed` w edge function `send-email`
+    //    jest "server-only" (wymaga service role). Klient nie może go wywołać,
+    //    więc tutaj nie udajemy sukcesu wysyłki — przerzucamy odpowiedzialność
+    //    do automatycznego maila wewnętrznego (notyfikacja in-app trafia przez
+    //    trigger statusu) i ostrzegamy pracodawcę toastem.
+    //    TODO: przenieść tę akcję do bezpiecznej edge function wywoływanej
+    //    z service role po stronie serwera.
+    toast.warning(
+      `Zamknięto rekrutację. Powiadomienia in-app zostały utworzone dla ${noContactCandidates.length} kandydatów. Maile do kandydatów wymagają obsługi serwerowej i zostaną wysłane po wdrożeniu mailera.`,
+      { duration: 7000 },
+    );
   }
 
   // Also close any other still-open applications (applied/viewed/interview)
