@@ -73,7 +73,7 @@ const Index = () => {
   
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
-  const { showTutorial, tutorialRole, completeTutorial } = useTutorial();
+  const { showTutorial } = useTutorial();
   const { recentEntries, trackView, clear: clearRecent, count: recentCount } = useRecentlyViewed();
 
   const {
