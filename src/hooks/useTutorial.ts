@@ -25,5 +25,12 @@ export function useTutorial() {
     }
   }, [user, profile, setPref]);
 
-  return { showTutorial, tutorialRole, completeTutorial };
+  const replayTutorial = useCallback(() => {
+    if (profile?.role === "candidate" || profile?.role === "employer") {
+      setTutorialRole(profile.role as "candidate" | "employer");
+      setShowTutorial(true);
+    }
+  }, [profile]);
+
+  return { showTutorial, tutorialRole, completeTutorial, replayTutorial };
 }
