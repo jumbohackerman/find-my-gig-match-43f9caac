@@ -54,6 +54,7 @@ const Navbar = () => {
   const { user, profile, signOut } = useAuth();
   const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
   const { theme, toggleTheme } = useTheme();
+  const { replayTutorial } = useTutorial();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showEmployerProfile, setShowEmployerProfile] = useState(false);
