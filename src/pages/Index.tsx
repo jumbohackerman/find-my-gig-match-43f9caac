@@ -13,7 +13,6 @@ import RecentlyViewedList from "@/components/RecentlyViewedList";
 import JobFilters from "@/components/JobFilters";
 import { defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
-import WelcomeTutorial from "@/components/WelcomeTutorial";
 import { useTutorial } from "@/hooks/useTutorial";
 import JobDetailModal from "@/components/JobDetailModal";
 import MobileBottomNav from "@/components/MobileBottomNav";
