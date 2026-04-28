@@ -624,7 +624,6 @@ const Index = () => {
       </main>
 
       <OnboardingModal open={showOnboarding && !showTutorial} onComplete={completeOnboarding} onClose={dismissOnboarding} />
-      {showTutorial && <WelcomeTutorial role={tutorialRole} onComplete={completeTutorial} />}
       <JobDetailModal
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
