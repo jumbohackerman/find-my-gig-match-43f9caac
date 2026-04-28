@@ -45,7 +45,7 @@ import { Progress } from "@/components/ui/progress";
 
 const Employer = () => {
   const { user, profile } = useAuth();
-  const { showTutorial, tutorialRole, completeTutorial } = useTutorial();
+  
   const { jobs: domainJobs, applicationsByJob, loading, refetch } = useEmployerDashboardData();
   const { createJob, createStructuredJob, deleteJob, submitting, EMPTY_FORM } = useEmployerJobs();
   const shortlist = useEmployerShortlist(user?.id, refetch);
