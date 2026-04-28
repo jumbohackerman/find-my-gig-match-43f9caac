@@ -520,7 +520,12 @@ const Employer = () => {
                                 <Lock className="w-4 h-4" />
                               </button>
                             )}
-                            <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors">
+                            <button
+                              onClick={() => setDeletingJob({ id: job.id, title: job.title })}
+                              className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                              title="Usuń ofertę"
+                              aria-label={`Usuń ofertę ${job.title}`}
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
