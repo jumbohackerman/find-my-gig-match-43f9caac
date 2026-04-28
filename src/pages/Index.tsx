@@ -628,7 +628,21 @@ const Index = () => {
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}
         onClose={closeJobModal}
-        onApply={(job) => { handleSwipeWithRefetch("right"); }}
+        onApply={async (job) => {
+          if (!requireAuth()) return;
+          // Apply EXACTLY to the job opened in the modal — never to the top swipe card.
+          // We deliberately do NOT call handleSwipe here (that would consume the current
+          // swipe-stack card). On success: close modal + refresh applications list.
+          // On failure: keep modal open so the user can retry; do not mark anything.
+          try {
+            trackView(job);
+            await applyToJob(job);
+            refetchApps();
+            closeJobModal();
+          } catch {
+            // applyToJob already shows a friendly toast; keep the modal open.
+          }
+        }}
         allJobs={allJobs}
         onSelectJob={(j) => setSelectedJob(j)}
       />
