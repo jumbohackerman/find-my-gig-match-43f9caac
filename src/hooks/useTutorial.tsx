@@ -1,3 +1,4 @@
+// Tutorial context — single shared state across Navbar, pages and TutorialHost
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePreferences } from "@/hooks/usePreferences";
