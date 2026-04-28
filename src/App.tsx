@@ -24,9 +24,39 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { loading, user } = useAuth();
+  const { loading, user, profile, profileError, signOut } = useAuth();
   if (loading) return null;
   if (!user) return <Navigate to="/auth" replace />;
+  if (profileError || !profile) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="max-w-md text-center space-y-4">
+          <h1 className="text-2xl font-display font-bold text-foreground">
+            Nie udało się wczytać profilu
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Twoje konto istnieje, ale nie znaleźliśmy danych profilu. Spróbuj odświeżyć stronę albo wyloguj się i zaloguj ponownie.
+          </p>
+          <div className="flex gap-2 justify-center pt-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 rounded-xl bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 transition-colors"
+            >
+              Odśwież
+            </button>
+            <button
+              type="button"
+              onClick={async () => { await signOut(); window.location.href = "/auth"; }}
+              className="px-4 py-2 rounded-xl bg-secondary border border-border text-foreground text-sm font-medium hover:bg-secondary/80 transition-colors"
+            >
+              Wyloguj
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return <>{children}</>;
 };
 
