@@ -85,9 +85,7 @@
 
   /* ── Light theme overrides (data-theme="light" on <html>) ── */
   :root[data-theme="light"] {
-    /* Page bg ~ #F8FAFC (slate-50) — soft off-white, not sterile */
-    --background: 210 40% 98%;
-    /* Primary text ~ #0F172A (slate-900) */
+    --background: 220 14% 96%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -96,66 +94,60 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 24 95% 48%;
+    /* Slightly deeper orange in light for better contrast */
+    --primary: 24 90% 46%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 27 96% 56%;
+    --primary-glow: 27 92% 52%;
 
-    /* Secondary surface ~ #F1F5F9 (slate-100) */
-    --secondary: 210 40% 96%;
-    /* Secondary text ~ #334155 (slate-700) */
-    --secondary-foreground: 215 25% 27%;
+    --secondary: 220 14% 93%;
+    --secondary-foreground: 220 20% 25%;
 
-    /* Muted surface ~ #F1F5F9 */
-    --muted: 210 40% 96%;
-    /* Muted text ~ #64748B (slate-500) */
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 14% 93%;
+    --muted-foreground: 220 9% 42%;
 
-    --accent: 162 70% 38%;
+    --accent: 175 65% 35%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 168 75% 45%;
+    --accent-glow: 178 70% 40%;
 
-    --destructive: 0 75% 50%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders ~ #E2E8F0 (slate-200) — subtle but visible */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 24 95% 48%;
+    --border: 220 13% 87%;
+    --input: 220 13% 87%;
+    --ring: 24 90% 46%;
 
-    --swipe-right: 24 95% 48%;
+    --swipe-right: 24 90% 46%;
     --swipe-left: 220 10% 50%;
 
-    --gradient-card: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(210 40% 99%) 60%, hsl(210 40% 98%) 100%);
-    --gradient-card-hover: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(210 40% 99.5%) 60%, hsl(210 40% 98.5%) 100%);
-    --gradient-mesh: linear-gradient(125deg, hsl(210 40% 98%) 0%, hsl(214 32% 96%) 50%, hsl(215 28% 97%) 100%);
-    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 95% 53% / 0.07) 0%, transparent 50%),
-                       radial-gradient(at 80% 20%, hsl(220 60% 60% / 0.05) 0%, transparent 50%),
-                       radial-gradient(at 50% 80%, hsl(162 70% 50% / 0.04) 0%, transparent 50%);
+    --gradient-card: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 14% 99%) 60%, hsl(220 14% 98%) 100%);
+    --gradient-card-hover: linear-gradient(155deg, hsl(0 0% 100%) 0%, hsl(220 14% 99.5%) 60%, hsl(220 14% 98.5%) 100%);
+    --gradient-mesh: linear-gradient(125deg, hsl(220 14% 96%) 0%, hsl(220 12% 95%) 50%, hsl(220 10% 96%) 100%);
+    --gradient-aurora: radial-gradient(at 20% 10%, hsl(24 90% 46% / 0.06) 0%, transparent 50%),
+                       radial-gradient(at 80% 20%, hsl(220 50% 55% / 0.04) 0%, transparent 50%),
+                       radial-gradient(at 50% 80%, hsl(175 65% 42% / 0.03) 0%, transparent 50%);
 
-    /* Softer, more premium shadows for light theme */
-    --shadow-card: 0 1px 2px 0 hsl(220 40% 20% / 0.04),
-                   0 8px 24px -8px hsl(220 40% 20% / 0.10),
-                   0 0 0 1px hsl(214 32% 91% / 0.6);
-    --shadow-card-hover: 0 4px 8px -2px hsl(220 40% 20% / 0.06),
-                         0 16px 40px -12px hsl(220 40% 20% / 0.14),
-                         0 0 0 1px hsl(214 32% 88% / 0.7);
-    --shadow-glow: 0 0 32px -8px hsl(24 95% 48% / 0.22);
-    --shadow-soft: 0 2px 12px -4px hsl(220 40% 20% / 0.08);
-    --shadow-elevated: 0 12px 32px -12px hsl(220 40% 20% / 0.14);
+    /* Shadow-first cards — float above background */
+    --shadow-card: 0 1px 3px 0 hsl(220 20% 20% / 0.05),
+                   0 10px 32px -10px hsl(220 20% 20% / 0.12);
+    --shadow-card-hover: 0 4px 8px -2px hsl(220 20% 20% / 0.06),
+                         0 18px 44px -14px hsl(220 20% 20% / 0.15);
+    --shadow-glow: 0 0 32px -8px hsl(24 90% 46% / 0.20);
+    --shadow-soft: 0 2px 12px -4px hsl(220 20% 20% / 0.08);
+    --shadow-elevated: 0 12px 32px -12px hsl(220 20% 20% / 0.14);
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 24 95% 48%;
+    --sidebar-primary: 24 90% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 215 25% 27%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 24 95% 48%;
+    --sidebar-accent: 220 14% 93%;
+    --sidebar-accent-foreground: 220 20% 25%;
+    --sidebar-border: 220 13% 87%;
+    --sidebar-ring: 24 90% 46%;
   }
 
   :root[data-theme="light"] .glass-surface {
-    background: linear-gradient(155deg, hsl(0 0% 100% / 0.85), hsl(220 20% 98% / 0.85));
-    border: 1px solid hsl(220 16% 86%);
+    background: linear-gradient(155deg, hsl(0 0% 100% / 0.9), hsl(220 14% 98% / 0.9));
+    border: 1px solid hsl(220 13% 85%);
   }
 }
 
