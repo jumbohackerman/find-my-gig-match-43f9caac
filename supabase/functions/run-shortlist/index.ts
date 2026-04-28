@@ -188,6 +188,31 @@ serve(async (req) => {
       throw new Error(`Need at least 10 candidates, currently have ${applications?.length ?? 0}`);
     }
 
+    // Fetch candidate professional data
+    const candidateIds = applications.map((a) => a.candidate_id);
+    const { data: candidates } = await supabase
+      .from("candidates")
+      .select("user_id, full_name, title, location, summary, skills, experience_entries, languages, salary_min, salary_max, seniority, years_of_experience, work_mode, employment_type, primary_industry, links")
+      .in("user_id", candidateIds);
+
+    const candidatesForAI: AICandidate[] = (candidates || []).map((c) => ({
+      candidate_id: c.user_id,
+      full_name: c.full_name,
+      job_title: c.title,
+      location: c.location,
+      summary: c.summary,
+      skills: c.skills,
+      experience: c.experience_entries,
+      languages: c.languages,
+      salary_min: c.salary_min,
+      salary_max: c.salary_max,
+      level: c.seniority,
+      years_experience: c.years_of_experience,
+      work_mode: c.work_mode,
+      employment_type: c.employment_type,
+      industry: c.primary_industry,
+    }));
+
     // Create shortlist record (status=processing)
     const { data: shortlist, error: shortlistErr } = await supabase
       .from("shortlists")
