@@ -32,8 +32,6 @@ import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Footer from "@/components/Footer";
-import WelcomeTutorial from "@/components/WelcomeTutorial";
-import { useTutorial } from "@/hooks/useTutorial";
 import type { ApplicationStatus } from "@/types/application";
 import { useAuth } from "@/hooks/useAuth";
 import { hideJob, unhideJob } from "@/lib/moderation";
