@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   Briefcase, Save, Plus, X, Upload, FileText,
   Globe, Github, Linkedin, ExternalLink, ChevronDown, Minus, Trash2, Eye, Languages,
-  Sparkles, ShieldCheck, ShieldOff, AlertTriangle
+  Sparkles, ShieldCheck, ShieldOff, AlertTriangle, CheckCircle2
 } from "lucide-react";
 import logo from "@/assets/jobswipe-logo.png";
 import { getProvider } from "@/providers/registry";
@@ -714,6 +714,43 @@ const MyProfile = () => {
             </AccordionSection>
           ) : (
             <>
+            {/* ── CV + AI — top of profile ── */}
+            {!cvUrl ? (
+              <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] p-5 sm:p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-display text-base font-bold text-foreground mb-1">
+                      Uzupełnij profil w sekundę
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      Wrzuć swoje CV w PDF — AI automatycznie wyciągnie umiejętności, doświadczenie
+                      i dane kontaktowe. Nie musisz nic wpisywać ręcznie.
+                    </p>
+                    <CandidateCvUpload onParsed={handleCvParsed} />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">CV przesłane i przeanalizowane</p>
+                    <p className="text-xs text-muted-foreground">Profil został uzupełniony na podstawie Twojego CV.</p>
+                  </div>
+                  <button
+                    onClick={() => toggleSection("links")}
+                    className="text-xs text-primary hover:underline shrink-0"
+                  >
+                    Zmień CV
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* BASIC INFO */}
             <AccordionSection id="basic" label="Dane podstawowe" icon="👤" isOpen={activeSection === "basic"} onToggle={() => toggleSection("basic")} badge={title || undefined}>
               <div className="space-y-4">
@@ -968,22 +1005,12 @@ const MyProfile = () => {
             </AccordionSection>
 
             {/* LINKS & CV */}
-            <AccordionSection id="links" label="Linki i CV" icon="🔗" isOpen={activeSection === "links"} onToggle={() => toggleSection("links")} badge={cvUrl ? "CV przesłane" : undefined}>
+            <AccordionSection id="links" label="Linki" icon="🔗" isOpen={activeSection === "links"} onToggle={() => toggleSection("links")}>
               <div className="space-y-4">
                 <LinkField icon={<Globe className="w-4 h-4 text-primary" />} label="Portfolio" value={links.portfolio_url || ""} onChange={(v) => setLinks({ ...links, portfolio_url: v })} placeholder="https://mojeportfolio.pl" />
                 <LinkField icon={<Github className="w-4 h-4 text-primary" />} label="GitHub" value={links.github_url || ""} onChange={(v) => setLinks({ ...links, github_url: v })} placeholder="https://github.com/username" />
                 <LinkField icon={<Linkedin className="w-4 h-4 text-primary" />} label="LinkedIn" value={links.linkedin_url || ""} onChange={(v) => setLinks({ ...links, linkedin_url: v })} placeholder="https://linkedin.com/in/username" />
                 <LinkField icon={<ExternalLink className="w-4 h-4 text-primary" />} label="Strona osobista" value={links.website_url || ""} onChange={(v) => setLinks({ ...links, website_url: v })} placeholder="https://mojastrona.pl" />
-                <div className="pt-2 border-t border-border mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
-                    <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-3 px-3 py-2 rounded-lg bg-secondary/40 border border-border/50">
-                    🔒 CV służy wyłącznie do automatycznego uzupełnienia profilu. Nie jest udostępniane pracodawcom — widzą oni tylko Twój profil.
-                  </p>
-                  <CandidateCvUpload onParsed={handleCvParsed} />
-                </div>
               </div>
             </AccordionSection>
 
@@ -1100,6 +1127,19 @@ const MyProfile = () => {
                   <Eye className="w-4 h-4" /> Podgląd profilu
                 </button>
               </div>
+
+              {!cvUrl && (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                  <p className="text-[11px] font-bold text-primary mb-1">📎 Najszybszy sposób:</p>
+                  <p className="text-[10px] text-foreground/70 mb-2">Wgraj CV — AI uzupełni profil za Ciebie.</p>
+                  <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    className="w-full py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Wgraj CV
+                  </button>
+                </div>
+              )}
 
               {completeness.missing.length > 0 && (
                 <div className="p-4 rounded-2xl bg-secondary/30 border border-border">
