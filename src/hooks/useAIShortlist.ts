@@ -80,7 +80,12 @@ export function useAIShortlist(jobId: string | undefined) {
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
-      toast.success("Shortlista AI wygenerowana");
+      const isDemo = (data as any)?.mock === true || (data as any)?.mode === "demo";
+      if (isDemo) {
+        toast.warning("DEMO/MOCK: shortlista jest losowa i nie zmienia statusów aplikacji ani nie wysyła emaili. Nie traktuj jako decyzji rekrutacyjnej.", { duration: 8000 });
+      } else {
+        toast.success("Shortlista AI wygenerowana");
+      }
       await reload();
       return true;
     } catch (e: any) {
@@ -91,5 +96,8 @@ export function useAIShortlist(jobId: string | undefined) {
     }
   }, [jobId, running, reload]);
 
-  return { shortlist, snapshots, loading, running, run, reload };
+  // Czy istniejąca shortlista pochodzi z trybu mock/demo (oznaczona w ai_model_used).
+  const isDemoShortlist = !!shortlist?.ai_model_used && shortlist.ai_model_used.startsWith("mock");
+
+  return { shortlist, snapshots, loading, running, run, reload, isDemoShortlist };
 }
