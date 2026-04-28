@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, MapPin, Briefcase, Clock, DollarSign, Users, Building2,
   CheckCircle2, ListChecks, Gift, Wifi, GraduationCap,
-  Sparkles, ArrowRight, Heart,
+  Sparkles, ArrowRight, Heart, Share2,
 } from "lucide-react";
+import { toast } from "sonner";
 import type { Job, SkillsByLevel } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
@@ -152,6 +153,32 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={async () => {
+                    const url = `${window.location.origin}/?job=${job.id}`;
+                    if (typeof navigator !== "undefined" && (navigator as any).share) {
+                      try {
+                        await (navigator as any).share({
+                          title: `${job.title} @ ${job.company}`,
+                          text: `Sprawdź tę ofertę na JobSwipe: ${job.title} w ${job.company}`,
+                          url,
+                        });
+                      } catch { /* user cancelled */ }
+                    } else {
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        toast.success("Link skopiowany!");
+                      } catch {
+                        toast.error("Nie udało się skopiować linku");
+                      }
+                    }
+                  }}
+                  className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label="Poleć ofertę"
+                  title="Poleć znajomemu"
+                >
+                  <Share2 className="w-4 h-4" aria-hidden="true" />
+                </button>
                 <ReportButton targetType="job" targetId={job.id} targetLabel={`${job.title} — ${job.company}`} />
                 <button ref={closeRef} onClick={onClose} className="text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1" aria-label="Zamknij">
                   <X className="w-5 h-5" aria-hidden="true" />
