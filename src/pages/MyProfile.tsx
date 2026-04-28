@@ -1005,22 +1005,12 @@ const MyProfile = () => {
             </AccordionSection>
 
             {/* LINKS & CV */}
-            <AccordionSection id="links" label="Linki i CV" icon="🔗" isOpen={activeSection === "links"} onToggle={() => toggleSection("links")} badge={cvUrl ? "CV przesłane" : undefined}>
+            <AccordionSection id="links" label="Linki" icon="🔗" isOpen={activeSection === "links"} onToggle={() => toggleSection("links")}>
               <div className="space-y-4">
                 <LinkField icon={<Globe className="w-4 h-4 text-primary" />} label="Portfolio" value={links.portfolio_url || ""} onChange={(v) => setLinks({ ...links, portfolio_url: v })} placeholder="https://mojeportfolio.pl" />
                 <LinkField icon={<Github className="w-4 h-4 text-primary" />} label="GitHub" value={links.github_url || ""} onChange={(v) => setLinks({ ...links, github_url: v })} placeholder="https://github.com/username" />
                 <LinkField icon={<Linkedin className="w-4 h-4 text-primary" />} label="LinkedIn" value={links.linkedin_url || ""} onChange={(v) => setLinks({ ...links, linkedin_url: v })} placeholder="https://linkedin.com/in/username" />
                 <LinkField icon={<ExternalLink className="w-4 h-4 text-primary" />} label="Strona osobista" value={links.website_url || ""} onChange={(v) => setLinks({ ...links, website_url: v })} placeholder="https://mojastrona.pl" />
-                <div className="pt-2 border-t border-border mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-foreground">CV (opcjonalne)</label>
-                    <span className="text-xs text-muted-foreground">Tylko PDF, maks. 5 MB</span>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-3 px-3 py-2 rounded-lg bg-secondary/40 border border-border/50">
-                    🔒 CV służy wyłącznie do automatycznego uzupełnienia profilu. Nie jest udostępniane pracodawcom — widzą oni tylko Twój profil.
-                  </p>
-                  <CandidateCvUpload onParsed={handleCvParsed} />
-                </div>
               </div>
             </AccordionSection>
 
