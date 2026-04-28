@@ -78,6 +78,8 @@ const Employer = () => {
   const [hidePending, setHidePending] = useState<string | null>(null);
   const [statusPending, setStatusPending] = useState<string | null>(null);
   const [closingJob, setClosingJob] = useState<{ id: string; title: string; company: string } | null>(null);
+  const [deletingJob, setDeletingJob] = useState<{ id: string; title: string } | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
