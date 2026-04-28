@@ -1,8 +1,22 @@
-import { useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePreferences } from "@/hooks/usePreferences";
 
-export function useTutorial() {
+interface TutorialCtx {
+  showTutorial: boolean;
+  tutorialRole: "candidate" | "employer";
+  completeTutorial: () => Promise<void>;
+  replayTutorial: () => void;
+}
+
+const Ctx = createContext<TutorialCtx>({
+  showTutorial: false,
+  tutorialRole: "candidate",
+  completeTutorial: async () => {},
+  replayTutorial: () => {},
+});
+
+export const TutorialProvider = ({ children }: { children: ReactNode }) => {
   const { user, profile } = useAuth();
   const { get: getPref, set: setPref } = usePreferences();
   const [showTutorial, setShowTutorial] = useState(false);
@@ -32,5 +46,11 @@ export function useTutorial() {
     }
   }, [profile]);
 
-  return { showTutorial, tutorialRole, completeTutorial, replayTutorial };
-}
+  return (
+    <Ctx.Provider value={{ showTutorial, tutorialRole, completeTutorial, replayTutorial }}>
+      {children}
+    </Ctx.Provider>
+  );
+};
+
+export const useTutorial = () => useContext(Ctx);
