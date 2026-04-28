@@ -40,6 +40,7 @@ import { timeAgo } from "@/lib/timeAgo";
 import CloseJobModal, { type ClosureReason } from "@/components/employer/CloseJobModal";
 import { closeJob } from "@/hooks/useContactInvitations";
 import { Lock } from "lucide-react";
+import JobDetailModal from "@/components/JobDetailModal";
 
 import { Progress } from "@/components/ui/progress";
 
@@ -80,6 +81,7 @@ const Employer = () => {
   const [closingJob, setClosingJob] = useState<{ id: string; title: string; company: string } | null>(null);
   const [deletingJob, setDeletingJob] = useState<{ id: string; title: string } | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const [previewJob, setPreviewJob] = useState<Job | null>(null);
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
@@ -490,6 +492,17 @@ const Employer = () => {
                         {job.employerId === user?.id && (
                           <div className="flex items-center gap-1 shrink-0">
                             <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewJob(job);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                              title="Podgląd z perspektywy kandydata"
+                              aria-label="Podgląd oferty z perspektywy kandydata"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={async () => {
                                 if (hidePending) return;
                                 setHidePending(job.id);
@@ -683,6 +696,20 @@ const Employer = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {previewJob && (
+        <JobDetailModal
+          job={previewJob}
+          onClose={() => setPreviewJob(null)}
+          onApply={() => {
+            toast("To podgląd z perspektywy kandydata", {
+              description: "Aplikowanie jest zablokowane w trybie pracodawcy.",
+            });
+          }}
+          allJobs={domainJobs}
+          onSelectJob={(j) => setPreviewJob(j)}
+        />
       )}
 
       <Footer />
