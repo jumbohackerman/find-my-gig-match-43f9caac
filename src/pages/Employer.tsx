@@ -492,6 +492,17 @@ const Employer = () => {
                         {job.employerId === user?.id && (
                           <div className="flex items-center gap-1 shrink-0">
                             <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewJob(job);
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                              title="Podgląd z perspektywy kandydata"
+                              aria-label="Podgląd oferty z perspektywy kandydata"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={async () => {
                                 if (hidePending) return;
                                 setHidePending(job.id);
