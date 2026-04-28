@@ -7,6 +7,7 @@ interface AuthContext {
   session: Session | null;
   profile: { role: string; full_name: string; avatar: string | null } | null;
   loading: boolean;
+  profileError: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -15,6 +16,7 @@ const AuthCtx = createContext<AuthContext>({
   session: null,
   profile: null,
   loading: true,
+  profileError: false,
   signOut: async () => {},
 });
 
@@ -25,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AuthContext["profile"]>(null);
   const [loading, setLoading] = useState(true);
-  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -38,10 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (!session?.user) {
-        setLoading(false);
-      }
-      // if user exists, loading will be set to false after profile fetch
+      if (!session?.user) setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -51,14 +50,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!user) {
       setProfile(null);
-      setProfileLoading(false);
+      setProfileError(false);
       setLoading(false);
       return;
     }
-    setProfileLoading(true);
+    setProfileError(false);
     let cancelled = false;
     const fetchProfile = async () => {
-      // Retry a few times for newly created accounts (trigger may not have finished)
       let attempts = 0;
       let data = null;
       while (attempts < 5) {
@@ -74,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       if (!cancelled) {
         setProfile(data);
-        setProfileLoading(false);
+        setProfileError(!data);
         setLoading(false);
       }
     };
@@ -87,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthCtx.Provider value={{ user, session, profile, loading, signOut }}>
+    <AuthCtx.Provider value={{ user, session, profile, loading, profileError, signOut }}>
       {children}
     </AuthCtx.Provider>
   );

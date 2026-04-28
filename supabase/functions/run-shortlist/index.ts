@@ -143,13 +143,39 @@ serve(async (req) => {
       .single();
     if (!job) throw new Error("Job not found or unauthorized");
 
-    // No existing shortlist
+    // ────────────────────────────────────────────────────────────────────
+    // SAFETY: do czasu wdrożenia realnej integracji AI, ZAWSZE wymuszamy
+    // tryb DEMO/MOCK — niezależnie od obecności AI_API_KEY. Bez tego losowy
+    // wynik mógłby wyglądać jak prawdziwa decyzja rekrutacyjna.
+    // Aby włączyć realne AI, trzeba JEDNOCZEŚNIE:
+    //   1) zaimplementować realną integrację (sekcja AI CALL niżej),
+    //   2) ustawić env AI_PRODUCTION_READY=true.
+    // ────────────────────────────────────────────────────────────────────
+    const aiProductionReady = Deno.env.get("AI_PRODUCTION_READY") === "true";
+    const hasRealAIKey = !!Deno.env.get("AI_API_KEY");
+    const isMockMode = !(aiProductionReady && hasRealAIKey);
+    const aiModel = isMockMode
+      ? "mock-demo-v1"
+      : (Deno.env.get("AI_MODEL") ?? "claude-opus-4-5");
+
+    // Existing shortlist handling:
+    //  - real mode: blokuj ponowne uruchomienie (idempotencja),
+    //  - mock/demo: pozwól zastąpić poprzedni mock (kasujemy stary rekord),
+    //    żeby tester mógł ponowić demo bez ręcznego czyszczenia bazy.
     const { data: existing } = await supabase
       .from("shortlists")
-      .select("id")
+      .select("id, ai_model_used")
       .eq("job_id", job_id)
       .maybeSingle();
-    if (existing) throw new Error("Shortlist already exists for this job");
+    if (existing) {
+      const existingIsMock = String(existing.ai_model_used || "").startsWith("mock");
+      if (!isMockMode || !existingIsMock) {
+        throw new Error("Shortlist already exists for this job");
+      }
+      // Demo retry: usuń poprzednie snapshoty + rekord shortlisty.
+      await supabase.from("ai_shortlist_snapshots").delete().eq("shortlist_id", existing.id);
+      await supabase.from("shortlists").delete().eq("id", existing.id);
+    }
 
     // Min 10 candidates
     const { data: applications, error: appsErr } = await supabase
@@ -186,14 +212,6 @@ serve(async (req) => {
       employment_type: c.employment_type,
       industry: c.primary_industry,
     }));
-
-    // MOCK MODE: brak prawdziwego klucza AI → oznaczamy model jako mock,
-    // żeby UI mógł jasno pokazać "Tryb testowy".
-    const hasRealAIKey = !!Deno.env.get("AI_API_KEY");
-    const aiModel = hasRealAIKey
-      ? (Deno.env.get("AI_MODEL") ?? "claude-opus-4-5")
-      : "mock-random-v1";
-    const isMockMode = !hasRealAIKey;
 
     // Create shortlist record (status=processing)
     const { data: shortlist, error: shortlistErr } = await supabase
@@ -314,7 +332,15 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, shortlist_id: shortlist.id, mock: isMockMode }),
+      JSON.stringify({
+        success: true,
+        shortlist_id: shortlist.id,
+        mock: isMockMode,
+        mode: isMockMode ? "demo" : "production",
+        notice: isMockMode
+          ? "DEMO/MOCK: wynik jest losowy, nie zmienia statusów aplikacji ani nie wysyła emaili. Nie traktuj jako decyzji rekrutacyjnej."
+          : undefined,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {

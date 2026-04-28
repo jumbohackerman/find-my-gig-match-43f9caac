@@ -78,6 +78,8 @@ const Employer = () => {
   const [hidePending, setHidePending] = useState<string | null>(null);
   const [statusPending, setStatusPending] = useState<string | null>(null);
   const [closingJob, setClosingJob] = useState<{ id: string; title: string; company: string } | null>(null);
+  const [deletingJob, setDeletingJob] = useState<{ id: string; title: string } | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
@@ -139,6 +141,21 @@ const Employer = () => {
   const handleDelete = async (id: string) => {
     await deleteJob(id);
     refetch();
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingJob) return;
+    setDeleteBusy(true);
+    try {
+      await deleteJob(deletingJob.id);
+      refetch();
+      toast.success(`Oferta "${deletingJob.title}" usunięta`);
+      setDeletingJob(null);
+    } catch (e: any) {
+      toast.error(`Nie udało się usunąć oferty: ${e?.message || "spróbuj ponownie"}`);
+    } finally {
+      setDeleteBusy(false);
+    }
   };
 
   if (loading) {
@@ -503,7 +520,12 @@ const Employer = () => {
                                 <Lock className="w-4 h-4" />
                               </button>
                             )}
-                            <button onClick={() => handleDelete(job.id)} className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors">
+                            <button
+                              onClick={() => setDeletingJob({ id: job.id, title: job.title })}
+                              className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                              title="Usuń ofertę"
+                              aria-label={`Usuń ofertę ${job.title}`}
+                            >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
@@ -618,6 +640,49 @@ const Employer = () => {
           onClose={() => setClosingJob(null)}
           onConfirm={handleCloseJob}
         />
+      )}
+
+      {deletingJob && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Potwierdź usunięcie oferty"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
+          onClick={() => !deleteBusy && setDeletingJob(null)}
+        >
+          <div
+            className="w-full max-w-md card-gradient rounded-2xl border border-border p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-lg font-bold text-foreground mb-2">Usunąć ofertę?</h3>
+            <p className="text-sm text-muted-foreground mb-2">
+              Zamierzasz trwale usunąć ofertę:
+            </p>
+            <p className="text-sm font-semibold text-foreground mb-4 p-2 rounded-lg bg-secondary/50 border border-border break-words">
+              {deletingJob.title}
+            </p>
+            <div className="flex items-start gap-2 rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-xs text-destructive mb-4">
+              <Trash2 className="w-4 h-4 shrink-0 mt-0.5" />
+              <p>Operacja jest nieodwracalna. Jeśli chcesz tylko zatrzymać rekrutację, użyj „Zakończ rekrutację”.</p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeletingJob(null)}
+                disabled={deleteBusy}
+                className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                Anuluj
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteBusy}
+                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {deleteBusy ? "Usuwanie…" : "Usuń ofertę"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <Footer />
