@@ -7,8 +7,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useTutorial } from "@/hooks/useTutorial";
 import type { NotificationType } from "@/domain/models";
 import EmployerProfileModal from "@/components/employer/EmployerProfileModal";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 function notificationIcon(type: NotificationType) {
