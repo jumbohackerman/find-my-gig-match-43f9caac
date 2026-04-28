@@ -228,7 +228,7 @@ const JobDetailModal = ({ job, matchResult, onClose, onApply, allJobs, onSelectJ
                   </div>
                   {onApply && (
                     <button
-                      onClick={() => { onApply(job); onClose(); }}
+                      onClick={() => onApply(job)}
                       className="hidden lg:flex lg:w-72 shrink-0 px-5 rounded-xl btn-gradient text-primary-foreground font-bold text-base hover:scale-[1.02] transition-transform items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-glow ring-2 ring-primary/40"
                     >
                       <CheckCircle2 className="w-5 h-5" /> Aplikuj na to stanowisko
