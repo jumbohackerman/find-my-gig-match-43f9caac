@@ -30,6 +30,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const TutorialHost = () => {
+  const { showTutorial, tutorialRole, completeTutorial } = useTutorial();
+  if (!showTutorial) return null;
+  return <WelcomeTutorial role={tutorialRole} onComplete={completeTutorial} />;
+};
+
 /** Show Landing to guests, redirect employer to /employer, candidates see Index */
 const HomeRedirect = ({ children }: { children: React.ReactNode }) => {
   const { user, profile, loading } = useAuth();
