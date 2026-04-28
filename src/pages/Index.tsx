@@ -453,7 +453,11 @@ const Index = () => {
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-12 w-full max-w-xs mx-auto">
                     <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4 text-3xl">🔍</div>
                     <h3 className="font-display text-lg font-bold text-foreground mb-1">Brak pasujących ofert</h3>
-                    <p className="text-muted-foreground text-sm mb-5">Spróbuj zmienić kryteria wyszukiwania.</p>
+                    <p className="text-muted-foreground text-sm mb-5">
+                      {hasActiveFilters
+                        ? "Obecne filtry nie pasują do żadnej oferty. Spróbuj je rozluźnić."
+                        : "Nowe oferty pojawiają się regularnie — wróć za jakiś czas."}
+                    </p>
                     <div className="flex flex-col gap-2">
                       <button onClick={() => handleFiltersChange({ ...defaultFilters })} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform">
                         <Filter className="w-4 h-4" /> Wyczyść filtry
