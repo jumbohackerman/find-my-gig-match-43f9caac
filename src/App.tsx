@@ -9,7 +9,7 @@ import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
 import SplashScreen from "@/components/SplashScreen";
 import WelcomeTutorial from "@/components/WelcomeTutorial";
-import { useTutorial } from "@/hooks/useTutorial";
+import { TutorialProvider, useTutorial } from "@/hooks/useTutorial";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Employer from "./pages/Employer";
@@ -52,46 +52,48 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/cookies" element={<Cookies />} />
-              <Route path="/" element={<HomeRedirect><Index /></HomeRedirect>} />
-              <Route path="/browse" element={<Navigate to="/" replace />} />
-              <Route
-                path="/my-profile"
-                element={
-                  <ProtectedRoute>
-                    <RoleGate role="candidate" redirectTo="/employer">
-                      <MyProfile />
-                    </RoleGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/employer"
-                element={
-                  <ProtectedRoute>
-                    <RoleGate role="employer" redirectTo="/">
-                      <Employer />
-                    </RoleGate>
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/profile" element={<Navigate to="/my-profile" replace />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <CookieBanner />
-            <TutorialHost />
-          </BrowserRouter>
-        </TooltipProvider>
+        <TutorialProvider>
+          <TooltipProvider>
+            {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/cookies" element={<Cookies />} />
+                <Route path="/" element={<HomeRedirect><Index /></HomeRedirect>} />
+                <Route path="/browse" element={<Navigate to="/" replace />} />
+                <Route
+                  path="/my-profile"
+                  element={
+                    <ProtectedRoute>
+                      <RoleGate role="candidate" redirectTo="/employer">
+                        <MyProfile />
+                      </RoleGate>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/employer"
+                  element={
+                    <ProtectedRoute>
+                      <RoleGate role="employer" redirectTo="/">
+                        <Employer />
+                      </RoleGate>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/profile" element={<Navigate to="/my-profile" replace />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <CookieBanner />
+              <TutorialHost />
+            </BrowserRouter>
+          </TooltipProvider>
+        </TutorialProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
