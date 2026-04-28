@@ -698,6 +698,20 @@ const Employer = () => {
         </div>
       )}
 
+      {previewJob && (
+        <JobDetailModal
+          job={previewJob}
+          onClose={() => setPreviewJob(null)}
+          onApply={() => {
+            toast("To podgląd z perspektywy kandydata", {
+              description: "Aplikowanie jest zablokowane w trybie pracodawcy.",
+            });
+          }}
+          allJobs={domainJobs}
+          onSelectJob={(j) => setPreviewJob(j)}
+        />
+      )}
+
       <Footer />
     </div>
   );
