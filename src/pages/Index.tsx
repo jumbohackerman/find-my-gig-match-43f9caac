@@ -13,7 +13,6 @@ import RecentlyViewedList from "@/components/RecentlyViewedList";
 import JobFilters from "@/components/JobFilters";
 import { defaultFilters, type JobFiltersState } from "@/components/JobFilters";
 import OnboardingModal from "@/components/OnboardingModal";
-import WelcomeTutorial from "@/components/WelcomeTutorial";
 import { useTutorial } from "@/hooks/useTutorial";
 import JobDetailModal from "@/components/JobDetailModal";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -74,7 +73,7 @@ const Index = () => {
   
   const { applications: dbApplications, loading: appsLoading, refetch: refetchApps } = useCandidateApplications();
   const { showOnboarding, completeOnboarding, dismissOnboarding } = useOnboarding();
-  const { showTutorial, tutorialRole, completeTutorial } = useTutorial();
+  const { showTutorial } = useTutorial();
   const { recentEntries, trackView, clear: clearRecent, count: recentCount } = useRecentlyViewed();
 
   const {
@@ -625,7 +624,6 @@ const Index = () => {
       </main>
 
       <OnboardingModal open={showOnboarding && !showTutorial} onComplete={completeOnboarding} onClose={dismissOnboarding} />
-      {showTutorial && <WelcomeTutorial role={tutorialRole} onComplete={completeTutorial} />}
       <JobDetailModal
         job={selectedJob}
         matchResult={selectedJob ? matchResults[selectedJob.id] : undefined}

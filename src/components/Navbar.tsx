@@ -7,8 +7,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useTutorial } from "@/hooks/useTutorial";
 import type { NotificationType } from "@/domain/models";
 import EmployerProfileModal from "@/components/employer/EmployerProfileModal";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 function notificationIcon(type: NotificationType) {
@@ -52,6 +54,7 @@ const Navbar = () => {
   const { user, profile, signOut } = useAuth();
   const { notifications, unreadCount, markAllRead, markRead } = useNotifications();
   const { theme, toggleTheme } = useTheme();
+  const { replayTutorial } = useTutorial();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showEmployerProfile, setShowEmployerProfile] = useState(false);
@@ -106,23 +109,27 @@ const Navbar = () => {
             {theme === "dark" ? <Sun className="w-4 h-4" aria-hidden="true" /> : <Moon className="w-4 h-4" aria-hidden="true" />}
           </button>
 
-          {/* ── Keyboard shortcuts hint (candidate, desktop only) ── */}
-          {isCandidate && (
-            <button
-              type="button"
-              onClick={() => {
-                toast("Skróty klawiszowe", {
-                  description: "← Pomiń · → Aplikuj · ↑ Zapisz · Enter — szczegóły",
-                  duration: 5000,
-                });
-              }}
-              className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors hidden sm:flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="Skróty klawiszowe"
-              title="Skróty klawiszowe"
-              data-testid="nav-keyboard-shortcuts"
-            >
-              <span className="text-xs font-mono font-bold w-4 h-4 flex items-center justify-center">?</span>
-            </button>
+          {/* ── Help / Tutorial replay (both roles, all devices) ── */}
+          {(isCandidate || isEmployer) && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => replayTutorial()}
+                  className="p-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-muted transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label="Jak to działa? Pokaż tutorial"
+                  data-testid="nav-help"
+                >
+                  <span className="text-xs font-mono font-bold w-4 h-4 flex items-center justify-center">?</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                <p className="font-semibold mb-1">Jak to działa? (pokaż tutorial)</p>
+                {isCandidate && (
+                  <p className="text-[11px] text-muted-foreground">← Pomiń · → Aplikuj · ↑ Zapisz · Enter — szczegóły</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
           )}
 
           {/* ── Guest CTA ── */}

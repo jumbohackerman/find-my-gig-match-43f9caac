@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
 import SplashScreen from "@/components/SplashScreen";
+import WelcomeTutorial from "@/components/WelcomeTutorial";
+import { useTutorial } from "@/hooks/useTutorial";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Employer from "./pages/Employer";
@@ -26,6 +28,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   if (loading) return null;
   if (!user) return <Navigate to="/auth" replace />;
   return <>{children}</>;
+};
+
+const TutorialHost = () => {
+  const { showTutorial, tutorialRole, completeTutorial } = useTutorial();
+  if (!showTutorial) return null;
+  return <WelcomeTutorial role={tutorialRole} onComplete={completeTutorial} />;
 };
 
 /** Show Landing to guests, redirect employer to /employer, candidates see Index */
@@ -81,6 +89,7 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CookieBanner />
+            <TutorialHost />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
