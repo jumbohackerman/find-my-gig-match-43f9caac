@@ -642,6 +642,49 @@ const Employer = () => {
         />
       )}
 
+      {deletingJob && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Potwierdź usunięcie oferty"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
+          onClick={() => !deleteBusy && setDeletingJob(null)}
+        >
+          <div
+            className="w-full max-w-md card-gradient rounded-2xl border border-border p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-lg font-bold text-foreground mb-2">Usunąć ofertę?</h3>
+            <p className="text-sm text-muted-foreground mb-2">
+              Zamierzasz trwale usunąć ofertę:
+            </p>
+            <p className="text-sm font-semibold text-foreground mb-4 p-2 rounded-lg bg-secondary/50 border border-border break-words">
+              {deletingJob.title}
+            </p>
+            <div className="flex items-start gap-2 rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-xs text-destructive mb-4">
+              <Trash2 className="w-4 h-4 shrink-0 mt-0.5" />
+              <p>Operacja jest nieodwracalna. Jeśli chcesz tylko zatrzymać rekrutację, użyj „Zakończ rekrutację”.</p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeletingJob(null)}
+                disabled={deleteBusy}
+                className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                Anuluj
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteBusy}
+                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {deleteBusy ? "Usuwanie…" : "Usuń ofertę"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
