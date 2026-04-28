@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import RoleGate from "@/components/RoleGate";
 import CookieBanner from "@/components/CookieBanner";
 import SplashScreen from "@/components/SplashScreen";
+import WelcomeTutorial from "@/components/WelcomeTutorial";
+import { useTutorial } from "@/hooks/useTutorial";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Employer from "./pages/Employer";
