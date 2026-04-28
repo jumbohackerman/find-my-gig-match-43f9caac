@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, MapPin, Briefcase, Clock, DollarSign, Users, Building2,
   CheckCircle2, ListChecks, Gift, Wifi, GraduationCap,
-  Sparkles, ArrowRight, Heart,
+  Sparkles, ArrowRight, Heart, Share2,
 } from "lucide-react";
+import { toast } from "sonner";
 import type { Job, SkillsByLevel } from "@/domain/models";
 import type { MatchResult } from "@/lib/matchScoring";
 import MatchBadge from "@/components/MatchBadge";
