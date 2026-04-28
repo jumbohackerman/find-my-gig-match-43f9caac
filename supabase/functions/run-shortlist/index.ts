@@ -332,7 +332,15 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, shortlist_id: shortlist.id, mock: isMockMode }),
+      JSON.stringify({
+        success: true,
+        shortlist_id: shortlist.id,
+        mock: isMockMode,
+        mode: isMockMode ? "demo" : "production",
+        notice: isMockMode
+          ? "DEMO/MOCK: wynik jest losowy, nie zmienia statusów aplikacji ani nie wysyła emaili. Nie traktuj jako decyzji rekrutacyjnej."
+          : undefined,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
