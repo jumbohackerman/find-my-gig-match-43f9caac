@@ -113,7 +113,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
       }}
     >
       <div
-        className="card-gradient ring-highlight shimmer-overlay rounded-3xl shadow-card hover:shadow-card-hover border border-border/70 cursor-grab active:cursor-grabbing h-full flex flex-col overflow-hidden relative"
+        className="card-gradient ring-highlight shimmer-overlay rounded-3xl shadow-card hover:shadow-card-hover border border-border cursor-grab active:cursor-grabbing h-full flex flex-col overflow-hidden relative"
         data-testid="swipe-card"
       >
         {/* Subtle top accent line */}
