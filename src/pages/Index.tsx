@@ -613,10 +613,8 @@ const Index = () => {
                           {actionPending ? <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin relative z-10" /> : <Check className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" />}
                         </motion.button>
                       </div>
-                      <p className="text-center text-muted-foreground text-[10px] pt-1.5 tracking-wide">
-                        <span className="text-foreground/80 font-semibold">{currentIndex + 1}</span>
-                        <span className="opacity-50"> / {filteredJobs.length}</span>
-                        <span className="hidden sm:inline ml-3 opacity-50">← → klawisze strzałek</span>
+                      <p className="hidden sm:block text-center text-muted-foreground text-[10px] pt-1.5 tracking-wide opacity-60">
+                        ← → klawisze strzałek
                       </p>
                     </div>
                   </>
