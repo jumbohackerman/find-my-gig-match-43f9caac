@@ -40,6 +40,7 @@ import { timeAgo } from "@/lib/timeAgo";
 import CloseJobModal, { type ClosureReason } from "@/components/employer/CloseJobModal";
 import { closeJob } from "@/hooks/useContactInvitations";
 import { Lock } from "lucide-react";
+import JobDetailModal from "@/components/JobDetailModal";
 
 import { Progress } from "@/components/ui/progress";
 
