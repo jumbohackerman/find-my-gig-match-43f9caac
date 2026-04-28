@@ -714,6 +714,43 @@ const MyProfile = () => {
             </AccordionSection>
           ) : (
             <>
+            {/* ── CV + AI — top of profile ── */}
+            {!cvUrl ? (
+              <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] p-5 sm:p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-display text-base font-bold text-foreground mb-1">
+                      Uzupełnij profil w sekundę
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                      Wrzuć swoje CV w PDF — AI automatycznie wyciągnie umiejętności, doświadczenie
+                      i dane kontaktowe. Nie musisz nic wpisywać ręcznie.
+                    </p>
+                    <CandidateCvUpload onParsed={handleCvParsed} />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">CV przesłane i przeanalizowane</p>
+                    <p className="text-xs text-muted-foreground">Profil został uzupełniony na podstawie Twojego CV.</p>
+                  </div>
+                  <button
+                    onClick={() => toggleSection("links")}
+                    className="text-xs text-primary hover:underline shrink-0"
+                  >
+                    Zmień CV
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* BASIC INFO */}
             <AccordionSection id="basic" label="Dane podstawowe" icon="👤" isOpen={activeSection === "basic"} onToggle={() => toggleSection("basic")} badge={title || undefined}>
               <div className="space-y-4">
