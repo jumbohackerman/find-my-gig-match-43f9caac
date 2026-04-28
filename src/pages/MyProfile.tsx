@@ -1128,6 +1128,19 @@ const MyProfile = () => {
                 </button>
               </div>
 
+              {!cvUrl && (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                  <p className="text-[11px] font-bold text-primary mb-1">📎 Najszybszy sposób:</p>
+                  <p className="text-[10px] text-foreground/70 mb-2">Wgraj CV — AI uzupełni profil za Ciebie.</p>
+                  <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    className="w-full py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Wgraj CV
+                  </button>
+                </div>
+              )}
+
               {completeness.missing.length > 0 && (
                 <div className="p-4 rounded-2xl bg-secondary/30 border border-border">
                   <p className="text-[11px] font-semibold text-foreground uppercase tracking-wider mb-2.5">Brakujące sekcje</p>
