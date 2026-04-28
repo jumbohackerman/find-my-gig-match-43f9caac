@@ -729,7 +729,23 @@ const MyProfile = () => {
                       Wrzuć swoje CV w PDF — AI automatycznie wyciągnie umiejętności, doświadczenie
                       i dane kontaktowe. Nie musisz nic wpisywać ręcznie.
                     </p>
-                    <CandidateCvUpload onParsed={handleCvParsed} />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <CandidateCvUpload onParsed={handleCvParsed} />
+                      <span className="text-[11px] text-muted-foreground">lub</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          toast("Import z LinkedIn", {
+                            description: "Otwórz LinkedIn → Ustawienia → Pobierz dane → Wgraj pobrany plik tutaj. Szczegółowa instrukcja wkrótce.",
+                            duration: 8000,
+                          });
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 text-[11px] text-[#0A66C2] font-medium hover:bg-[#0A66C2]/20 transition-colors"
+                      >
+                        <Linkedin className="w-3.5 h-3.5" />
+                        Import z LinkedIn
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
