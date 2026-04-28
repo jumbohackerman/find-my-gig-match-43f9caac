@@ -621,7 +621,6 @@ const Employer = () => {
       )}
 
       <Footer />
-      {showTutorial && <WelcomeTutorial role={tutorialRole} onComplete={completeTutorial} />}
     </div>
   );
 };
