@@ -143,6 +143,21 @@ const Employer = () => {
     refetch();
   };
 
+  const confirmDelete = async () => {
+    if (!deletingJob) return;
+    setDeleteBusy(true);
+    try {
+      await deleteJob(deletingJob.id);
+      refetch();
+      toast.success(`Oferta "${deletingJob.title}" usunięta`);
+      setDeletingJob(null);
+    } catch (e: any) {
+      toast.error(`Nie udało się usunąć oferty: ${e?.message || "spróbuj ponownie"}`);
+    } finally {
+      setDeleteBusy(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
