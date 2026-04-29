@@ -717,11 +717,12 @@ const MyProfile = () => {
             {!cvUrl ? (
               <AccordionSection
                 id="cv"
-                label="Uzupełnij profil w sekundę"
+                label="Uzupełnij profil jednym kliknięciem"
                 icon="✨"
                 isOpen={activeSection === "cv"}
                 onToggle={() => toggleSection("cv")}
                 badge="AI z CV"
+                highlight
               >
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground leading-relaxed">
