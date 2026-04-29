@@ -392,7 +392,7 @@ const Employer = () => {
                     className="card-gradient rounded-xl border border-border overflow-hidden"
                   >
                     {/* Top metrics strip — quick at-a-glance numbers */}
-                    <div className="px-4 pt-3 flex gap-3 text-[11px] text-muted-foreground flex-wrap">
+                    <div className="px-5 pt-3.5 flex gap-4 text-xs text-muted-foreground flex-wrap">
                       <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
                       <span className={`flex items-center gap-1 ${slotsExhausted ? "text-destructive font-semibold" : balance.remainingSlots > 0 ? "text-accent font-semibold" : ""}`}>
                         <Layers className="w-3 h-3" />
