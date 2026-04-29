@@ -166,7 +166,7 @@ const Employer = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <main className="flex-1 flex flex-col px-4 sm:px-8 py-6 max-w-4xl mx-auto w-full space-y-3">
+        <main className="flex-1 flex flex-col px-4 sm:px-8 py-6 max-w-7xl mx-auto w-full space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-gradient rounded-xl border border-border p-4 space-y-3">
               <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ const Employer = () => {
       <Navbar />
 
       <main
-        className={`flex-1 flex flex-col px-4 sm:px-8 py-6 mx-auto w-full ${activeView === "market" ? "max-w-6xl" : "max-w-4xl"}`}
+        className="flex-1 flex flex-col px-4 sm:px-8 py-6 mx-auto w-full max-w-7xl"
         data-testid="employer-dashboard"
       >
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
