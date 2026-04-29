@@ -153,25 +153,25 @@
 
 @media (min-width: 640px) {
   :root {
-    --browse-card-column: 28rem;
+    --browse-card-column: 24rem;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --browse-card-column: 32rem;
+    --browse-card-column: 26rem;
   }
 }
 
 @media (min-width: 1440px) {
   :root {
-    --browse-card-column: 36rem;
+    --browse-card-column: 28rem;
   }
 }
 
 @media (min-width: 1920px) {
   :root {
-    --browse-card-column: 40rem;
+    --browse-card-column: 30rem;
   }
 }
 
