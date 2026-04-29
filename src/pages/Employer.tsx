@@ -455,7 +455,7 @@ const Employer = () => {
                                 ?.scrollIntoView({ behavior: "smooth", block: "start" });
                             }, 200);
                           }}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform"
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-base font-medium shadow-glow hover:scale-[1.02] transition-transform"
                           data-testid={`employer-run-shortlist-${job.id}`}
                         >
                           <Zap className="w-4 h-4" aria-hidden="true" />
