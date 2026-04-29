@@ -1234,21 +1234,34 @@ const MyProfile = () => {
   );
 };
 
-function AccordionSection({ id, label, icon, isOpen, onToggle, badge, children }: {
-  id: string; label: string; icon: string; isOpen: boolean; onToggle: () => void; badge?: string; children: React.ReactNode;
+function AccordionSection({ id, label, icon, isOpen, onToggle, badge, children, highlight }: {
+  id: string; label: string; icon: string; isOpen: boolean; onToggle: () => void; badge?: string; children: React.ReactNode; highlight?: boolean;
 }) {
+  const containerCls = highlight
+    ? "rounded-xl border-2 border-orange-500/60 bg-gradient-to-br from-orange-500/15 via-amber-500/10 to-orange-500/5 overflow-hidden shadow-[0_0_24px_-6px_rgba(249,115,22,0.45)]"
+    : "rounded-xl border border-border overflow-hidden";
+  const buttonCls = highlight
+    ? `w-full px-5 py-5 flex items-center gap-4 text-left transition-colors ${isOpen ? "bg-orange-500/10" : "hover:bg-orange-500/10"}`
+    : `w-full px-5 py-5 flex items-center gap-4 text-left transition-colors ${isOpen ? "bg-primary/5" : "hover:bg-secondary/80"}`;
   return (
-    <div className="rounded-xl border border-border overflow-hidden">
-      <button onClick={onToggle} className={`w-full px-5 py-5 flex items-center gap-4 text-left transition-colors ${isOpen ? "bg-primary/5" : "hover:bg-secondary/80"}`}>
+    <div className={containerCls}>
+      <button onClick={onToggle} className={buttonCls}>
         <span className="text-xl">{icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-base font-semibold text-foreground">{label}</p>
-          {badge && !isOpen && <p className="text-xs text-muted-foreground truncate mt-1">{badge}</p>}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`text-base font-semibold ${highlight ? "text-orange-400" : "text-foreground"}`}>{label}</p>
+            {highlight && (
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500 text-white">
+                Polecane
+              </span>
+            )}
+          </div>
+          {badge && !isOpen && <p className={`text-xs truncate mt-1 ${highlight ? "text-orange-300/80" : "text-muted-foreground"}`}>{badge}</p>}
         </div>
-        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-5 h-5 transition-transform ${highlight ? "text-orange-400" : "text-muted-foreground"} ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-4 pb-4 pt-2 border-t border-border">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`px-4 pb-4 pt-2 border-t ${highlight ? "border-orange-500/30" : "border-border"}`}>
           {children}
         </motion.div>
       )}
