@@ -701,7 +701,7 @@ const MyProfile = () => {
           )}
 
           {/* Accordion sections */}
-          <div className="space-y-2">
+          <div className="space-y-3">
           {isEmployer ? (
             <AccordionSection id="basic" label="Dane firmy" icon="🏢" isOpen={activeSection === "basic"} onToggle={() => toggleSection("basic")} badge={fullName || undefined}>
               <div className="space-y-4">
@@ -1238,13 +1238,13 @@ function AccordionSection({ id, label, icon, isOpen, onToggle, badge, children }
 }) {
   return (
     <div className="rounded-xl border border-border overflow-hidden">
-      <button onClick={onToggle} className={`w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors ${isOpen ? "bg-primary/5" : "hover:bg-secondary/80"}`}>
-        <span className="text-lg">{icon}</span>
+      <button onClick={onToggle} className={`w-full px-5 py-5 flex items-center gap-4 text-left transition-colors ${isOpen ? "bg-primary/5" : "hover:bg-secondary/80"}`}>
+        <span className="text-xl">{icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground">{label}</p>
-          {badge && !isOpen && <p className="text-[11px] text-muted-foreground truncate mt-0.5">{badge}</p>}
+          <p className="text-base font-semibold text-foreground">{label}</p>
+          {badge && !isOpen && <p className="text-xs text-muted-foreground truncate mt-1">{badge}</p>}
         </div>
-        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-4 pb-4 pt-2 border-t border-border">
