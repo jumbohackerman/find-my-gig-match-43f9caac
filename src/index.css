@@ -558,89 +558,122 @@ input[type="number"] {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Compact Retina Desktop mode
+   Compact desktop/tablet layout (viewport-driven)
    --------------------------------------------------------------------------
-   Cel: na MacBookach (Retina, devicePixelRatio ≈ 1.6–2) Chrome przy zoom 100%
-   raportuje viewport CSS bardzo zbliżony do laptopa Windows 1176×911 dpr=1,
-   ale przez wyższy DPR cała aplikacja wygląda jak przybliżona. Skalujemy
-   downwards padding/gap/typografię i max-szerokość karty, żeby proporcje
-   były podobne do widoku na 14" Windowsie dpr=1.
+   Toggled by JS in src/main.tsx via `html[data-compact="true"]` whenever:
+     - innerWidth  <= 1200px, OR
+     - innerHeight <= 850px
+   Additional `html[data-shortvh="true"]` triggers when innerHeight <= 760px
+   for even tighter spacing.
 
-   Aktywacja:
-     - min-width 900px (tylko desktop, nie ruszamy mobile/tabletów)
-     - min-resolution 1.25dppx ORAZ -webkit-min-device-pixel-ratio 1.25
-       (oba syntaxy — Safari/Chromium kompatybilność)
-     - max-height 1000px (chroni przed degradacją na 4K monitorach przy
-       skalowaniu OS, gdzie viewport jest niski tylko przez skalowanie)
+   Goal: render a real compact layout (smaller paddings, narrower swipe card,
+   tighter typography in toolbar/card/footer, smaller swipe buttons) so the
+   browse screen fits comfortably on:
+     • 1176×911  DPR 1   (Windows 14")
+     • 1196×924  DPR 1.6 (MacBook 13" Chrome 100%)
+     • 957×739   DPR 2   (MacBook scaled)
+     • 1440×900  DPR 2   (MacBook Pro 15")
+     • 1920×1080 DPR 1   (external monitor — flag stays OFF, full layout)
 
-   Test w DevTools (Device toolbar → Add custom device + DPR):
-     • 1196×924  DPR 1.6  (MacBook 13" Chrome 100%)
-     • 1176×911  DPR 1    (Windows 14" Chrome 100%) — bez zmian
-     • 1512×982  DPR 1.6  (MacBook Air 13" natywny)
-     • 1440×900  DPR 2    (MacBook Pro 15" Retina)
-     • 1920×1080 DPR 1    (zewnętrzny monitor) — bez zmian
-
-   Nie ruszamy: kolorów, brandingu, animacji, logiki swipe/aplikowania,
-   layoutu mobile (<900px), Supabase/auth/.env.
+   No global zoom, no transform: scale on root. Mobile (<640px) is unaffected
+   because mobile already uses its own compact paddings.
    ────────────────────────────────────────────────────────────────────── */
-@media (min-width: 900px) and (max-height: 1000px) and (min-resolution: 1.25dppx),
-       (min-width: 900px) and (max-height: 1000px) and (-webkit-min-device-pixel-ratio: 1.25) {
-  :root {
-    /* Karta swipe ~12% węższa niż standardowy desktop */
-    --browse-card-column: 22rem;
-  }
+html[data-compact="true"] {
+  /* Narrower swipe card column on cramped desktops */
+  --browse-card-column: 22rem;
+}
 
-  /* Header — zmniejszony padding pionowy (py-4 → ~py-2) */
-  header[data-testid="navbar"] {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-  header[data-testid="navbar"] .w-9.h-9 {
-    width: 2rem;
-    height: 2rem;
-  }
-  header[data-testid="navbar"] h1 {
-    font-size: 1.05rem;
-  }
-
-  /* Sticky tabs/filter bar — mniej oddechu */
-  main + div, /* fallback */
-  .sticky.top-\[57px\] {
-    padding-top: 0.375rem !important;
-    padding-bottom: 0.375rem !important;
-  }
-
-  /* Główna kolumna swipe — niższy padding wokół karty */
-  main {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-
-  /* Karta swipe — kompaktowy padding wewnętrzny (~12% mniej) */
-  [data-testid="swipe-card"] > div.flex-1 {
-    padding: 0.625rem !important;   /* zamiast p-3/4/5 */
-    gap: 0.375rem !important;
-  }
-  [data-testid="swipe-card"] h2 {
-    font-size: 0.95rem;
-    line-height: 1.15;
-  }
-
-  /* Przyciski swipe — minimalnie mniejsze */
-  button[aria-label="Pomiń"],
-  button[aria-label="Aplikuj"],
-  button[aria-label="Zapisz"],
-  button[aria-label="Cofnij"] {
-    transform: scale(0.92);
-    transform-origin: center;
-  }
-
-  /* Footer — kompaktowo */
-  footer {
-    padding-top: 0.375rem;
-    padding-bottom: 0.375rem;
-  }
-  footer .text-xs {
-    font-size: 0.7rem;
+@media (min-width: 1024px) {
+  html[data-compact="true"] {
+    --browse-card-column: 23rem;
   }
 }
+
+/* Navbar — lower vertical padding + smaller logo/title */
+html[data-compact="true"] header[data-testid="navbar"] {
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+html[data-compact="true"] header[data-testid="navbar"] .w-9.h-9 {
+  width: 1.875rem;
+  height: 1.875rem;
+}
+html[data-compact="true"] header[data-testid="navbar"] h1 {
+  font-size: 1.05rem;
+}
+
+/* Sticky toolbar (tabs + Reset/Filtry) — tighter padding, smaller buttons */
+html[data-compact="true"] .browse-toolbar {
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.375rem !important;
+}
+html[data-compact="true"] .browse-toolbar [role="tab"] {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+  font-size: 0.72rem;
+}
+html[data-compact="true"] .browse-toolbar button {
+  font-size: 0.72rem;
+}
+html[data-compact="true"] .browse-toolbar button[title*="Pokaż wszystkie"],
+html[data-compact="true"] .browse-toolbar [data-testid="filters-trigger"] {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  padding-left: 0.55rem;
+  padding-right: 0.55rem;
+}
+
+/* Main padding (browse area) — give swipe buttons breathing room above footer */
+html[data-compact="true"] main {
+  padding-top: 0.375rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Swipe card — tighter inner padding & gap, smaller fonts only inside card */
+html[data-compact="true"] [data-testid="swipe-card"] > div.flex-1 {
+  padding: 0.625rem !important;
+  gap: 0.35rem !important;
+}
+html[data-compact="true"] [data-testid="swipe-card"] h2 {
+  font-size: 0.92rem;
+  line-height: 1.15;
+}
+
+/* Swipe action buttons — slightly smaller, bigger gap to footer */
+html[data-compact="true"] [data-testid="swipe-skip"],
+html[data-compact="true"] [data-testid="swipe-apply"] {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+html[data-compact="true"] [data-testid="swipe-save"] {
+  width: 2.1rem;
+  height: 2.1rem;
+}
+html[data-compact="true"] [role="group"][aria-label="Akcje swipe"] {
+  margin-bottom: 0.25rem;
+}
+
+/* Footer — compact on browse */
+html[data-compact="true"] footer {
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+html[data-compact="true"] footer .text-xs {
+  font-size: 0.68rem;
+}
+
+/* Extra-tight when viewport is very short (laptop in split view, etc.) */
+html[data-shortvh="true"] [data-testid="swipe-card"] > div.flex-1 {
+  padding: 0.5rem !important;
+  gap: 0.3rem !important;
+}
+html[data-shortvh="true"] [data-testid="swipe-card"] .hidden.sm\:block {
+  display: none !important; /* drop summary teaser when no room */
+}
+html[data-shortvh="true"] footer {
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
