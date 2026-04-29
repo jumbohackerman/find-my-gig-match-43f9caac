@@ -357,6 +357,29 @@ function ensurePrintStyles() {
       letter-spacing: 0.6px;
       margin-top: 1px;
     }
+    /* Document footer (rendered once at end of main content / last page) */
+    #${PRINT_AREA_ID} .cv-doc-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 8.5pt;
+      color: #6b7280;
+      letter-spacing: 0.3px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    #${PRINT_AREA_ID} .cv-doc-footer strong {
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+    #${PRINT_AREA_ID} .cv-doc-footer-logo {
+      width: 14px;
+      height: 14px;
+      object-fit: contain;
+    }
 
     /* ── Main (right, white) ─────────────────────────────── */
     #${PRINT_AREA_ID} .cv-main {
@@ -651,15 +674,6 @@ function buildHtml(c: Candidate): string {
       ${skillsBlock}
       ${langsBlock}
       ${expectBlock}
-
-      <div class="cv-side-footer">
-        <div class="cv-footer-brand">
-          <img src="${jobswipeLogo}" alt="JobSwipe" class="cv-footer-logo" />
-          <span class="cv-footer-name">JobSwipe.pl</span>
-        </div>
-        <div class="cv-footer-tag">Wygenerowane przez JobSwipe.pl</div>
-        <div class="cv-footer-url">jobswipe.pl</div>
-      </div>
     </aside>
 
     <main class="cv-main">
@@ -680,6 +694,11 @@ function buildHtml(c: Candidate): string {
 
       ${expBlock}
       ${eduBlock}
+
+      <div class="cv-doc-footer">
+        <img src="${jobswipeLogo}" alt="JobSwipe" class="cv-doc-footer-logo" />
+        <span>Wygenerowane przez <strong>JobSwipe.pl</strong></span>
+      </div>
     </main>
   `;
 }
