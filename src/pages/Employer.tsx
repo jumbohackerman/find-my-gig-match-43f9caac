@@ -689,11 +689,11 @@ const Employer = () => {
           onClick={() => !deleteBusy && setDeletingJob(null)}
         >
           <div
-            className="w-full max-w-md card-gradient rounded-2xl border border-border p-5"
+            className="w-full max-w-md card-gradient rounded-2xl border border-border p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display text-lg font-bold text-foreground mb-2">Usunąć ofertę?</h3>
-            <p className="text-sm text-muted-foreground mb-2">
+            <p className="text-base text-muted-foreground mb-2">
               Zamierzasz trwale usunąć ofertę:
             </p>
             <p className="text-sm font-semibold text-foreground mb-4 p-2 rounded-lg bg-secondary/50 border border-border break-words">
@@ -707,14 +707,14 @@ const Employer = () => {
               <button
                 onClick={() => setDeletingJob(null)}
                 disabled={deleteBusy}
-                className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-base font-medium hover:bg-muted transition-colors disabled:opacity-50"
               >
                 Anuluj
               </button>
               <button
                 onClick={confirmDelete}
                 disabled={deleteBusy}
-                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-base font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {deleteBusy ? "Usuwanie…" : "Usuń ofertę"}
               </button>
