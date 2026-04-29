@@ -637,7 +637,7 @@ const MyProfile = () => {
         </div>
       </header>
 
-      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-6xl mx-auto lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8"}`}>
+      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-[1400px] mx-auto lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6"}`}>
         <LocalErrorBoundary label="Formularz profilu">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="min-w-0">
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
