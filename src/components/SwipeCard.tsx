@@ -208,7 +208,7 @@ const SwipeCard = ({ job, onSwipe, isTop, matchResult, isSaved, onTap, forcedExi
 
           {/* Dlaczego warto — offer highlights */}
           {highlights.length > 0 && (
-            <div className="rounded-lg bg-accent/10 border border-accent/25 p-2">
+            <div className="rounded-lg bg-accent/15 border border-accent/35 p-2">
               <span className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1 block">Dlaczego warto</span>
               <div className="space-y-0.5">
                 {highlights.slice(0, 3).map((h, i) => (

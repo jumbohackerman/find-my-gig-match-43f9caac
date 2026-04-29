@@ -50,11 +50,16 @@ export function useRecentlyViewed() {
     setEntries([]);
   }, []);
 
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const recentCount = entries.filter(
+    (e) => e.viewedAt && new Date(e.viewedAt).getTime() > cutoff,
+  ).length;
+
   return {
     recentJobs: entries.map((e) => e.job),
     recentEntries: entries,
     trackView,
     clear,
-    count: entries.length,
+    count: recentCount,
   };
 }
