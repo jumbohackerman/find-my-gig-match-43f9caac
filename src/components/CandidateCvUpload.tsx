@@ -214,6 +214,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     // ── All guards passed — lock and start ──
     aiRequestInFlight.current = true;
     setAiProcessing(true);
+    setParsingStep(0);
     devLog("[CvUpload] AI analysis STARTED for cv_upload_id:", lastCv.id);
 
     try {
@@ -221,6 +222,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       if (existing?.raw_text && existing.raw_text.length > 0) {
         setParsedData(existing);
         setLastCv({ ...lastCv, status: "ai_processing" });
+        setParsingStep(1);
 
         const parseResult = await startAiParsing(lastCv.id, user.id);
         if (!parseResult.success) {
@@ -233,6 +235,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
         parsedCvIds.current.add(lastCv.id);
         setParsedData(refreshedParsed);
         setLastCv({ ...lastCv, status: "parsed", error_message: null });
+        setParsingStep(2);
         toast.success("AI przeanalizowało Twoje CV!");
         // Auto-import after fresh AI parse (user explicitly clicked analyze)
         if (hasParsedJson(refreshedParsed)) {
@@ -254,6 +257,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
 
       // Text extracted, now run AI parsing
       setLastCv({ ...lastCv, status: "ai_processing" });
+      setParsingStep(1);
 
       const parseResult = await startAiParsing(lastCv.id, user.id);
       if (!parseResult.success) {
@@ -267,6 +271,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       parsedCvIds.current.add(lastCv.id);
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
+      setParsingStep(2);
       toast.success("AI przeanalizowało Twoje CV!");
       // Auto-import after fresh AI parse (user explicitly clicked analyze)
       if (hasParsedJson(refreshedParsed)) {
@@ -276,6 +281,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     } finally {
       aiRequestInFlight.current = false;
       setAiProcessing(false);
+      setParsingStep(0);
       devLog("[CvUpload] AI analysis FINISHED for cv_upload_id:", lastCv.id);
     }
   };
