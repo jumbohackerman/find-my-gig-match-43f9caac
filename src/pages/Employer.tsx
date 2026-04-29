@@ -30,6 +30,7 @@ import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
 import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import JobAnalyticsBlock from "@/components/employer/JobAnalyticsBlock";
+import CandidateKanban from "@/components/employer/CandidateKanban";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Footer from "@/components/Footer";
@@ -101,6 +102,7 @@ const Employer = () => {
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [previewJob, setPreviewJob] = useState<Job | null>(null);
   const [sortCandidates, setSortCandidates] = useState<"date" | "score">("date");
+  const [candidatesView, setCandidatesView] = useState<"list" | "kanban">("list");
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
