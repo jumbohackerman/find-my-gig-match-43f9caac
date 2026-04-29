@@ -556,3 +556,91 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Compact Retina Desktop mode
+   --------------------------------------------------------------------------
+   Cel: na MacBookach (Retina, devicePixelRatio ≈ 1.6–2) Chrome przy zoom 100%
+   raportuje viewport CSS bardzo zbliżony do laptopa Windows 1176×911 dpr=1,
+   ale przez wyższy DPR cała aplikacja wygląda jak przybliżona. Skalujemy
+   downwards padding/gap/typografię i max-szerokość karty, żeby proporcje
+   były podobne do widoku na 14" Windowsie dpr=1.
+
+   Aktywacja:
+     - min-width 900px (tylko desktop, nie ruszamy mobile/tabletów)
+     - min-resolution 1.25dppx ORAZ -webkit-min-device-pixel-ratio 1.25
+       (oba syntaxy — Safari/Chromium kompatybilność)
+     - max-height 1000px (chroni przed degradacją na 4K monitorach przy
+       skalowaniu OS, gdzie viewport jest niski tylko przez skalowanie)
+
+   Test w DevTools (Device toolbar → Add custom device + DPR):
+     • 1196×924  DPR 1.6  (MacBook 13" Chrome 100%)
+     • 1176×911  DPR 1    (Windows 14" Chrome 100%) — bez zmian
+     • 1512×982  DPR 1.6  (MacBook Air 13" natywny)
+     • 1440×900  DPR 2    (MacBook Pro 15" Retina)
+     • 1920×1080 DPR 1    (zewnętrzny monitor) — bez zmian
+
+   Nie ruszamy: kolorów, brandingu, animacji, logiki swipe/aplikowania,
+   layoutu mobile (<900px), Supabase/auth/.env.
+   ────────────────────────────────────────────────────────────────────── */
+@media (min-width: 900px) and (max-height: 1000px) and (min-resolution: 1.25dppx),
+       (min-width: 900px) and (max-height: 1000px) and (-webkit-min-device-pixel-ratio: 1.25) {
+  :root {
+    /* Karta swipe ~12% węższa niż standardowy desktop */
+    --browse-card-column: 22rem;
+  }
+
+  /* Header — zmniejszony padding pionowy (py-4 → ~py-2) */
+  header[data-testid="navbar"] {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  header[data-testid="navbar"] .w-9.h-9 {
+    width: 2rem;
+    height: 2rem;
+  }
+  header[data-testid="navbar"] h1 {
+    font-size: 1.05rem;
+  }
+
+  /* Sticky tabs/filter bar — mniej oddechu */
+  main + div, /* fallback */
+  .sticky.top-\[57px\] {
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+  }
+
+  /* Główna kolumna swipe — niższy padding wokół karty */
+  main {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Karta swipe — kompaktowy padding wewnętrzny (~12% mniej) */
+  [data-testid="swipe-card"] > div.flex-1 {
+    padding: 0.625rem !important;   /* zamiast p-3/4/5 */
+    gap: 0.375rem !important;
+  }
+  [data-testid="swipe-card"] h2 {
+    font-size: 0.95rem;
+    line-height: 1.15;
+  }
+
+  /* Przyciski swipe — minimalnie mniejsze */
+  button[aria-label="Pomiń"],
+  button[aria-label="Aplikuj"],
+  button[aria-label="Zapisz"],
+  button[aria-label="Cofnij"] {
+    transform: scale(0.92);
+    transform-origin: center;
+  }
+
+  /* Footer — kompaktowo */
+  footer {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+  footer .text-xs {
+    font-size: 0.7rem;
+  }
+}
