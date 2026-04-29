@@ -444,7 +444,7 @@ const Employer = () => {
                     )}
 
                     {jobApps.length >= 10 && !slotsExhausted && job.status !== "closed" && (
-                      <div className="px-4 pb-2">
+                      <div className="px-5 pb-2.5">
                         <button
                           type="button"
                           onClick={() => {
