@@ -497,7 +497,7 @@ const Employer = () => {
                                 e.stopPropagation();
                                 setPreviewJob(job);
                               }}
-                              className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                              className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                               title="Podgląd z perspektywy kandydata"
                               aria-label="Podgląd oferty z perspektywy kandydata"
                             >
@@ -520,7 +520,7 @@ const Employer = () => {
                                 finally { setHidePending(null); }
                               }}
                               disabled={hidePending === job.id}
-                              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                              className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
                               title={job.status === "hidden" ? "Opublikuj" : "Ukryj"}
                             >
                               {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -528,7 +528,7 @@ const Employer = () => {
                             {job.status !== "closed" && (
                               <button
                                 onClick={() => setClosingJob({ id: job.id, title: job.title, company: job.company })}
-                                className="p-1.5 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
+                                className="p-2 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
                                 title="Zakończ rekrutację"
                               >
                                 <Lock className="w-4 h-4" />
@@ -536,7 +536,7 @@ const Employer = () => {
                             )}
                             <button
                               onClick={() => setDeletingJob({ id: job.id, title: job.title })}
-                              className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                              className="p-2 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
                               title="Usuń ofertę"
                               aria-label={`Usuń ofertę ${job.title}`}
                             >
@@ -553,7 +553,7 @@ const Employer = () => {
                         />
                         <button
                           onClick={() => setExpandedJob(isExpanded ? null : job.id)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
                           aria-expanded={isExpanded}
                           aria-label={isExpanded ? "Zwiń panel oferty" : "Rozwiń panel oferty"}
                         >
