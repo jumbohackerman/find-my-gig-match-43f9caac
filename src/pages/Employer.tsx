@@ -650,54 +650,86 @@ const Employer = () => {
 
                   {jobApps.length > 0 && (
                     <div className="px-5 pt-4 pb-3 space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
                         <h3 className="font-display text-base font-bold text-foreground">
                           Aplikacje ({jobApps.length})
                         </h3>
-                        {balance.totalSlots > 0 && (
-                          <span className="text-xs text-muted-foreground">
-                            Sloty shortlisty: {balance.remainingSlots}/{balance.totalSlots}
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <div role="tablist" aria-label="Widok kandydatów" className="inline-flex items-center gap-0.5 p-0.5 rounded-lg bg-secondary/40 border border-border">
+                            {(["list", "kanban"] as const).map((v) => (
+                              <button
+                                key={v}
+                                role="tab"
+                                aria-selected={candidatesView === v}
+                                onClick={() => setCandidatesView(v)}
+                                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                                  candidatesView === v
+                                    ? "bg-background text-foreground shadow-soft"
+                                    : "text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {v === "list" ? "Lista" : "Kanban"}
+                              </button>
+                            ))}
+                          </div>
+                          {balance.totalSlots > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              Sloty: {balance.remainingSlots}/{balance.totalSlots}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center justify-end gap-1.5 text-xs">
-                        <span className="text-muted-foreground">Sortuj:</span>
-                        {(["date", "score"] as const).map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => setSortCandidates(s)}
-                            className={`px-2 py-0.5 rounded-md transition-colors ${
-                              sortCandidates === s
-                                ? "bg-primary text-primary-foreground font-medium"
-                                : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            {s === "date" ? "Najnowsze" : "Najlepsze"}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="space-y-2">
-                        {sortedApps.map((app) => (
-                          <CandidateCard
-                            key={app.id}
-                            app={app}
-                            jobId={job.id}
-                            employerId={user?.id}
-                            onView={() => handleViewCandidate(app)}
-                            onAdvanceStatus={handleAdvanceStatus}
-                            onShortlist={() => requestShortlist(app, job.id, job.title)}
-                            canShortlist={balance.remainingSlots > 0 && job.status !== "closed"}
-                            chatMessages={messaging.getMessages(app.id)}
-                            onSendMessage={(content) => messaging.sendMessage(app.id, content)}
-                            isChatOpen={messaging.isChatOpen(app.id)}
-                            onUnlockChat={() => {
-                              messaging.unlockChat(app.id);
-                              messaging.loadMessages(app.id);
-                            }}
-                            currentUserId={user?.id}
-                          />
-                        ))}
-                      </div>
+                      {candidatesView === "list" && (
+                        <div className="flex items-center justify-end gap-1.5 text-xs">
+                          <span className="text-muted-foreground">Sortuj:</span>
+                          {(["date", "score"] as const).map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => setSortCandidates(s)}
+                              className={`px-2 py-0.5 rounded-md transition-colors ${
+                                sortCandidates === s
+                                  ? "bg-primary text-primary-foreground font-medium"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {s === "date" ? "Najnowsze" : "Najlepsze"}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {candidatesView === "list" ? (
+                        <div className="space-y-2">
+                          {sortedApps.map((app) => (
+                            <CandidateCard
+                              key={app.id}
+                              app={app}
+                              jobId={job.id}
+                              employerId={user?.id}
+                              onView={() => handleViewCandidate(app)}
+                              onAdvanceStatus={handleAdvanceStatus}
+                              onShortlist={() => requestShortlist(app, job.id, job.title)}
+                              canShortlist={balance.remainingSlots > 0 && job.status !== "closed"}
+                              chatMessages={messaging.getMessages(app.id)}
+                              onSendMessage={(content) => messaging.sendMessage(app.id, content)}
+                              isChatOpen={messaging.isChatOpen(app.id)}
+                              onUnlockChat={() => {
+                                messaging.unlockChat(app.id);
+                                messaging.loadMessages(app.id);
+                              }}
+                              currentUserId={user?.id}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <CandidateKanban
+                          apps={jobApps}
+                          canShortlist={balance.remainingSlots > 0 && job.status !== "closed"}
+                          jobClosed={job.status === "closed"}
+                          onView={(app) => handleViewCandidate(app)}
+                          onShortlist={(app) => requestShortlist(app, job.id, job.title)}
+                          onAdvanceStatus={handleAdvanceStatus}
+                        />
+                      )}
                     </div>
                   )}
 
