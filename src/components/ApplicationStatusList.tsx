@@ -81,7 +81,7 @@ const ApplicationStatusList = ({ applications, loading, onJobClick }: Props) => 
 
                 {/* Right: status pipeline */}
                 <div className="lg:pl-6 lg:border-l lg:border-border/60">
-                  <StatusPipeline currentStatus={status} />
+                  <StatusPipeline currentStatus={status} size="lg" />
                 </div>
               </div>
             </motion.div>
