@@ -351,6 +351,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
             }
           }}
           processing={aiProcessing}
+          parsingStep={parsingStep}
           errorMessage={lastCv.error_message}
           importState={importState}
         />
@@ -389,33 +390,35 @@ function FileCard({ cv, onUpload, onRemove }: { cv: CvRecord; onUpload: (e: Reac
   );
 }
 
-function AiSection({ state, onStart, onImport, processing, errorMessage, importState }: { state: CvState; onStart: () => void; onImport: () => void; processing: boolean; errorMessage: string | null; importState: ImportState }) {
+function AiSection({ state, onStart, onImport, processing, parsingStep, errorMessage, importState }: { state: CvState; onStart: () => void; onImport: () => void; processing: boolean; parsingStep: number; errorMessage: string | null; importState: ImportState }) {
   if (state === "empty") return null;
 
-  if (state === "processing") {
+  if (state === "processing" || state === "ai_parsing" || processing) {
+    const steps = [
+      { label: "Wgrywam PDF", done: true },
+      { label: "Analizuję treść dokumentu", done: parsingStep > 0 },
+      { label: "Wyciągam dane do profilu", done: parsingStep > 1 },
+    ];
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-foreground">Odczytywanie treści z CV…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu.</p>
-          </div>
+        <p className="text-sm font-medium text-foreground mb-3">AI analizuje Twoje CV…</p>
+        <div className="space-y-3">
+          {steps.map((step, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                step.done ? "bg-accent text-accent-foreground" : "border-2 border-primary"
+              }`}>
+                {step.done
+                  ? <Check className="w-3 h-3" />
+                  : <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+              </div>
+              <span className={`text-xs ${step.done ? "text-foreground" : "text-muted-foreground"}`}>
+                {step.label}
+              </span>
+            </div>
+          ))}
         </div>
-      </div>
-    );
-  }
-
-  if (state === "ai_parsing" || processing) {
-    return (
-      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-foreground">AI analizuje Twoje CV…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Wyciąganie danych: umiejętności, doświadczenie, wykształcenie. To może potrwać kilkanaście sekund.</p>
-          </div>
-        </div>
+        <p className="text-[10px] text-muted-foreground mt-3">To może potrwać kilkanaście sekund — nie zamykaj okna.</p>
       </div>
     );
   }
