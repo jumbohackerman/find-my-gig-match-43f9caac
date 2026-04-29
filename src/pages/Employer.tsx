@@ -32,6 +32,7 @@ import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import JobAnalyticsBlock from "@/components/employer/JobAnalyticsBlock";
 import CandidateKanban from "@/components/employer/CandidateKanban";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
+import EmployerProfileSidebar from "@/components/employer/EmployerProfileSidebar";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Footer from "@/components/Footer";
 import type { ApplicationStatus } from "@/types/application";
