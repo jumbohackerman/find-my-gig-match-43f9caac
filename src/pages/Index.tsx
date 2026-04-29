@@ -474,7 +474,12 @@ const Index = () => {
                 ) : (
                   <>
                     <div className="browse-card-stage relative flex-1 min-h-0">
-                      <div className="browse-card-frame">
+                      {/* Subtle ambient glow behind the card stack */}
+                      <div
+                        aria-hidden
+                        className="absolute -inset-6 bg-gradient-to-br from-primary/20 via-accent/10 to-transparent rounded-3xl blur-2xl pointer-events-none"
+                      />
+                      <div className="browse-card-frame relative">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
                             <SwipeCard
