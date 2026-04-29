@@ -637,7 +637,7 @@ const MyProfile = () => {
         </div>
       </header>
 
-      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-7xl mx-auto lg:relative"}`}>
+      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-[1400px] mx-auto lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6"}`}>
         <LocalErrorBoundary label="Formularz profilu">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="min-w-0">
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
@@ -1125,7 +1125,7 @@ const MyProfile = () => {
 
         {/* Right sticky panel — desktop only, candidate only */}
         {!isEmployer && (
-          <aside className="hidden lg:block lg:absolute lg:top-6 lg:right-4 lg:w-[340px]">
+          <aside className="hidden lg:block">
             <div className="sticky top-6 space-y-4">
               <div className="p-5 rounded-2xl bg-secondary/50 border border-border">
                 <div className="flex items-center justify-between mb-2">
