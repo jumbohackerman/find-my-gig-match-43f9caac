@@ -641,7 +641,13 @@ const Employer = () => {
                   </div>
 
                   {jobApps.length > 0 && (
-                    <div className="px-5 pt-4 pb-3 border-t border-border space-y-3">
+                    <div className="px-5 pt-3 border-t border-border">
+                      <JobAnalyticsBlock apps={jobApps} balance={balance} />
+                    </div>
+                  )}
+
+                  {jobApps.length > 0 && (
+                    <div className="px-5 pt-4 pb-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <h3 className="font-display text-base font-bold text-foreground">
                           Aplikacje ({jobApps.length})
