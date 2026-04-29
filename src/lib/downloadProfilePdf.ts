@@ -357,6 +357,29 @@ function ensurePrintStyles() {
       letter-spacing: 0.6px;
       margin-top: 1px;
     }
+    /* Document footer (rendered once at end of main content / last page) */
+    #${PRINT_AREA_ID} .cv-doc-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 8.5pt;
+      color: #6b7280;
+      letter-spacing: 0.3px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    #${PRINT_AREA_ID} .cv-doc-footer strong {
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+    #${PRINT_AREA_ID} .cv-doc-footer-logo {
+      width: 14px;
+      height: 14px;
+      object-fit: contain;
+    }
 
     /* ── Main (right, white) ─────────────────────────────── */
     #${PRINT_AREA_ID} .cv-main {
