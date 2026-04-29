@@ -151,6 +151,38 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: "Missing authorization header" }, 401);
     }
 
+    // ── Rate limit: max 5 CV parses per user per hour ──
+    const rlUserId = (() => {
+      try {
+        const token = authHeader.replace(/^Bearer\s+/i, "");
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload.sub as string;
+      } catch {
+        return null;
+      }
+    })();
+    if (rlUserId) {
+      const rateLimitUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/rate-limiter`;
+      const rl = await fetch(rateLimitUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
+        },
+        body: JSON.stringify({
+          key: `cv_parse:${rlUserId}`,
+          maxRequests: 5,
+          windowMs: 3600000,
+        }),
+      }).catch(() => null);
+      if (rl?.status === 429) {
+        return jsonResponse(
+          { error: "Zbyt wiele prób. Poczekaj godzinę i spróbuj ponownie." },
+          429,
+        );
+      }
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey, {
