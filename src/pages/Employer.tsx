@@ -82,6 +82,7 @@ const Employer = () => {
   const [deletingJob, setDeletingJob] = useState<{ id: string; title: string } | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [previewJob, setPreviewJob] = useState<Job | null>(null);
+  const [sortCandidates, setSortCandidates] = useState<"date" | "score">("date");
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
@@ -573,7 +574,14 @@ const Employer = () => {
                           className="overflow-hidden"
                         >
                           {/* Aplikacje — actionable candidate list (status, shortlist, chat) */}
-                          {jobApps.length > 0 && (
+                          {jobApps.length > 0 && (() => {
+                            const sortedApps = [...jobApps].sort((a, b) => {
+                              if (sortCandidates === "score") {
+                                return (b.matchResult?.score ?? 0) - (a.matchResult?.score ?? 0);
+                              }
+                              return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
+                            });
+                            return (
                             <div className="px-4 pt-3 pb-2 border-t border-border space-y-2">
                               <div className="flex items-center justify-between">
                                 <h3 className="font-display text-sm font-bold text-foreground">
@@ -585,8 +593,24 @@ const Employer = () => {
                                   </span>
                                 )}
                               </div>
+                              <div className="flex items-center justify-end gap-1 text-[10px]">
+                                <span className="text-muted-foreground">Sortuj:</span>
+                                {(["date", "score"] as const).map((s) => (
+                                  <button
+                                    key={s}
+                                    onClick={() => setSortCandidates(s)}
+                                    className={`px-2 py-0.5 rounded-md transition-colors ${
+                                      sortCandidates === s
+                                        ? "bg-primary text-primary-foreground font-medium"
+                                        : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                  >
+                                    {s === "date" ? "Najnowsze" : "Najlepsze"}
+                                  </button>
+                                ))}
+                              </div>
                               <div className="space-y-2">
-                                {jobApps.map((app) => (
+                                {sortedApps.map((app) => (
                                   <CandidateCard
                                     key={app.id}
                                     app={app}
@@ -608,7 +632,8 @@ const Employer = () => {
                                 ))}
                               </div>
                             </div>
-                          )}
+                            );
+                          })()}
 
                           <div id={`shortlist-section-${job.id}`}>
                             <AIShortlistSection jobId={job.id} jobApps={jobApps} />
