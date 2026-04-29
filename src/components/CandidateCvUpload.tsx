@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Upload, FileText, Trash2, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { Upload, FileText, Trash2, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Progress } from "@/components/ui/progress";
@@ -46,6 +46,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loadingRecord, setLoadingRecord] = useState(true);
   const [aiProcessing, setAiProcessing] = useState(false);
+  /** 0 = upload done, 1 = text extracted, 2 = AI parsed */
+  const [parsingStep, setParsingStep] = useState(0);
   /** Tracks whether parsed data has been imported into the form in this session */
   const [importState, setImportState] = useState<ImportState>("not_imported");
   /** Hard ref-based guard: survives re-renders and prevents concurrent AI calls */
@@ -212,6 +214,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     // ── All guards passed — lock and start ──
     aiRequestInFlight.current = true;
     setAiProcessing(true);
+    setParsingStep(0);
     devLog("[CvUpload] AI analysis STARTED for cv_upload_id:", lastCv.id);
 
     try {
@@ -219,6 +222,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       if (existing?.raw_text && existing.raw_text.length > 0) {
         setParsedData(existing);
         setLastCv({ ...lastCv, status: "ai_processing" });
+        setParsingStep(1);
 
         const parseResult = await startAiParsing(lastCv.id, user.id);
         if (!parseResult.success) {
@@ -231,6 +235,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
         parsedCvIds.current.add(lastCv.id);
         setParsedData(refreshedParsed);
         setLastCv({ ...lastCv, status: "parsed", error_message: null });
+        setParsingStep(2);
         toast.success("AI przeanalizowało Twoje CV!");
         // Auto-import after fresh AI parse (user explicitly clicked analyze)
         if (hasParsedJson(refreshedParsed)) {
@@ -252,6 +257,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
 
       // Text extracted, now run AI parsing
       setLastCv({ ...lastCv, status: "ai_processing" });
+      setParsingStep(1);
 
       const parseResult = await startAiParsing(lastCv.id, user.id);
       if (!parseResult.success) {
@@ -265,6 +271,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
       parsedCvIds.current.add(lastCv.id);
       setParsedData(refreshedParsed);
       setLastCv({ ...lastCv, status: "parsed", error_message: null });
+      setParsingStep(2);
       toast.success("AI przeanalizowało Twoje CV!");
       // Auto-import after fresh AI parse (user explicitly clicked analyze)
       if (hasParsedJson(refreshedParsed)) {
@@ -274,6 +281,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
     } finally {
       aiRequestInFlight.current = false;
       setAiProcessing(false);
+      setParsingStep(0);
       devLog("[CvUpload] AI analysis FINISHED for cv_upload_id:", lastCv.id);
     }
   };
@@ -343,6 +351,7 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
             }
           }}
           processing={aiProcessing}
+          parsingStep={parsingStep}
           errorMessage={lastCv.error_message}
           importState={importState}
         />
@@ -381,33 +390,35 @@ function FileCard({ cv, onUpload, onRemove }: { cv: CvRecord; onUpload: (e: Reac
   );
 }
 
-function AiSection({ state, onStart, onImport, processing, errorMessage, importState }: { state: CvState; onStart: () => void; onImport: () => void; processing: boolean; errorMessage: string | null; importState: ImportState }) {
+function AiSection({ state, onStart, onImport, processing, parsingStep, errorMessage, importState }: { state: CvState; onStart: () => void; onImport: () => void; processing: boolean; parsingStep: number; errorMessage: string | null; importState: ImportState }) {
   if (state === "empty") return null;
 
-  if (state === "processing") {
+  if (state === "processing" || state === "ai_parsing" || processing) {
+    const steps = [
+      { label: "Wgrywam PDF", done: true },
+      { label: "Analizuję treść dokumentu", done: parsingStep > 0 },
+      { label: "Wyciągam dane do profilu", done: parsingStep > 1 },
+    ];
     return (
       <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-foreground">Odczytywanie treści z CV…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Pobieranie pliku i ekstrakcja tekstu.</p>
-          </div>
+        <p className="text-sm font-medium text-foreground mb-3">AI analizuje Twoje CV…</p>
+        <div className="space-y-3">
+          {steps.map((step, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                step.done ? "bg-accent text-accent-foreground" : "border-2 border-primary"
+              }`}>
+                {step.done
+                  ? <Check className="w-3 h-3" />
+                  : <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+              </div>
+              <span className={`text-xs ${step.done ? "text-foreground" : "text-muted-foreground"}`}>
+                {step.label}
+              </span>
+            </div>
+          ))}
         </div>
-      </div>
-    );
-  }
-
-  if (state === "ai_parsing" || processing) {
-    return (
-      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-foreground">AI analizuje Twoje CV…</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Wyciąganie danych: umiejętności, doświadczenie, wykształcenie. To może potrwać kilkanaście sekund.</p>
-          </div>
-        </div>
+        <p className="text-[10px] text-muted-foreground mt-3">To może potrwać kilkanaście sekund — nie zamykaj okna.</p>
       </div>
     );
   }
