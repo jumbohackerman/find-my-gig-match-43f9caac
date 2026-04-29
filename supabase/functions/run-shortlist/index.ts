@@ -53,7 +53,6 @@ Return JSON in this exact format:
 
 interface AICandidate {
   candidate_id: string;
-  full_name?: string;
   job_title?: string;
   [k: string]: unknown;
 }
