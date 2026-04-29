@@ -714,41 +714,40 @@ const MyProfile = () => {
             </AccordionSection>
           ) : (
             <>
-            {/* ── CV + AI — top of profile ── */}
+            {/* ── CV + AI — top of profile (collapsible) ── */}
             {!cvUrl ? (
-              <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/[0.03] p-5 sm:p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-display text-base font-bold text-foreground mb-1">
-                      Uzupełnij profil w sekundę
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                      Wrzuć swoje CV w PDF — AI automatycznie wyciągnie umiejętności, doświadczenie
-                      i dane kontaktowe. Nie musisz nic wpisywać ręcznie.
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <CandidateCvUpload onParsed={handleCvParsed} />
-                      <span className="text-[11px] text-muted-foreground">lub</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toast("Import z LinkedIn", {
-                            description: "Otwórz LinkedIn → Ustawienia → Pobierz dane → Wgraj pobrany plik tutaj. Szczegółowa instrukcja wkrótce.",
-                            duration: 8000,
-                          });
-                        }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 text-[11px] text-[#0A66C2] font-medium hover:bg-[#0A66C2]/20 transition-colors"
-                      >
-                        <Linkedin className="w-3.5 h-3.5" />
-                        Import z LinkedIn
-                      </button>
-                    </div>
+              <AccordionSection
+                id="cv"
+                label="Uzupełnij profil w sekundę"
+                icon="✨"
+                isOpen={activeSection === "cv"}
+                onToggle={() => toggleSection("cv")}
+                badge="AI z CV"
+              >
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Wrzuć swoje CV w PDF — AI automatycznie wyciągnie umiejętności, doświadczenie
+                    i dane kontaktowe. Nie musisz nic wpisywać ręcznie.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CandidateCvUpload onParsed={handleCvParsed} />
+                    <span className="text-[11px] text-muted-foreground">lub</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        toast("Import z LinkedIn", {
+                          description: "Otwórz LinkedIn → Ustawienia → Pobierz dane → Wgraj pobrany plik tutaj. Szczegółowa instrukcja wkrótce.",
+                          duration: 8000,
+                        });
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A66C2]/10 border border-[#0A66C2]/20 text-[11px] text-[#0A66C2] font-medium hover:bg-[#0A66C2]/20 transition-colors"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" />
+                      Import z LinkedIn
+                    </button>
                   </div>
                 </div>
-              </div>
+              </AccordionSection>
             ) : (
               <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4">
                 <div className="flex items-center gap-3">
