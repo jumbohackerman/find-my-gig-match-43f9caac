@@ -296,9 +296,14 @@ export const supabaseApplicationRepository: ApplicationRepository = {
     };
   },
 
-  subscribeForEmployer(_employerId: string, onChange: () => void): () => void {
+  subscribeForEmployer(employerId: string, onChange: () => void): () => void {
+    // TODO: Supabase realtime nie wspiera filtra IN(...) na job_ids.
+    // Callback odpala się przy KAŻDEJ zmianie w tabeli applications (dla wszystkich pracodawców).
+    // RLS gwarantuje, że SELECT zwróci tylko dane tego pracodawcy, więc faktyczne dane
+    // nie wyciekają — ale callback odpala niepotrzebny refetch.
+    // Docelowo: użyć osobnego channel per job_id lub migrować na filtr server-side.
     const channel = supabase
-      .channel("employer-dashboard")
+      .channel(`employer-dashboard-${employerId}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "applications" },
