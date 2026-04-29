@@ -85,8 +85,8 @@ const SampleJobsPanel = () => {
           <Sparkles className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground">Wzorcowe oferty — inspiracja</p>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-base font-semibold text-foreground">Wzorcowe oferty — inspiracja</p>
+          <p className="text-sm text-muted-foreground">
             Dobrze uzupełniona oferta przyciąga lepszych kandydatów i daje trafniejszą shortlistę. Zobacz przykłady.
           </p>
         </div>
