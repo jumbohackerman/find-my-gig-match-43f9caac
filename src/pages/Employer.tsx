@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox, CheckSquare,
+  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox, CheckSquare, Copy,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -32,6 +32,7 @@ import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
 import JobAnalyticsBlock from "@/components/employer/JobAnalyticsBlock";
 import CandidateKanban from "@/components/employer/CandidateKanban";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
+import EmployerProfileSidebar from "@/components/employer/EmployerProfileSidebar";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Footer from "@/components/Footer";
 import type { ApplicationStatus } from "@/types/application";
@@ -103,6 +104,43 @@ const Employer = () => {
   const [previewJob, setPreviewJob] = useState<Job | null>(null);
   const [sortCandidates, setSortCandidates] = useState<"date" | "score">("date");
   const [candidatesView, setCandidatesView] = useState<"list" | "kanban">("list");
+  const [duplicateSource, setDuplicateSource] = useState<Partial<StructuredJobFormData> | null>(null);
+
+  const jobToFormData = (job: Job): Partial<StructuredJobFormData> => {
+    const ensureList = (arr?: string[]) => (arr && arr.length > 0 ? arr : [""]);
+    const sr = job.salaryRange;
+    return {
+      title: job.title ? `${job.title} (kopia)` : "",
+      company: job.company || "",
+      logo: job.logo || "🏢",
+      location: job.location || "",
+      workMode: job.workMode || "Zdalnie",
+      contractType: job.contractType || "B2B",
+      experienceLevel: job.experienceLevel || job.seniority || "Mid",
+      salaryFrom: sr?.min ? String(sr.min) : "",
+      salaryTo: sr?.max ? String(sr.max) : "",
+      salaryCurrency: sr?.currency || "PLN",
+      summary: job.summary || "",
+      aboutRole: job.aboutRole || job.description || "",
+      responsibilities: ensureList(job.responsibilities),
+      requirements: ensureList(job.requirements),
+      niceToHave: ensureList(job.niceToHave),
+      benefits: ensureList(job.benefits),
+      aboutCompany: job.aboutCompany || "",
+      techStack: job.tags || [],
+      recruitmentSteps: ensureList(job.recruitmentSteps),
+    };
+  };
+
+  const handleDuplicate = (job: Job) => {
+    setDuplicateSource(jobToFormData(job));
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setDuplicateSource(null);
+  };
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
@@ -362,9 +400,13 @@ const Employer = () => {
         <AnimatePresence>
           {showForm && (
             <JobPostForm
-              onSubmit={handleStructuredSubmit}
-              onCancel={() => setShowForm(false)}
+              onSubmit={async (data) => {
+                await handleStructuredSubmit(data);
+                setDuplicateSource(null);
+              }}
+              onCancel={closeForm}
               submitting={submitting}
+              initialData={duplicateSource || undefined}
             />
           )}
         </AnimatePresence>
@@ -400,11 +442,18 @@ const Employer = () => {
                 : null;
 
               return (
-                <button
+                <div
                   key={job.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedJobId(job.id)}
-                  className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedJobId(job.id);
+                    }
+                  }}
+                  className={`w-full text-left rounded-xl border p-3 transition-colors cursor-pointer ${
                     isSelected
                       ? "bg-primary/10 border-primary/40 shadow-soft"
                       : "bg-secondary/30 border-border hover:bg-secondary/60"
@@ -422,6 +471,18 @@ const Employer = () => {
                       <p className="text-sm font-semibold text-foreground truncate">{job.title}</p>
                       <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicate(job);
+                      }}
+                      className="p-1 -m-1 rounded hover:bg-primary/15 text-muted-foreground hover:text-primary transition-colors shrink-0"
+                      title="Duplikuj ofertę"
+                      aria-label={`Duplikuj ofertę ${job.title}`}
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                   <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -446,7 +507,7 @@ const Employer = () => {
                       </span>
                     </div>
                   )}
-                </button>
+                </div>
               );
             };
 
@@ -795,6 +856,7 @@ const Employer = () => {
 
                 {/* RIGHT — Detail */}
                 <section className={`${selectedJobId ? "block" : "hidden lg:block"} min-w-0`}>
+                  <EmployerProfileSidebar />
                   {selectedJob ? (
                     detailCard
                   ) : (
