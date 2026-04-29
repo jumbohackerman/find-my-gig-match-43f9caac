@@ -165,7 +165,7 @@ const Employer = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full space-y-3">
+        <main className="flex-1 flex flex-col px-4 sm:px-8 py-6 max-w-4xl mx-auto w-full space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-gradient rounded-xl border border-border p-4 space-y-3">
               <div className="flex items-center gap-3">
