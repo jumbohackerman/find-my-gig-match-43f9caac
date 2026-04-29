@@ -637,7 +637,7 @@ const MyProfile = () => {
         </div>
       </header>
 
-      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-[1400px] mx-auto lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6"}`}>
+      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-[1400px] mx-auto"}`}>
         <LocalErrorBoundary label="Formularz profilu">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="min-w-0">
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
@@ -649,7 +649,6 @@ const MyProfile = () => {
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
 
-          {/* Profil nie istnieje jeszcze w bazie — jasny komunikat zamiast cichego pokazywania pustego stanu jako "profilu". */}
           {!isEmployer && !profileExists && (
             <div className="mb-6 p-4 rounded-2xl border border-primary/40 bg-primary/10 flex items-start gap-3" role="status" aria-live="polite">
               <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
@@ -662,7 +661,6 @@ const MyProfile = () => {
             </div>
           )}
 
-          {/* Block 11: AI prefill banner */}
           {!isEmployer && aiPrefilled && (
             <div className="mb-6 p-4 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 flex items-start gap-3" role="status" aria-live="polite">
               <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" aria-hidden="true" />
@@ -674,7 +672,6 @@ const MyProfile = () => {
             </div>
           )}
 
-          {/* Completeness — mobile only (desktop shows it in sticky right column) */}
           {!isEmployer && (
             <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border lg:hidden">
               <div className="flex items-center justify-between mb-2">
@@ -700,7 +697,9 @@ const MyProfile = () => {
             </div>
           )}
 
-          {/* Accordion sections */}
+          {/* Grid: left accordions + right sticky sidebar — both columns aligned at top */}
+          <div className={isEmployer ? "" : "lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 lg:items-start"}>
+          <div className="min-w-0">
           <div className="space-y-3">
           {isEmployer ? (
             <AccordionSection id="basic" label="Dane firmy" icon="🏢" isOpen={activeSection === "basic"} onToggle={() => toggleSection("basic")} badge={fullName || undefined}>
@@ -1120,78 +1119,80 @@ const MyProfile = () => {
             </>
           )}
           </div>
-        </motion.div>
-        </LocalErrorBoundary>
+          </div>{/* /min-w-0 left column */}
 
-        {/* Right sticky panel — desktop only, candidate only */}
-        {!isEmployer && (
-          <aside className="hidden lg:block">
-            <div className="sticky top-6 space-y-4">
-              <div className="p-5 rounded-2xl bg-secondary/50 border border-border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-muted-foreground">Kompletność profilu</span>
-                  <span className={`text-base font-bold ${completeness.score >= 80 ? "text-accent" : completeness.score >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
-                    {completeness.score}%
-                  </span>
-                </div>
-                <Progress value={completeness.score} className="h-2 mb-3" />
-                <button
-                  onClick={() => setShowPreview(true)}
-                  className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-muted transition-colors"
-                >
-                  <Eye className="w-4 h-4" /> Podgląd profilu
-                </button>
-              </div>
-
-              {!cvUrl && (
-                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
-                  <p className="text-sm font-bold text-primary mb-1.5">📎 Najszybszy sposób:</p>
-                  <p className="text-sm text-foreground/80 mb-3 leading-relaxed">Wgraj CV — AI uzupełni profil za Ciebie.</p>
+          {/* Right sticky panel — desktop only, candidate only */}
+          {!isEmployer && (
+            <aside className="hidden lg:block mt-6 lg:mt-0">
+              <div className="sticky top-6 space-y-4">
+                <div className="p-5 rounded-2xl bg-secondary/50 border border-border">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-muted-foreground">Kompletność profilu</span>
+                    <span className={`text-base font-bold ${completeness.score >= 80 ? "text-accent" : completeness.score >= 50 ? "text-yellow-400" : "text-muted-foreground"}`}>
+                      {completeness.score}%
+                    </span>
+                  </div>
+                  <Progress value={completeness.score} className="h-2 mb-3" />
                   <button
-                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                    className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                    onClick={() => setShowPreview(true)}
+                    className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium border border-border hover:bg-muted transition-colors"
                   >
-                    Wgraj CV
+                    <Eye className="w-4 h-4" /> Podgląd profilu
                   </button>
                 </div>
-              )}
 
-              {completeness.missing.length > 0 && (
-                <div className="p-5 rounded-2xl bg-secondary/30 border border-border">
-                  <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">Brakujące sekcje</p>
+                {!cvUrl && (
+                  <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+                    <p className="text-sm font-bold text-primary mb-1.5">📎 Najszybszy sposób:</p>
+                    <p className="text-sm text-foreground/80 mb-3 leading-relaxed">Wgraj CV — AI uzupełni profil za Ciebie.</p>
+                    <button
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      Wgraj CV
+                    </button>
+                  </div>
+                )}
+
+                {completeness.missing.length > 0 && (
+                  <div className="p-5 rounded-2xl bg-secondary/30 border border-border">
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">Brakujące sekcje</p>
+                    <ul className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+                      {completeness.missing.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">💡 Wskazówki</p>
                   <ul className="text-sm text-muted-foreground space-y-2 leading-relaxed">
-                    {completeness.missing.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
+                    <li>• Dodaj 5-10 umiejętności, aby zwiększyć dopasowanie.</li>
+                    <li>• Opisz każde stanowisko 3-5 punktami.</li>
+                    <li>• Ustaw realistyczne widełki — kluczowe dla scoringu.</li>
+                    <li>• Konkretny tytuł zawodowy &gt; ogólny.</li>
                   </ul>
                 </div>
-              )}
 
-              <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20">
-                <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">💡 Wskazówki</p>
-                <ul className="text-sm text-muted-foreground space-y-2 leading-relaxed">
-                  <li>• Dodaj 5-10 umiejętności, aby zwiększyć dopasowanie.</li>
-                  <li>• Opisz każde stanowisko 3-5 punktami.</li>
-                  <li>• Ustaw realistyczne widełki — kluczowe dla scoringu.</li>
-                  <li>• Konkretny tytuł zawodowy &gt; ogólny.</li>
-                </ul>
+                <div className="card-gradient rounded-xl border border-border p-5">
+                  <p className="text-sm font-bold text-primary uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4" />
+                    Jak działa scoring?
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Każda oferta pokazuje % dopasowania Twojego profilu. Im pełniejszy profil (umiejętności, doświadczenie, oczekiwania), tym trafniejszy scoring i większa szansa na shortlistę.
+                  </p>
+                </div>
               </div>
-
-              <div className="card-gradient rounded-xl border border-border p-5">
-                <p className="text-sm font-bold text-primary uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4" />
-                  Jak działa scoring?
-                </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Każda oferta pokazuje % dopasowania Twojego profilu. Im pełniejszy profil (umiejętności, doświadczenie, oczekiwania), tym trafniejszy scoring i większa szansa na shortlistę.
-                </p>
-              </div>
-            </div>
-          </aside>
-        )}
+            </aside>
+          )}
+          </div>{/* /grid */}
+        </motion.div>
+        </LocalErrorBoundary>
       </main>
 
       {showPreview && (
