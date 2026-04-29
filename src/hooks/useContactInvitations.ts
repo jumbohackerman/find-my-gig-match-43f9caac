@@ -65,7 +65,7 @@ export function useContactInvitations(jobId: string | null) {
             employer_message: params.message,
           },
         })
-        .catch((e) => console.error("[send-email] invoke error:", e));
+        .catch((e) => { if (import.meta.env.DEV) console.error("[send-email] invoke error:", e); });
 
       toast.success("Zaproszenie do kontaktu wysłane");
       await reload();
