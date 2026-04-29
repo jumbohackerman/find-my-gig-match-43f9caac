@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Upload, FileText, Trash2, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import { Upload, FileText, Trash2, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Progress } from "@/components/ui/progress";
@@ -46,6 +46,8 @@ export default function CandidateCvUpload({ onParsed }: CandidateCvUploadProps =
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loadingRecord, setLoadingRecord] = useState(true);
   const [aiProcessing, setAiProcessing] = useState(false);
+  /** 0 = upload done, 1 = text extracted, 2 = AI parsed */
+  const [parsingStep, setParsingStep] = useState(0);
   /** Tracks whether parsed data has been imported into the form in this session */
   const [importState, setImportState] = useState<ImportState>("not_imported");
   /** Hard ref-based guard: survives re-renders and prevents concurrent AI calls */
