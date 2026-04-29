@@ -257,12 +257,12 @@ const Employer = () => {
           )}
 
           {/* View tabs — clearly separates own management from read-only market research */}
-          <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-4 rounded-xl bg-secondary/40 border border-border">
+          <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-5 rounded-xl bg-secondary/40 border border-border">
             <button
               role="tab"
               aria-selected={activeView === "my-jobs"}
               onClick={() => setActiveView("my-jobs")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeView === "my-jobs"
                   ? "bg-background text-foreground shadow-soft"
                   : "text-muted-foreground hover:text-foreground"
@@ -274,7 +274,7 @@ const Employer = () => {
               role="tab"
               aria-selected={activeView === "market"}
               onClick={() => setActiveView("market")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeView === "market"
                   ? "bg-background text-foreground shadow-soft"
                   : "text-muted-foreground hover:text-foreground"
