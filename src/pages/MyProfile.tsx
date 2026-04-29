@@ -637,7 +637,7 @@ const MyProfile = () => {
         </div>
       </header>
 
-      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-[1400px] mx-auto lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6"}`}>
+      <main className={`flex-1 w-full px-4 py-6 ${isEmployer ? "max-w-lg mx-auto" : "max-w-[1400px] mx-auto"}`}>
         <LocalErrorBoundary label="Formularz profilu">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="min-w-0">
           <h2 className="font-display text-2xl font-bold text-foreground mb-1">
@@ -649,7 +649,6 @@ const MyProfile = () => {
               : "Bądź zwięzły — rekruterzy skanują profil w mniej niż 30 sekund."}
           </p>
 
-          {/* Profil nie istnieje jeszcze w bazie — jasny komunikat zamiast cichego pokazywania pustego stanu jako "profilu". */}
           {!isEmployer && !profileExists && (
             <div className="mb-6 p-4 rounded-2xl border border-primary/40 bg-primary/10 flex items-start gap-3" role="status" aria-live="polite">
               <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
@@ -662,7 +661,6 @@ const MyProfile = () => {
             </div>
           )}
 
-          {/* Block 11: AI prefill banner */}
           {!isEmployer && aiPrefilled && (
             <div className="mb-6 p-4 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 flex items-start gap-3" role="status" aria-live="polite">
               <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" aria-hidden="true" />
@@ -674,7 +672,6 @@ const MyProfile = () => {
             </div>
           )}
 
-          {/* Completeness — mobile only (desktop shows it in sticky right column) */}
           {!isEmployer && (
             <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border lg:hidden">
               <div className="flex items-center justify-between mb-2">
@@ -700,7 +697,9 @@ const MyProfile = () => {
             </div>
           )}
 
-          {/* Accordion sections */}
+          {/* Grid: left accordions + right sticky sidebar — both columns aligned at top */}
+          <div className={isEmployer ? "" : "lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 lg:items-start"}>
+          <div className="min-w-0">
           <div className="space-y-3">
           {isEmployer ? (
             <AccordionSection id="basic" label="Dane firmy" icon="🏢" isOpen={activeSection === "basic"} onToggle={() => toggleSection("basic")} badge={fullName || undefined}>
