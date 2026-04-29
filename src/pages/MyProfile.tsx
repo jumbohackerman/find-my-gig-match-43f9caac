@@ -701,7 +701,7 @@ const MyProfile = () => {
           )}
 
           {/* Accordion sections */}
-          <div className="space-y-2">
+          <div className="space-y-3">
           {isEmployer ? (
             <AccordionSection id="basic" label="Dane firmy" icon="🏢" isOpen={activeSection === "basic"} onToggle={() => toggleSection("basic")} badge={fullName || undefined}>
               <div className="space-y-4">
