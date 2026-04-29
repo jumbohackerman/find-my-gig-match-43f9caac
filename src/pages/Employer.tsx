@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox,
+  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox, CheckSquare,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -29,6 +29,7 @@ import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
 import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
+import JobAnalyticsBlock from "@/components/employer/JobAnalyticsBlock";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Footer from "@/components/Footer";
@@ -228,50 +229,41 @@ const Employer = () => {
             )}
           </div>
 
-          {/* Overview cards — quick at-a-glance metrics */}
-          {activeView === "my-jobs" && domainJobs.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-              {[
-                {
-                  label: "Aktywne oferty",
-                  value: domainJobs.filter((j) => j.status !== "closed").length,
-                  icon: "📋",
-                },
-                {
-                  label: "Kandydaci łącznie",
-                  value: Object.values(applicationsByJob).reduce((sum, apps) => sum + apps.length, 0),
-                  icon: "👥",
-                },
-                {
-                  label: "Gotowe do shortlisty",
-                  value: domainJobs.filter((j) => {
-                    const apps = applicationsByJob[j.id] || [];
-                    return apps.length >= 10 && j.status !== "closed";
-                  }).length,
-                  icon: "⚡",
-                },
-                {
-                  label: "Shortlisty wykonane",
-                  value: domainJobs.filter((j) => {
-                    const bal = shortlist.getBalance(j.id);
-                    return bal.totalSlots > 0 && bal.remainingSlots < bal.totalSlots;
-                  }).length,
-                  icon: "✅",
-                },
-              ].map((card) => (
-                <div
-                  key={card.label}
-                  className={`card-gradient rounded-xl border border-border p-4 sm:p-5 text-center transition-colors ${
-                    card.value > 0 ? "hover:border-primary/30" : "opacity-60"
-                  }`}
-                >
-                  <span className="text-2xl mb-1 block" aria-hidden="true">{card.icon}</span>
-                  <p className="text-xl sm:text-2xl font-bold text-foreground">{card.value}</p>
-                  <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Overview metrics — compact inline bar */}
+          {activeView === "my-jobs" && domainJobs.length > 0 && (() => {
+            const activeCount = domainJobs.filter((j) => j.status !== "closed").length;
+            const candidatesCount = Object.values(applicationsByJob).reduce((sum, apps) => sum + apps.length, 0);
+            const readyCount = domainJobs.filter((j) => {
+              const apps = applicationsByJob[j.id] || [];
+              return apps.length >= 10 && j.status !== "closed";
+            }).length;
+            const shortlistCount = domainJobs.filter((j) => {
+              const bal = shortlist.getBalance(j.id);
+              return bal.totalSlots > 0 && bal.remainingSlots < bal.totalSlots;
+            }).length;
+
+            const items = [
+              { icon: <Briefcase className="w-3.5 h-3.5" />, value: activeCount, label: "aktywne" },
+              { icon: <Users className="w-3.5 h-3.5" />, value: candidatesCount, label: "kandydatów" },
+              { icon: <Zap className="w-3.5 h-3.5" />, value: readyCount, label: "gotowych" },
+              { icon: <CheckSquare className="w-3.5 h-3.5" />, value: shortlistCount, label: "shortlist" },
+            ];
+
+            return (
+              <div className="flex items-center flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground mb-5">
+                {items.map((it, i) => (
+                  <div key={it.label} className="flex items-center gap-3">
+                    {i > 0 && <span className="text-muted-foreground/40 -ml-2.5" aria-hidden="true">·</span>}
+                    <span className="flex items-center gap-1.5">
+                      {it.icon}
+                      <span className="font-bold text-foreground">{it.value}</span>
+                      <span>{it.label}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* View tabs — clearly separates own management from read-only market research */}
           <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-5 rounded-xl bg-secondary/40 border border-border">
@@ -649,7 +641,13 @@ const Employer = () => {
                   </div>
 
                   {jobApps.length > 0 && (
-                    <div className="px-5 pt-4 pb-3 border-t border-border space-y-3">
+                    <div className="px-5 pt-3 border-t border-border">
+                      <JobAnalyticsBlock apps={jobApps} balance={balance} />
+                    </div>
+                  )}
+
+                  {jobApps.length > 0 && (
+                    <div className="px-5 pt-4 pb-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <h3 className="font-display text-base font-bold text-foreground">
                           Aplikacje ({jobApps.length})
