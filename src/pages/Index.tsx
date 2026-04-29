@@ -473,12 +473,20 @@ const Index = () => {
                   </motion.div>
                 ) : (
                   <>
-                    <div className="browse-card-stage relative flex-1 min-h-0 overflow-visible">
-                      {/* Subtle ambient glow behind the card stack */}
+                    <div className="browse-card-stage relative flex-1 min-h-0">
+                      {/* Subtle ambient glow behind the card stack — clipped to stage to avoid scrollbars */}
                       <div
                         aria-hidden
-                        className="absolute -inset-x-20 -inset-y-24 bg-gradient-to-tr from-primary/40 via-primary/10 to-accent/40 rounded-[2rem] blur-3xl pointer-events-none"
-                      />
+                        className="absolute inset-0 pointer-events-none overflow-hidden"
+                      >
+                        <div
+                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[110%] blur-3xl opacity-60"
+                          style={{
+                            background:
+                              "radial-gradient(ellipse 55% 45% at 25% 75%, hsl(var(--primary) / 0.18), transparent 70%), radial-gradient(ellipse 55% 45% at 75% 25%, hsl(var(--accent) / 0.18), transparent 70%)",
+                          }}
+                        />
+                      </div>
                       <div className="browse-card-frame relative">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
