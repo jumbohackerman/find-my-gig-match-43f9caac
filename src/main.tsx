@@ -17,6 +17,22 @@ if (!isProduction) {
   document.head.appendChild(meta);
 }
 
+// ── Compact layout flag (viewport-driven, NOT DPR-driven) ───────────────────
+// Triggered when width<=1200 OR height<=850. Drives `html[data-compact="true"]`
+// CSS in index.css to scale down navbar/toolbar/swipe-card/footer real layout
+// (no zoom/transform hacks). Also exposes `data-shortvh` for very low heights.
+const applyViewportFlags = () => {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const root = document.documentElement;
+  const compact = w <= 1200 || h <= 850;
+  root.dataset.compact = compact ? "true" : "false";
+  root.dataset.shortvh = h <= 760 ? "true" : "false";
+};
+applyViewportFlags();
+window.addEventListener("resize", applyViewportFlags, { passive: true });
+window.addEventListener("orientationchange", applyViewportFlags, { passive: true });
+
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <App />
