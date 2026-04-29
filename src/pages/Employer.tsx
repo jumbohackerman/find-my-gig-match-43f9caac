@@ -61,6 +61,22 @@ const Employer = () => {
   const [shortlistBusy, setShortlistBusy] = useState(false);
   const [activeView, setActiveView] = useState<"my-jobs" | "market">("my-jobs");
 
+  // Auto-select first active job on desktop when none selected
+  useEffect(() => {
+    if (selectedJobId || domainJobs.length === 0) return;
+    if (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches) {
+      const firstActive = domainJobs.find((j) => j.status !== "closed") || domainJobs[0];
+      if (firstActive) setSelectedJobId(firstActive.id);
+    }
+  }, [domainJobs, selectedJobId]);
+
+  // Clear selection if the job no longer exists
+  useEffect(() => {
+    if (selectedJobId && !domainJobs.find((j) => j.id === selectedJobId)) {
+      setSelectedJobId(null);
+    }
+  }, [domainJobs, selectedJobId]);
+
   const requestShortlist = (app: EnrichedEmployerApplication, jobId: string, jobTitle: string) => {
     setPendingShortlist({ app, jobId, jobTitle });
   };
