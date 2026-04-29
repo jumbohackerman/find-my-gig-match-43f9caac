@@ -81,7 +81,7 @@ export function useJobFeed() {
         });
       } catch (err: any) {
         if (err?.message !== "AI_CONSENT_REQUIRED") {
-          console.error("Apply error:", err);
+          if (import.meta.env.DEV) console.error("Apply error:", err);
           const msg = String(err?.message || "");
           if (/duplicate|already|unique/i.test(msg)) {
             toast.info("Już aplikowałeś na tę ofertę.");
@@ -183,7 +183,7 @@ export function useJobFeed() {
       try {
         await getProvider("swipeEvents").record(userId, job.id, direction);
       } catch (err) {
-        console.warn("[useJobFeed] swipe record failed (non-blocking):", err);
+        if (import.meta.env.DEV) console.warn("[useJobFeed] swipe record failed (non-blocking):", err);
       }
       setSwipedJobIds((prev) => new Set(prev).add(job.id));
 
@@ -217,7 +217,7 @@ export function useJobFeed() {
         try {
           await unsaveJob(job.id);
         } catch (err) {
-          console.warn("[useJobFeed] unsave after apply failed (non-blocking):", err);
+          if (import.meta.env.DEV) console.warn("[useJobFeed] unsave after apply failed (non-blocking):", err);
         }
       } catch {
         // applyToJob already showed a friendly toast; saved entry preserved.

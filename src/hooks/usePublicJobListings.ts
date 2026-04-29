@@ -31,7 +31,7 @@ export function usePublicJobListings(filters: PublicJobListingFilters) {
       const data = await repo.list(filters);
       setItems(data);
     } catch (e) {
-      console.error("[usePublicJobListings] error:", e);
+      if (import.meta.env.DEV) console.error("[usePublicJobListings] error:", e);
       setError("Nie udało się pobrać ofert.");
       setItems([]);
     } finally {
