@@ -213,7 +213,7 @@ const Employer = () => {
 
           {/* Overview cards — quick at-a-glance metrics */}
           {activeView === "my-jobs" && domainJobs.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
               {[
                 {
                   label: "Aktywne oferty",
@@ -244,13 +244,13 @@ const Employer = () => {
               ].map((card) => (
                 <div
                   key={card.label}
-                  className={`card-gradient rounded-xl border border-border p-3 text-center transition-colors ${
+                  className={`card-gradient rounded-xl border border-border p-4 sm:p-5 text-center transition-colors ${
                     card.value > 0 ? "hover:border-primary/30" : "opacity-60"
                   }`}
                 >
-                  <span className="text-xl mb-1 block" aria-hidden="true">{card.icon}</span>
-                  <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
-                  <p className="text-[10px] text-muted-foreground font-medium">{card.label}</p>
+                  <span className="text-2xl mb-1 block" aria-hidden="true">{card.icon}</span>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">{card.value}</p>
+                  <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
                 </div>
               ))}
             </div>
