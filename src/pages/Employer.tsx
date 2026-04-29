@@ -856,6 +856,7 @@ const Employer = () => {
 
                 {/* RIGHT — Detail */}
                 <section className={`${selectedJobId ? "block" : "hidden lg:block"} min-w-0`}>
+                  <EmployerProfileSidebar />
                   {selectedJob ? (
                     detailCard
                   ) : (
