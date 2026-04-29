@@ -104,6 +104,43 @@ const Employer = () => {
   const [previewJob, setPreviewJob] = useState<Job | null>(null);
   const [sortCandidates, setSortCandidates] = useState<"date" | "score">("date");
   const [candidatesView, setCandidatesView] = useState<"list" | "kanban">("list");
+  const [duplicateSource, setDuplicateSource] = useState<Partial<StructuredJobFormData> | null>(null);
+
+  const jobToFormData = (job: Job): Partial<StructuredJobFormData> => {
+    const ensureList = (arr?: string[]) => (arr && arr.length > 0 ? arr : [""]);
+    const sr = job.salaryRange;
+    return {
+      title: job.title ? `${job.title} (kopia)` : "",
+      company: job.company || "",
+      logo: job.logo || "🏢",
+      location: job.location || "",
+      workMode: job.workMode || "Zdalnie",
+      contractType: job.contractType || "B2B",
+      experienceLevel: job.experienceLevel || job.seniority || "Mid",
+      salaryFrom: sr?.from ? String(sr.from) : "",
+      salaryTo: sr?.to ? String(sr.to) : "",
+      salaryCurrency: sr?.currency || "PLN",
+      summary: job.summary || "",
+      aboutRole: job.aboutRole || job.description || "",
+      responsibilities: ensureList(job.responsibilities),
+      requirements: ensureList(job.requirements),
+      niceToHave: ensureList(job.niceToHave),
+      benefits: ensureList(job.benefits),
+      aboutCompany: job.aboutCompany || "",
+      techStack: job.tags || [],
+      recruitmentSteps: ensureList(job.recruitmentSteps),
+    };
+  };
+
+  const handleDuplicate = (job: Job) => {
+    setDuplicateSource(jobToFormData(job));
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setDuplicateSource(null);
+  };
 
   const handleCloseJob = async (reason: ClosureReason) => {
     if (!closingJob) return;
