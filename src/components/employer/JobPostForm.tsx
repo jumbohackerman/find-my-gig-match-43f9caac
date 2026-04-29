@@ -137,10 +137,13 @@ interface Props {
   onSubmit: (data: StructuredJobFormData) => void;
   onCancel: () => void;
   submitting: boolean;
+  initialData?: Partial<StructuredJobFormData>;
 }
 
-const JobPostForm = ({ onSubmit, onCancel, submitting }: Props) => {
-  const [form, setForm] = useState<StructuredJobFormData>(EMPTY_FORM);
+const JobPostForm = ({ onSubmit, onCancel, submitting, initialData }: Props) => {
+  const [form, setForm] = useState<StructuredJobFormData>(() =>
+    initialData ? { ...EMPTY_FORM, ...initialData } : EMPTY_FORM
+  );
   const [showPreview, setShowPreview] = useState(false);
 
   const set = <K extends keyof StructuredJobFormData>(key: K, val: StructuredJobFormData[K]) =>
