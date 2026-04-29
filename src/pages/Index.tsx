@@ -480,10 +480,10 @@ const Index = () => {
                         className="absolute inset-0 pointer-events-none overflow-hidden"
                       >
                         <div
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[110%] blur-3xl opacity-60"
+                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[115%] blur-3xl"
                           style={{
                             background:
-                              "radial-gradient(ellipse 55% 45% at 25% 75%, hsl(var(--primary) / 0.18), transparent 70%), radial-gradient(ellipse 55% 45% at 75% 25%, hsl(var(--accent) / 0.18), transparent 70%)",
+                              "radial-gradient(ellipse 50% 45% at 20% 80%, hsl(var(--primary) / 0.45), transparent 65%), radial-gradient(ellipse 50% 45% at 80% 20%, hsl(var(--accent) / 0.45), transparent 65%)",
                           }}
                         />
                       </div>
