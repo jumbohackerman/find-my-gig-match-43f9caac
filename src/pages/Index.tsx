@@ -377,7 +377,16 @@ const Index = () => {
               ))}
             </div>
             {activeTab === "swipe" && (
-              <div className="shrink-0 ml-auto sm:ml-0">
+              <div className="shrink-0 ml-auto sm:ml-0 flex items-center gap-2">
+                <button
+                  onClick={resetFeed}
+                  title="Pokaż wszystkie oferty od nowa, łącznie z już przejrzanymi"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors border border-border"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Zobacz ponownie oferty</span>
+                  <span className="sm:hidden">Reset</span>
+                </button>
                 <JobFilters filters={filters} onChange={handleFiltersChange} />
               </div>
             )}
