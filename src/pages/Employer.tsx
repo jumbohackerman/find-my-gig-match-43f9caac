@@ -579,7 +579,7 @@ const Employer = () => {
                               if (sortCandidates === "score") {
                                 return (b.matchResult?.score ?? 0) - (a.matchResult?.score ?? 0);
                               }
-                              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                              return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
                             });
                             return (
                             <div className="px-4 pt-3 pb-2 border-t border-border space-y-2">
