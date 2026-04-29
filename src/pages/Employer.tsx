@@ -191,19 +191,19 @@ const Employer = () => {
       <Navbar />
 
       <main
-        className={`flex-1 flex flex-col px-4 py-6 mx-auto w-full ${activeView === "market" ? "max-w-5xl" : "max-w-2xl"}`}
+        className={`flex-1 flex flex-col px-4 sm:px-8 py-6 mx-auto w-full ${activeView === "market" ? "max-w-6xl" : "max-w-4xl"}`}
         data-testid="employer-dashboard"
       >
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">Panel pracodawcy</h2>
-              <p className="text-muted-foreground text-sm mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Panel pracodawcy</h2>
+              <p className="text-muted-foreground text-sm sm:text-base mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
             </div>
             {activeView === "my-jobs" && (
               <button
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl btn-gradient text-primary-foreground text-sm sm:text-base font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
                 data-testid="employer-add-job"
               >
                 <Plus className="w-4 h-4" /> Dodaj ogłoszenie
