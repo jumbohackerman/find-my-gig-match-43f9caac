@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox,
+  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox, CheckSquare,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -29,6 +29,7 @@ import StatusPipeline from "@/components/employer/StatusPipeline";
 import EmptyState from "@/components/employer/EmptyState";
 import ChatPanel from "@/components/employer/ChatPanel";
 import SampleJobsPanel from "@/components/employer/SampleJobsPanel";
+import JobAnalyticsBlock from "@/components/employer/JobAnalyticsBlock";
 import MarketResearchPanel from "@/components/employer/MarketResearchPanel";
 import LocalErrorBoundary from "@/components/LocalErrorBoundary";
 import Footer from "@/components/Footer";
