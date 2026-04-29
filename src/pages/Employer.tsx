@@ -464,7 +464,7 @@ const Employer = () => {
                       </div>
                     )}
 
-                    <div className="p-4 pt-2">
+                    <div className="p-5 pt-2.5">
                       {/* Contextual Suggestion UX */}
                       {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
                         <div className="mb-3 p-2.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-xs text-yellow-500 font-medium">
@@ -472,7 +472,7 @@ const Employer = () => {
                         </div>
                       )}
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
                           {job.logo?.startsWith("http") ? (
                             <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
                           ) : (
@@ -480,15 +480,15 @@ const Employer = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-display text-sm font-semibold text-foreground truncate flex items-center gap-1.5">
+                          <h4 className="font-display text-base font-bold text-foreground truncate flex items-center gap-1.5">
                             <span
-                              className={`w-2 h-2 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
+                              className={`w-2.5 h-2.5 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
                               title={job.status === "closed" ? "Zamknięta" : "Aktywna"}
                               aria-hidden="true"
                             />
                             <span className="truncate">{job.title}</span>
                           </h4>
-                          <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
+                          <p className="text-sm text-muted-foreground truncate">{job.company} · {job.location}</p>
                         </div>
                         {job.employerId === user?.id && (
                           <div className="flex items-center gap-1 shrink-0">
