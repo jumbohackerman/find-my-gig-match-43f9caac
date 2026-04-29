@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { createFallbackCandidate } from "@/data/defaults";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe,
+  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -53,12 +53,29 @@ const Employer = () => {
   const appActions = useEmployerApplicationActions(refetch);
   const messaging = useEmployerMessages(user?.id);
 
-  const [expandedJob, setExpandedJob] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
   const [pendingShortlist, setPendingShortlist] = useState<{ app: EnrichedEmployerApplication; jobId: string; jobTitle: string } | null>(null);
   const [shortlistBusy, setShortlistBusy] = useState(false);
   const [activeView, setActiveView] = useState<"my-jobs" | "market">("my-jobs");
+
+  // Auto-select first active job on desktop when none selected
+  useEffect(() => {
+    if (selectedJobId || domainJobs.length === 0) return;
+    if (typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches) {
+      const firstActive = domainJobs.find((j) => j.status !== "closed") || domainJobs[0];
+      if (firstActive) setSelectedJobId(firstActive.id);
+    }
+  }, [domainJobs, selectedJobId]);
+
+  // Clear selection if the job no longer exists
+  useEffect(() => {
+    if (selectedJobId && !domainJobs.find((j) => j.id === selectedJobId)) {
+      setSelectedJobId(null);
+    }
+  }, [domainJobs, selectedJobId]);
 
   const requestShortlist = (app: EnrichedEmployerApplication, jobId: string, jobTitle: string) => {
     setPendingShortlist({ app, jobId, jobTitle });
@@ -165,7 +182,7 @@ const Employer = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <main className="flex-1 flex flex-col px-4 sm:px-8 py-6 max-w-4xl mx-auto w-full space-y-3">
+        <main className="flex-1 flex flex-col px-4 sm:px-8 py-6 max-w-7xl mx-auto w-full space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-gradient rounded-xl border border-border p-4 space-y-3">
               <div className="flex items-center gap-3">
@@ -191,7 +208,7 @@ const Employer = () => {
       <Navbar />
 
       <main
-        className={`flex-1 flex flex-col px-4 sm:px-8 py-6 mx-auto w-full ${activeView === "market" ? "max-w-6xl" : "max-w-4xl"}`}
+        className="flex-1 flex flex-col px-4 sm:px-8 py-6 mx-auto w-full max-w-7xl"
         data-testid="employer-dashboard"
       >
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -373,279 +390,392 @@ const Employer = () => {
           />
         ) : (
           <LocalErrorBoundary label="Lista ogłoszeń">
-          <div className="space-y-3">
-            <AnimatePresence>
-              {domainJobs.map((job, i) => {
-                const jobApps = applicationsByJob[job.id] || [];
-                const isExpanded = expandedJob === job.id;
-                const balance = shortlist.getBalance(job.id);
-                const noSlots = balance.totalSlots === 0;
-                const slotsExhausted = balance.totalSlots > 0 && balance.remainingSlots === 0;
+          {(() => {
+            const activeJobs = domainJobs.filter((j) => j.status !== "closed");
+            const archivedJobs = domainJobs.filter((j) => j.status === "closed");
+            const selectedJob = domainJobs.find((j) => j.id === selectedJobId) || null;
 
-                return (
-                  <motion.div
-                    key={job.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ delay: i * 0.03 }}
-                    className="card-gradient rounded-xl border border-border overflow-hidden"
-                  >
-                    {/* Top metrics strip — quick at-a-glance numbers */}
-                    <div className="px-5 pt-3.5 flex gap-4 text-xs text-muted-foreground flex-wrap">
-                      <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
-                      <span className={`flex items-center gap-1 ${slotsExhausted ? "text-destructive font-semibold" : balance.remainingSlots > 0 ? "text-accent font-semibold" : ""}`}>
-                        <Layers className="w-3 h-3" />
-                        {noSlots
-                          ? "0 slotów (kup pakiet)"
-                          : `${balance.usedSlots}/${balance.totalSlots} shortlista · ${balance.remainingSlots} wolnych`}
-                      </span>
-                      {jobApps.length > 0 && (() => {
-                        const newest = jobApps.reduce((latest, a) =>
-                          new Date(a.appliedAt) > new Date(latest.appliedAt) ? a : latest
-                        );
-                        return (
-                          <span className="flex items-center gap-1 ml-auto text-muted-foreground/70">
-                            Ostatnia: {timeAgo(newest.appliedAt)}
-                          </span>
-                        );
-                      })()}
+            const renderListItem = (job: Job, archived = false) => {
+              const jobApps = applicationsByJob[job.id] || [];
+              const balance = shortlist.getBalance(job.id);
+              const isSelected = selectedJobId === job.id;
+              const newest = jobApps.length
+                ? jobApps.reduce((latest, a) =>
+                    new Date(a.appliedAt) > new Date(latest.appliedAt) ? a : latest
+                  )
+                : null;
+
+              return (
+                <button
+                  key={job.id}
+                  type="button"
+                  onClick={() => setSelectedJobId(job.id)}
+                  className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                    isSelected
+                      ? "bg-primary/10 border-primary/40 shadow-soft"
+                      : "bg-secondary/30 border-border hover:bg-secondary/60"
+                  } ${archived ? "opacity-60" : ""}`}
+                  aria-current={isSelected ? "true" : undefined}
+                >
+                  <div className="flex items-start gap-2 mb-1.5">
+                    <span
+                      className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                        job.status === "closed" ? "bg-destructive" : "bg-accent"
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{job.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
                     </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Users className="w-3 h-3" /> {jobApps.length}
+                    </span>
+                    {newest && (
+                      <span className="truncate">{timeAgo(newest.appliedAt)}</span>
+                    )}
+                  </div>
+                  {jobApps.length < 10 && job.status !== "closed" && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="flex-1 h-1 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            jobApps.length >= 7 ? "bg-yellow-500" : "bg-primary"
+                          }`}
+                          style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                        {jobApps.length}/10
+                      </span>
+                    </div>
+                  )}
+                </button>
+              );
+            };
 
-                    {job.status === "closed" && (
-                      <div className="mx-4 mb-1 px-3 py-1.5 rounded-lg bg-muted/50 border border-border text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                        <Lock className="w-3 h-3" />
-                        Rekrutacja zamknięta
+            const detailCard = selectedJob ? (() => {
+              const job = selectedJob;
+              const jobApps = applicationsByJob[job.id] || [];
+              const balance = shortlist.getBalance(job.id);
+              const noSlots = balance.totalSlots === 0;
+              const slotsExhausted = balance.totalSlots > 0 && balance.remainingSlots === 0;
+
+              const sortedApps = [...jobApps].sort((a, b) => {
+                if (sortCandidates === "score") {
+                  return (b.matchResult?.score ?? 0) - (a.matchResult?.score ?? 0);
+                }
+                return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
+              });
+
+              return (
+                <motion.div
+                  key={job.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="card-gradient rounded-xl border border-border overflow-hidden"
+                >
+                  {/* Mobile back */}
+                  <div className="lg:hidden p-3 border-b border-border">
+                    <button
+                      onClick={() => setSelectedJobId(null)}
+                      className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> Wstecz do listy
+                    </button>
+                  </div>
+
+                  {/* Top metrics strip */}
+                  <div className="px-5 pt-3.5 flex gap-4 text-xs text-muted-foreground flex-wrap">
+                    <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
+                    <span className={`flex items-center gap-1 ${slotsExhausted ? "text-destructive font-semibold" : balance.remainingSlots > 0 ? "text-accent font-semibold" : ""}`}>
+                      <Layers className="w-3 h-3" />
+                      {noSlots
+                        ? "0 slotów (kup pakiet)"
+                        : `${balance.usedSlots}/${balance.totalSlots} shortlista · ${balance.remainingSlots} wolnych`}
+                    </span>
+                    {jobApps.length > 0 && (() => {
+                      const newest = jobApps.reduce((latest, a) =>
+                        new Date(a.appliedAt) > new Date(latest.appliedAt) ? a : latest
+                      );
+                      return (
+                        <span className="flex items-center gap-1 ml-auto text-muted-foreground/70">
+                          Ostatnia: {timeAgo(newest.appliedAt)}
+                        </span>
+                      );
+                    })()}
+                  </div>
+
+                  {job.status === "closed" && (
+                    <div className="mx-4 mb-1 px-3 py-1.5 rounded-lg bg-muted/50 border border-border text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                      <Lock className="w-3 h-3" />
+                      Rekrutacja zamknięta
+                    </div>
+                  )}
+
+                  {jobApps.length < 10 && job.status !== "closed" && (
+                    <div className="px-5 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              jobApps.length >= 10
+                                ? "bg-accent"
+                                : jobApps.length >= 7
+                                  ? "bg-yellow-500"
+                                  : "bg-primary"
+                            }`}
+                            style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">
+                          {jobApps.length >= 10
+                            ? "✓ Gotowe do shortlisty!"
+                            : `${jobApps.length}/10 do shortlisty`}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {jobApps.length >= 10 && !slotsExhausted && job.status !== "closed" && (
+                    <div className="px-5 pb-2.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTimeout(() => {
+                            document
+                              .getElementById(`shortlist-section-${job.id}`)
+                              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }, 100);
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-base font-medium shadow-glow hover:scale-[1.02] transition-transform"
+                        data-testid={`employer-run-shortlist-${job.id}`}
+                      >
+                        <Zap className="w-4 h-4" aria-hidden="true" />
+                        Uruchom Shortlistę ({jobApps.length} kandydatów)
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="p-5 pt-2.5">
+                    {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
+                      <div className="mb-3 p-2.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-xs text-yellow-500 font-medium">
+                        Wskazówka: Dodaj tagi i dłuższy opis, aby poprawić jakość dopasowania kandydatów.
                       </div>
                     )}
-
-                    {jobApps.length < 10 && job.status !== "closed" && (
-                      <div className="px-5 pb-2.5">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all duration-500 ${
-                                jobApps.length >= 10
-                                  ? "bg-accent"
-                                  : jobApps.length >= 7
-                                    ? "bg-yellow-500"
-                                    : "bg-primary"
-                              }`}
-                              style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">
-                            {jobApps.length >= 10
-                              ? "✓ Gotowe do shortlisty!"
-                              : `${jobApps.length}/10 do shortlisty`}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {jobApps.length >= 10 && !slotsExhausted && job.status !== "closed" && (
-                      <div className="px-5 pb-2.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setExpandedJob(job.id);
-                            setTimeout(() => {
-                              document
-                                .getElementById(`shortlist-section-${job.id}`)
-                                ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }, 200);
-                          }}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-base font-medium shadow-glow hover:scale-[1.02] transition-transform"
-                          data-testid={`employer-run-shortlist-${job.id}`}
-                        >
-                          <Zap className="w-4 h-4" aria-hidden="true" />
-                          Uruchom Shortlistę ({jobApps.length} kandydatów)
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="p-5 pt-2.5">
-                      {/* Contextual Suggestion UX */}
-                      {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
-                        <div className="mb-3 p-2.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-xs text-yellow-500 font-medium">
-                          Wskazówka: Dodaj tagi i dłuższy opis, aby poprawić jakość dopasowania kandydatów.
-                        </div>
-                      )}
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
-                          {job.logo?.startsWith("http") ? (
-                            <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
-                          ) : (
-                            <span>{job.logo}</span>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-display text-base font-bold text-foreground truncate flex items-center gap-1.5">
-                            <span
-                              className={`w-2.5 h-2.5 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
-                              title={job.status === "closed" ? "Zamknięta" : "Aktywna"}
-                              aria-hidden="true"
-                            />
-                            <span className="truncate">{job.title}</span>
-                          </h4>
-                          <p className="text-sm text-muted-foreground truncate">{job.company} · {job.location}</p>
-                        </div>
-                        {job.employerId === user?.id && (
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setPreviewJob(job);
-                              }}
-                              className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                              title="Podgląd z perspektywy kandydata"
-                              aria-label="Podgląd oferty z perspektywy kandydata"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={async () => {
-                                if (hidePending) return;
-                                setHidePending(job.id);
-                                try {
-                                  if (job.status === "hidden") {
-                                    await unhideJob(job.id);
-                                    toast.success("Oferta opublikowana ponownie");
-                                  } else {
-                                    await hideJob(job.id);
-                                    toast.success("Oferta ukryta");
-                                  }
-                                  refetch();
-                                } catch { toast.error("Nie udało się zmienić statusu"); }
-                                finally { setHidePending(null); }
-                              }}
-                              disabled={hidePending === job.id}
-                              className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
-                              title={job.status === "hidden" ? "Opublikuj" : "Ukryj"}
-                            >
-                              {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                            </button>
-                            {job.status !== "closed" && (
-                              <button
-                                onClick={() => setClosingJob({ id: job.id, title: job.title, company: job.company })}
-                                className="p-2 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
-                                title="Zakończ rekrutację"
-                              >
-                                <Lock className="w-4 h-4" />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => setDeletingJob({ id: job.id, title: job.title })}
-                              className="p-2 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
-                              title="Usuń ofertę"
-                              aria-label={`Usuń ofertę ${job.title}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                        {job.logo?.startsWith("http") ? (
+                          <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                        ) : (
+                          <span>{job.logo}</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <PackagePurchaseButton
-                          jobId={job.id}
-                          balance={balance}
-                          onPurchase={(size) => shortlist.purchasePackage(job.id, size)}
-                        />
-                        <button
-                          onClick={() => setExpandedJob(isExpanded ? null : job.id)}
-                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
-                          aria-expanded={isExpanded}
-                          aria-label={isExpanded ? "Zwiń panel oferty" : "Rozwiń panel oferty"}
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          {jobApps.length}
-                          {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                        </button>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-display text-base font-bold text-foreground truncate flex items-center gap-1.5">
+                          <span
+                            className={`w-2.5 h-2.5 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
+                            title={job.status === "closed" ? "Zamknięta" : "Aktywna"}
+                            aria-hidden="true"
+                          />
+                          <span className="truncate">{job.title}</span>
+                        </h4>
+                        <p className="text-sm text-muted-foreground truncate">{job.company} · {job.location}</p>
+                      </div>
+                      {job.employerId === user?.id && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewJob(job);
+                            }}
+                            className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                            title="Podgląd z perspektywy kandydata"
+                            aria-label="Podgląd oferty z perspektywy kandydata"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (hidePending) return;
+                              setHidePending(job.id);
+                              try {
+                                if (job.status === "hidden") {
+                                  await unhideJob(job.id);
+                                  toast.success("Oferta opublikowana ponownie");
+                                } else {
+                                  await hideJob(job.id);
+                                  toast.success("Oferta ukryta");
+                                }
+                                refetch();
+                              } catch { toast.error("Nie udało się zmienić statusu"); }
+                              finally { setHidePending(null); }
+                            }}
+                            disabled={hidePending === job.id}
+                            className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                            title={job.status === "hidden" ? "Opublikuj" : "Ukryj"}
+                          >
+                            {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </button>
+                          {job.status !== "closed" && (
+                            <button
+                              onClick={() => setClosingJob({ id: job.id, title: job.title, company: job.company })}
+                              className="p-2 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
+                              title="Zakończ rekrutację"
+                            >
+                              <Lock className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setDeletingJob({ id: job.id, title: job.title })}
+                            className="p-2 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                            title="Usuń ofertę"
+                            aria-label={`Usuń ofertę ${job.title}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <PackagePurchaseButton
+                        jobId={job.id}
+                        balance={balance}
+                        onPurchase={(size) => shortlist.purchasePackage(job.id, size)}
+                      />
+                    </div>
+                  </div>
+
+                  {jobApps.length > 0 && (
+                    <div className="px-5 pt-4 pb-3 border-t border-border space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-display text-base font-bold text-foreground">
+                          Aplikacje ({jobApps.length})
+                        </h3>
+                        {balance.totalSlots > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            Sloty shortlisty: {balance.remainingSlots}/{balance.totalSlots}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-end gap-1.5 text-xs">
+                        <span className="text-muted-foreground">Sortuj:</span>
+                        {(["date", "score"] as const).map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => setSortCandidates(s)}
+                            className={`px-2 py-0.5 rounded-md transition-colors ${
+                              sortCandidates === s
+                                ? "bg-primary text-primary-foreground font-medium"
+                                : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {s === "date" ? "Najnowsze" : "Najlepsze"}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="space-y-2">
+                        {sortedApps.map((app) => (
+                          <CandidateCard
+                            key={app.id}
+                            app={app}
+                            jobId={job.id}
+                            employerId={user?.id}
+                            onView={() => handleViewCandidate(app)}
+                            onAdvanceStatus={handleAdvanceStatus}
+                            onShortlist={() => requestShortlist(app, job.id, job.title)}
+                            canShortlist={balance.remainingSlots > 0 && job.status !== "closed"}
+                            chatMessages={messaging.getMessages(app.id)}
+                            onSendMessage={(content) => messaging.sendMessage(app.id, content)}
+                            isChatOpen={messaging.isChatOpen(app.id)}
+                            onUnlockChat={() => {
+                              messaging.unlockChat(app.id);
+                              messaging.loadMessages(app.id);
+                            }}
+                            currentUserId={user?.id}
+                          />
+                        ))}
                       </div>
                     </div>
+                  )}
 
-                    {/* Expanded panel: candidate list + analytics + AI shortlist */}
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          {/* Aplikacje — actionable candidate list (status, shortlist, chat) */}
-                          {jobApps.length > 0 && (() => {
-                            const sortedApps = [...jobApps].sort((a, b) => {
-                              if (sortCandidates === "score") {
-                                return (b.matchResult?.score ?? 0) - (a.matchResult?.score ?? 0);
-                              }
-                              return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
-                            });
-                            return (
-                            <div className="px-5 pt-4 pb-3 border-t border-border space-y-3">
-                              <div className="flex items-center justify-between">
-                                <h3 className="font-display text-base font-bold text-foreground">
-                                  Aplikacje ({jobApps.length})
-                                </h3>
-                                {balance.totalSlots > 0 && (
-                                  <span className="text-xs text-muted-foreground">
-                                    Sloty shortlisty: {balance.remainingSlots}/{balance.totalSlots}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center justify-end gap-1.5 text-xs">
-                                <span className="text-muted-foreground">Sortuj:</span>
-                                {(["date", "score"] as const).map((s) => (
-                                  <button
-                                    key={s}
-                                    onClick={() => setSortCandidates(s)}
-                                    className={`px-2 py-0.5 rounded-md transition-colors ${
-                                      sortCandidates === s
-                                        ? "bg-primary text-primary-foreground font-medium"
-                                        : "text-muted-foreground hover:text-foreground"
-                                    }`}
-                                  >
-                                    {s === "date" ? "Najnowsze" : "Najlepsze"}
-                                  </button>
-                                ))}
-                              </div>
-                              <div className="space-y-2">
-                                {sortedApps.map((app) => (
-                                  <CandidateCard
-                                    key={app.id}
-                                    app={app}
-                                    jobId={job.id}
-                                    employerId={user?.id}
-                                    onView={() => handleViewCandidate(app)}
-                                    onAdvanceStatus={handleAdvanceStatus}
-                                    onShortlist={() => requestShortlist(app, job.id, job.title)}
-                                    canShortlist={balance.remainingSlots > 0 && job.status !== "closed"}
-                                    chatMessages={messaging.getMessages(app.id)}
-                                    onSendMessage={(content) => messaging.sendMessage(app.id, content)}
-                                    isChatOpen={messaging.isChatOpen(app.id)}
-                                    onUnlockChat={() => {
-                                      messaging.unlockChat(app.id);
-                                      messaging.loadMessages(app.id);
-                                    }}
-                                    currentUserId={user?.id}
-                                  />
-                                ))}
-                              </div>
+                  <div id={`shortlist-section-${job.id}`}>
+                    <AIShortlistSection jobId={job.id} jobApps={jobApps} />
+                  </div>
+                </motion.div>
+              );
+            })() : null;
+
+            return (
+              <div className="lg:grid lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-5">
+                {/* LEFT — Job list */}
+                <aside
+                  className={`flex-col gap-3 ${selectedJobId ? "hidden lg:flex" : "flex"}`}
+                >
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 px-1">
+                      Aktywne ({activeJobs.length})
+                    </p>
+                    {activeJobs.length === 0 ? (
+                      <p className="text-xs text-muted-foreground px-1 py-3">Brak aktywnych ofert.</p>
+                    ) : (
+                      <div className="space-y-2">{activeJobs.map((j) => renderListItem(j))}</div>
+                    )}
+                  </div>
+
+                  {archivedJobs.length > 0 && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setArchiveOpen((v) => !v)}
+                        className="w-full flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 px-1 hover:text-foreground transition-colors"
+                        aria-expanded={archiveOpen}
+                      >
+                        <span>Archiwum ({archivedJobs.length})</span>
+                        {archiveOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {archiveOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-2">
+                              {archivedJobs.map((j) => renderListItem(j, true))}
                             </div>
-                            );
-                          })()}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
 
-                          <div id={`shortlist-section-${job.id}`}>
-                            <AIShortlistSection jobId={job.id} jobApps={jobApps} />
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="mt-2 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-semibold shadow-glow hover:scale-[1.02] transition-transform"
+                  >
+                    <Plus className="w-4 h-4" /> Dodaj ogłoszenie
+                  </button>
+                </aside>
+
+                {/* RIGHT — Detail */}
+                <section className={`${selectedJobId ? "block" : "hidden lg:block"} min-w-0`}>
+                  {selectedJob ? (
+                    detailCard
+                  ) : (
+                    <div className="hidden lg:flex flex-col items-center justify-center text-center rounded-xl border border-dashed border-border p-12 min-h-[320px] text-muted-foreground">
+                      <Inbox className="w-10 h-10 mb-3 opacity-60" />
+                      <p className="text-sm font-medium text-foreground mb-1">Wybierz ofertę z listy</p>
+                      <p className="text-xs">Szczegóły, kandydaci i shortlista pojawią się tutaj.</p>
+                    </div>
+                  )}
+                </section>
+              </div>
+            );
+          })()}
           </LocalErrorBoundary>
         )}
         </>
