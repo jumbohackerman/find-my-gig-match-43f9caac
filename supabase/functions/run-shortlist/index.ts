@@ -53,7 +53,6 @@ Return JSON in this exact format:
 
 interface AICandidate {
   candidate_id: string;
-  full_name?: string;
   job_title?: string;
   [k: string]: unknown;
 }
@@ -197,7 +196,7 @@ serve(async (req) => {
 
     const candidatesForAI: AICandidate[] = (candidates || []).map((c) => ({
       candidate_id: c.user_id,
-      full_name: c.full_name,
+      // full_name USUNIĘTE — blueprint 7.3: zakaz cech identyfikujących
       job_title: c.title,
       location: c.location,
       summary: c.summary,

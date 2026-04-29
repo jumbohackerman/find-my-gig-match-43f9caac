@@ -251,7 +251,16 @@ export const supabaseApplicationRepository: ApplicationRepository = {
 
     const currentStatus = currentApp.status as ApplicationStatus;
 
-    // 2. Validate transition
+    // 2. Server-side validation first (cannot be bypassed via DevTools)
+    const { data: validation, error: valError } = await supabase.functions.invoke(
+      "validate-status-transition",
+      { body: { currentStatus, newStatus: status } }
+    );
+    if (valError || !validation?.valid) {
+      throw new Error(validation?.reason || "Niedozwolona zmiana statusu");
+    }
+
+    // 3. Local validation as fallback
     const { validateTransition } = await import("@/domain/application-state-machine");
     validateTransition(currentStatus, status, "employer");
 

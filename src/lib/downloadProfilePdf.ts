@@ -21,7 +21,8 @@ const esc = (s: unknown) =>
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
 function getInitials(name: string): string {
   const parts = (name || "").trim().split(/\s+/).filter(Boolean);
