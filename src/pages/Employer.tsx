@@ -582,18 +582,18 @@ const Employer = () => {
                               return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
                             });
                             return (
-                            <div className="px-4 pt-3 pb-2 border-t border-border space-y-2">
+                            <div className="px-5 pt-4 pb-3 border-t border-border space-y-3">
                               <div className="flex items-center justify-between">
-                                <h3 className="font-display text-sm font-bold text-foreground">
+                                <h3 className="font-display text-base font-bold text-foreground">
                                   Aplikacje ({jobApps.length})
                                 </h3>
                                 {balance.totalSlots > 0 && (
-                                  <span className="text-[10px] text-muted-foreground">
+                                  <span className="text-xs text-muted-foreground">
                                     Sloty shortlisty: {balance.remainingSlots}/{balance.totalSlots}
                                   </span>
                                 )}
                               </div>
-                              <div className="flex items-center justify-end gap-1 text-[10px]">
+                              <div className="flex items-center justify-end gap-1.5 text-xs">
                                 <span className="text-muted-foreground">Sortuj:</span>
                                 {(["date", "score"] as const).map((s) => (
                                   <button
