@@ -47,37 +47,42 @@ const ApplicationStatusList = ({ applications, loading, onJobClick }: Props) => 
               className="card-gradient rounded-xl border border-border overflow-hidden cursor-pointer hover:border-primary/40 transition-colors"
               onClick={() => onJobClick?.(job)}
             >
-              <div className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
-                  {job.logo?.startsWith("http") ? (
-                    <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
-                  ) : (
-                    <span>{job.logo}</span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-display text-sm font-semibold text-foreground truncate">
-                    {job.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    {job.company} · {job.location}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${STATUS_COLORS[status] || "bg-secondary text-secondary-foreground"}`}
-                    >
-                      {STATUS_LABELS[status] || status}
-                    </span>
-                    {app.appliedAt && (
-                      <span className="text-[10px] text-muted-foreground/70">
-                        {timeAgo(app.appliedAt)}
-                      </span>
+              <div className="p-5 grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 lg:gap-6 items-center">
+                {/* Left: job info */}
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center text-2xl shrink-0 overflow-hidden">
+                    {job.logo?.startsWith("http") ? (
+                      <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                    ) : (
+                      <span>{job.logo}</span>
                     )}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-display text-base font-semibold text-foreground truncate">
+                      {job.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {job.company} · {job.location}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span
+                        className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${STATUS_COLORS[status] || "bg-secondary text-secondary-foreground"}`}
+                      >
+                        {STATUS_LABELS[status] || status}
+                      </span>
+                      {app.appliedAt && (
+                        <span className="text-[11px] text-muted-foreground/70">
+                          {timeAgo(app.appliedAt)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="px-4 pb-3">
-                <StatusPipeline currentStatus={status} />
+
+                {/* Right: status pipeline */}
+                <div className="lg:pl-6 lg:border-l lg:border-border/60">
+                  <StatusPipeline currentStatus={status} />
+                </div>
               </div>
             </motion.div>
           );
