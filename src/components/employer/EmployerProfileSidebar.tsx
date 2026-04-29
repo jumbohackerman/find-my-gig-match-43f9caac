@@ -43,7 +43,7 @@ const EmployerProfileSidebar = () => {
   const filledCount = FIELDS.filter((f) => (data[f.key] || "").trim().length > 0).length;
   const completeness = Math.round((filledCount / FIELDS.length) * 100);
   const missing = FIELDS.filter((f) => !(data[f.key] || "").trim());
-  const companyName = data.company || profile?.company || "Twoja firma";
+  const companyName = data.company || (profile as any)?.company || "Twoja firma";
 
   return (
     <>
