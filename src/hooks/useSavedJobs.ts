@@ -32,7 +32,7 @@ export function useSavedJobs() {
         await getProvider("savedJobs").save(userId, jobId);
         setSavedJobIds((prev) => new Set(prev).add(jobId));
       } catch (err) {
-        console.error("[useSavedJobs] save failed:", err);
+        if (import.meta.env.DEV) console.error("[useSavedJobs] save failed:", err);
         throw err;
       } finally {
         pendingOps.current.delete(`save-${jobId}`);
@@ -53,7 +53,7 @@ export function useSavedJobs() {
           return next;
         });
       } catch (err) {
-        console.error("[useSavedJobs] remove failed:", err);
+        if (import.meta.env.DEV) console.error("[useSavedJobs] remove failed:", err);
         throw err;
       } finally {
         pendingOps.current.delete(`remove-${jobId}`);

@@ -47,7 +47,7 @@ export function useEmployerJobs() {
       return job;
     } catch (e) {
       toast.error("Nie udało się opublikować ogłoszenia");
-      console.error("[useEmployerJobs] createJob error", e);
+      if (import.meta.env.DEV) console.error("[useEmployerJobs] createJob error", e);
       return null;
     } finally {
       setSubmitting(false);
@@ -102,7 +102,7 @@ export function useEmployerJobs() {
       return job;
     } catch (e) {
       toast.error("Nie udało się opublikować ogłoszenia");
-      console.error("[useEmployerJobs] createStructuredJob error", e);
+      if (import.meta.env.DEV) console.error("[useEmployerJobs] createStructuredJob error", e);
       return null;
     } finally {
       setSubmitting(false);
@@ -117,7 +117,7 @@ export function useEmployerJobs() {
       return job;
     } catch (e) {
       toast.error("Nie udało się zaktualizować ogłoszenia");
-      console.error("[useEmployerJobs] editJob error", e);
+      if (import.meta.env.DEV) console.error("[useEmployerJobs] editJob error", e);
       return null;
     } finally {
       setSubmitting(false);
@@ -130,7 +130,7 @@ export function useEmployerJobs() {
       toast.success("Ogłoszenie zamknięte");
     } catch (e) {
       toast.error("Nie udało się zamknąć ogłoszenia");
-      console.error("[useEmployerJobs] archiveJob error", e);
+      if (import.meta.env.DEV) console.error("[useEmployerJobs] archiveJob error", e);
     }
   }, []);
 
@@ -140,7 +140,7 @@ export function useEmployerJobs() {
       toast.success("Ogłoszenie usunięte");
     } catch (e) {
       toast.error("Nie udało się usunąć ogłoszenia");
-      console.error("[useEmployerJobs] deleteJob error", e);
+      if (import.meta.env.DEV) console.error("[useEmployerJobs] deleteJob error", e);
     }
   }, []);
 
