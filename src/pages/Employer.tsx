@@ -165,7 +165,7 @@ const Employer = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <main className="flex-1 flex flex-col px-4 py-6 max-w-2xl mx-auto w-full space-y-3">
+        <main className="flex-1 flex flex-col px-4 sm:px-8 py-6 max-w-4xl mx-auto w-full space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card-gradient rounded-xl border border-border p-4 space-y-3">
               <div className="flex items-center gap-3">
@@ -191,19 +191,19 @@ const Employer = () => {
       <Navbar />
 
       <main
-        className={`flex-1 flex flex-col px-4 py-6 mx-auto w-full ${activeView === "market" ? "max-w-5xl" : "max-w-2xl"}`}
+        className={`flex-1 flex flex-col px-4 sm:px-8 py-6 mx-auto w-full ${activeView === "market" ? "max-w-6xl" : "max-w-4xl"}`}
         data-testid="employer-dashboard"
       >
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">Panel pracodawcy</h2>
-              <p className="text-muted-foreground text-sm mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground">Panel pracodawcy</h2>
+              <p className="text-muted-foreground text-sm sm:text-base mt-1">Zarządzaj ogłoszeniami, shortlistami i kandydatami.</p>
             </div>
             {activeView === "my-jobs" && (
               <button
                 onClick={() => setShowForm(!showForm)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl btn-gradient text-primary-foreground text-sm sm:text-base font-medium shadow-glow hover:scale-105 transition-transform shrink-0 self-start sm:self-auto"
                 data-testid="employer-add-job"
               >
                 <Plus className="w-4 h-4" /> Dodaj ogłoszenie
@@ -213,7 +213,7 @@ const Employer = () => {
 
           {/* Overview cards — quick at-a-glance metrics */}
           {activeView === "my-jobs" && domainJobs.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
               {[
                 {
                   label: "Aktywne oferty",
@@ -244,25 +244,25 @@ const Employer = () => {
               ].map((card) => (
                 <div
                   key={card.label}
-                  className={`card-gradient rounded-xl border border-border p-3 text-center transition-colors ${
+                  className={`card-gradient rounded-xl border border-border p-4 sm:p-5 text-center transition-colors ${
                     card.value > 0 ? "hover:border-primary/30" : "opacity-60"
                   }`}
                 >
-                  <span className="text-xl mb-1 block" aria-hidden="true">{card.icon}</span>
-                  <p className="text-lg sm:text-xl font-bold text-foreground">{card.value}</p>
-                  <p className="text-[10px] text-muted-foreground font-medium">{card.label}</p>
+                  <span className="text-2xl mb-1 block" aria-hidden="true">{card.icon}</span>
+                  <p className="text-xl sm:text-2xl font-bold text-foreground">{card.value}</p>
+                  <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
                 </div>
               ))}
             </div>
           )}
 
           {/* View tabs — clearly separates own management from read-only market research */}
-          <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-4 rounded-xl bg-secondary/40 border border-border">
+          <div role="tablist" aria-label="Sekcje panelu pracodawcy" className="inline-flex items-center gap-1 p-1 mb-5 rounded-xl bg-secondary/40 border border-border">
             <button
               role="tab"
               aria-selected={activeView === "my-jobs"}
               onClick={() => setActiveView("my-jobs")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeView === "my-jobs"
                   ? "bg-background text-foreground shadow-soft"
                   : "text-muted-foreground hover:text-foreground"
@@ -274,7 +274,7 @@ const Employer = () => {
               role="tab"
               aria-selected={activeView === "market"}
               onClick={() => setActiveView("market")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeView === "market"
                   ? "bg-background text-foreground shadow-soft"
                   : "text-muted-foreground hover:text-foreground"
@@ -392,7 +392,7 @@ const Employer = () => {
                     className="card-gradient rounded-xl border border-border overflow-hidden"
                   >
                     {/* Top metrics strip — quick at-a-glance numbers */}
-                    <div className="px-4 pt-3 flex gap-3 text-[11px] text-muted-foreground flex-wrap">
+                    <div className="px-5 pt-3.5 flex gap-4 text-xs text-muted-foreground flex-wrap">
                       <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {jobApps.length} aplikacji</span>
                       <span className={`flex items-center gap-1 ${slotsExhausted ? "text-destructive font-semibold" : balance.remainingSlots > 0 ? "text-accent font-semibold" : ""}`}>
                         <Layers className="w-3 h-3" />
@@ -420,9 +420,9 @@ const Employer = () => {
                     )}
 
                     {jobApps.length < 10 && job.status !== "closed" && (
-                      <div className="px-4 pb-2">
+                      <div className="px-5 pb-2.5">
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+                          <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 jobApps.length >= 10
@@ -434,7 +434,7 @@ const Employer = () => {
                               style={{ width: `${Math.min((jobApps.length / 10) * 100, 100)}%` }}
                             />
                           </div>
-                          <span className="text-[10px] text-muted-foreground font-medium whitespace-nowrap">
+                          <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">
                             {jobApps.length >= 10
                               ? "✓ Gotowe do shortlisty!"
                               : `${jobApps.length}/10 do shortlisty`}
@@ -444,7 +444,7 @@ const Employer = () => {
                     )}
 
                     {jobApps.length >= 10 && !slotsExhausted && job.status !== "closed" && (
-                      <div className="px-4 pb-2">
+                      <div className="px-5 pb-2.5">
                         <button
                           type="button"
                           onClick={() => {
@@ -455,7 +455,7 @@ const Employer = () => {
                                 ?.scrollIntoView({ behavior: "smooth", block: "start" });
                             }, 200);
                           }}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl btn-gradient text-primary-foreground text-sm font-medium shadow-glow hover:scale-[1.02] transition-transform"
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl btn-gradient text-primary-foreground text-base font-medium shadow-glow hover:scale-[1.02] transition-transform"
                           data-testid={`employer-run-shortlist-${job.id}`}
                         >
                           <Zap className="w-4 h-4" aria-hidden="true" />
@@ -464,7 +464,7 @@ const Employer = () => {
                       </div>
                     )}
 
-                    <div className="p-4 pt-2">
+                    <div className="p-5 pt-2.5">
                       {/* Contextual Suggestion UX */}
                       {(job.tags.length === 0 || job.description.length < 50) && job.employerId === user?.id && (
                         <div className="mb-3 p-2.5 rounded-lg bg-yellow-400/10 border border-yellow-400/20 text-xs text-yellow-500 font-medium">
@@ -472,7 +472,7 @@ const Employer = () => {
                         </div>
                       )}
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                        <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-xl shrink-0 overflow-hidden">
                           {job.logo?.startsWith("http") ? (
                             <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
                           ) : (
@@ -480,15 +480,15 @@ const Employer = () => {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-display text-sm font-semibold text-foreground truncate flex items-center gap-1.5">
+                          <h4 className="font-display text-base font-bold text-foreground truncate flex items-center gap-1.5">
                             <span
-                              className={`w-2 h-2 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
+                              className={`w-2.5 h-2.5 rounded-full shrink-0 ${job.status === "closed" ? "bg-destructive" : "bg-accent"}`}
                               title={job.status === "closed" ? "Zamknięta" : "Aktywna"}
                               aria-hidden="true"
                             />
                             <span className="truncate">{job.title}</span>
                           </h4>
-                          <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
+                          <p className="text-sm text-muted-foreground truncate">{job.company} · {job.location}</p>
                         </div>
                         {job.employerId === user?.id && (
                           <div className="flex items-center gap-1 shrink-0">
@@ -497,7 +497,7 @@ const Employer = () => {
                                 e.stopPropagation();
                                 setPreviewJob(job);
                               }}
-                              className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                              className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                               title="Podgląd z perspektywy kandydata"
                               aria-label="Podgląd oferty z perspektywy kandydata"
                             >
@@ -520,7 +520,7 @@ const Employer = () => {
                                 finally { setHidePending(null); }
                               }}
                               disabled={hidePending === job.id}
-                              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                              className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
                               title={job.status === "hidden" ? "Opublikuj" : "Ukryj"}
                             >
                               {job.status === "hidden" ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -528,7 +528,7 @@ const Employer = () => {
                             {job.status !== "closed" && (
                               <button
                                 onClick={() => setClosingJob({ id: job.id, title: job.title, company: job.company })}
-                                className="p-1.5 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
+                                className="p-2 rounded-lg hover:bg-orange-500/20 text-muted-foreground hover:text-orange-400 transition-colors"
                                 title="Zakończ rekrutację"
                               >
                                 <Lock className="w-4 h-4" />
@@ -536,7 +536,7 @@ const Employer = () => {
                             )}
                             <button
                               onClick={() => setDeletingJob({ id: job.id, title: job.title })}
-                              className="p-1.5 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                              className="p-2 rounded-lg hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
                               title="Usuń ofertę"
                               aria-label={`Usuń ofertę ${job.title}`}
                             >
@@ -553,7 +553,7 @@ const Employer = () => {
                         />
                         <button
                           onClick={() => setExpandedJob(isExpanded ? null : job.id)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-muted transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors"
                           aria-expanded={isExpanded}
                           aria-label={isExpanded ? "Zwiń panel oferty" : "Rozwiń panel oferty"}
                         >
@@ -582,18 +582,18 @@ const Employer = () => {
                               return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
                             });
                             return (
-                            <div className="px-4 pt-3 pb-2 border-t border-border space-y-2">
+                            <div className="px-5 pt-4 pb-3 border-t border-border space-y-3">
                               <div className="flex items-center justify-between">
-                                <h3 className="font-display text-sm font-bold text-foreground">
+                                <h3 className="font-display text-base font-bold text-foreground">
                                   Aplikacje ({jobApps.length})
                                 </h3>
                                 {balance.totalSlots > 0 && (
-                                  <span className="text-[10px] text-muted-foreground">
+                                  <span className="text-xs text-muted-foreground">
                                     Sloty shortlisty: {balance.remainingSlots}/{balance.totalSlots}
                                   </span>
                                 )}
                               </div>
-                              <div className="flex items-center justify-end gap-1 text-[10px]">
+                              <div className="flex items-center justify-end gap-1.5 text-xs">
                                 <span className="text-muted-foreground">Sortuj:</span>
                                 {(["date", "score"] as const).map((s) => (
                                   <button
@@ -689,11 +689,11 @@ const Employer = () => {
           onClick={() => !deleteBusy && setDeletingJob(null)}
         >
           <div
-            className="w-full max-w-md card-gradient rounded-2xl border border-border p-5"
+            className="w-full max-w-md card-gradient rounded-2xl border border-border p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display text-lg font-bold text-foreground mb-2">Usunąć ofertę?</h3>
-            <p className="text-sm text-muted-foreground mb-2">
+            <p className="text-base text-muted-foreground mb-2">
               Zamierzasz trwale usunąć ofertę:
             </p>
             <p className="text-sm font-semibold text-foreground mb-4 p-2 rounded-lg bg-secondary/50 border border-border break-words">
@@ -707,14 +707,14 @@ const Employer = () => {
               <button
                 onClick={() => setDeletingJob(null)}
                 disabled={deleteBusy}
-                className="px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-base font-medium hover:bg-muted transition-colors disabled:opacity-50"
               >
                 Anuluj
               </button>
               <button
                 onClick={confirmDelete}
                 disabled={deleteBusy}
-                className="px-4 py-2 rounded-xl bg-destructive text-destructive-foreground text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-destructive text-destructive-foreground text-base font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {deleteBusy ? "Usuwanie…" : "Usuń ofertę"}
               </button>
