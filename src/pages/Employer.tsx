@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { createFallbackCandidate } from "@/data/defaults";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Briefcase, Plus, Users, Trash2, Eye, ChevronDown, ChevronUp,
-  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe,
+  BarChart3, Zap, Layers, UserCheck, EyeOff, Globe, ArrowLeft, Inbox,
 } from "lucide-react";
 import { type Job, type Candidate, type MatchResult, type EnrichedEmployerApplication, getActivityLabel, getAllSkills } from "@/domain/models";
 import MatchBadge from "@/components/MatchBadge";
@@ -53,7 +53,8 @@ const Employer = () => {
   const appActions = useEmployerApplicationActions(refetch);
   const messaging = useEmployerMessages(user?.id);
 
-  const [expandedJob, setExpandedJob] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<{ candidate: Candidate; match: MatchResult; applicationStatus?: ApplicationStatus } | null>(null);
   const [pendingShortlist, setPendingShortlist] = useState<{ app: EnrichedEmployerApplication; jobId: string; jobTitle: string } | null>(null);
