@@ -651,15 +651,6 @@ function buildHtml(c: Candidate): string {
       ${skillsBlock}
       ${langsBlock}
       ${expectBlock}
-
-      <div class="cv-side-footer">
-        <div class="cv-footer-brand">
-          <img src="${jobswipeLogo}" alt="JobSwipe" class="cv-footer-logo" />
-          <span class="cv-footer-name">JobSwipe.pl</span>
-        </div>
-        <div class="cv-footer-tag">Wygenerowane przez JobSwipe.pl</div>
-        <div class="cv-footer-url">jobswipe.pl</div>
-      </div>
     </aside>
 
     <main class="cv-main">
