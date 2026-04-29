@@ -671,6 +671,11 @@ function buildHtml(c: Candidate): string {
 
       ${expBlock}
       ${eduBlock}
+
+      <div class="cv-doc-footer">
+        <img src="${jobswipeLogo}" alt="JobSwipe" class="cv-doc-footer-logo" />
+        <span>Wygenerowane przez <strong>JobSwipe.pl</strong></span>
+      </div>
     </main>
   `;
 }
