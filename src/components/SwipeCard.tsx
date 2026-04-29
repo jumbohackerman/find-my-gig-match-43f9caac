@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { MapPin, Briefcase, Sparkles, Users, ListChecks, Clock, ChevronRight, Shield, GraduationCap, Building2, Gift, CalendarDays, Languages } from "lucide-react";
+import { MapPin, Briefcase, Sparkles, Users, ListChecks, Clock, ChevronRight, Shield, GraduationCap, Building2, Gift } from "lucide-react";
 import MatchBadge from "@/components/MatchBadge";
 import { timeAgo } from "@/lib/timeAgo";
 import type { Job } from "@/domain/models";
