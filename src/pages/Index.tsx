@@ -474,20 +474,7 @@ const Index = () => {
                 ) : (
                   <>
                     <div className="browse-card-stage relative flex-1 min-h-0">
-                      {/* Subtle ambient glow behind the card stack — clipped to stage to avoid scrollbars */}
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 pointer-events-none overflow-hidden"
-                      >
-                        <div
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[115%] blur-3xl"
-                          style={{
-                            background:
-                              "radial-gradient(ellipse 50% 45% at 20% 80%, hsl(var(--primary) / 0.45), transparent 65%), radial-gradient(ellipse 50% 45% at 80% 20%, hsl(var(--accent) / 0.45), transparent 65%)",
-                          }}
-                        />
-                      </div>
-                      <div className="browse-card-frame relative">
+                      <div className="browse-card-frame">
                         <AnimatePresence initial={false}>
                           {remainingJobs.slice(0, 2).map((job, index) => (
                             <SwipeCard
