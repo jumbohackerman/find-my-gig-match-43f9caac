@@ -400,9 +400,13 @@ const Employer = () => {
         <AnimatePresence>
           {showForm && (
             <JobPostForm
-              onSubmit={handleStructuredSubmit}
-              onCancel={() => setShowForm(false)}
+              onSubmit={async (data) => {
+                await handleStructuredSubmit(data);
+                setDuplicateSource(null);
+              }}
+              onCancel={closeForm}
               submitting={submitting}
+              initialData={duplicateSource || undefined}
             />
           )}
         </AnimatePresence>
