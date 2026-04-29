@@ -477,7 +477,7 @@ const Index = () => {
                       {/* Subtle ambient glow behind the card stack */}
                       <div
                         aria-hidden
-                        className="absolute -inset-x-12 -inset-y-16 bg-gradient-to-tr from-primary/10 via-transparent to-accent/10 rounded-[2rem] blur-3xl pointer-events-none -z-10"
+                        className="absolute -inset-x-16 -inset-y-20 bg-gradient-to-tr from-primary/25 via-primary/5 to-accent/25 rounded-[2rem] blur-3xl pointer-events-none -z-10"
                       />
                       <div className="browse-card-frame relative">
                         <AnimatePresence initial={false}>
