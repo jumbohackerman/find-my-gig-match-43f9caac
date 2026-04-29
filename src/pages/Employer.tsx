@@ -442,11 +442,18 @@ const Employer = () => {
                 : null;
 
               return (
-                <button
+                <div
                   key={job.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedJobId(job.id)}
-                  className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedJobId(job.id);
+                    }
+                  }}
+                  className={`w-full text-left rounded-xl border p-3 transition-colors cursor-pointer ${
                     isSelected
                       ? "bg-primary/10 border-primary/40 shadow-soft"
                       : "bg-secondary/30 border-border hover:bg-secondary/60"
@@ -464,6 +471,18 @@ const Employer = () => {
                       <p className="text-sm font-semibold text-foreground truncate">{job.title}</p>
                       <p className="text-xs text-muted-foreground truncate">{job.company} · {job.location}</p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDuplicate(job);
+                      }}
+                      className="p-1 -m-1 rounded hover:bg-primary/15 text-muted-foreground hover:text-primary transition-colors shrink-0"
+                      title="Duplikuj ofertę"
+                      aria-label={`Duplikuj ofertę ${job.title}`}
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                   <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -488,7 +507,7 @@ const Employer = () => {
                       </span>
                     </div>
                   )}
-                </button>
+                </div>
               );
             };
 
